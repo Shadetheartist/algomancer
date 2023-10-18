@@ -2,7 +2,16 @@
 
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+
+type Target = i32;
+
+#[derive(Serialize, Deserialize, Clone)]
+enum Effect {
+    Damage { target: Target, amount: i32 },
+    Heal { target: Target, amount: i32 },
+    Special(SpecialEffect),
+}
 
 trait StateMutator {
     fn name(&self) -> &str;
@@ -10,28 +19,54 @@ trait StateMutator {
     fn mutate_state(&self, _: &mut State);
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 struct SpecialEffect {
-    effect_number: i32
+    effect_number: i32,
 }
 
 impl StateMutator for SpecialEffect {
     fn name(&self) -> &str {
-        "Special Effect"
+        "Special"
     }
 
     fn explain(&self) -> String {
         format!("Sets the game step to {}", self.effect_number)
     }
 
-    fn mutate_state(&self, state: &mut State){
+    fn mutate_state(&self, state: &mut State) {
         state.step = self.effect_number
+    }
+}
+
+impl StateMutator for Effect {
+    fn name(&self) -> &str {
+        match self {
+            Effect::Special { .. } => "Special",
+            Effect::Damage { .. } => "Damage",
+            Effect::Heal { .. } => "Heal"
+        }
+    }
+
+    fn explain(&self) -> String {
+        match self {
+            Effect::Special(effect) => format!("Sets the game step to {}", effect.effect_number),
+            Effect::Damage { amount, .. } => format!("Deal {} Damage", amount),
+            Effect::Heal { amount, .. } => format!("Heal {} Damage", amount),
+        }
+    }
+
+    fn mutate_state(&self, state: &mut State) {
+        match self {
+            Effect::Special(effect) => effect.mutate_state(state),
+            Effect::Heal { amount, .. } => state.step -= amount,
+            Effect::Damage { amount, .. } => state.step += amount,
+        }
     }
 }
 
 #[derive(Hash, Eq, PartialEq, Clone)]
 struct State {
-    step: i32
+    step: i32,
 }
 
 impl State {
@@ -48,52 +83,97 @@ impl State {
     }
 }
 
-
-struct Game<'a>  {
-    mutation_history: Vec<Box<dyn StateMutator+'a>>,
-    state: State
+struct EffectHistoryEntry {
+    effect: Box<Effect>,
+    serialized: Vec<u8>,
 }
 
-impl<'a> Game<'a> {
-    fn new() -> Game<'a> {
+struct Game {
+    effect_history: Vec<EffectHistoryEntry>,
+    state: State,
+}
+
+impl Game {
+    fn new() -> Game {
         Game {
-            mutation_history: Vec::new(),
-            state: State::new()
+            effect_history: Vec::new(),
+            state: State::new(),
         }
     }
 
     fn print_history(&self) {
-        for mhi in &self.mutation_history {
-            println!("Applied mutator \"{}\" ({})", mhi.name(), mhi.explain());
+        println!();
+        println!("Action History ({})", self.effect_history.len());
+        for (idx, effect) in self.effect_history.iter().enumerate() {
+            println!("\t{idx} Applied mutator \"{}\" ({})", effect.effect.name(), effect.effect.explain());
         }
     }
 
-    fn apply_mutator(&mut self, mutator: impl StateMutator+Clone+'a) {
-        println!("{} Applying mutator \"{}\" ({})", self.state.get_hash_string(), mutator.name(), mutator.explain());
+    fn apply_effect(&mut self, effect: Effect) {
+        print!("Applying mutator \"{}\" ({}) {}", effect.name(), effect.explain(), self.state.get_hash_string());
 
         // clone state and apply the mutation
         let mut state = self.state.clone();
 
         // apply the mutation to the state clone
-        mutator.mutate_state(&mut state);
+        effect.mutate_state(&mut state);
+
+        if self.state == state {
+            panic!("effect [{}] did not mutate the state", effect.name())
+        }
+
+        let serialized = serde_json::to_vec(&effect).expect("serialized effect");
 
         // store the mutation in history
-        self.mutation_history.push(Box::new(mutator));
+        self.effect_history.push(EffectHistoryEntry {
+            effect: Box::new(effect),
+            serialized,
+        });
+
 
         // set current state to mutated clone of state
         self.state = state;
+
+        // print resulting game hash
+        println!(" -> {}", self.state.get_hash_string());
     }
 }
 
 
 fn main() {
-
     let mut game = Game::new();
 
-    game.apply_mutator(SpecialEffect{ effect_number: 11 });
-    game.apply_mutator(SpecialEffect{ effect_number: 9 });
-    game.apply_mutator(SpecialEffect{ effect_number: 7 });
-    game.apply_mutator(SpecialEffect{ effect_number: 5 });
+    game.apply_effect(Effect::Special(SpecialEffect { effect_number: 11 }));
+    game.apply_effect(Effect::Heal { amount: 3, target: 1 });
+    game.apply_effect(Effect::Damage { amount: 5, target: 1 });
 
-    game.print_history()
+    game.print_history();
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::Game;
+    use super::Effect;
+    use super::SpecialEffect;
+
+    #[test]
+    fn test_action_replay() {
+        // apply effects to a game, each mutating its state somehow
+        let mut game = Game::new();
+        game.apply_effect(Effect::Special(SpecialEffect { effect_number: 11 }));
+        game.apply_effect(Effect::Heal { amount: 3, target: 1 });
+        game.apply_effect(Effect::Damage { amount: 5, target: 1 });
+
+        // use the action history from game 1 on game 2
+        let mut game2 = Game::new();
+        for entry in game.effect_history.iter() {
+            let effect = *entry.effect.clone();
+            game2.apply_effect(effect)
+        }
+
+        // after applying the effects in action replay to another game instance,
+        // we should end at the same state
+        assert_eq!(game.state.get_hash_string(), game2.state.get_hash_string());
+    }
 }

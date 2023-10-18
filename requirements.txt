@@ -1,4 +1,5 @@
 
+
 Player view info filtering
 
 Action history
@@ -14,6 +15,7 @@ Cards
     - procedural macros to enable automatic effect ids?
 
 Determinism
+    - random seeding initial state
     - game state hashing
     - f(s, a) = s'
     - Replayability
