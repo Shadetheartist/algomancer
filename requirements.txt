@@ -1,0 +1,27 @@
+
+Player view info filtering
+
+Action history
+
+n>2 Players
+
+Zones
+    - card zones
+    - player zones
+
+Cards
+    - compile time guarantees from macros?
+    - procedural macros to enable automatic effect ids?
+
+Determinism
+    - game state hashing
+    - f(s, a) = s'
+    - Replayability
+        - Initial state + list of actions = State N
+
+game states database
+    - input hash gets a game state
+    - serialization of game states and actions
+
+Optimizations
+    - computed fields
