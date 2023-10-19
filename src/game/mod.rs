@@ -29,7 +29,7 @@ impl StateMutator for SpecialEffect {
         "Special"
     }
 
-    fn prepare(&self, state: &mut state::State) -> Self {
+    fn prepare(&self, _: &mut state::State) -> Self {
         SpecialEffect {
             effect_number: self.effect_number
         }
@@ -183,7 +183,8 @@ mod tests {
         game.apply_effect(Effect::Damage { amount: 1, target: 1 });
         game2.apply_effect(Effect::Damage { amount: 1, target: 1 });
 
+        // game state hashes should still be the same
+        assert_eq!(game.state.get_hash_string(), game2.state.get_hash_string());
 
-        // if they
     }
 }
