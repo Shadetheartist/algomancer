@@ -1,5 +1,5 @@
 use std::cell::RefCell;
-use crate::game::{GameOptions, PlayMode};
+use crate::game::{DeckMode, GameOptions, PlayMode};
 
 mod game;
 
@@ -7,7 +7,8 @@ fn main() {
     let options = GameOptions{
         seed: game::state::AlgomancerRngSeed::default(),
         num_players: 0,
-        play_mode: PlayMode::FFA,
+        play_mode: PlayMode::Teams,
+        deck_mode: DeckMode::CommonDeck,
     };
 
     let game = game::Game::new(&options);

@@ -20,9 +20,16 @@ pub enum PlayMode {
     Teams
 }
 
+#[derive(Clone)]
+pub enum DeckMode {
+    CommonDeck,
+    PlayerDecks
+}
+
 pub struct Game {
 
     play_mode: PlayMode,
+    deck_mode: DeckMode,
 
     // effect history is separate from the game state, so that we don't have to
     // consider the effect history in the state hash, this isn't a blockchain, thank god
@@ -34,12 +41,14 @@ pub struct GameOptions {
     pub seed: AlgomancerRngSeed,
     pub num_players: i32,
     pub play_mode: PlayMode,
+    pub deck_mode: DeckMode,
 }
 
 impl Game {
     pub fn new(options: &GameOptions) -> Game {
         let mut game = Game {
             play_mode: options.play_mode.clone(),
+            deck_mode: options.deck_mode.clone(),
             effect_history: Vec::new(),
             state: state::State::new(options.seed),
         };
