@@ -3,14 +3,6 @@ mod effect;
 
 type ObjectId = i32;
 
-trait StateMutator {
-    fn name(&self) -> &str;
-    // not sure i like this pattern of preparation
-    fn prepare(&self, state: &mut state::State) -> Self;
-    fn explain(&self) -> String;
-    fn mutate_state(&self, state: &mut state::State);
-}
-
 struct EffectHistoryEntry {
     effect: Box<effect::Effect>,
 }

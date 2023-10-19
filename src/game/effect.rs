@@ -1,7 +1,7 @@
 pub mod special;
 
 use serde::{Deserialize, Serialize};
-use super::{ObjectId, state, StateMutator};
+use super::{ObjectId, state};
 use special::SpecialEffect;
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -12,18 +12,18 @@ pub enum Effect {
     Special(SpecialEffect),
 }
 
-impl StateMutator for Effect {
+impl Effect {
 
-    fn name(&self) -> &str {
+    pub fn name(&self) -> &str {
         match self {
-            Effect::Special { .. } => "Special",
+            Effect::Special(effect) => effect.name(),
             Effect::Damage { .. } => "Damage",
             Effect::RandomDamage { .. } => "Random Damage",
             Effect::Heal { .. } => "Heal"
         }
     }
 
-    fn prepare(&self, state: &mut state::State) -> Effect {
+    pub fn prepare(&self, state: &mut state::State) -> Effect {
         match self {
             Effect::RandomDamage { min, max, target, .. } => {
                 let amount = state.rand.gen_range(*min..*max);
@@ -34,9 +34,9 @@ impl StateMutator for Effect {
         }
     }
 
-    fn explain(&self) -> String {
+    pub fn explain(&self) -> String {
         match self {
-            Effect::Special(effect) => format!("Sets the game step to {}", effect.effect_number),
+            Effect::Special(effect) => effect.explain(),
             Effect::Damage { amount, .. } => format!("Deal {} Damage", amount),
             // design issue - the random value should probably be resolved before this part
             Effect::RandomDamage { prepared_amount, max, min, .. } => format!("Deals Between {} and {} Damage [{}]", min, max, prepared_amount),
@@ -44,7 +44,7 @@ impl StateMutator for Effect {
         }
     }
 
-    fn mutate_state(&self, state: &mut state::State) {
+    pub fn mutate_state(&self, state: &mut state::State) {
         match self {
             Effect::Special(effect) => effect.mutate_state(state),
             Effect::Heal { amount, .. } => state.step -= amount,

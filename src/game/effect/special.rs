@@ -1,27 +1,23 @@
 use serde::{Deserialize, Serialize};
-use crate::game::{state, StateMutator};
+use crate::game::{state};
 
+// this special effect demonstrates how to extract code out of the effects enum
+// this pattern could be solidified in a trait down the road
 #[derive(Clone, Serialize, Deserialize)]
 pub struct SpecialEffect {
     pub effect_number: i32,
 }
 
-impl StateMutator for SpecialEffect {
-    fn name(&self) -> &str {
+impl SpecialEffect {
+    pub fn name(&self) -> &str {
         "Special"
     }
 
-    fn prepare(&self, _: &mut state::State) -> Self {
-        SpecialEffect {
-            effect_number: self.effect_number
-        }
-    }
-
-    fn explain(&self) -> String {
+    pub fn explain(&self) -> String {
         format!("Sets the game step to {}", self.effect_number)
     }
 
-    fn mutate_state(&self, state: &mut state::State) {
+    pub fn mutate_state(&self, state: &mut state::State) {
         state.step = self.effect_number
     }
 }
