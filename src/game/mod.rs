@@ -1,8 +1,9 @@
-use crate::game::card::Deck;
+use crate::game::action::Action;
 use crate::game::player::Player;
 use crate::game::state::{AlgomancerRngSeed, DeckMode, PlayMode};
 
 pub mod state;
+pub mod action;
 mod effect;
 mod card;
 mod zone;
@@ -15,8 +16,6 @@ type ObjectId = i32;
 struct EffectHistoryEntry {
     effect: Box<effect::Effect>,
 }
-
-
 
 pub struct GameOptions {
     pub seed: AlgomancerRngSeed,
@@ -47,10 +46,7 @@ impl Game {
         game
     }
 
-    // the state machine takes a step forward
-    pub fn step(&self) {
-
-    }
+    pub fn apply_action(&self, action: Action) {}
 
     pub fn print_history(&self) {
         println!();
@@ -99,11 +95,11 @@ mod tests {
 
     #[test]
     fn test_action_replay() {
-        let game_options = GameOptions{
+        let game_options = GameOptions {
             seed: AlgomancerRngSeed::default(),
             num_players: 8,
             play_mode: PlayMode::Teams,
-            deck_mode: DeckMode::CommonDeck
+            deck_mode: DeckMode::CommonDeck,
         };
 
         // apply effect to a game, each mutating its state somehow
@@ -133,11 +129,11 @@ mod tests {
 
     #[test]
     fn test_serialization() {
-        let game_options = GameOptions{
+        let game_options = GameOptions {
             seed: AlgomancerRngSeed::default(),
             num_players: 8,
             play_mode: PlayMode::Teams,
-            deck_mode: DeckMode::CommonDeck
+            deck_mode: DeckMode::CommonDeck,
         };
 
         // apply effect to a game, each mutating its state somehow

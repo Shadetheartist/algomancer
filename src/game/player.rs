@@ -30,4 +30,11 @@ impl Player {
             }
         }
     }
+
+    // this should return the left & right neighboring opponents
+    // pretend the player list is wrapped into a circle.
+    // the player's allies are transparent to them, so only opponents can be 'seen'.
+    pub fn neighbors() -> Vec<Player> {
+        todo!()
+    }
 }
