@@ -126,25 +126,32 @@ mod tests {
     #[test]
     fn test_rand_deterministic(){
 
-
         // create a rng instances
         let mut r1 = setup_rand();
         let mut r2 = setup_rand();
 
         let min = 0;
         let max = 1000000;
+        let n = 10;
 
+        for _ in 0..n {
+            let r1_val = r1.gen_range(min..max);
+            let r2_val = r2.gen_range(min..max);
+
+            // these should still be equal
+            assert_eq!(r1_val, r2_val);
+        }
+
+        // one generation to make sure things will be different
         let r1_val = r1.gen_range(min..max);
+
+        // do one more generation on r2 than on r1
         let r2_val = r2.gen_range(min..max);
-
-        // these should still be equal
-        assert_eq!(r1_val, r2_val);
-
-        // do one more generation on r2
         let r2_val = r2.gen_range(min..max);
 
         // so this should not be equal
         assert_ne!(r1_val, r2_val);
+
     }
 
     #[test]
@@ -175,5 +182,6 @@ mod tests {
 
         // so this should not be equal
         assert_ne!(r1_hash, r3_hash);
+
     }
 }
