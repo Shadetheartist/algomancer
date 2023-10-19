@@ -37,5 +37,9 @@ Objects
 
 Effects
     - target objects
+    - preparation stage
+        came across this idea when implementing an effect which used a random value.
+        probably the parameters in effect need to be fully resolved before they are applied to the game state.
+        So like, a random, or X, damage effect would turn into a normal damage effect with a concrete value.
 
 Webassembly

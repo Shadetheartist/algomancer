@@ -7,8 +7,7 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dff0511b-cadf-480a-a468-34b33e20bec8" name="Changes" comment="jetbrains wants my brains">
-      <change beforePath="$PROJECT_DIR$/.idea/algomancer.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/algomancer.iml" afterDir="false" />
+    <list default="true" id="dff0511b-cadf-480a-a468-34b33e20bec8" name="Changes" comment="considerations about rand">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
@@ -90,7 +89,7 @@
       <option name="presentableId" value="Default" />
       <updated>1697676520805</updated>
       <workItem from="1697676521944" duration="592000" />
-      <workItem from="1697677120347" duration="2559000" />
+      <workItem from="1697677120347" duration="7605000" />
     </task>
     <task id="LOCAL-00001" summary="updated .idea">
       <option name="closed" value="true" />
@@ -116,7 +115,15 @@
       <option name="project" value="LOCAL" />
       <updated>1697677468562</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="considerations about rand">
+      <option name="closed" value="true" />
+      <created>1697679697890</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1697679697890</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -126,7 +133,8 @@
     <MESSAGE value="updated .idea" />
     <MESSAGE value="ordeal getting jetbrains to work after simply renaming the project folder is done" />
     <MESSAGE value="jetbrains wants my brains" />
-    <option name="LAST_COMMIT_MESSAGE" value="jetbrains wants my brains" />
+    <MESSAGE value="considerations about rand" />
+    <option name="LAST_COMMIT_MESSAGE" value="considerations about rand" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

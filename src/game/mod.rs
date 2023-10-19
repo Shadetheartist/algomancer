@@ -1,13 +1,12 @@
 pub mod state;
 
-use rand::{Rng, RngCore};
 use serde::{Deserialize, Serialize};
 
 type ObjectId = i32;
 
 #[derive(Serialize, Deserialize, Clone)]
 enum Effect {
-    RandomDamage { target: ObjectId, min: i32, max: i32 },
+    RandomDamage { target: ObjectId, min: i32, max: i32, prepared_amount: i32 },
     Damage { target: ObjectId, amount: i32 },
     Heal { target: ObjectId, amount: i32 },
     Special(SpecialEffect),
@@ -15,8 +14,9 @@ enum Effect {
 
 trait StateMutator {
     fn name(&self) -> &str;
+    fn prepare(&self, state: &mut state::State) -> Self;
     fn explain(&self) -> String;
-    fn mutate_state(&self, _: &mut state::State);
+    fn mutate_state(&self, state: &mut state::State);
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -29,6 +29,12 @@ impl StateMutator for SpecialEffect {
         "Special"
     }
 
+    fn prepare(&self, state: &mut state::State) -> Self {
+        SpecialEffect {
+            effect_number: self.effect_number
+        }
+    }
+
     fn explain(&self) -> String {
         format!("Sets the game step to {}", self.effect_number)
     }
@@ -39,6 +45,7 @@ impl StateMutator for SpecialEffect {
 }
 
 impl StateMutator for Effect {
+
     fn name(&self) -> &str {
         match self {
             Effect::Special { .. } => "Special",
@@ -48,12 +55,23 @@ impl StateMutator for Effect {
         }
     }
 
+    fn prepare(&self, state: &mut state::State) -> Effect {
+        match self {
+            Effect::RandomDamage { min, max, target, .. } => {
+                let amount = state.rand.gen_range(*min..*max);
+                let effect = Effect::Damage { amount, target: *target };
+                effect
+            },
+            _ => self.clone()
+        }
+    }
+
     fn explain(&self) -> String {
         match self {
             Effect::Special(effect) => format!("Sets the game step to {}", effect.effect_number),
             Effect::Damage { amount, .. } => format!("Deal {} Damage", amount),
             // design issue - the random value should probably be resolved before this part
-            Effect::RandomDamage { max, min, .. } => format!("Deals Between {} and {} Damage", min, max),
+            Effect::RandomDamage { prepared_amount, max, min, .. } => format!("Deals Between {} and {} Damage [{}]", min, max, prepared_amount),
             Effect::Heal { amount, .. } => format!("Heal {} Damage", amount),
         }
     }
@@ -62,8 +80,8 @@ impl StateMutator for Effect {
         match self {
             Effect::Special(effect) => effect.mutate_state(state),
             Effect::Heal { amount, .. } => state.step -= amount,
-            Effect::RandomDamage { max, min, .. } => {
-                state.step -= state.rand.gen_range(min..max)
+            Effect::RandomDamage { prepared_amount, .. } => {
+                state.step -= prepared_amount
             },
             Effect::Damage { amount, .. } => state.step += amount,
         }
@@ -81,7 +99,7 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(seed: [u8; 32], num_players: i32) -> Game {
+    pub fn new(seed: [u8; 16], num_players: i32) -> Game {
         let mut game = Game {
             effect_history: Vec::new(),
             state: state::State::new(seed),
@@ -103,10 +121,15 @@ impl Game {
     }
 
     fn apply_effect(&mut self, effect: Effect) {
-        print!("Applying mutator \"{}\" ({}) {}", effect.name(), effect.explain(), self.state.get_hash_string());
 
         // clone state and apply the mutation
         let mut state = self.state.clone();
+
+        println!("Preparing Effect \"{}\"", effect.name());
+
+        let effect = effect.prepare(&mut self.state);
+
+        print!("Applying mutator \"{}\" ({}) {}", effect.name(), effect.explain(), self.state.get_hash_string());
 
         // apply the mutation to the state clone
         effect.mutate_state(&mut state);
@@ -136,13 +159,14 @@ mod tests {
 
     #[test]
     fn test_action_replay() {
-        let seed = [0u8; 32];
+        let seed = [0u8; 16];
         let num_players = 123;
         // apply effects to a game, each mutating its state somehow
         let mut game = Game::new(seed, num_players);
         game.apply_effect(Effect::Special(SpecialEffect { effect_number: 11 }));
         game.apply_effect(Effect::Heal { amount: 3, target: 1 });
         game.apply_effect(Effect::Damage { amount: 5, target: 1 });
+        game.apply_effect(Effect::RandomDamage { max: 10, min: 1, target: 1, prepared_amount: 0 });
 
         // use the action history from game 1 on game 2
         let mut game2 = Game::new(seed, num_players);
