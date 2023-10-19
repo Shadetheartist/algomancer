@@ -1,99 +1,23 @@
 pub mod state;
-
-use serde::{Deserialize, Serialize};
+pub mod effect;
 
 type ObjectId = i32;
 
-#[derive(Serialize, Deserialize, Clone)]
-enum Effect {
-    RandomDamage { target: ObjectId, min: i32, max: i32, prepared_amount: i32 },
-    Damage { target: ObjectId, amount: i32 },
-    Heal { target: ObjectId, amount: i32 },
-    Special(SpecialEffect),
-}
-
 trait StateMutator {
     fn name(&self) -> &str;
+    // not sure i like this pattern of preparation
     fn prepare(&self, state: &mut state::State) -> Self;
     fn explain(&self) -> String;
     fn mutate_state(&self, state: &mut state::State);
 }
 
-#[derive(Clone, Serialize, Deserialize)]
-struct SpecialEffect {
-    effect_number: i32,
-}
-
-impl StateMutator for SpecialEffect {
-    fn name(&self) -> &str {
-        "Special"
-    }
-
-    fn prepare(&self, _: &mut state::State) -> Self {
-        SpecialEffect {
-            effect_number: self.effect_number
-        }
-    }
-
-    fn explain(&self) -> String {
-        format!("Sets the game step to {}", self.effect_number)
-    }
-
-    fn mutate_state(&self, state: &mut state::State) {
-        state.step = self.effect_number
-    }
-}
-
-impl StateMutator for Effect {
-
-    fn name(&self) -> &str {
-        match self {
-            Effect::Special { .. } => "Special",
-            Effect::Damage { .. } => "Damage",
-            Effect::RandomDamage { .. } => "Random Damage",
-            Effect::Heal { .. } => "Heal"
-        }
-    }
-
-    fn prepare(&self, state: &mut state::State) -> Effect {
-        match self {
-            Effect::RandomDamage { min, max, target, .. } => {
-                let amount = state.rand.gen_range(*min..*max);
-                let effect = Effect::Damage { amount, target: *target };
-                effect
-            },
-            _ => self.clone()
-        }
-    }
-
-    fn explain(&self) -> String {
-        match self {
-            Effect::Special(effect) => format!("Sets the game step to {}", effect.effect_number),
-            Effect::Damage { amount, .. } => format!("Deal {} Damage", amount),
-            // design issue - the random value should probably be resolved before this part
-            Effect::RandomDamage { prepared_amount, max, min, .. } => format!("Deals Between {} and {} Damage [{}]", min, max, prepared_amount),
-            Effect::Heal { amount, .. } => format!("Heal {} Damage", amount),
-        }
-    }
-
-    fn mutate_state(&self, state: &mut state::State) {
-        match self {
-            Effect::Special(effect) => effect.mutate_state(state),
-            Effect::Heal { amount, .. } => state.step -= amount,
-            Effect::RandomDamage { prepared_amount, .. } => {
-                state.step -= prepared_amount
-            },
-            Effect::Damage { amount, .. } => state.step += amount,
-        }
-    }
-}
-
-
 struct EffectHistoryEntry {
-    effect: Box<Effect>
+    effect: Box<effect::Effect>,
 }
 
 pub struct Game {
+    // effect history is separate from the game state, so that we don't have to
+    // consider the effect history in the state hash, this isn't a blockchain, thank god
     effect_history: Vec<EffectHistoryEntry>,
     state: state::State,
 }
@@ -120,7 +44,7 @@ impl Game {
         }
     }
 
-    fn apply_effect(&mut self, effect: Effect) {
+    fn apply_effect(&mut self, effect: effect::Effect) {
 
         // clone state and apply the mutation
         let mut state = self.state.clone();
@@ -154,14 +78,14 @@ impl Game {
 #[cfg(test)]
 mod tests {
     use super::Game;
-    use super::Effect;
-    use super::SpecialEffect;
+    use super::effect::special::SpecialEffect;
+    use super::effect::Effect;
 
     #[test]
     fn test_action_replay() {
         let seed = [0u8; 16];
         let num_players = 123;
-        // apply effects to a game, each mutating its state somehow
+        // apply effect to a game, each mutating its state somehow
         let mut game = Game::new(seed, num_players);
         game.apply_effect(Effect::Special(SpecialEffect { effect_number: 11 }));
         game.apply_effect(Effect::Heal { amount: 3, target: 1 });
@@ -175,7 +99,7 @@ mod tests {
             game2.apply_effect(effect)
         }
 
-        // after applying the effects in action replay to another game instance,
+        // after applying the effect in action replay to another game instance,
         // we should end at the same state
         assert_eq!(game.state.get_hash_string(), game2.state.get_hash_string());
 
@@ -185,6 +109,5 @@ mod tests {
 
         // game state hashes should still be the same
         assert_eq!(game.state.get_hash_string(), game2.state.get_hash_string());
-
     }
 }

@@ -43,6 +43,7 @@ Objects
     - targetable, target filtering
 
 Effects
+    - triggered effects
     - target objects
     - preparation stage
         came across this idea when implementing an effect which used a random value.
