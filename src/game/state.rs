@@ -46,8 +46,11 @@ impl Hash for AlgomancerRng {
         state.write(str.as_slice())
     }
 
-    fn hash_slice<H: Hasher>(_data: &[Self], _state: &mut H) where Self: Sized {
-        todo!()
+    fn hash_slice<H: Hasher>(data: &[Self], state: &mut H) where Self: Sized {
+        for rng in data {
+            let str = serde_json::to_vec(&rng.inner).expect("serialized rng inner to json");
+            state.write(str.as_slice())
+        }
     }
 }
 
