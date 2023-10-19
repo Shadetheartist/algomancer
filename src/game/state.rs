@@ -119,7 +119,8 @@ mod tests {
         let serialized = serde_json::to_string(&state).expect("stringified state json");
         let deserialized: State = serde_json::from_str(&serialized.as_str()).expect("deserialized state object");
 
-        assert_eq!(state.get_hash_string(), deserialized.get_hash_string())
+        assert_eq!(state.get_hash_string(), deserialized.get_hash_string());
+        assert_eq!(state, deserialized);
     }
 
 
