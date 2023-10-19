@@ -1,8 +1,10 @@
 pub mod special;
 
 use serde::{Deserialize, Serialize};
-use super::{ObjectId, state};
+
 use special::SpecialEffect;
+use crate::game::state;
+use crate::game::state::ObjectId;
 
 // this builder pattern allows for effect preparation before application to the state
 // for instance, if an effect would have a random damage value, the randomness is resolved here

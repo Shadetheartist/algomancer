@@ -1,22 +1,15 @@
 use serde::{Deserialize, Serialize};
 use crate::game::action::Action;
-use crate::game::player::Player;
-use crate::game::state::{AlgomancerRngSeed, DeckMode, PlayMode};
+use crate::game::state::player::Player;
+use crate::game::state::{AlgomancerRngSeed, DeckMode, effect, PlayMode};
 
 pub mod state;
-pub mod action;
-mod effect;
-mod card;
-mod zone;
-mod player;
-mod progression;
-mod resource;
+mod action;
 
-type ObjectId = i32;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct EffectHistoryEntry {
-    effect: Box<effect::Effect>,
+    effect: Box<state::effect::Effect>,
 }
 
 pub struct GameOptions {
@@ -90,11 +83,11 @@ impl Game {
 
 #[cfg(test)]
 mod tests {
-    use crate::game::effect::EffectBuilder;
+    use crate::game::state::effect::EffectBuilder;
     use crate::game::state::DeckMode;
     use super::{Game, GameOptions, PlayMode};
-    use super::effect::special::SpecialEffect;
-    use super::effect::Effect;
+    use super::state::effect::special::SpecialEffect;
+    use super::state::effect::Effect;
     use super::state::AlgomancerRngSeed;
 
     #[test]

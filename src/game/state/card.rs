@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
-use crate::game::effect::EffectBuilder;
-use crate::game::resource::Costs;
+use crate::game::state::effect::EffectBuilder;
+use crate::game::state::resource::Costs;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Card {

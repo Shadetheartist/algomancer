@@ -4,9 +4,17 @@ use rand::distributions::uniform::{SampleRange, SampleUniform};
 use rand::{Rng, SeedableRng};
 use rand_pcg;
 use serde::{Deserialize, Serialize};
-use crate::game::card::Deck;
+use crate::game::state::card::Deck;
+use crate::game::state::player::Player;
 
-use crate::game::player::Player;
+pub mod effect;
+mod card;
+mod zone;
+pub mod player;
+mod progression;
+mod resource;
+
+type ObjectId = i32;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum PlayMode {

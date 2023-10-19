@@ -1,4 +1,4 @@
-use crate::game::player::Player;
+use crate::game::state::player::Player;
 
 // zones/regions area really important as a top level entity
 // objects can only interact with other objects by which zone they're in,
