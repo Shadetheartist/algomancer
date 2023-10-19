@@ -1,6 +1,7 @@
 use crate::game::effect::EffectBuilder;
 use crate::game::resource::Costs;
 
+#[derive(Hash, Eq, PartialEq, Clone)]
 pub struct Card {
     name: String,
     text: String,
@@ -9,11 +10,29 @@ pub struct Card {
 }
 
 // a hand is a collection of cards without an order
+#[derive(Hash, Eq, PartialEq, Clone)]
 pub struct Hand {
-    cards: Vec<Card>,
+    pub cards: Vec<Card>,
+}
+
+impl Hand {
+    pub fn new() -> Hand {
+        Hand {
+            cards: Vec::new()
+        }
+    }
 }
 
 // a deck is a collection of cards in some order
+#[derive(Hash, Eq, PartialEq, Clone)]
 pub struct Deck {
-    cards: Vec<Card>,
+    pub cards: Vec<Card>,
+}
+
+impl Deck {
+    pub fn new() -> Deck {
+        Deck {
+            cards: Vec::new()
+        }
+    }
 }

@@ -1,5 +1,5 @@
 
-#[derive(Clone)]
+#[derive(Hash, Eq, PartialEq, Clone)]
 pub enum Resource {
     Fire,
     Earth,
@@ -8,7 +8,7 @@ pub enum Resource {
     Wood,
 }
 
-#[derive(Clone)]
+#[derive(Hash, Eq, PartialEq, Clone)]
 pub struct Cost {
     resource: Resource,
     amount: i32

@@ -3,7 +3,7 @@ use crate::game::{state};
 
 // this special effect demonstrates how to extract code out of the effects enum
 // this pattern could be solidified in a trait down the road
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize, Hash, Eq, PartialEq)]
 pub struct SpecialEffect {
     pub effect_number: i32,
 }

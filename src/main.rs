@@ -1,5 +1,5 @@
-use std::cell::RefCell;
-use crate::game::{DeckMode, GameOptions, PlayMode};
+use crate::game::GameOptions;
+use crate::game::state::{DeckMode, PlayMode};
 
 mod game;
 

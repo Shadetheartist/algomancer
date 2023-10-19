@@ -1,4 +1,6 @@
-use crate::game::state::AlgomancerRngSeed;
+use crate::game::card::Deck;
+use crate::game::player::Player;
+use crate::game::state::{AlgomancerRngSeed, DeckMode, PlayMode};
 
 pub mod state;
 mod effect;
@@ -14,28 +16,7 @@ struct EffectHistoryEntry {
     effect: Box<effect::Effect>,
 }
 
-#[derive(Clone)]
-pub enum PlayMode {
-    FFA,
-    Teams
-}
 
-#[derive(Clone)]
-pub enum DeckMode {
-    CommonDeck,
-    PlayerDecks
-}
-
-pub struct Game {
-
-    play_mode: PlayMode,
-    deck_mode: DeckMode,
-
-    // effect history is separate from the game state, so that we don't have to
-    // consider the effect history in the state hash, this isn't a blockchain, thank god
-    effect_history: Vec<EffectHistoryEntry>,
-    state: state::State,
-}
 
 pub struct GameOptions {
     pub seed: AlgomancerRngSeed,
@@ -44,20 +25,31 @@ pub struct GameOptions {
     pub deck_mode: DeckMode,
 }
 
+pub struct Game {
+    // effect history is separate from the game state, so that we don't have to
+    // consider the effect history in the state hash, this isn't a blockchain, thank god
+    effect_history: Vec<EffectHistoryEntry>,
+    state: state::State,
+}
+
+
 impl Game {
     pub fn new(options: &GameOptions) -> Game {
         let mut game = Game {
-            play_mode: options.play_mode.clone(),
-            deck_mode: options.deck_mode.clone(),
             effect_history: Vec::new(),
-            state: state::State::new(options.seed),
+            state: state::State::new(options.seed, &options.play_mode, &options.deck_mode),
         };
 
         for _ in 0..options.num_players {
-            game.state.players.push(state::Player { health: 30 });
+            game.state.players.push(Player::new());
         }
 
         game
+    }
+
+    // the state machine takes a step forward
+    pub fn step(&self) {
+
     }
 
     pub fn print_history(&self) {

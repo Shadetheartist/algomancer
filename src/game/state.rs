@@ -3,18 +3,20 @@ use std::hash::{Hash, Hasher};
 use rand::distributions::uniform::{SampleRange, SampleUniform};
 use rand::{Rng, SeedableRng};
 use rand_xorshift;
+use crate::game::card::Deck;
 
-// zones area really important as a top level entity
-// objects can only interact with other objects by which zone they're in,
-// with the exception of the main deck, which is not in any zone
+use crate::game::player::Player;
+
 #[derive(Hash, Eq, PartialEq, Clone)]
-pub struct Zone {
-
+pub enum PlayMode {
+    FFA,
+    Teams
 }
 
 #[derive(Hash, Eq, PartialEq, Clone)]
-pub struct Player {
-    pub health: i32
+pub enum DeckMode {
+    CommonDeck,
+    PlayerDecks
 }
 
 #[derive(Eq, PartialEq, Clone)]
@@ -56,14 +58,20 @@ impl Hash for AlgomancerRng {
 
 #[derive(Hash, Eq, PartialEq, Clone)]
 pub struct State {
+    pub play_mode: PlayMode,
+    pub deck_mode: DeckMode,
+    pub common_deck: Deck,
     pub rand: AlgomancerRng,
     pub step: i32,
     pub players: Vec<Player>
 }
 
 impl State {
-    pub fn new(seed: AlgomancerRngSeed) -> State {
+    pub fn new(seed: AlgomancerRngSeed, play_mode: &PlayMode, deck_mode: &DeckMode) -> State {
         State {
+            play_mode: play_mode.clone(),
+            deck_mode: deck_mode.clone(),
+            common_deck: Deck::new(),
             rand: AlgomancerRng::new(seed),
             step: 0,
             players: Vec::new()
