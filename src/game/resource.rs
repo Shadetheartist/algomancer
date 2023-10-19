@@ -1,5 +1,6 @@
+use serde::{Deserialize, Serialize};
 
-#[derive(Hash, Eq, PartialEq, Clone)]
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
 pub enum Resource {
     Fire,
     Earth,
@@ -8,7 +9,7 @@ pub enum Resource {
     Wood,
 }
 
-#[derive(Hash, Eq, PartialEq, Clone)]
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Cost {
     resource: Resource,
     amount: i32

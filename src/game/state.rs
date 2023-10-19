@@ -3,23 +3,24 @@ use std::hash::{Hash, Hasher};
 use rand::distributions::uniform::{SampleRange, SampleUniform};
 use rand::{Rng, SeedableRng};
 use rand_xorshift;
+use serde::{Deserialize, Serialize};
 use crate::game::card::Deck;
 
 use crate::game::player::Player;
 
-#[derive(Hash, Eq, PartialEq, Clone)]
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
 pub enum PlayMode {
     FFA,
     Teams
 }
 
-#[derive(Hash, Eq, PartialEq, Clone)]
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
 pub enum DeckMode {
     CommonDeck,
     PlayerDecks
 }
 
-#[derive(Eq, PartialEq, Clone)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize)]
 pub struct AlgomancerRng {
     inner: rand_xorshift::XorShiftRng
 }
@@ -56,7 +57,7 @@ impl Hash for AlgomancerRng {
     }
 }
 
-#[derive(Hash, Eq, PartialEq, Clone)]
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
 pub struct State {
     pub play_mode: PlayMode,
     pub deck_mode: DeckMode,
@@ -90,7 +91,7 @@ impl State {
 mod tests {
     use std::collections::hash_map::DefaultHasher;
     use std::hash::{Hash, Hasher};
-    use super::{AlgomancerRng, AlgomancerRngSeed};
+    use super::{AlgomancerRng, AlgomancerRngSeed, DeckMode, PlayMode, State};
 
     // utility function to avoid code duplication
     // creates a pre-defined rng instance
@@ -109,6 +110,18 @@ mod tests {
 
         r
     }
+
+    #[test]
+    fn test_state_serialization(){
+        let mut state = State::new(AlgomancerRngSeed::default(), &PlayMode::Teams, &DeckMode::CommonDeck);
+        state.step = 100;
+
+        let serialized = serde_json::to_string(&state).expect("stringified state json");
+        let deserialized: State = serde_json::from_str(&serialized.as_str()).expect("deserialized state object");
+
+        assert_eq!(state.get_hash_string(), deserialized.get_hash_string())
+    }
+
 
     #[test]
     fn test_rand_deterministic(){

@@ -7,7 +7,7 @@ use special::SpecialEffect;
 // this builder pattern allows for effect preparation before application to the state
 // for instance, if an effect would have a random damage value, the randomness is resolved here
 // and the effect is applied as a regular damage effect
-#[derive(Hash, Eq, PartialEq, Clone)]
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
 pub enum EffectBuilder {
     Default(Effect),
     RandomDamage { target: ObjectId, min: i32, max: i32 },
@@ -63,12 +63,12 @@ impl Effect {
 
 #[cfg(test)]
 mod tests {
-    use crate::game::state::{AlgomancerRngSeed, State};
+    use crate::game::state::{AlgomancerRngSeed, DeckMode, PlayMode, State};
     use super::{Effect, EffectBuilder};
 
     #[test]
     fn test_default_effect_builder() {
-        let mut state = State::new(AlgomancerRngSeed::default());
+        let mut state = State::new(AlgomancerRngSeed::default(), &PlayMode::Teams, &DeckMode::CommonDeck);
 
         let damage_amount = 10;
         let effect = EffectBuilder::Default(Effect::Damage { amount: damage_amount, target: 1 }).build_effect(&mut state);
@@ -97,7 +97,8 @@ mod tests {
 
     #[test]
     fn test_random_damage_effect_builder() {
-        let mut state = State::new(AlgomancerRngSeed::default());
+        let mut state = State::new(AlgomancerRngSeed::default(), &PlayMode::Teams, &DeckMode::CommonDeck);
+
         let effect = EffectBuilder::RandomDamage { min: 2, max: 5, target: 1 }.build_effect(&mut state);
 
         match effect {

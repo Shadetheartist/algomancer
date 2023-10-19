@@ -91,6 +91,7 @@ impl Game {
 
 #[cfg(test)]
 mod tests {
+    use crate::game::state::DeckMode;
     use super::{Game, GameOptions, PlayMode};
     use super::effect::special::SpecialEffect;
     use super::effect::Effect;
@@ -102,6 +103,7 @@ mod tests {
             seed: AlgomancerRngSeed::default(),
             num_players: 8,
             play_mode: PlayMode::Teams,
+            deck_mode: DeckMode::CommonDeck
         };
 
         // apply effect to a game, each mutating its state somehow
@@ -135,6 +137,7 @@ mod tests {
             seed: AlgomancerRngSeed::default(),
             num_players: 8,
             play_mode: PlayMode::Teams,
+            deck_mode: DeckMode::CommonDeck
         };
 
         // apply effect to a game, each mutating its state somehow
