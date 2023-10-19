@@ -8,19 +8,19 @@ use crate::game::card::Deck;
 
 use crate::game::player::Player;
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum PlayMode {
     FFA,
     Teams
 }
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum DeckMode {
     CommonDeck,
     PlayerDecks
 }
 
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct AlgomancerRng {
     inner: rand_xorshift::XorShiftRng
 }
@@ -57,7 +57,7 @@ impl Hash for AlgomancerRng {
     }
 }
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct State {
     pub play_mode: PlayMode,
     pub deck_mode: DeckMode,

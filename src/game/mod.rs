@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use crate::game::action::Action;
 use crate::game::player::Player;
 use crate::game::state::{AlgomancerRngSeed, DeckMode, PlayMode};
@@ -13,6 +14,7 @@ mod resource;
 
 type ObjectId = i32;
 
+#[derive(Serialize, Deserialize, Debug)]
 struct EffectHistoryEntry {
     effect: Box<effect::Effect>,
 }
@@ -24,6 +26,7 @@ pub struct GameOptions {
     pub deck_mode: DeckMode,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Game {
     // effect history is separate from the game state, so that we don't have to
     // consider the effect history in the state hash, this isn't a blockchain, thank god
@@ -87,6 +90,7 @@ impl Game {
 
 #[cfg(test)]
 mod tests {
+    use crate::game::effect::EffectBuilder;
     use crate::game::state::DeckMode;
     use super::{Game, GameOptions, PlayMode};
     use super::effect::special::SpecialEffect;
@@ -136,28 +140,46 @@ mod tests {
             deck_mode: DeckMode::CommonDeck,
         };
 
-        // apply effect to a game, each mutating its state somehow
         let mut game = Game::new(&game_options);
-        game.apply_effect(Effect::Special(SpecialEffect { effect_number: 11 }));
-        game.apply_effect(Effect::Heal { amount: 3, target: 1 });
-        game.apply_effect(Effect::Damage { amount: 5, target: 1 });
+        println!("{}", game.state.rand.gen_range(0..1000));
+        println!("{}", game.state.rand.gen_range(0..1000));
+        println!("{}", game.state.rand.gen_range(0..1000));
+        println!("{}", game.state.rand.gen_range(0..1000));
+        println!("{}", game.state.rand.gen_range(0..1000));
+        println!("{}", game.state.rand.gen_range(0..1000));
+        println!("{}", game.state.rand.gen_range(0..1000));
+        println!("{}", game.state.rand.gen_range(0..1000));
+        println!("{}", game.state.rand.gen_range(0..1000));
+        println!("{}", game.state.rand.gen_range(0..1000));
+        println!("{}", game.state.rand.gen_range(0..1000));
+        println!("{}", game.state.rand.gen_range(0..1000));
 
-        // use the action history from game 1 on game 2
-        let mut game2 = Game::new(&game_options);
-        for entry in game.effect_history.iter() {
-            let effect = *entry.effect.clone();
-            game2.apply_effect(effect)
-        }
+        // use a random damage builder so that we are mutating the rand state
+        // we need to make sure that it's serialized properly, so when we resume a game from
+        // one of these states, the rng is seeded and offset the same way
+        let rand_effect_builder = EffectBuilder::RandomDamage {min: 1, max: 100000, target: 1};
 
-        // after applying the effect in action replay to another game instance,
-        // we should end at the same state
-        assert_eq!(game.state.get_hash_string(), game2.state.get_hash_string());
+        // apply the affect to a game
+        let effect = rand_effect_builder.build_effect(&mut game.state);
+        game.apply_effect(effect);
 
-        // apply the same effect to both games
-        game.apply_effect(Effect::Damage { amount: 1, target: 1 });
-        game2.apply_effect(Effect::Damage { amount: 1, target: 1 });
+        // serialize the game
+        let json = serde_json::to_string_pretty(&game).expect("serialized game json");
 
-        // game state hashes should still be the same
-        assert_eq!(game.state.get_hash_string(), game2.state.get_hash_string());
+        // deserialize the game
+        let mut deserialized: Game = serde_json::from_str(json.as_str()).expect("deserialized game");
+
+        assert_eq!(game.state, deserialized.state);
+
+        // apply another random effect to both the original game and the deserialized one
+        let effect = rand_effect_builder.build_effect(&mut game.state);
+        game.apply_effect(effect);
+
+        let effect = rand_effect_builder.build_effect(&mut deserialized.state);
+        deserialized.apply_effect(effect);
+
+        // the random number generator should be the same, and so the modified states should be equal
+        assert_eq!(game.state, deserialized.state);
+
     }
 }

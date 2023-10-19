@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use crate::game::effect::EffectBuilder;
 use crate::game::resource::Costs;
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Card {
     name: String,
     text: String,
@@ -11,7 +11,7 @@ pub struct Card {
 }
 
 // a hand is a collection of cards without an order
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Hand {
     pub cards: Vec<Card>,
 }
@@ -25,7 +25,7 @@ impl Hand {
 }
 
 // a deck is a collection of cards in some order
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Deck {
     pub cards: Vec<Card>,
 }

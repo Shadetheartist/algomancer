@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use crate::game::card::{Deck, Hand};
 use crate::game::state::{DeckMode, State};
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Player {
     health: i32,
     hand: Hand,
