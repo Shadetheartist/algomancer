@@ -29,6 +29,7 @@ game states database
     - serialization of game states and actions
 
 Optimizations
+    - Parallelism (rayon?)
     - computed fields (lazily computed as needed per state)
 
 Objects
@@ -43,3 +44,11 @@ Effects
         So like, a random, or X, damage effect would turn into a normal damage effect with a concrete value.
 
 Webassembly
+
+Documentation Generation
+
+Organization (Obsidian?)
+
+
+
+CI/CD
