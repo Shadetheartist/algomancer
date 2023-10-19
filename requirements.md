@@ -17,14 +17,14 @@ Determinism
     - serializing / deserializing rand
     - game state hashing
     - f(s, a) = s'
-    - Replayability
+    - Replay-ability
         - Initial state + list of actions = State N
         - expand initial 'state + actions' into individual game states for efficient history browsing
 
-game history browser
+game history browser (external application?)
     - move between states recorded in the game's history
 
-game states database
+game states database (external application?)
     - input hash gets a game state
     - serialization of game states and actions
 
@@ -46,9 +46,9 @@ Effects
 Webassembly
 
 Documentation Generation
+    - possibly some way to generate a glossary of effects?
+    - partial rulebook generation?
 
 Organization (Obsidian?)
-
-
 
 CI/CD
