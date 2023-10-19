@@ -8,6 +8,7 @@ Action history
 
 n>2 Players
 - multiple panes for UI (not that we care in this application)
+- players are connected in an n-gon formation, with two neighbors
 
 Zones (this is some sort of top level object)
 - card zones
@@ -42,7 +43,16 @@ Objects
 - have identifiers
 - targetable, target filtering
 
+Progression
+- Steps
+- Phases
+- Priority
+
+Actions
+- a set of effects which are all resolved as a unit
+
 Effects
+- effects go on the stack
 - triggered effects
 - target objects
 - preparation stage
@@ -77,3 +87,4 @@ Input mechanism
 State in general
 - at any point, the immutable state should basically be valid. A good way to think about it is around the framing 
   device of 'if i disconnected from the game at this moment, and reconnected, would the game show me the same view?'
+- game has an async nature during some steps, in general, async issues are resolved as first-come-first-serve
