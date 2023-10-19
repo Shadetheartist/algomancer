@@ -1,5 +1,3 @@
-
-
 Player view info filtering
 
 Action history
@@ -20,10 +18,21 @@ Determinism
     - f(s, a) = s'
     - Replayability
         - Initial state + list of actions = State N
+        - expand initial 'state + actions' into individual game states for efficient history browsing
+
+game history browser
+    - move between states recorded in the game's history
 
 game states database
     - input hash gets a game state
     - serialization of game states and actions
 
 Optimizations
-    - computed fields
+    - computed fields (lazily computed as needed per state)
+
+Objects
+    - have identifiers
+    - targetable, target filtering
+
+Effects
+    - target objects
