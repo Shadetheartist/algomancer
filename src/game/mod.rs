@@ -1,11 +1,13 @@
 pub mod state;
 
+use rand::{Rng, RngCore};
 use serde::{Deserialize, Serialize};
 
 type ObjectId = i32;
 
 #[derive(Serialize, Deserialize, Clone)]
 enum Effect {
+    RandomDamage { target: ObjectId, min: i32, max: i32 },
     Damage { target: ObjectId, amount: i32 },
     Heal { target: ObjectId, amount: i32 },
     Special(SpecialEffect),
@@ -41,6 +43,7 @@ impl StateMutator for Effect {
         match self {
             Effect::Special { .. } => "Special",
             Effect::Damage { .. } => "Damage",
+            Effect::RandomDamage { .. } => "Random Damage",
             Effect::Heal { .. } => "Heal"
         }
     }
@@ -49,6 +52,8 @@ impl StateMutator for Effect {
         match self {
             Effect::Special(effect) => format!("Sets the game step to {}", effect.effect_number),
             Effect::Damage { amount, .. } => format!("Deal {} Damage", amount),
+            // design issue - the random value should probably be resolved before this part
+            Effect::RandomDamage { max, min, .. } => format!("Deals Between {} and {} Damage", min, max),
             Effect::Heal { amount, .. } => format!("Heal {} Damage", amount),
         }
     }
@@ -57,13 +62,12 @@ impl StateMutator for Effect {
         match self {
             Effect::Special(effect) => effect.mutate_state(state),
             Effect::Heal { amount, .. } => state.step -= amount,
+            Effect::RandomDamage { max, min, .. } => {
+                state.step -= state.rand.gen_range(min..max)
+            },
             Effect::Damage { amount, .. } => state.step += amount,
         }
     }
-}
-
-trait Object {
-    fn get_object_id() -> ObjectId;
 }
 
 
@@ -73,14 +77,14 @@ struct EffectHistoryEntry {
 
 pub struct Game {
     effect_history: Vec<EffectHistoryEntry>,
-    pub state: state::State,
+    state: state::State,
 }
 
 impl Game {
-    pub fn new(num_players: i32) -> Game {
+    pub fn new(seed: [u8; 32], num_players: i32) -> Game {
         let mut game = Game {
             effect_history: Vec::new(),
-            state: state::State::new(),
+            state: state::State::new(seed),
         };
 
         for _ in 0..num_players {
@@ -90,7 +94,7 @@ impl Game {
         game
     }
 
-    fn print_history(&self) {
+    pub fn print_history(&self) {
         println!();
         println!("Action History ({})", self.effect_history.len());
         for (idx, effect) in self.effect_history.iter().enumerate() {
@@ -116,7 +120,6 @@ impl Game {
             effect: Box::new(effect),
         });
 
-
         // set current state to mutated clone of state
         self.state = state;
 
@@ -133,14 +136,16 @@ mod tests {
 
     #[test]
     fn test_action_replay() {
+        let seed = [0u8; 32];
+        let num_players = 123;
         // apply effects to a game, each mutating its state somehow
-        let mut game = Game::new(4);
+        let mut game = Game::new(seed, num_players);
         game.apply_effect(Effect::Special(SpecialEffect { effect_number: 11 }));
         game.apply_effect(Effect::Heal { amount: 3, target: 1 });
         game.apply_effect(Effect::Damage { amount: 5, target: 1 });
 
         // use the action history from game 1 on game 2
-        let mut game2 = Game::new(4);
+        let mut game2 = Game::new(seed, num_players);
         for entry in game.effect_history.iter() {
             let effect = *entry.effect.clone();
             game2.apply_effect(effect)
@@ -149,5 +154,12 @@ mod tests {
         // after applying the effects in action replay to another game instance,
         // we should end at the same state
         assert_eq!(game.state.get_hash_string(), game2.state.get_hash_string());
+
+        // apply the same effect to both games
+        game.apply_effect(Effect::Damage { amount: 1, target: 1 });
+        game2.apply_effect(Effect::Damage { amount: 1, target: 1 });
+
+
+        // if they
     }
 }

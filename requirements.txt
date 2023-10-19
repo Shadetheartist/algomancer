@@ -4,7 +4,7 @@ Action history
 
 n>2 Players
 
-Zones
+Zones (this is some sort of top level object)
     - card zones
     - player zones
 
@@ -14,6 +14,7 @@ Cards
 
 Determinism
     - random seeding initial state
+    - serializing / deserializing rand
     - game state hashing
     - f(s, a) = s'
     - Replayability
@@ -36,3 +37,5 @@ Objects
 
 Effects
     - target objects
+
+Webassembly
