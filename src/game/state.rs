@@ -2,7 +2,7 @@ use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use rand::distributions::uniform::{SampleRange, SampleUniform};
 use rand::{Rng, SeedableRng};
-use rand_xorshift;
+use rand_pcg;
 use serde::{Deserialize, Serialize};
 use crate::game::card::Deck;
 
@@ -22,14 +22,14 @@ pub enum DeckMode {
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct AlgomancerRng {
-    inner: rand_xorshift::XorShiftRng
+    inner: rand_pcg::Mcg128Xsl64
 }
 
 pub type AlgomancerRngSeed = [u8; 16];
 
 impl AlgomancerRng {
     pub fn new(seed: AlgomancerRngSeed) -> AlgomancerRng {
-        let rand =  rand_xorshift::XorShiftRng::from_seed(seed);
+        let rand =  rand_pcg::Mcg128Xsl64::from_seed(seed);
         AlgomancerRng {
             inner: rand
         }

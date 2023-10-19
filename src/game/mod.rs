@@ -141,18 +141,6 @@ mod tests {
         };
 
         let mut game = Game::new(&game_options);
-        println!("{}", game.state.rand.gen_range(0..1000));
-        println!("{}", game.state.rand.gen_range(0..1000));
-        println!("{}", game.state.rand.gen_range(0..1000));
-        println!("{}", game.state.rand.gen_range(0..1000));
-        println!("{}", game.state.rand.gen_range(0..1000));
-        println!("{}", game.state.rand.gen_range(0..1000));
-        println!("{}", game.state.rand.gen_range(0..1000));
-        println!("{}", game.state.rand.gen_range(0..1000));
-        println!("{}", game.state.rand.gen_range(0..1000));
-        println!("{}", game.state.rand.gen_range(0..1000));
-        println!("{}", game.state.rand.gen_range(0..1000));
-        println!("{}", game.state.rand.gen_range(0..1000));
 
         // use a random damage builder so that we are mutating the rand state
         // we need to make sure that it's serialized properly, so when we resume a game from
