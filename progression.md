@@ -4,7 +4,10 @@ A full description of the progression of a game of algomancy, including stage, s
 
 ## Setup Stage
 This stage handles the setup of the game. This includes the decision of setting up the game in 'new-player' mode 
-and the selection of which decks to include in the game deck.
+and the selection of which decks to include in the game deck. 
+
+Player's may also choose to bring in their own decks for constructed play, where each player draws cards from their own 
+deck. Otherwise, the default, each player using the same central deck. 
 
 ### New Player Mode
 

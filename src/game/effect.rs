@@ -8,6 +8,7 @@ use special::SpecialEffect;
 // for instance, if an effect would have a random damage value, the randomness is resolved here
 // and the effect is applied as a regular damage effect
 pub enum EffectBuilder {
+    Default(Effect),
     RandomDamage { target: ObjectId, min: i32, max: i32 },
 }
 
@@ -19,6 +20,7 @@ impl EffectBuilder {
                 let effect = Effect::Damage { amount, target: *target };
                 effect
             },
+            EffectBuilder::Default(effect) => effect.clone(),
         }
     }
 }
@@ -64,6 +66,35 @@ mod tests {
     use super::{Effect, EffectBuilder};
 
     #[test]
+    fn test_default_effect_builder() {
+        let mut state = State::new(AlgomancerRngSeed::default());
+
+        let damage_amount = 10;
+        let effect = EffectBuilder::Default(Effect::Damage { amount: damage_amount, target: 1 }).build_effect(&mut state);
+        match effect {
+            Effect::Damage { amount, .. } => {
+                // magic number could change if the random algorithm is modified
+                assert_eq!(amount, amount)
+            },
+            _ => {
+                assert!(false)
+            }
+        }
+
+        let heal_amount = 7;
+        let effect = EffectBuilder::Default(Effect::Heal { amount: heal_amount, target: 1 }).build_effect(&mut state);
+        match effect {
+            Effect::Heal { amount, .. } => {
+                // magic number could change if the random algorithm is modified
+                assert_eq!(amount, amount)
+            },
+            _ => {
+                assert!(false)
+            }
+        }
+    }
+
+    #[test]
     fn test_random_damage_effect_builder() {
         let mut state = State::new(AlgomancerRngSeed::default());
         let effect = EffectBuilder::RandomDamage { min: 2, max: 5, target: 1 }.build_effect(&mut state);
@@ -77,6 +108,5 @@ mod tests {
                 assert!(false)
             }
         }
-
     }
 }
