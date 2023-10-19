@@ -1,12 +1,18 @@
+# Algomancer - The Algomancy Game Rules Engine  
+
+## Design Considerations
+
 Player view info filtering
 
 Action history
 
 n>2 Players
+    - multiple panes for UI (not that we care in this application)
 
 Zones (this is some sort of top level object)
     - card zones
     - player zones
+    - main deck (does this even have a zone?)
 
 Cards
     - compile time guarantees from macros?
@@ -29,7 +35,7 @@ game states database (external application?)
     - serialization of game states and actions
 
 Optimizations
-    - Parallelism (rayon?)
+    - Parallelism (rayon crate?)
     - computed fields (lazily computed as needed per state)
 
 Objects
@@ -42,8 +48,10 @@ Effects
         came across this idea when implementing an effect which used a random value.
         probably the parameters in effect need to be fully resolved before they are applied to the game state.
         So like, a random, or X, damage effect would turn into a normal damage effect with a concrete value.
-
-Webassembly
+    - replacement effects
+    
+Webassembly Support
+    - need to make sure included crates also have webassembly support 
 
 Documentation Generation
     - possibly some way to generate a glossary of effects?
@@ -52,3 +60,5 @@ Documentation Generation
 Organization (Obsidian?)
 
 CI/CD
+
+Rust macros can probably do a lot of work

@@ -4,9 +4,12 @@ use rand::distributions::uniform::{SampleRange, SampleUniform};
 use rand::{Rng, SeedableRng};
 use rand_xorshift;
 
+// zones area really important as a top level entity
+// objects can only interact with other objects by which zone they're in,
+// with the exception of the main deck, which is not in any zone
 #[derive(Hash, Eq, PartialEq, Clone)]
 pub struct Zone {
-    pub health: i32
+
 }
 
 #[derive(Hash, Eq, PartialEq, Clone)]
