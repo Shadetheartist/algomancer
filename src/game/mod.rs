@@ -41,16 +41,14 @@ impl Game {
         // clone state and apply the mutation
         let mut state = self.state.clone();
 
-        println!("Preparing Effect \"{}\"", effect.name());
-
-        let effect = effect.prepare(&mut self.state);
-
         print!("Applying mutator \"{}\" ({}) {}", effect.name(), effect.explain(), self.state.get_hash_string());
 
         // apply the mutation to the state clone
         effect.mutate_state(&mut state);
 
         if self.state == state {
+            // this probably shouldn't actually panic,
+            // since there are ways an effect is potentially nullified
             panic!("effect [{}] did not mutate the state", effect.name())
         }
 
@@ -82,7 +80,6 @@ mod tests {
         game.apply_effect(Effect::Special(SpecialEffect { effect_number: 11 }));
         game.apply_effect(Effect::Heal { amount: 3, target: 1 });
         game.apply_effect(Effect::Damage { amount: 5, target: 1 });
-        game.apply_effect(Effect::RandomDamage { max: 10, min: 1, target: 1, prepared_amount: 0 });
 
         // use the action history from game 1 on game 2
         let mut game2 = Game::new(seed, num_players);
