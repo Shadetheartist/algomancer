@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
+use state::rng::AlgomancerRngSeed;
 use crate::game::action::Action;
 use crate::game::state::player::Player;
-use crate::game::state::{AlgomancerRngSeed, DeckMode, effect, PlayMode};
+use crate::game::state::{DeckMode, effect, PlayMode};
 use crate::game::state::progression::Phase;
 
 pub mod state;
@@ -102,7 +103,7 @@ mod tests {
     use super::{Game, GameOptions, PlayMode};
     use super::state::effect::special::SpecialEffect;
     use super::state::effect::Effect;
-    use super::state::AlgomancerRngSeed;
+    use crate::game::state::rng::AlgomancerRngSeed;
 
     #[test]
     fn test_action_replay() {

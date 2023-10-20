@@ -65,7 +65,8 @@ impl Effect {
 
 #[cfg(test)]
 mod tests {
-    use crate::game::state::{AlgomancerRngSeed, DeckMode, PlayMode, State};
+    use crate::game::state::{DeckMode, PlayMode, State};
+    use crate::game::state::rng::AlgomancerRngSeed;
     use super::{Effect, EffectBuilder};
 
     #[test]

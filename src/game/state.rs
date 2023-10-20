@@ -4,6 +4,7 @@ use rand::distributions::uniform::{SampleRange, SampleUniform};
 use rand::{Rng, SeedableRng};
 use rand_pcg;
 use serde::{Deserialize, Serialize};
+use rng::{AlgomancerRng, AlgomancerRngSeed};
 use crate::game::state::card::Deck;
 use crate::game::state::player::Player;
 use crate::game::state::progression::Phase;
@@ -16,6 +17,7 @@ mod zone;
 pub mod player;
 pub mod progression;
 mod resource;
+pub mod rng;
 
 type ObjectId = i32;
 
@@ -29,43 +31,6 @@ pub enum PlayMode {
 pub enum DeckMode {
     CommonDeck,
     PlayerDecks
-}
-
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
-pub struct AlgomancerRng {
-    inner: rand_pcg::Mcg128Xsl64
-}
-
-pub type AlgomancerRngSeed = [u8; 16];
-
-impl AlgomancerRng {
-    pub fn new(seed: AlgomancerRngSeed) -> AlgomancerRng {
-        let rand =  rand_pcg::Mcg128Xsl64::from_seed(seed);
-        AlgomancerRng {
-            inner: rand
-        }
-    }
-    pub fn gen_range<T, R>(&mut self, range: R) -> T
-        where
-            T: SampleUniform,
-            R: SampleRange<T>
-    {
-        self.inner.gen_range(range)
-    }
-}
-
-impl Hash for AlgomancerRng {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        let str = serde_json::to_vec(&self.inner).expect("serialized rng inner to json");
-        state.write(str.as_slice())
-    }
-
-    fn hash_slice<H: Hasher>(data: &[Self], state: &mut H) where Self: Sized {
-        for rng in data {
-            let str = serde_json::to_vec(&rng.inner).expect("serialized rng inner to json");
-            state.write(str.as_slice())
-        }
-    }
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
@@ -106,7 +71,8 @@ impl State {
 mod tests {
     use std::collections::hash_map::DefaultHasher;
     use std::hash::{Hash, Hasher};
-    use super::{AlgomancerRng, AlgomancerRngSeed, DeckMode, PlayMode, State};
+    use crate::game::state::rng::{AlgomancerRng, AlgomancerRngSeed};
+    use super::{DeckMode, PlayMode, State};
 
     // utility function to avoid code duplication
     // creates a pre-defined rng instance
