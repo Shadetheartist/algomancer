@@ -3,7 +3,6 @@ use state::rng::AlgomancerRngSeed;
 use crate::game::action::Action;
 use crate::game::state::player::Player;
 use crate::game::state::{DeckMode, effect, PlayMode};
-use crate::game::state::progression::Phase;
 
 pub mod state;
 mod action;
@@ -49,7 +48,6 @@ impl Game {
             Action::PassPriority => {}
         }
     }
-
 
     pub fn print_history(&self) {
         println!();

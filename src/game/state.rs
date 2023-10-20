@@ -1,13 +1,10 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
-use rand::distributions::uniform::{SampleRange, SampleUniform};
-use rand::{Rng, SeedableRng};
-use rand_pcg;
 use serde::{Deserialize, Serialize};
 use rng::{AlgomancerRng, AlgomancerRngSeed};
 use crate::game::state::card::Deck;
 use crate::game::state::player::Player;
-use crate::game::state::progression::{CombatPhaseAStep, CombatPhaseBStep, MainPhaseStep, Phase, PrecombatPhaseStep};
+use crate::game::state::progression::{Phase, PrecombatPhaseStep};
 
 pub mod effect;
 mod card;
@@ -128,7 +125,7 @@ mod tests {
         let r1_val = r1.gen_range(min..max);
 
         // do one more generation on r2 than on r1
-        let r2_val = r2.gen_range(min..max);
+        r2.gen_range(min..max);
         let r2_val = r2.gen_range(min..max);
 
         // so this should not be equal
