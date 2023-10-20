@@ -1,32 +1,41 @@
+use serde::{Deserialize, Serialize};
 
-pub enum Stage {
-    Setup(SetupStageStep),
-    Play(PlayStageStep),
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+pub enum Phase {
+    PrecombatPhase(PrecombatPhaseStep),
+    CombatPhaseA(CombatPhaseAStep),
+    CombatPhaseB(CombatPhaseBStep),
+    MainPhase,
 }
 
-pub enum SetupStageStep {
-    FactionSelection,
-    PlayerPreparation, // might be irrelevant in digital
-}
-
-pub enum PlayStageStep {
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+pub enum PrecombatPhaseStep {
+    Untap,
     Draw,
     Draft,
-    Mana,
-    Combat(CombatStep),
+    ITMana,
+    NITMana,
 }
 
-
-pub enum CombatStep {
-    DeclareAttacks, // in-formation
-
-    // priority window
-
-    DeclareBlocks, // and counter-attack (not in formation)
-
-    // priority window
-
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+pub enum CombatPhaseAStep {
+    ITAttack,
+    NITBlock,
     Damage,
+    AfterCombat,
+}
 
-    AfterCombat // priority window
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+pub enum CombatPhaseBStep {
+    NITAttack,
+    ITBlock,
+    Damage,
+    AfterCombat,
+}
+
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+pub enum MainPhaseStep {
+    Regroup,
+    ITMain,
+    NITMain,
 }

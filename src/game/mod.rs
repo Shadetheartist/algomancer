@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use crate::game::action::Action;
 use crate::game::state::player::Player;
 use crate::game::state::{AlgomancerRngSeed, DeckMode, effect, PlayMode};
+use crate::game::state::progression::Phase;
 
 pub mod state;
 mod action;
@@ -9,7 +10,7 @@ mod action;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct EffectHistoryEntry {
-    effect: Box<state::effect::Effect>,
+    effect: Box<effect::Effect>,
 }
 
 pub struct GameOptions {
@@ -27,7 +28,6 @@ pub struct Game {
     state: state::State,
 }
 
-
 impl Game {
     pub fn new(options: &GameOptions) -> Game {
         let mut game = Game {
@@ -42,7 +42,21 @@ impl Game {
         game
     }
 
-    pub fn apply_action(&self, action: Action) {}
+    pub fn apply_action(&self, action: Action) {
+        println!("Applying Action ({:?})", action);
+        match action {
+            Action::PassPriority => {}
+        }
+    }
+
+    fn next_step(&self){
+       match self.state.phase {
+           Phase::PrecombatPhase(_) => {}
+           Phase::CombatPhaseA(_) => {}
+           Phase::CombatPhaseB(_) => {}
+           Phase::MainPhase => {}
+       }
+    }
 
     pub fn print_history(&self) {
         println!();
@@ -125,10 +139,10 @@ mod tests {
     }
 
     #[test]
-    fn test_serialization() {
+    fn test_game_serialization() {
         let game_options = GameOptions {
             seed: AlgomancerRngSeed::default(),
-            num_players: 8,
+            num_players: 2,
             play_mode: PlayMode::Teams,
             deck_mode: DeckMode::CommonDeck,
         };
@@ -146,6 +160,8 @@ mod tests {
 
         // serialize the game
         let json = serde_json::to_string_pretty(&game).expect("serialized game json");
+
+        println!("{}", json);
 
         // deserialize the game
         let mut deserialized: Game = serde_json::from_str(json.as_str()).expect("deserialized game");

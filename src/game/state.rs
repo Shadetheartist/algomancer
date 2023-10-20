@@ -6,12 +6,15 @@ use rand_pcg;
 use serde::{Deserialize, Serialize};
 use crate::game::state::card::Deck;
 use crate::game::state::player::Player;
+use crate::game::state::progression::Phase;
+use crate::game::state::progression::Phase::PrecombatPhase;
+use crate::game::state::progression::PrecombatPhaseStep::Untap;
 
 pub mod effect;
 mod card;
 mod zone;
 pub mod player;
-mod progression;
+pub mod progression;
 mod resource;
 
 type ObjectId = i32;
@@ -71,8 +74,11 @@ pub struct State {
     pub deck_mode: DeckMode,
     pub common_deck: Deck,
     pub rand: AlgomancerRng,
-    pub step: i32,
-    pub players: Vec<Player>
+    pub players: Vec<Player>,
+    pub phase: Phase,
+
+    // using this for testing
+    pub funny_number: i32,
 }
 
 impl State {
@@ -82,8 +88,9 @@ impl State {
             deck_mode: deck_mode.clone(),
             common_deck: Deck::new(),
             rand: AlgomancerRng::new(seed),
-            step: 0,
-            players: Vec::new()
+            funny_number: 0,
+            players: Vec::new(),
+            phase: PrecombatPhase(Untap),
         }
     }
 
@@ -122,7 +129,7 @@ mod tests {
     #[test]
     fn test_state_serialization(){
         let mut state = State::new(AlgomancerRngSeed::default(), &PlayMode::Teams, &DeckMode::CommonDeck);
-        state.step = 100;
+        state.funny_number = 100;
 
         let serialized = serde_json::to_string(&state).expect("stringified state json");
         let deserialized: State = serde_json::from_str(&serialized.as_str()).expect("deserialized state object");
