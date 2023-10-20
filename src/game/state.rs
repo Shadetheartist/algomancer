@@ -54,6 +54,19 @@ impl State {
         }
     }
 
+    // this is useful for testing
+    pub fn default() -> State {
+        State {
+            play_mode: PlayMode::Teams,
+            deck_mode: DeckMode::CommonDeck,
+            common_deck: Deck::new(),
+            rand: AlgomancerRng::new(AlgomancerRngSeed::default()),
+            funny_number: 0,
+            players: Vec::new(),
+            phase: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
+        }
+    }
+
     pub fn get_hash_string(&self) -> String {
         let mut hasher = DefaultHasher::new();
         self.hash(&mut hasher);
@@ -91,7 +104,7 @@ mod tests {
 
     #[test]
     fn test_state_serialization(){
-        let mut state = State::new(AlgomancerRngSeed::default(), &PlayMode::Teams, &DeckMode::CommonDeck);
+        let mut state = State::default();
         state.funny_number = 100;
 
         let serialized = serde_json::to_string(&state).expect("stringified state json");

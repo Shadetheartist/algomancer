@@ -174,9 +174,11 @@ mod tests {
     #[test]
     fn test_phase_next(){
 
+        let initial_phase = Phase::PrecombatPhase(PrecombatPhaseStep::Untap);
+
         // there aren't nearly 100 steps in a round,
         // so if we get to the end of a round before the loop is over, the test is successful
-        let mut phase = Phase::PrecombatPhase(PrecombatPhaseStep::Untap);
+        let mut phase = initial_phase.clone();
         for _ in 0..100 {
             println!("{:?}", phase);
             phase = phase.next();
@@ -187,6 +189,10 @@ mod tests {
             }
         }
 
-        assert!(false);
+        // go one more
+        phase = phase.next();
+
+        // we should be back to the initial phase
+        assert_eq!(phase, initial_phase);
     }
 }

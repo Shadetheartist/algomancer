@@ -71,7 +71,7 @@ mod tests {
 
     #[test]
     fn test_default_effect_builder() {
-        let mut state = State::new(AlgomancerRngSeed::default(), &PlayMode::Teams, &DeckMode::CommonDeck);
+        let mut state = State::default();
 
         let damage_amount = 10;
         let effect = EffectBuilder::Default(Effect::Damage { amount: damage_amount, target: 1 }).build_effect(&mut state);
@@ -100,7 +100,7 @@ mod tests {
 
     #[test]
     fn test_random_damage_effect_builder() {
-        let mut state = State::new(AlgomancerRngSeed::default(), &PlayMode::Teams, &DeckMode::CommonDeck);
+        let mut state = State::default();
 
         let effect = EffectBuilder::RandomDamage { min: 2, max: 5, target: 1 }.build_effect(&mut state);
 

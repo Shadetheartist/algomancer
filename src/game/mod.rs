@@ -35,8 +35,11 @@ impl Game {
             state: state::State::new(options.seed, &options.play_mode, &options.deck_mode),
         };
 
-        for _ in 0..options.num_players {
-            game.state.players.push(Player::new());
+        for i in 0..options.num_players {
+            // simple 0,1,0,1... team pattern. Will only work for 2 teams.
+            // this may need to be a setup option
+            let team = i % 2;
+            game.state.players.push(Player::new(i as usize, team));
         }
 
         game
@@ -47,6 +50,14 @@ impl Game {
         match action {
             Action::PassPriority => {}
         }
+    }
+
+    pub fn valid_actions(&self) -> Vec<Action> {
+        let mut valid_actions = Vec::new();
+
+        valid_actions.push(Action::PassPriority);
+
+        valid_actions
     }
 
     pub fn print_history(&self) {
