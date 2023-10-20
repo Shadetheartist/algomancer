@@ -7,9 +7,7 @@ use serde::{Deserialize, Serialize};
 use rng::{AlgomancerRng, AlgomancerRngSeed};
 use crate::game::state::card::Deck;
 use crate::game::state::player::Player;
-use crate::game::state::progression::Phase;
-use crate::game::state::progression::Phase::PrecombatPhase;
-use crate::game::state::progression::PrecombatPhaseStep::Untap;
+use crate::game::state::progression::{CombatPhaseAStep, CombatPhaseBStep, MainPhaseStep, Phase, PrecombatPhaseStep};
 
 pub mod effect;
 mod card;
@@ -55,7 +53,7 @@ impl State {
             rand: AlgomancerRng::new(seed),
             funny_number: 0,
             players: Vec::new(),
-            phase: PrecombatPhase(Untap),
+            phase: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
         }
     }
 
@@ -64,6 +62,8 @@ impl State {
         self.hash(&mut hasher);
         format!("#{:x}", hasher.finish())
     }
+
+
 }
 
 

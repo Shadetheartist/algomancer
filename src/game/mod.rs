@@ -50,14 +50,6 @@ impl Game {
         }
     }
 
-    fn next_step(&self){
-       match self.state.phase {
-           Phase::PrecombatPhase(_) => {}
-           Phase::CombatPhaseA(_) => {}
-           Phase::CombatPhaseB(_) => {}
-           Phase::MainPhase => {}
-       }
-    }
 
     pub fn print_history(&self) {
         println!();
