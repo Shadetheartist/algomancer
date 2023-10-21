@@ -1,9 +1,10 @@
+use std::collections::HashSet;
 use serde::{Deserialize, Serialize};
 use state::rng::AlgomancerRngSeed;
 use crate::game::action::Action;
-use crate::game::state::player::Player;
+use crate::game::state::player::{Player, PlayerId};
 use crate::game::state::{DeckMode, effect, PlayMode};
-use crate::game::state::progression::{MainPhaseStep, Phase};
+use crate::game::state::progression::{MainPhaseStep, Phase, PrecombatPhaseStep};
 
 pub mod state;
 mod action;
@@ -40,7 +41,7 @@ impl Game {
             // simple 0,1,0,1... team pattern. Will only work for 2 teams.
             // this may need to be a setup option
             let team = i % 2;
-            let player_id = i * (team + 1);
+            let player_id = PlayerId(i * (team + 1));
             let player_seat = i * (team + 1);
             game.state.players.push(Player::new(player_id, player_seat, team));
         }
@@ -56,23 +57,34 @@ impl Game {
         let mut next_state = self.state.clone();
 
         match action {
-            Action::PassPriority => {
+            Action::Resolve => {
                 next_state.phase = next_state.phase.next()
+            }
+
+            Action::Draft { .. } => {
+                todo!()
+            }
+
+            Action::Cast(_) => {
+                todo!()
             }
         }
 
         self.state = next_state
     }
 
-    pub fn valid_actions(&self) -> Vec<Action> {
-        let mut valid_actions = Vec::new();
+    pub fn valid_actions(&self) -> HashSet<Action> {
+        let mut valid_actions = HashSet::new();
 
         match &self.state.phase {
             Phase::MainPhase(MainPhaseStep::NITMain) => {
                 // dont put a valid action, for testing
-            },
+            }
+            Phase::PrecombatPhase(PrecombatPhaseStep::Draft) => {
+                valid_actions.insert(Action::Resolve);
+            }
             _ => {
-                valid_actions.push(Action::PassPriority);
+                valid_actions.insert(Action::Resolve);
             }
         }
 

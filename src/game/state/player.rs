@@ -4,8 +4,17 @@ use crate::game::state::{DeckMode, PlayMode, State};
 use crate::wrap_index::wrap_index;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+pub struct PlayerId(pub usize);
+
+impl PlayerId {
+    pub fn get_player(self, state: &State) -> Option<&Player> {
+        state.players.iter().find(|p| p.id == self)
+    }
+}
+
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Player {
-    id: usize,
+    id: PlayerId,
     seat: usize,
     team_id: usize,
 
@@ -17,7 +26,7 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(id: usize, seat: usize, team_id: usize) -> Player {
+    pub fn new(id: PlayerId, seat: usize, team_id: usize) -> Player {
         Player {
             id,
             seat,

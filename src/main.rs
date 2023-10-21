@@ -24,7 +24,7 @@ fn main() {
             break;
         }
 
-        let action = &actions[0];
+        let action = &actions.iter().next().expect("any action");
         game.apply_action(&action);
     }
 

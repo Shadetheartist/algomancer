@@ -4,7 +4,7 @@ use crate::game::state::resource::Costs;
 use crate::game::state::State;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
-pub struct CardId(usize);
+pub struct CardId(pub usize);
 impl CardId {
     pub fn get_card(self, state: &State) -> Option<&Card> {
         state.cards.iter().find(|c| c.id == self)

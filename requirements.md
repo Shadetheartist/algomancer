@@ -42,10 +42,18 @@ Optimizations
 Objects
 - have identifiers
 - targetable, target filtering
+- Cards
+  - Resources
+  - Units
+    - Tokens
+  - Spells
+    - Tokens
+    - Haste, Virus 
 
 Progression
-- Steps
-- Phases
+- Turns
+- Steps / Phases
+- Initiative
 - Priority
 
 Actions
