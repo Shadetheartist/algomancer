@@ -16,7 +16,7 @@ struct EffectHistoryEntry {
 
 pub struct GameOptions {
     pub seed: AlgomancerRngSeed,
-    pub num_players: i32,
+    pub num_players: usize,
     pub play_mode: PlayMode,
     pub deck_mode: DeckMode,
 }
@@ -40,7 +40,9 @@ impl Game {
             // simple 0,1,0,1... team pattern. Will only work for 2 teams.
             // this may need to be a setup option
             let team = i % 2;
-            game.state.players.push(Player::new(i as usize, team));
+            let player_id = i * (team + 1);
+            let player_seat = i * (team + 1);
+            game.state.players.push(Player::new(player_id, player_seat, team));
         }
 
         game

@@ -14,16 +14,21 @@ fn main() {
     };
 
     let mut game = game::Game::new(&options);
+    let json = serde_json::to_string_pretty(&game).expect("serialized game json");
+
     loop {
         let actions = game.valid_actions();
 
         if actions.len() < 1 {
             eprintln!("out of actions");
-            return;
+            break;
         }
 
         let action = &actions[0];
         game.apply_action(&action);
     }
+
+    println!("{json}");
+
 }
 

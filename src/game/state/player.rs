@@ -5,8 +5,9 @@ use crate::wrap_index::wrap_index;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Player {
+    id: usize,
     seat: usize,
-    team: i32,
+    team_id: usize,
 
     health: i32,
     hand: Hand,
@@ -16,10 +17,11 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(seat: usize, team: i32) -> Player {
+    pub fn new(id: usize, seat: usize, team_id: usize) -> Player {
         Player {
+            id,
             seat,
-            team,
+            team_id,
             health: 30,
             hand: Hand::new(),
             constructed_deck: Deck::new(),
@@ -52,7 +54,7 @@ impl Player {
                 }
                 PlayMode::Teams => {
                     // if they're not with me, then they're against me
-                    if self.team != neighbor.team  {
+                    if self.team_id != neighbor.team_id {
                         return Some(neighbor);
                     }
                 }

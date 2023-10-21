@@ -1,10 +1,12 @@
 use std::collections::hash_map::DefaultHasher;
+use std::collections::{HashMap, HashSet};
 use std::hash::{Hash, Hasher};
 use serde::{Deserialize, Serialize};
 use rng::{AlgomancerRng, AlgomancerRngSeed};
-use crate::game::state::card::Deck;
+use crate::game::state::card::{Card, CardId, Deck};
 use crate::game::state::player::Player;
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
+use crate::game::state::team::Team;
 
 pub mod effect;
 mod card;
@@ -36,8 +38,13 @@ pub struct State {
     pub deck_mode: DeckMode,
     pub common_deck: Deck,
     pub rand: AlgomancerRng,
-    pub players: Vec<Player>,
     pub phase: Phase,
+
+    // store data in a generally flat structure, using id's
+    // to reference other objects rather than pointers, at least for now
+    pub teams: Vec<Team>,
+    pub players: Vec<Player>,
+    pub cards: Vec<Card>,
 
     // using this for testing
     pub funny_number: i32,
@@ -50,9 +57,12 @@ impl State {
             deck_mode: deck_mode.clone(),
             common_deck: Deck::new(),
             rand: AlgomancerRng::new(seed),
-            funny_number: 0,
-            players: Vec::new(),
             phase: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
+            players: Vec::new(),
+            teams: Vec::new(),
+            cards: Vec::new(),
+
+            funny_number: 0,
         }
     }
 
@@ -63,9 +73,12 @@ impl State {
             deck_mode: DeckMode::CommonDeck,
             common_deck: Deck::new(),
             rand: AlgomancerRng::new(AlgomancerRngSeed::default()),
-            funny_number: 0,
-            players: Vec::new(),
             phase: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
+            players: Vec::new(),
+            teams: Vec::new(),
+            cards: Vec::new(),
+
+            funny_number: 0,
         }
     }
 
@@ -74,7 +87,6 @@ impl State {
         self.hash(&mut hasher);
         format!("#{:x}", hasher.finish())
     }
-
 
 }
 
