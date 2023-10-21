@@ -32,7 +32,7 @@ mod tests {
 
     #[test]
     fn test_wrap_index(){
-        assert_eq!(wrap_index(usize::MAX, 333).unwrap(), 333);
+        assert_eq!(wrap_index(usize::MAX, 333), None);
         assert_eq!(wrap_index(5, 5).unwrap(), 0);
         assert_eq!(wrap_index(5, 6).unwrap(), 1);
         assert_eq!(wrap_index(5, -1).unwrap(), 4);

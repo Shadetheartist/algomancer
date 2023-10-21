@@ -13,6 +13,8 @@ pub mod player;
 pub mod progression;
 mod resource;
 pub mod rng;
+mod team;
+mod priority;
 
 type ObjectId = i32;
 
@@ -82,7 +84,7 @@ mod tests {
     use std::collections::hash_map::DefaultHasher;
     use std::hash::{Hash, Hasher};
     use crate::game::state::rng::{AlgomancerRng, AlgomancerRngSeed};
-    use super::{DeckMode, PlayMode, State};
+    use super::{State};
 
     // utility function to avoid code duplication
     // creates a pre-defined rng instance

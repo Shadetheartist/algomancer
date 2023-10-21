@@ -48,6 +48,7 @@ pub enum MainPhaseStep {
 
 
 impl Phase {
+    #[allow(dead_code)]
     pub fn is_combat(&self) -> bool {
         match self {
             Phase::CombatPhaseA(_) => true,
@@ -56,6 +57,7 @@ impl Phase {
         }
     }
 
+    #[allow(dead_code)]
     pub fn is_priority_window(&self) -> bool {
         match self {
             Phase::CombatPhaseA(step) => {

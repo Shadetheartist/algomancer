@@ -13,7 +13,17 @@ fn main() {
         deck_mode: DeckMode::CommonDeck,
     };
 
-    let game = game::Game::new(&options);
-    game.print_history();
+    let mut game = game::Game::new(&options);
+    loop {
+        let actions = game.valid_actions();
+
+        if actions.len() < 1 {
+            eprintln!("out of actions");
+            return;
+        }
+
+        let action = &actions[0];
+        game.apply_action(&action);
+    }
 }
 

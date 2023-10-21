@@ -127,4 +127,10 @@ mod tests {
 
         assert_eq!(ccw_p.seat, 3);
     }
+
+    #[test]
+    fn test_neighbors_4p_opponent_death(){
+        // should test when an opponent dies
+        todo!()
+    }
 }

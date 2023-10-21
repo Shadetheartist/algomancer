@@ -3,6 +3,7 @@ use state::rng::AlgomancerRngSeed;
 use crate::game::action::Action;
 use crate::game::state::player::Player;
 use crate::game::state::{DeckMode, effect, PlayMode};
+use crate::game::state::progression::{MainPhaseStep, Phase};
 
 pub mod state;
 mod action;
@@ -45,17 +46,34 @@ impl Game {
         game
     }
 
-    pub fn apply_action(&self, action: Action) {
-        println!("Applying Action ({:?})", action);
+    pub fn apply_action(&mut self, action: &Action) {
+        // todo: teams
+        // todo: priority system (need teams)
+        println!("Applying Action [{:?}] during phase [{:?}]", action, self.state.phase);
+
+        let mut next_state = self.state.clone();
+
         match action {
-            Action::PassPriority => {}
+            Action::PassPriority => {
+                next_state.phase = next_state.phase.next()
+            }
         }
+
+        self.state = next_state
     }
 
     pub fn valid_actions(&self) -> Vec<Action> {
         let mut valid_actions = Vec::new();
 
-        valid_actions.push(Action::PassPriority);
+        match &self.state.phase {
+            Phase::MainPhase(MainPhaseStep::NITMain) => {
+                // dont put a valid action, for testing
+            },
+            _ => {
+                valid_actions.push(Action::PassPriority);
+            }
+        }
+
 
         valid_actions
     }
