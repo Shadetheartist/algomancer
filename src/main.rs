@@ -17,7 +17,7 @@ fn main() {
     let mut game = game::Game::new(&options).expect("game object");
     let json = serde_json::to_string_pretty(&game).expect("serialized game json");
     let mut counter = 0;
-    while counter < 100 {
+    while counter < 500 {
         let actions: Vec<Action> = game.valid_actions().iter().cloned().collect();
 
         if actions.len() < 1 {

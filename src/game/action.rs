@@ -60,8 +60,11 @@ impl Game {
 
             Action::Draft { player_id, .. } => {
                 let mut player = player_id.get_player(&mut next_state).unwrap();
+
+                // todo: set hand to cards selected in draft
+
                 player.has_drafted = true;
-                println!("Player [{:?}] has finished drafting.", player.id);
+                println!("Player [{:?}] has selected their draft.", player.id);
             }
 
             Action::Cast(_) => {
@@ -83,16 +86,14 @@ impl Game {
             Phase::PrecombatPhase(PrecombatPhaseStep::Draft) => {
                 for p in &self.state.players {
                     if !p.has_drafted {
-                        if self.state.players.iter().find(|p| p.has_drafted) == None {
-                            valid_actions.insert(Action::Draft {
-                                player_id: p.id,
-                                hand: Hand {
-                                    cards: vec![
-                                        CardId(1)
-                                    ]
-                                },
-                            });
-                        }
+                        valid_actions.insert(Action::Draft {
+                            player_id: p.id,
+                            hand: Hand {
+                                cards: vec![
+                                    CardId(1)
+                                ]
+                            },
+                        });
                     }
 
                     if !self.is_over() {

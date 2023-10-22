@@ -54,7 +54,8 @@ impl Game {
 
             for p in 0..players_per_team {
                 let player_seat = p + t * num_teams;
-                game.state.players.push(Player::new(PlayerId(player_seat), player_seat, TeamId(team_id)));
+                let player_id = PlayerId(player_seat + 1);
+                game.state.players.push(Player::new(player_id, player_seat, TeamId(team_id)));
             }
         }
 
