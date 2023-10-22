@@ -22,6 +22,7 @@ pub struct Player {
     pub has_drafted: bool,
     pub health: i32,
     pub hand: Hand,
+    pub passed_priority: bool,
 
     // this may not be used, depending on the game mode
     pub constructed_deck: Deck
@@ -37,6 +38,7 @@ impl Player {
             has_drafted: false,
             health: 30,
             hand: Hand::new(),
+            passed_priority: false,
             constructed_deck: Deck::new(),
         }
     }

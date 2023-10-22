@@ -1,4 +1,3 @@
-
 // priority is this system which enables a team to take actions.
 // a team can only take actions if they have priority.
 // the initiative team takes priority first, whenever priority is reset.
@@ -7,14 +6,15 @@
 use crate::game::state::State;
 use crate::game::state::team::Team;
 
-struct Priority {
-
-}
+struct Priority {}
 
 impl State {
+    pub fn all_players_passed_priority(&self) -> bool {
+        !self.players.iter().any(|p| p.passed_priority == false)
+    }
 
     // resets priority state for all teams
-    fn reset_priority(&mut self) {
+    pub fn reset_priority(&mut self) {
         self.teams.iter_mut().for_each(|t| {
             t.passed_priority = true;
             t.has_priority = false;
@@ -22,14 +22,52 @@ impl State {
     }
 
     // gets the team with initiative right now
-    fn get_initiative_team(&mut self) -> &mut Team {
+    pub fn get_initiative_team(&mut self) -> &mut Team {
         self.teams.iter_mut().find(|t| t.has_initiative).unwrap()
     }
 
-    fn begin_window(&mut self) {
+    pub fn begin_window(&mut self) {
         self.reset_priority();
 
         let initiative_team = self.get_initiative_team();
         initiative_team.has_priority = true;
+    }
+}
+
+
+
+#[cfg(test)]
+mod tests {
+    use crate::game::state::player::{Player, PlayerId};
+    use crate::game::state::State;
+    use crate::game::state::team::TeamId;
+
+    #[test]
+    fn test_all_players_passed_priority(){
+
+        // test with no players with passed priority
+        let mut state = State::default();
+        for i in 0..4 {
+            let mut player = Player::new(PlayerId(0), 0, TeamId(0));
+            player.passed_priority = false;
+            state.players.push(player);
+        }
+        assert_eq!(state.all_players_passed_priority(), false);
+
+
+        // test all but one player with passed priority
+        for mut player in state.players.iter_mut() {
+            player.passed_priority = true;
+        }
+        state.players[0].passed_priority = false;
+        assert_eq!(state.all_players_passed_priority(), false);
+
+
+        // test all players with passed priority
+        for mut player in state.players.iter_mut() {
+            player.passed_priority = true;
+        }
+        assert_eq!(state.all_players_passed_priority(), true);
+
     }
 }

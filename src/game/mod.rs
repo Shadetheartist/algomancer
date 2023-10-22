@@ -53,9 +53,8 @@ impl Game {
             });
 
             for p in 0..players_per_team {
-                let player_id = PlayerId(p + 1);
                 let player_seat = p + t * num_teams;
-                game.state.players.push(Player::new(player_id, player_seat, TeamId(team_id)));
+                game.state.players.push(Player::new(PlayerId(player_seat), player_seat, TeamId(team_id)));
             }
         }
 
@@ -137,7 +136,6 @@ mod tests {
 
         let res = game.is_over();
         assert_eq!(res, true);
-
     }
 
     #[test]

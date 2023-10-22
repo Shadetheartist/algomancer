@@ -179,6 +179,8 @@ impl State {
         let next_step = self.step.get_next_step();
         println!("Transitioning from {:?} to {:?}", self.step, next_step);
 
+        self.players.iter_mut().for_each(|p| p.passed_priority = false);
+
         match next_step {
             Phase::PrecombatPhase(PrecombatPhaseStep::Untap) => {
                 self.reset_player_draft_flags()

@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use crate::game::state::player::{Player, PlayerId};
+use crate::game::state::player::{Player};
 use crate::game::state::State;
 
 #[derive(Hash, PartialEq, Eq, Serialize, Deserialize, Clone, Debug, Copy)]
@@ -8,6 +8,7 @@ pub struct TeamId(pub usize);
 #[derive(Hash, PartialEq, Eq, Serialize, Deserialize, Clone, Debug)]
 pub struct Team {
     pub id: TeamId,
+    // maybe this is computed from each player's values
     pub passed_priority: bool,
     pub has_priority: bool,
     pub has_initiative: bool,

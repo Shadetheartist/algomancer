@@ -1,4 +1,5 @@
 use game::state;
+use crate::game::action::Action;
 use crate::game::GameOptions;
 use crate::game::state::{DeckMode, PlayMode};
 
@@ -17,15 +18,18 @@ fn main() {
     let json = serde_json::to_string_pretty(&game).expect("serialized game json");
     let mut counter = 0;
     while counter < 100 {
-        let actions = game.valid_actions();
+        let actions: Vec<Action> = game.valid_actions().iter().cloned().collect();
 
         if actions.len() < 1 {
             eprintln!("out of actions");
             break;
         }
 
-        let action = actions.iter().next().expect("any action");
+        let mut sorted_actions = actions.clone();
+        sorted_actions.sort();
+        sorted_actions.reverse();
 
+        let action = sorted_actions.iter().next().expect("any action");
         game.apply_action(action);
 
         counter += 1;
