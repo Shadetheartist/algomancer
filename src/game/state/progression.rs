@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use crate::game::state::team::Initiative;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum Phase {
@@ -22,22 +21,22 @@ pub enum PrecombatPhaseStep {
 pub enum CombatPhaseAStep {
     ITPrepareFormation,
     ITAttack,
-    AfterITAttackPriorityWindow(Initiative),
+    AfterITAttackPriorityWindow,
     NITBlock,
-    AfterNITBlockPriorityWindow(Initiative),
+    AfterNITBlockPriorityWindow,
     Damage,
-    AfterCombatPriorityWindow(Initiative),
+    AfterCombatPriorityWindow,
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum CombatPhaseBStep {
     NITPrepareFormation,
     NITAttack,
-    AfterNITAttackPriorityWindow(Initiative),
+    AfterNITAttackPriorityWindow,
     ITBlock,
-    AfterITBlockPriorityWindow(Initiative),
+    AfterITBlockPriorityWindow,
     Damage,
-    AfterCombatPriorityWindow(Initiative),
+    AfterCombatPriorityWindow,
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
@@ -47,10 +46,38 @@ pub enum MainPhaseStep {
     NITMain,
 }
 
+
 impl Phase {
-    pub fn transition_next(&mut self) {
-        let mut next = self.next();
-        *self = next;
+    #[allow(dead_code)]
+    pub fn is_combat(&self) -> bool {
+        match self {
+            Phase::CombatPhaseA(_) => true,
+            Phase::CombatPhaseB(_) => true,
+            _ => false,
+        }
+    }
+
+    #[allow(dead_code)]
+    pub fn is_priority_window(&self) -> bool {
+        match self {
+            Phase::CombatPhaseA(step) => {
+                match step {
+                    CombatPhaseAStep::AfterITAttackPriorityWindow => true,
+                    CombatPhaseAStep::AfterNITBlockPriorityWindow => true,
+                    CombatPhaseAStep::AfterCombatPriorityWindow => true,
+                    _ => false,
+                }
+            },
+            Phase::CombatPhaseB(step) => {
+                match step {
+                    CombatPhaseBStep::AfterNITAttackPriorityWindow => true,
+                    CombatPhaseBStep::AfterITBlockPriorityWindow => true,
+                    CombatPhaseBStep::AfterCombatPriorityWindow => true,
+                    _ => false,
+                }
+            },
+            _ => false,
+        }
     }
 
     // this returns the next phase & step given the current phase & step
@@ -62,7 +89,6 @@ impl Phase {
                         Phase::PrecombatPhase(PrecombatPhaseStep::Draw)
                     }
                     PrecombatPhaseStep::Draw => {
-                        // on turn 1 and num_players+1, recycle the draft packs
                         Phase::PrecombatPhase(PrecombatPhaseStep::Draft)
                     }
                     PrecombatPhaseStep::Draft => {
@@ -82,30 +108,21 @@ impl Phase {
                         Phase::CombatPhaseA(CombatPhaseAStep::ITAttack)
                     }
                     CombatPhaseAStep::ITAttack => {
-                        Phase::CombatPhaseA(CombatPhaseAStep::AfterITAttackPriorityWindow(Initiative::Initiative))
+                        Phase::CombatPhaseA(CombatPhaseAStep::AfterITAttackPriorityWindow)
                     }
-                    CombatPhaseAStep::AfterITAttackPriorityWindow(Initiative::Initiative) => {
-                        Phase::CombatPhaseA(CombatPhaseAStep::AfterITAttackPriorityWindow(Initiative::NonInitiative))
-                    }
-                    CombatPhaseAStep::AfterITAttackPriorityWindow(Initiative::NonInitiative) => {
+                    CombatPhaseAStep::AfterITAttackPriorityWindow => {
                         Phase::CombatPhaseA(CombatPhaseAStep::NITBlock)
                     }
                     CombatPhaseAStep::NITBlock => {
-                        Phase::CombatPhaseA(CombatPhaseAStep::AfterNITBlockPriorityWindow(Initiative::Initiative))
+                        Phase::CombatPhaseA(CombatPhaseAStep::AfterNITBlockPriorityWindow)
                     }
-                    CombatPhaseAStep::AfterNITBlockPriorityWindow(Initiative::Initiative) => {
-                        Phase::CombatPhaseA(CombatPhaseAStep::AfterNITBlockPriorityWindow(Initiative::NonInitiative))
-                    }
-                    CombatPhaseAStep::AfterNITBlockPriorityWindow(Initiative::NonInitiative) => {
+                    CombatPhaseAStep::AfterNITBlockPriorityWindow => {
                         Phase::CombatPhaseA(CombatPhaseAStep::Damage)
                     }
                     CombatPhaseAStep::Damage => {
-                        Phase::CombatPhaseA(CombatPhaseAStep::AfterCombatPriorityWindow(Initiative::Initiative))
+                        Phase::CombatPhaseA(CombatPhaseAStep::AfterCombatPriorityWindow)
                     }
-                    CombatPhaseAStep::AfterCombatPriorityWindow(Initiative::Initiative) => {
-                        Phase::CombatPhaseA(CombatPhaseAStep::AfterCombatPriorityWindow(Initiative::NonInitiative))
-                    }
-                    CombatPhaseAStep::AfterCombatPriorityWindow(Initiative::NonInitiative) => {
+                    CombatPhaseAStep::AfterCombatPriorityWindow => {
                         Phase::CombatPhaseB(CombatPhaseBStep::NITPrepareFormation)
                     }
                 }
@@ -116,30 +133,21 @@ impl Phase {
                         Phase::CombatPhaseB(CombatPhaseBStep::NITAttack)
                     }
                     CombatPhaseBStep::NITAttack => {
-                        Phase::CombatPhaseB(CombatPhaseBStep::AfterNITAttackPriorityWindow(Initiative::Initiative))
+                        Phase::CombatPhaseB(CombatPhaseBStep::AfterNITAttackPriorityWindow)
                     }
-                    CombatPhaseBStep::AfterNITAttackPriorityWindow(Initiative::Initiative) => {
-                        Phase::CombatPhaseB(CombatPhaseBStep::AfterNITAttackPriorityWindow(Initiative::NonInitiative))
-                    }
-                    CombatPhaseBStep::AfterNITAttackPriorityWindow(Initiative::NonInitiative) => {
+                    CombatPhaseBStep::AfterNITAttackPriorityWindow => {
                         Phase::CombatPhaseB(CombatPhaseBStep::ITBlock)
                     }
                     CombatPhaseBStep::ITBlock => {
-                        Phase::CombatPhaseB(CombatPhaseBStep::AfterITBlockPriorityWindow(Initiative::Initiative))
+                        Phase::CombatPhaseB(CombatPhaseBStep::AfterITBlockPriorityWindow)
                     }
-                    CombatPhaseBStep::AfterITBlockPriorityWindow(Initiative::Initiative) => {
-                        Phase::CombatPhaseB(CombatPhaseBStep::AfterITBlockPriorityWindow(Initiative::NonInitiative))
-                    }
-                    CombatPhaseBStep::AfterITBlockPriorityWindow(Initiative::NonInitiative) => {
+                    CombatPhaseBStep::AfterITBlockPriorityWindow => {
                         Phase::CombatPhaseB(CombatPhaseBStep::Damage)
                     }
                     CombatPhaseBStep::Damage => {
-                        Phase::CombatPhaseB(CombatPhaseBStep::AfterCombatPriorityWindow(Initiative::Initiative))
+                        Phase::CombatPhaseB(CombatPhaseBStep::AfterCombatPriorityWindow)
                     }
-                    CombatPhaseBStep::AfterCombatPriorityWindow(Initiative::Initiative) => {
-                        Phase::CombatPhaseB(CombatPhaseBStep::AfterCombatPriorityWindow(Initiative::NonInitiative))
-                    }
-                    CombatPhaseBStep::AfterCombatPriorityWindow(Initiative::NonInitiative) => {
+                    CombatPhaseBStep::AfterCombatPriorityWindow => {
                         Phase::MainPhase(MainPhaseStep::Regroup)
                     }
                 }

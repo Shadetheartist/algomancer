@@ -9,6 +9,8 @@ Action history
 n>2 Players
 - multiple panes for UI (not that we care in this application)
 - players are connected in an n-gon formation, with two neighbors
+- FFA
+- Teams
 
 Zones (this is some sort of top level object)
 - card zones
