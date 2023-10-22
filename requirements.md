@@ -57,6 +57,7 @@ Progression
 - Steps / Phases
 - Initiative
 - Priority
+- Per player priority for simultaneous actions
 
 Actions
 - a set of effects which are all resolved as a unit

@@ -13,10 +13,10 @@ fn main() {
         deck_mode: DeckMode::CommonDeck,
     };
 
-    let mut game = game::Game::new(&options);
+    let mut game = game::Game::new(&options).expect("game object");
     let json = serde_json::to_string_pretty(&game).expect("serialized game json");
-
-    loop {
+    let mut counter = 0;
+    while counter < 100 {
         let actions = game.valid_actions();
 
         if actions.len() < 1 {
@@ -24,8 +24,11 @@ fn main() {
             break;
         }
 
-        let action = &actions.iter().next().expect("any action");
-        game.apply_action(&action);
+        let action = actions.iter().next().expect("any action");
+
+        game.apply_action(action);
+
+        counter += 1;
     }
 
     println!("{json}");

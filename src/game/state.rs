@@ -38,7 +38,7 @@ pub struct State {
     pub deck_mode: DeckMode,
     pub common_deck: Deck,
     pub rand: AlgomancerRng,
-    pub phase: Phase,
+    pub step: Phase,
 
     // store data in a generally flat structure, using id's
     // to reference other objects rather than pointers, at least for now
@@ -57,7 +57,7 @@ impl State {
             deck_mode: deck_mode.clone(),
             common_deck: Deck::new(),
             rand: AlgomancerRng::new(seed),
-            phase: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
+            step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
             players: Vec::new(),
             teams: Vec::new(),
             cards: Vec::new(),
@@ -73,7 +73,7 @@ impl State {
             deck_mode: DeckMode::CommonDeck,
             common_deck: Deck::new(),
             rand: AlgomancerRng::new(AlgomancerRngSeed::default()),
-            phase: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
+            step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
             players: Vec::new(),
             teams: Vec::new(),
             cards: Vec::new(),

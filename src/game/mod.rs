@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use state::rng::AlgomancerRngSeed;
 use crate::game::state::player::{Player, PlayerId};
 use crate::game::state::{DeckMode, effect, PlayMode};
+use crate::game::state::team::{Team, TeamId};
 
 pub mod state;
 pub mod action;
@@ -28,24 +29,38 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(options: &GameOptions) -> Game {
+    pub fn new(options: &GameOptions) -> Result<Game, &str> {
         let mut game = Game {
             effect_history: Vec::new(),
             state: state::State::new(options.seed, &options.play_mode, &options.deck_mode),
         };
 
-        for i in 0..options.num_players {
-            // simple 0,1,0,1... team pattern. Will only work for 2 teams.
-            // this may need to be a setup option
-            let team = i % 2;
-            let player_id = PlayerId(i * (team + 1));
-            let player_seat = i * (team + 1);
-            game.state.players.push(Player::new(player_id, player_seat, team));
+        // game basically supports 1 or two teams, where 1 is ffa, and 2 is team play
+        let num_teams = 2;
+        let players_per_team = options.num_players / num_teams;
+        if players_per_team * num_teams != options.num_players {
+            return Err("s");
         }
 
-        game
-    }
+        for t in 0..num_teams {
+            let team_id = t + 1;
 
+            game.state.teams.push(Team{
+                id: TeamId(team_id),
+                passed_priority: false,
+                has_priority: false,
+                has_initiative: false,
+            });
+
+            for p in 0..players_per_team {
+                let player_id = PlayerId(p + 1);
+                let player_seat = p + t * num_teams;
+                game.state.players.push(Player::new(player_id, player_seat, TeamId(team_id)));
+            }
+        }
+
+        Ok(game)
+    }
 
     pub fn print_history(&self) {
         println!();
@@ -53,6 +68,14 @@ impl Game {
         for (idx, effect) in self.effect_history.iter().enumerate() {
             println!("\t{idx} Applied mutator \"{}\" ({})", effect.effect.name(), effect.effect.explain());
         }
+    }
+
+    // is_over returns true if there are are any living players on at least two teams
+    pub fn is_over(&self) -> bool {
+        let filtered = self.state.teams.iter().filter(|&t| !self.state.living_players_in_team(t.id).is_empty());
+        let count = filtered.take(2).count();
+        let result = count < 2;
+        result
     }
 
     fn apply_effect(&mut self, effect: effect::Effect) {
@@ -92,6 +115,30 @@ mod tests {
     use super::state::effect::special::SpecialEffect;
     use super::state::effect::Effect;
     use crate::game::state::rng::AlgomancerRngSeed;
+    use crate::game::state::team::TeamId;
+
+    #[test]
+    fn test_is_over() {
+        let game_options = GameOptions {
+            seed: AlgomancerRngSeed::default(),
+            num_players: 4,
+            play_mode: PlayMode::Teams,
+            deck_mode: DeckMode::CommonDeck,
+        };
+
+        // apply effect to a game, each mutating its state somehow
+        let mut game = Game::new(&game_options).expect("game object");
+        let res = game.is_over();
+        assert_eq!(res, false);
+
+        for mut p in game.state.players_in_team_mut(TeamId(1)) {
+            p.is_alive = false
+        }
+
+        let res = game.is_over();
+        assert_eq!(res, true);
+
+    }
 
     #[test]
     fn test_action_replay() {
@@ -103,13 +150,13 @@ mod tests {
         };
 
         // apply effect to a game, each mutating its state somehow
-        let mut game = Game::new(&game_options);
+        let mut game = Game::new(&game_options).expect("game object");
         game.apply_effect(Effect::Special(SpecialEffect { effect_number: 11 }));
         game.apply_effect(Effect::Heal { amount: 3, target: 1 });
         game.apply_effect(Effect::Damage { amount: 5, target: 1 });
 
         // use the action history from game 1 on game 2
-        let mut game2 = Game::new(&game_options);
+        let mut game2 = Game::new(&game_options).expect("game object");
         for entry in game.effect_history.iter() {
             let effect = *entry.effect.clone();
             game2.apply_effect(effect)
@@ -136,7 +183,7 @@ mod tests {
             deck_mode: DeckMode::CommonDeck,
         };
 
-        let mut game = Game::new(&game_options);
+        let mut game = Game::new(&game_options).expect("game object");
 
         // use a random damage builder so that we are mutating the rand state
         // we need to make sure that it's serialized properly, so when we resume a game from

@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use crate::game::state::State;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum Phase {
@@ -81,7 +82,7 @@ impl Phase {
     }
 
     // this returns the next phase & step given the current phase & step
-    pub fn next(&self) -> Phase {
+    pub fn get_next_step(&self) -> Phase {
         match self {
             Phase::PrecombatPhase(step) => {
                 match step {
@@ -169,6 +170,26 @@ impl Phase {
     }
 }
 
+impl State {
+    fn reset_player_draft_flags(&mut self) {
+        self.players.iter_mut().for_each(|t| t.has_drafted = false)
+    }
+
+    pub fn transition_to_next_step(&mut self) {
+        let next_step = self.step.get_next_step();
+        println!("Transitioning from {:?} to {:?}", self.step, next_step);
+
+        match next_step {
+            Phase::PrecombatPhase(PrecombatPhaseStep::Untap) => {
+                self.reset_player_draft_flags()
+            }
+            _ => {}
+        }
+
+        self.step = next_step;
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::game::state::progression::{MainPhaseStep, Phase, PrecombatPhaseStep};
@@ -183,7 +204,7 @@ mod tests {
         let mut phase = initial_phase.clone();
         for _ in 0..100 {
             println!("{:?}", phase);
-            phase = phase.next();
+            phase = phase.get_next_step();
 
             // we got from the beginning to the end of the loop, success!
             if phase == Phase::MainPhase(MainPhaseStep::NITMain) {
@@ -192,7 +213,7 @@ mod tests {
         }
 
         // go one more
-        phase = phase.next();
+        phase = phase.get_next_step();
 
         // we should be back to the initial phase
         assert_eq!(phase, initial_phase);

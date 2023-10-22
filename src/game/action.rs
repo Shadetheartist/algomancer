@@ -19,27 +19,33 @@ pub enum Action {
 
 
 impl Game {
-
     pub fn apply_action(&mut self, action: &Action) {
         // todo: teams
         // todo: priority system (need teams)
-        println!("Applying Action [{:?}] during phase [{:?}]", action, self.state.phase);
+        println!("Applying Action [{:?}] during phase [{:?}]", action, self.state.step);
 
         let mut next_state = self.state.clone();
 
         match action {
             Action::Resolve => {
-                next_state.phase = next_state.phase.next()
+                next_state.transition_to_next_step();
             }
 
-            Action::Draft { .. } => {
-                todo!()
+            Action::Draft { player_id, .. } => {
+                let mut player = player_id.get_player(&mut next_state).unwrap();
+                player.has_drafted = true;
+                println!("Player [{:?}] has finished drafting.", player.id);
+
+                if next_state.players.iter().find(|p| p.has_drafted) == None {
+                    next_state.transition_to_next_step();
+                }
             }
 
             Action::Cast(_) => {
                 todo!()
             }
         }
+        next_state.transition_to_next_step();
 
         self.state = next_state
     }
@@ -47,18 +53,34 @@ impl Game {
     pub fn valid_actions(&self) -> HashSet<Action> {
         let mut valid_actions = HashSet::new();
 
-        match &self.state.phase {
+        match &self.state.step {
             Phase::MainPhase(MainPhaseStep::NITMain) => {
                 // dont put a valid action, for testing
             }
+
             Phase::PrecombatPhase(PrecombatPhaseStep::Draft) => {
-                valid_actions.insert(Action::Resolve);
+                for p in &self.state.players {
+                    if p.has_drafted {
+                        continue;
+                    }
+
+                    valid_actions.insert(Action::Draft {
+                        player_id: p.id,
+                        hand: Hand {
+                            cards: vec![
+                                CardId(1)
+                            ]
+                        },
+                    });
+                }
             }
+
             _ => {
-                valid_actions.insert(Action::Resolve);
+                if self.is_over() {
+                    valid_actions.insert(Action::Resolve);
+                }
             }
         }
-
 
         valid_actions
     }

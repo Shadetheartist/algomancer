@@ -1,36 +1,40 @@
 use serde::{Deserialize, Serialize};
 use crate::game::state::card::{Deck, Hand};
 use crate::game::state::{DeckMode, PlayMode, State};
+use crate::game::state::team::TeamId;
 use crate::wrap_index::wrap_index;
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct PlayerId(pub usize);
 
 impl PlayerId {
-    pub fn get_player(self, state: &State) -> Option<&Player> {
-        state.players.iter().find(|p| p.id == self)
+    pub fn get_player(self, state: &mut State) -> Option<&mut Player> {
+        state.players.iter_mut().find(|p| p.id == self)
     }
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Player {
-    id: PlayerId,
-    seat: usize,
-    team_id: usize,
-
-    health: i32,
-    hand: Hand,
+    pub id: PlayerId,
+    pub team_id: TeamId,
+    pub seat: usize,
+    pub is_alive: bool,
+    pub has_drafted: bool,
+    pub health: i32,
+    pub hand: Hand,
 
     // this may not be used, depending on the game mode
-    constructed_deck: Deck
+    pub constructed_deck: Deck
 }
 
 impl Player {
-    pub fn new(id: PlayerId, seat: usize, team_id: usize) -> Player {
+    pub fn new(id: PlayerId, seat: usize, team_id: TeamId) -> Player {
         Player {
             id,
             seat,
             team_id,
+            is_alive: true,
+            has_drafted: false,
             health: 30,
             hand: Hand::new(),
             constructed_deck: Deck::new(),
@@ -84,6 +88,11 @@ impl Player {
     }
 }
 
+impl State {
+    pub fn living_players(self, state: &State) -> Vec<&Player> {
+        state.players.iter().filter(|p| p.is_alive).collect()
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -100,7 +109,7 @@ mod tests {
             deck_mode: DeckMode::CommonDeck,
         };
 
-        let game = Game::new(&options);
+        let game = Game::new(&options).expect("a game object");
 
         let p1 = &game.state.players[0];
 
@@ -124,7 +133,7 @@ mod tests {
             deck_mode: DeckMode::CommonDeck,
         };
 
-        let game = Game::new(&options);
+        let game = Game::new(&options).expect("a game object");
 
         let p1 = &game.state.players[0];
 

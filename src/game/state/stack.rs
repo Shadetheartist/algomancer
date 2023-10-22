@@ -11,7 +11,7 @@ struct Stack {
 
 
 impl Stack {
-    fn add(entry: StackEffect) {}
+    fn add(_: StackEffect) {}
     fn next() {}
     fn resolve_next() {}
 }
