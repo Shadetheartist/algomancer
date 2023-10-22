@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use crate::game::state::State;
+use crate::game::state::{GameMode, State};
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum Phase {
@@ -82,7 +82,7 @@ impl Phase {
     }
 
     // this returns the next phase & step given the current phase & step
-    pub fn get_next_step(&self) -> Phase {
+    pub fn get_next_step(&self, state: &State) -> Phase {
         match self {
             Phase::PrecombatPhase(step) => {
                 match step {
@@ -90,7 +90,11 @@ impl Phase {
                         Phase::PrecombatPhase(PrecombatPhaseStep::Draw)
                     }
                     PrecombatPhaseStep::Draw => {
-                        Phase::PrecombatPhase(PrecombatPhaseStep::Draft)
+                        match state.deck_mode {
+                            GameMode::Standard | GameMode::TeamDraft => Phase::PrecombatPhase(PrecombatPhaseStep::Draft),
+                            // skip draft phase in constructed
+                            GameMode::Constructed => Phase::PrecombatPhase(PrecombatPhaseStep::ITMana),
+                        }
                     }
                     PrecombatPhaseStep::Draft => {
                         Phase::PrecombatPhase(PrecombatPhaseStep::ITMana)
@@ -176,7 +180,7 @@ impl State {
     }
 
     pub fn transition_to_next_step(&mut self) {
-        let next_step = self.step.get_next_step();
+        let next_step = self.step.get_next_step(self);
         println!("Transitioning from {:?} to {:?}", self.step, next_step);
 
         self.players.iter_mut().for_each(|p| p.passed_priority = false);

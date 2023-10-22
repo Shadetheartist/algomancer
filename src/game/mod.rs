@@ -1,7 +1,9 @@
 use serde::{Deserialize, Serialize};
 use state::rng::AlgomancerRngSeed;
 use crate::game::state::player::{Player, PlayerId};
-use crate::game::state::{DeckMode, effect, PlayMode};
+use crate::game::state::{GameMode, effect, PlayMode};
+use crate::game::state::card::Card;
+use crate::game::state::pack::Pack;
 use crate::game::state::team::{Team, TeamId};
 
 pub mod state;
@@ -17,7 +19,7 @@ pub struct GameOptions {
     pub seed: AlgomancerRngSeed,
     pub num_players: usize,
     pub play_mode: PlayMode,
-    pub deck_mode: DeckMode,
+    pub deck_mode: GameMode,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -25,6 +27,7 @@ pub struct Game {
     // effect history is separate from the game state, so that we don't have to
     // consider the effect history in the state hash, this isn't a blockchain, thank god
     effect_history: Vec<EffectHistoryEntry>,
+    cards: Vec<Card>,
     state: state::State,
 }
 
@@ -32,6 +35,7 @@ impl Game {
     pub fn new(options: &GameOptions) -> Result<Game, &str> {
         let mut game = Game {
             effect_history: Vec::new(),
+            cards: Vec::new(),
             state: state::State::new(options.seed, &options.play_mode, &options.deck_mode),
         };
 
@@ -55,7 +59,10 @@ impl Game {
             for p in 0..players_per_team {
                 let player_seat = p + t * num_teams;
                 let player_id = PlayerId(player_seat + 1);
-                game.state.players.push(Player::new(player_id, player_seat, TeamId(team_id)));
+                game.state.players.push(Player::new(player_id, player_seat, TeamId(team_id), Pack {
+                    owner: player_id,
+                    cards: vec![],
+                }));
             }
         }
 
@@ -110,7 +117,7 @@ impl Game {
 #[cfg(test)]
 mod tests {
     use crate::game::state::effect::EffectBuilder;
-    use crate::game::state::DeckMode;
+    use crate::game::state::GameMode;
     use super::{Game, GameOptions, PlayMode};
     use super::state::effect::special::SpecialEffect;
     use super::state::effect::Effect;
@@ -123,7 +130,7 @@ mod tests {
             seed: AlgomancerRngSeed::default(),
             num_players: 4,
             play_mode: PlayMode::Teams,
-            deck_mode: DeckMode::CommonDeck,
+            deck_mode: GameMode::Standard,
         };
 
         // apply effect to a game, each mutating its state somehow
@@ -145,7 +152,7 @@ mod tests {
             seed: AlgomancerRngSeed::default(),
             num_players: 8,
             play_mode: PlayMode::Teams,
-            deck_mode: DeckMode::CommonDeck,
+            deck_mode: GameMode::Standard,
         };
 
         // apply effect to a game, each mutating its state somehow
@@ -179,7 +186,7 @@ mod tests {
             seed: AlgomancerRngSeed::default(),
             num_players: 2,
             play_mode: PlayMode::Teams,
-            deck_mode: DeckMode::CommonDeck,
+            deck_mode: GameMode::Standard,
         };
 
         let mut game = Game::new(&game_options).expect("game object");

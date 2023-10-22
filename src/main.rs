@@ -1,7 +1,7 @@
 use game::state;
 use crate::game::action::Action;
 use crate::game::GameOptions;
-use crate::game::state::{DeckMode, PlayMode};
+use crate::game::state::{GameMode, PlayMode};
 
 mod game;
 mod wrap_index;
@@ -11,7 +11,7 @@ fn main() {
         seed: state::rng::AlgomancerRngSeed::default(),
         num_players: 4,
         play_mode: PlayMode::Teams,
-        deck_mode: DeckMode::CommonDeck,
+        deck_mode: GameMode::Standard,
     };
 
     let mut game = game::Game::new(&options).expect("game object");

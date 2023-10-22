@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
 use crate::game::state::deck::{Deck};
 use crate::game::state::hand::{Hand};
-use crate::game::state::{DeckMode, PlayMode, State};
+use crate::game::state::{GameMode, PlayMode, State};
+use crate::game::state::pack::Pack;
 use crate::game::state::team::TeamId;
 use crate::wrap_index::wrap_index;
 
@@ -23,14 +24,12 @@ pub struct Player {
     pub has_drafted: bool,
     pub health: i32,
     pub hand: Hand,
+    pub pack: Pack,
     pub passed_priority: bool,
-
-    // this may not be used, depending on the game mode
-    pub constructed_deck: Deck
 }
 
 impl Player {
-    pub fn new(id: PlayerId, seat: usize, team_id: TeamId) -> Player {
+    pub fn new(id: PlayerId, seat: usize, team_id: TeamId, pack: Pack) -> Player {
         Player {
             id,
             seat,
@@ -39,18 +38,21 @@ impl Player {
             has_drafted: false,
             health: 30,
             hand: Hand::new(),
+            pack,
             passed_priority: false,
-            constructed_deck: Deck::new(),
         }
     }
 
     pub fn get_deck<'a>(&'a self, state: &'a State) -> &Deck {
         match state.deck_mode {
-            DeckMode::CommonDeck => {
+            GameMode::Standard => {
                 &state.common_deck
             }
-            DeckMode::PlayerDecks => {
-                &self.constructed_deck
+            GameMode::TeamDraft => {
+                todo!()
+            }
+            GameMode::Constructed => {
+                todo!()
             }
         }
     }
@@ -100,7 +102,7 @@ impl State {
 #[cfg(test)]
 mod tests {
     use crate::game::{Game, GameOptions};
-    use crate::game::state::{DeckMode, PlayMode};
+    use crate::game::state::{GameMode, PlayMode};
     use crate::game::state::rng::AlgomancerRngSeed;
 
     #[test]
@@ -109,7 +111,7 @@ mod tests {
             seed: AlgomancerRngSeed::default(),
             num_players: 2,
             play_mode: PlayMode::Teams,
-            deck_mode: DeckMode::CommonDeck,
+            deck_mode: GameMode::Standard,
         };
 
         let game = Game::new(&options).expect("a game object");
@@ -133,7 +135,7 @@ mod tests {
             seed: AlgomancerRngSeed::default(),
             num_players: 4,
             play_mode: PlayMode::Teams,
-            deck_mode: DeckMode::CommonDeck,
+            deck_mode: GameMode::Standard,
         };
 
         let game = Game::new(&options).expect("a game object");

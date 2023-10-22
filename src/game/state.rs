@@ -3,7 +3,7 @@ use std::hash::{Hash, Hasher};
 use serde::{Deserialize, Serialize};
 use rng::{AlgomancerRng, AlgomancerRngSeed};
 use crate::game::state::card::{Card};
-use crate::game::state::deck::Deck;
+use crate::game::state::deck::{Deck, DeckId};
 use crate::game::state::player::Player;
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
 use crate::game::state::team::Team;
@@ -31,15 +31,17 @@ pub enum PlayMode {
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
-pub enum DeckMode {
-    CommonDeck,
-    PlayerDecks
+pub enum GameMode {
+    Standard,
+    // todo: PreDraft,
+    TeamDraft,
+    Constructed
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct State {
     pub play_mode: PlayMode,
-    pub deck_mode: DeckMode,
+    pub deck_mode: GameMode,
     pub common_deck: Deck,
     pub rand: AlgomancerRng,
     pub step: Phase,
@@ -48,23 +50,23 @@ pub struct State {
     // to reference other objects rather than pointers, at least for now
     pub teams: Vec<Team>,
     pub players: Vec<Player>,
-    pub cards: Vec<Card>,
+    pub decks: Vec<Deck>,
 
     // using this for testing
     pub funny_number: i32,
 }
 
 impl State {
-    pub fn new(seed: AlgomancerRngSeed, play_mode: &PlayMode, deck_mode: &DeckMode) -> State {
+    pub fn new(seed: AlgomancerRngSeed, play_mode: &PlayMode, deck_mode: &GameMode) -> State {
         State {
             play_mode: play_mode.clone(),
             deck_mode: deck_mode.clone(),
-            common_deck: Deck::new(),
+            common_deck: Deck::new(DeckId(1)),
             rand: AlgomancerRng::new(seed),
             step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
             players: Vec::new(),
             teams: Vec::new(),
-            cards: Vec::new(),
+            decks: Vec::new(),
 
             funny_number: 0,
         }
@@ -74,13 +76,13 @@ impl State {
     pub fn default() -> State {
         State {
             play_mode: PlayMode::Teams,
-            deck_mode: DeckMode::CommonDeck,
-            common_deck: Deck::new(),
+            deck_mode: GameMode::Standard,
+            common_deck: Deck::new(DeckId(1)),
             rand: AlgomancerRng::new(AlgomancerRngSeed::default()),
             step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
             players: Vec::new(),
             teams: Vec::new(),
-            cards: Vec::new(),
+            decks: Vec::new(),
 
             funny_number: 0,
         }

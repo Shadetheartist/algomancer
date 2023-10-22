@@ -65,6 +65,7 @@ impl Game {
             Action::Draft { player_id, .. } => {
                 let mut player = player_id.get_player(&mut next_state).unwrap();
 
+                // todo: constructed vs draft (constructed draw and draft are combined)
                 // todo: set hand to cards selected in draft
 
                 player.has_drafted = true;

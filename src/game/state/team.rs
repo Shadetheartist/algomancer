@@ -31,7 +31,7 @@ impl State {
 #[cfg(test)]
 mod tests {
     use crate::game::{Game, GameOptions};
-    use crate::game::state::{DeckMode, PlayMode};
+    use crate::game::state::{GameMode, PlayMode};
     use crate::game::state::rng::AlgomancerRngSeed;
     use crate::game::state::team::TeamId;
 
@@ -42,7 +42,7 @@ mod tests {
             seed: AlgomancerRngSeed::default(),
             num_players: 2,
             play_mode: PlayMode::Teams,
-            deck_mode: DeckMode::CommonDeck,
+            deck_mode: GameMode::Standard,
         }).expect("a game object");
 
         let players = game.state.players_in_team(TeamId(1));
@@ -54,7 +54,7 @@ mod tests {
             seed: AlgomancerRngSeed::default(),
             num_players: 3,
             play_mode: PlayMode::Teams,
-            deck_mode: DeckMode::CommonDeck,
+            deck_mode: GameMode::Standard,
         };
         // testing 3 player, shouldn't work
         let game = Game::new(options);
@@ -65,7 +65,7 @@ mod tests {
             seed: AlgomancerRngSeed::default(),
             num_players: 4,
             play_mode: PlayMode::Teams,
-            deck_mode: DeckMode::CommonDeck,
+            deck_mode: GameMode::Standard,
         }).expect("a game object");
 
         let players = game.state.players_in_team(TeamId(1));
@@ -78,7 +78,7 @@ mod tests {
             seed: AlgomancerRngSeed::default(),
             num_players: 5,
             play_mode: PlayMode::Teams,
-            deck_mode: DeckMode::CommonDeck,
+            deck_mode: GameMode::Standard,
         };
         // testing 3 player, shouldn't work
         let game = Game::new(options);
@@ -90,7 +90,7 @@ mod tests {
             seed: AlgomancerRngSeed::default(),
             num_players: 6,
             play_mode: PlayMode::Teams,
-            deck_mode: DeckMode::CommonDeck,
+            deck_mode: GameMode::Standard,
         }).expect("a game object");
 
         let players = game.state.players_in_team(TeamId(1));
