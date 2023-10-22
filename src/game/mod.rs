@@ -1,13 +1,10 @@
-use std::collections::HashSet;
 use serde::{Deserialize, Serialize};
 use state::rng::AlgomancerRngSeed;
-use crate::game::action::Action;
 use crate::game::state::player::{Player, PlayerId};
 use crate::game::state::{DeckMode, effect, PlayMode};
-use crate::game::state::progression::{MainPhaseStep, Phase, PrecombatPhaseStep};
 
 pub mod state;
-mod action;
+pub mod action;
 
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -49,48 +46,6 @@ impl Game {
         game
     }
 
-    pub fn apply_action(&mut self, action: &Action) {
-        // todo: teams
-        // todo: priority system (need teams)
-        println!("Applying Action [{:?}] during phase [{:?}]", action, self.state.phase);
-
-        let mut next_state = self.state.clone();
-
-        match action {
-            Action::Resolve => {
-                next_state.phase = next_state.phase.next()
-            }
-
-            Action::Draft { .. } => {
-                todo!()
-            }
-
-            Action::Cast(_) => {
-                todo!()
-            }
-        }
-
-        self.state = next_state
-    }
-
-    pub fn valid_actions(&self) -> HashSet<Action> {
-        let mut valid_actions = HashSet::new();
-
-        match &self.state.phase {
-            Phase::MainPhase(MainPhaseStep::NITMain) => {
-                // dont put a valid action, for testing
-            }
-            Phase::PrecombatPhase(PrecombatPhaseStep::Draft) => {
-                valid_actions.insert(Action::Resolve);
-            }
-            _ => {
-                valid_actions.insert(Action::Resolve);
-            }
-        }
-
-
-        valid_actions
-    }
 
     pub fn print_history(&self) {
         println!();
