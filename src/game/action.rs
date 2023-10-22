@@ -2,7 +2,8 @@ use std::cmp::Ordering;
 use std::collections::HashSet;
 use serde::{Deserialize, Serialize};
 use crate::game::Game;
-use crate::game::state::card::{CardId, Hand};
+use crate::game::state::card::{CardId};
+use crate::game::state::hand::Hand;
 use crate::game::state::player::PlayerId;
 use crate::game::state::progression::{MainPhaseStep, Phase, PrecombatPhaseStep};
 
@@ -30,7 +31,10 @@ impl Ord for Action {
     fn cmp(&self, other: &Self) -> Ordering {
         match self {
             Action::PassPriority(_) => {
-                Ordering::Less
+                match other {
+                    Action::PassPriority(_) => Ordering::Equal,
+                    _ => Ordering::Less,
+                }
             }
             _ => {
                 Ordering::Equal

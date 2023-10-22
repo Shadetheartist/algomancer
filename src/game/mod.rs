@@ -39,7 +39,7 @@ impl Game {
         let num_teams = 2;
         let players_per_team = options.num_players / num_teams;
         if players_per_team * num_teams != options.num_players {
-            return Err("s");
+            return Err("odd number of players not allowed since they won't fit nicely in teams");
         }
 
         for t in 0..num_teams {
