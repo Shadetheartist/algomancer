@@ -7,9 +7,20 @@ pub struct CardId(pub usize);
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Card {
-    id: CardId,
-    name: String,
-    text: String,
-    costs: Costs,
-    effects: Vec<EffectBuilder>
+    pub card_id: CardId,
+    pub name: String,
+    pub text: String,
+    pub costs: Costs,
+    pub effects: Vec<EffectBuilder>
+}
+
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+pub struct CardsDB {
+    pub cards: Vec<Card>
+}
+
+impl CardsDB {
+    pub fn get_card(&self, card_id: CardId) -> Option<&Card> {
+        self.cards.iter().find(|c| c.card_id == card_id)
+    }
 }

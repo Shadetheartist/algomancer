@@ -7,14 +7,14 @@ pub struct DeckId(pub usize);
 // a deck is a collection of cards in some order
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Deck {
-    pub id: DeckId,
+    pub deck_id: DeckId,
     pub cards: Vec<CardId>,
 }
 
 impl Deck {
     pub fn new(id: DeckId) -> Deck {
         Deck {
-            id,
+            deck_id: id,
             cards: Vec::new()
         }
     }

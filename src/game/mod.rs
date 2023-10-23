@@ -1,8 +1,10 @@
+use rand::seq::SliceRandom;
 use serde::{Deserialize, Serialize};
 use state::rng::AlgomancerRngSeed;
 use crate::game::state::player::{Player, PlayerId};
 use crate::game::state::{GameMode, effect, PlayMode};
-use crate::game::state::card::Card;
+use crate::game::state::card::{Card, CardId, CardsDB};
+use crate::game::state::deck::{Deck, DeckId};
 use crate::game::state::pack::Pack;
 use crate::game::state::team::{Team, TeamId};
 
@@ -27,16 +29,41 @@ pub struct Game {
     // effect history is separate from the game state, so that we don't have to
     // consider the effect history in the state hash, this isn't a blockchain, thank god
     effect_history: Vec<EffectHistoryEntry>,
-    cards: Vec<Card>,
+    cards_db: CardsDB,
     state: state::State,
 }
 
 impl Game {
     pub fn new(options: &GameOptions) -> Result<Game, &str> {
+
+        let mut cards = Vec::new();
+        for i in 0..(54*3+50) {
+            let card_id = i+1;
+            cards.push(Card{
+                card_id: CardId(card_id),
+                name: format!("Card #{}", card_id),
+                text: "No card text".to_string(),
+                costs: vec![],
+                effects: vec![],
+            })
+        }
+        let cards_db = CardsDB { cards };
+
+        let mut state = state::State::new(options.seed, &options.play_mode, &options.deck_mode);
+
+        let mut deck = Deck::new(DeckId(1));
+        for c in &cards_db.cards {
+            deck.cards.push(c.card_id)
+        }
+        deck.cards.shuffle(&mut state.rand.rng);
+
+        state.common_deck = deck;
+
         let mut game = Game {
             effect_history: Vec::new(),
-            cards: Vec::new(),
-            state: state::State::new(options.seed, &options.play_mode, &options.deck_mode),
+            cards_db: cards_db,
+            state: state,
+
         };
 
         // game basically supports 1 or two teams, where 1 is ffa, and 2 is team play
