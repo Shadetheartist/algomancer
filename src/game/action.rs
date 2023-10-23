@@ -1,3 +1,7 @@
+mod draw;
+mod draft;
+mod pass_priority;
+
 use std::cmp::Ordering;
 use std::collections::HashSet;
 use serde::{Deserialize, Serialize};
@@ -54,22 +58,12 @@ impl Game {
         let mut next_state = self.state.clone();
 
         match action {
-            Action::PassPriority(player_id) => {
-                let mut player = player_id.get_player(&mut next_state).expect("the player that passed priority");
-                player.passed_priority = true;
-                if next_state.all_players_passed_priority() {
-                    next_state.transition_to_next_step();
-                }
+            Action::PassPriority(_) => {
+                self.apply_pass_priority_action(&mut next_state, action);
             }
-
             Action::Draft { player_id, .. } => {
-                let mut player = player_id.get_player(&mut next_state).unwrap();
+                self.apply_draft_action(&mut next_state, action);
 
-                // todo: constructed vs draft (constructed draw and draft are combined)
-                // todo: set hand to cards selected in draft
-
-                player.has_drafted = true;
-                println!("Player [{:?}] has selected their draft.", player.id);
             }
 
             Action::Cast(_) => {
