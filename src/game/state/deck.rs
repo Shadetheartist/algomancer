@@ -18,4 +18,13 @@ impl Deck {
             cards: Vec::new()
         }
     }
+
+    pub fn top_card_id(&self) -> Option<CardId> {
+        if self.cards.len() > 0 {
+            return Some(self.cards[0]);
+        }
+
+        None
+    }
 }
+

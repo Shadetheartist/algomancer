@@ -1,5 +1,7 @@
+use std::fmt::Error;
 use serde::{Deserialize, Serialize};
 use crate::game::state::{GameMode, State};
+use crate::game::state::card::CardId;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum Phase {
@@ -68,7 +70,7 @@ impl Phase {
                     CombatPhaseAStep::AfterCombatPriorityWindow => true,
                     _ => false,
                 }
-            },
+            }
             Phase::CombatPhaseB(step) => {
                 match step {
                     CombatPhaseBStep::AfterNITAttackPriorityWindow => true,
@@ -76,7 +78,7 @@ impl Phase {
                     CombatPhaseBStep::AfterCombatPriorityWindow => true,
                     _ => false,
                 }
-            },
+            }
             _ => false,
         }
     }
@@ -179,15 +181,42 @@ impl State {
         self.players.iter_mut().for_each(|t| t.has_drafted = false)
     }
 
+    fn reset_player_priority(&mut self) {
+        self.players.iter_mut().for_each(|p| p.passed_priority = false);
+    }
+
+    fn move_card(card_id: CardId, from: &mut Vec<CardId>, to: &mut Vec<CardId>) -> Result<(), &'static str> {
+        if let Some(index) = from.iter().position(|&c_id| c_id == card_id) {
+            from.remove(index);
+            to.push(card_id);
+            Ok(())
+        } else {
+            Err("cannot move card, it does not exist in 'from' vec")
+        }
+    }
+
+    fn take_draw_step_cards(&mut self) {
+        self.players.iter_mut().for_each(|p| {
+            for _ in 0..2 {
+                if let Some(top_card_id) = self.common_deck.top_card_id() {
+                    Self::move_card(top_card_id, &mut self.common_deck.cards, &mut p.hand.cards).expect("card should have moved");
+                }
+            }
+        });
+    }
+
     pub fn transition_to_next_step(&mut self) {
         let next_step = self.step.get_next_step(self);
         println!("Transitioning from {:?} to {:?}", self.step, next_step);
 
-        self.players.iter_mut().for_each(|p| p.passed_priority = false);
+        self.reset_player_priority();
 
         match next_step {
             Phase::PrecombatPhase(PrecombatPhaseStep::Untap) => {
                 self.reset_player_draft_flags()
+            }
+            Phase::PrecombatPhase(PrecombatPhaseStep::Draw) => {
+                self.take_draw_step_cards()
             }
             _ => {}
         }
@@ -201,8 +230,7 @@ mod tests {
     use crate::game::state::progression::{MainPhaseStep, Phase, PrecombatPhaseStep};
 
     #[test]
-    fn test_phase_next(){
-
+    fn test_phase_next() {
         let initial_phase = Phase::PrecombatPhase(PrecombatPhaseStep::Untap);
 
         // there aren't nearly 100 steps in a round,
