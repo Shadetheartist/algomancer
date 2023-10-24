@@ -2,6 +2,12 @@
 
 ## Design Considerations
 
+Freeplay mode (initial goal)
+- enforces only the base rules of the game, does not handle card abilities at all
+- to allow games to be piloted by players, allowing them to move cards in and out of various zones
+- like cockatrice
+
+
 Player view info filtering
 
 Action history

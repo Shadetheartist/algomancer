@@ -33,9 +33,22 @@ impl Faction {
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
-pub struct Cost {
-    faction: Faction,
-    amount: i32
+pub struct FactionAffinity {
+    pub faction: Faction,
+    pub amount: u8
 }
 
-pub type Costs = Vec<Cost>;
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+pub struct Cost {
+    pub faction_affinities: Vec<FactionAffinity>,
+    pub additional_cost: u8,
+}
+
+impl Cost {
+    pub fn free() -> Cost {
+        Cost {
+            faction_affinities: Vec::new(),
+            additional_cost: 0
+        }
+    }
+}

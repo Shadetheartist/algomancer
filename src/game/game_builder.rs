@@ -13,7 +13,7 @@ use crate::game::state::permanent::{Permanent, PermanentCommon, PermanentId};
 use crate::game::state::player::{Player, PlayerId};
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
 use crate::game::state::region::Region;
-use crate::game::state::resource::{Faction, Resource};
+use crate::game::state::resource::{Cost, Faction, Resource};
 use crate::game::state::rng::AlgomancerRng;
 use crate::game::state::team::TeamId;
 
@@ -56,7 +56,7 @@ impl Game {
                     prototype_id: card_prototype_id,
                     name: format!("Card #{}", id_num),
                     text: format!("Text for card #{}.", id_num),
-                    costs: Vec::new(),
+                    costs: Cost::free(),
                     card_type: CardType::Unit,
                 });
             }
@@ -69,7 +69,7 @@ impl Game {
                 prototype_id: card_prototype_id,
                 name: "Mana Converter".to_string(),
                 text: "At the beginning of the mana step, you may exchange this for another resource.".to_string(),
-                costs: Vec::new(),
+                costs: Cost::free(),
                 card_type: CardType::Resource,
             });
 
@@ -79,7 +79,7 @@ impl Game {
                 prototype_id: card_prototype_id,
                 name: "Shard".to_string(),
                 text: "(Shards add no affinity, but all resources including this can be expended for [1]).".to_string(),
-                costs: Vec::new(),
+                costs: Cost::free(),
                 card_type: CardType::Resource,
             });
 
@@ -90,7 +90,7 @@ impl Game {
                     prototype_id: card_prototype_id,
                     name: format!("{:?}", f),
                     text: format!("When I enter play, if you have [{:?} {:?} {:?}], take a shard.", f, f, f),
-                    costs: Vec::new(),
+                    costs: Cost::free(),
                     card_type: CardType::Resource,
                 });
             }
@@ -101,7 +101,7 @@ impl Game {
                 prototype_id: card_prototype_id,
                 name: "Token Unit".to_string(),
                 text: "Why, hello there".to_string(),
-                costs: Vec::new(),
+                costs: Cost::free(),
                 card_type: CardType::UnitToken,
             });
 

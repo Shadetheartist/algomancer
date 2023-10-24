@@ -2,8 +2,7 @@ use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 
 use serde::{Deserialize, Serialize};
-
-use crate::game::state::resource::Costs;
+use crate::game::state::resource::Cost;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum CardType {
@@ -22,7 +21,7 @@ pub struct CardPrototype {
     pub prototype_id: CardPrototypeId,
     pub name: String,
     pub text: String,
-    pub costs: Costs,
+    pub costs: Cost,
     pub card_type: CardType,
 }
 
