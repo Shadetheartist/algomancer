@@ -20,6 +20,18 @@ pub enum Faction {
     Wood,
 }
 
+impl Faction {
+    pub fn all() -> Vec<Faction> {
+        vec![
+            Faction::Fire,
+            Faction::Earth,
+            Faction::Water,
+            Faction::Metal,
+            Faction::Wood,
+        ]
+    }
+}
+
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Cost {
     faction: Faction,

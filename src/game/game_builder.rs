@@ -7,7 +7,7 @@ use rand::prelude::SliceRandom;
 use crate::game::{Game, GameOptions};
 use crate::game::game_builder::NewGameError::NotSupportedYet;
 use crate::game::state::{GameMode, State, TeamConfiguration};
-use crate::game::state::card::{CardPrototype, CardPrototypeId, CardsDB};
+use crate::game::state::card::{Card, CardId, CardPrototype, CardPrototypeId, CardsDB, CardType};
 use crate::game::state::deck::{Deck, DeckId};
 use crate::game::state::permanent::{Permanent, PermanentCommon, PermanentId};
 use crate::game::state::player::{Player, PlayerId};
@@ -47,52 +47,84 @@ impl Game {
         if let GameMode::LiveDraft { team_configuration, .. } = &options.game_mode {
             let mut algomancer_rng = AlgomancerRng::new(options.seed);
 
-            let mut cards = HashMap::new();
+            let mut card_prototypes = HashMap::new();
             let mut id_num = 0;
-            for i in 0..(54 * 3 + 50) {
+            for i in 0..((10 + 54) * 3) {
                 id_num = i + 1;
                 let card_prototype_id = CardPrototypeId(id_num);
-                cards.insert(card_prototype_id, CardPrototype {
+                card_prototypes.insert(card_prototype_id, CardPrototype {
                     prototype_id: card_prototype_id,
                     name: format!("Card #{}", id_num),
                     text: format!("Text for card #{}.", id_num),
                     costs: Vec::new(),
+                    card_type: CardType::Unit,
                 });
             }
 
             // add the prototypes for the resource types, mana converters, shards, and, tokens
             id_num += 1;
             let card_prototype_id = CardPrototypeId(id_num);
-            cards.insert(card_prototype_id, CardPrototype {
+            card_prototypes.insert(card_prototype_id, CardPrototype {
                 prototype_id: card_prototype_id,
                 name: "Mana Converter".to_string(),
                 text: "At the beginning of the mana step, you may exchange this for another resource.".to_string(),
                 costs: Vec::new(),
+                card_type: CardType::Resource,
             });
 
             id_num += 1;
             let card_prototype_id = CardPrototypeId(id_num);
-            cards.insert(card_prototype_id, CardPrototype {
+            card_prototypes.insert(card_prototype_id, CardPrototype {
                 prototype_id: card_prototype_id,
                 name: "Shard".to_string(),
                 text: "(Shards add no affinity, but all resources including this can be expended for [1]).".to_string(),
                 costs: Vec::new(),
+                card_type: CardType::Resource,
             });
 
-            for r in vec![Faction::Earth, Faction::Wood, Faction::Water, Faction::Fire, Faction::Metal] {
+            for f in Faction::all() {
                 id_num += 1;
                 let card_prototype_id = CardPrototypeId(id_num);
-                cards.insert(card_prototype_id, CardPrototype {
+                card_prototypes.insert(card_prototype_id, CardPrototype {
                     prototype_id: card_prototype_id,
-                    name: format!("{:?}", r),
-                    text: format!("When I enter play, if you have [{:?} {:?} {:?}], take a shard.", r, r, r),
+                    name: format!("{:?}", f),
+                    text: format!("When I enter play, if you have [{:?} {:?} {:?}], take a shard.", f, f, f),
                     costs: Vec::new(),
+                    card_type: CardType::Resource,
                 });
             }
 
+            id_num += 1;
+            let card_prototype_id = CardPrototypeId(id_num);
+            card_prototypes.insert(card_prototype_id, CardPrototype {
+                prototype_id: card_prototype_id,
+                name: "Token Unit".to_string(),
+                text: "Why, hello there".to_string(),
+                costs: Vec::new(),
+                card_type: CardType::UnitToken,
+            });
+
+            // takes all the non-token, non-resource card prototypes and maps them to card instances
+            let mut card_id_counter = 0;
+            let cards_for_deck = card_prototypes.values()
+                .filter(|c| {
+                    match c.card_type {
+                        CardType::Resource | CardType::UnitToken | CardType::SpellToken => false,
+                        CardType::Unit | CardType::Spell => true,
+                    }
+                })
+                .map(|c| {
+                    card_id_counter += 1;
+                    Card {
+                        card_id: CardId(card_id_counter),
+                        prototype_id: c.prototype_id,
+                    }
+                })
+                .collect();
+
             let cards_db = CardsDB {
-                card_prototypes: cards,
-                card_instances: vec![]
+                card_prototypes,
+                card_instances: cards_for_deck,
             };
 
             let mut deck = Deck::new(DeckId(1));
@@ -130,7 +162,7 @@ impl Game {
                 }
             }
 
-            fn add_players_and_regions(game: &mut Game, teams_of_players: &Vec<u8>){
+            fn add_players_and_regions(game: &mut Game, teams_of_players: &Vec<u8>) {
                 let interlaced_players = Game::interlace_players(teams_of_players);
                 for (seat, &team_id) in interlaced_players.iter().enumerate() {
                     let player_id = PlayerId((seat + 1) as u8);
@@ -151,13 +183,13 @@ impl Game {
                                 owner_player_id: player_id,
                                 region_id: region_id,
                             },
-                            resource_type: Resource::ManaConverter
+                            resource_type: Resource::ManaConverter,
                         })
                     }
                 }
             }
 
-            return Ok(game)
+            return Ok(game);
         }
 
         panic!("don't call this if the game mode isn't live draft")
@@ -209,8 +241,6 @@ impl Game {
         }
     }
 }
-
-
 
 
 #[cfg(test)]

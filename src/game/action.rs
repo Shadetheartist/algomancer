@@ -64,7 +64,6 @@ impl Game {
             }
             Action::Draft { .. } => {
                 self.apply_draft_action(&mut next_state, action);
-
             }
 
             Action::Cast(_) => {

@@ -5,6 +5,15 @@ use serde::{Deserialize, Serialize};
 
 use crate::game::state::resource::Costs;
 
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+pub enum CardType {
+    Resource,
+    UnitToken,
+    SpellToken,
+    Unit,
+    Spell,
+}
+
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy, Ord, PartialOrd)]
 pub struct CardPrototypeId(pub usize);
 
@@ -14,6 +23,7 @@ pub struct CardPrototype {
     pub name: String,
     pub text: String,
     pub costs: Costs,
+    pub card_type: CardType,
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
