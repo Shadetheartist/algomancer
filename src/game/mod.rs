@@ -1,12 +1,9 @@
-use rand::seq::SliceRandom;
 use serde::{Deserialize, Serialize};
+
 use state::rng::AlgomancerRngSeed;
-use crate::game::state::player::{Player, PlayerId};
-use crate::game::state::{GameMode, effect, TeamConfiguration};
-use crate::game::state::card::{Card, CardId, CardsDB};
-use crate::game::state::deck::{Deck, DeckId};
-use crate::game::state::pack::Pack;
-use crate::game::state::team::{Team, TeamId};
+
+use crate::game::state::{effect, GameMode};
+use crate::game::state::card::CardsDB;
 
 pub mod state;
 pub mod action;
@@ -84,11 +81,12 @@ impl Game {
 mod tests {
     use crate::game::state::effect::EffectBuilder;
     use crate::game::state::GameMode;
-    use super::{Game, GameOptions, TeamConfiguration};
-    use super::state::effect::special::SpecialEffect;
-    use super::state::effect::Effect;
     use crate::game::state::rng::AlgomancerRngSeed;
     use crate::game::state::team::TeamId;
+
+    use super::{Game, GameOptions};
+    use super::state::effect::Effect;
+    use super::state::effect::special::SpecialEffect;
 
     #[test]
     fn test_is_over() {

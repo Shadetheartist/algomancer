@@ -1,14 +1,16 @@
-mod draft;
-mod pass_priority;
-
 use std::cmp::Ordering;
 use std::collections::HashSet;
+
 use serde::{Deserialize, Serialize};
+
 use crate::game::Game;
-use crate::game::state::card::{CardId};
+use crate::game::state::card::CardId;
 use crate::game::state::hand::Hand;
 use crate::game::state::player::PlayerId;
 use crate::game::state::progression::{MainPhaseStep, Phase, PrecombatPhaseStep};
+
+mod draft;
+mod pass_priority;
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Serialize, Deserialize)]
 pub enum Action {
@@ -60,7 +62,7 @@ impl Game {
             Action::PassPriority(_) => {
                 self.apply_pass_priority_action(&mut next_state, action);
             }
-            Action::Draft { player_id, .. } => {
+            Action::Draft { .. } => {
                 self.apply_draft_action(&mut next_state, action);
 
             }

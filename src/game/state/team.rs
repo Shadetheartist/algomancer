@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
-use crate::game::state::player::{Player};
+
+use crate::game::state::player::Player;
 use crate::game::state::State;
 
 #[derive(Hash, PartialEq, Eq, Serialize, Deserialize, Clone, Debug, Copy)]
@@ -31,7 +32,7 @@ impl State {
 #[cfg(test)]
 mod tests {
     use crate::game::{Game, GameOptions};
-    use crate::game::state::{GameMode, TeamConfiguration};
+    use crate::game::state::GameMode;
     use crate::game::state::rng::AlgomancerRngSeed;
     use crate::game::state::team::TeamId;
 

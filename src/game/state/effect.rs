@@ -1,10 +1,11 @@
-pub mod special;
-
 use serde::{Deserialize, Serialize};
 
 use special::SpecialEffect;
+
 use crate::game::state;
 use crate::game::state::ObjectId;
+
+pub mod special;
 
 // this builder pattern allows for effect preparation before application to the state
 // for instance, if an effect would have a random damage value, the randomness is resolved here
@@ -65,7 +66,8 @@ impl Effect {
 
 #[cfg(test)]
 mod tests {
-    use crate::game::state::{State};
+    use crate::game::state::State;
+
     use super::{Effect, EffectBuilder};
 
     #[test]

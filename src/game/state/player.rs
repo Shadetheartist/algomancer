@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
-use crate::game::state::hand::{Hand};
-use crate::game::state::{State};
+
+use crate::game::state::State;
+use crate::game::state::hand::Hand;
 use crate::game::state::pack::Pack;
 use crate::game::state::team::TeamId;
-use crate::wrap_index::wrap_index;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct PlayerId(pub u8);
@@ -42,7 +42,7 @@ impl Player {
         }
     }
 
-    fn next_neighbor<'a, F>(&'a self, state: &'a State, f: F) -> Option<&Player> where F: Fn(u8, u8) -> i32 {
+    fn next_neighbor<'a, F>(&'a self, _: &'a State, f: F) -> Option<&Player> where F: Fn(u8, u8) -> i32 {
         todo!()
     }
 
@@ -66,7 +66,7 @@ impl State {
 #[cfg(test)]
 mod tests {
     use crate::game::{Game, GameOptions};
-    use crate::game::state::{GameMode};
+    use crate::game::state::GameMode;
     use crate::game::state::rng::AlgomancerRngSeed;
 
     #[test]

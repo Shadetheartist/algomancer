@@ -1,13 +1,14 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
+
 use serde::{Deserialize, Serialize};
+
 use rng::{AlgomancerRng, AlgomancerRngSeed};
-use crate::game::state::card::{Card};
+
 use crate::game::state::deck::{Deck, DeckId};
 use crate::game::state::player::Player;
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
 use crate::game::state::resource::Resource;
-use crate::game::state::resource::Resource::{Earth, Wood};
 use crate::game::state::team::Team;
 
 pub mod effect;
@@ -68,7 +69,7 @@ impl GameMode {
     pub fn new_player_mode() -> GameMode {
         GameMode::LiveDraft {
             team_configuration: TeamConfiguration::one_v_one(),
-            selected_deck_types: vec![Earth, Wood]
+            selected_deck_types: vec![Resource::Earth, Resource::Wood]
         }
     }
 }
@@ -108,12 +109,7 @@ impl State {
     // this is useful for testing
     pub fn default() -> State {
         State {
-            game_mode: GameMode::LiveDraft {
-                selected_deck_types: vec![Resource::Fire, Resource::Wood],
-                team_configuration: TeamConfiguration::Teams {
-                    players: vec![1, 1]
-                },
-            },
+            game_mode: GameMode::new_player_mode(),
             common_deck: Deck::new(DeckId(1)),
             rand: AlgomancerRng::new(AlgomancerRngSeed::default()),
             step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
@@ -137,8 +133,10 @@ impl State {
 mod tests {
     use std::collections::hash_map::DefaultHasher;
     use std::hash::{Hash, Hasher};
+
     use crate::game::state::rng::{AlgomancerRng, AlgomancerRngSeed};
-    use super::{State};
+
+    use super::State;
 
     // utility function to avoid code duplication
     // creates a pre-defined rng instance

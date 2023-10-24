@@ -1,7 +1,8 @@
-use rand::distributions::uniform::{SampleRange, SampleUniform};
 use std::hash::{Hash, Hasher};
-use serde::{Deserialize, Serialize};
+
 use rand::{Rng, SeedableRng};
+use rand::distributions::uniform::{SampleRange, SampleUniform};
+use serde::{Deserialize, Serialize};
 
 // wrapping some other seedable rng in the inner field,
 // so that we can implement the hash trait ourselves

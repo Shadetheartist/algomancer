@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+
 use crate::game::state::card::CardId;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]

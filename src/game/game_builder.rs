@@ -1,18 +1,16 @@
-use std::cmp::Reverse;
-use std::collections::BinaryHeap;
 use std::error::Error;
 use std::fmt;
+
 use rand::prelude::SliceRandom;
-use crate::game::{Game, GameOptions, state};
+
+use crate::game::{Game, GameOptions};
 use crate::game::game_builder::NewGameError::NotSupportedYet;
 use crate::game::state::{GameMode, State, TeamConfiguration};
 use crate::game::state::card::{Card, CardId, CardsDB};
 use crate::game::state::deck::{Deck, DeckId};
 use crate::game::state::pack::Pack;
 use crate::game::state::player::{Player, PlayerId};
-use crate::game::state::rng::AlgomancerRngSeed;
 use crate::game::state::team::{Team, TeamId};
-
 
 #[derive(Debug)]
 pub enum NewGameError {

@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
-use crate::game::{state};
+
+use crate::game::state;
 
 // this special effect demonstrates how to extract code out of the effects enum
 // this pattern could be solidified in a trait down the road

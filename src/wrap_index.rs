@@ -27,7 +27,6 @@ pub fn wrap_index(len: usize, idx: i32) -> Option<usize> {
 
 #[cfg(test)]
 mod tests {
-    use std::usize;
     use crate::wrap_index::wrap_index;
 
     #[test]
