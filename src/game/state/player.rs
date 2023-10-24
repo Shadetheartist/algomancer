@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::game::state::{GameMode, State};
 use crate::game::state::hand::Hand;
-use crate::game::state::pack::Pack;
+use crate::game::state::pack::PackId;
 use crate::game::state::team::TeamId;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
@@ -18,17 +18,17 @@ impl PlayerId {
 pub struct Player {
     pub id: PlayerId,
     pub team_id: TeamId,
+    pub pack_id: Option<PackId>,
     pub seat: u8,
     pub is_alive: bool,
     pub has_drafted: bool,
     pub health: i32,
     pub hand: Hand,
-    pub pack: Pack,
     pub passed_priority: bool,
 }
 
 impl Player {
-    pub fn new(id: PlayerId, seat: u8, team_id: TeamId, pack: Pack) -> Player {
+    pub fn new(id: PlayerId, seat: u8, team_id: TeamId, option: Option<PackId>) -> Player {
         Player {
             id,
             seat,
@@ -37,8 +37,8 @@ impl Player {
             has_drafted: false,
             health: 30,
             hand: Hand::new(),
-            pack,
             passed_priority: false,
+            pack_id: Option::from(PackId(0)),
         }
     }
 

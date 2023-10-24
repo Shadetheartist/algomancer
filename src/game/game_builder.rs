@@ -8,7 +8,6 @@ use crate::game::game_builder::NewGameError::NotSupportedYet;
 use crate::game::state::{GameMode, State, TeamConfiguration};
 use crate::game::state::card::{Card, CardId, CardsDB};
 use crate::game::state::deck::{Deck, DeckId};
-use crate::game::state::pack::Pack;
 use crate::game::state::permanent::{Permanent, PermanentCommon, PermanentId};
 use crate::game::state::player::{Player, PlayerId};
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
@@ -74,6 +73,7 @@ impl Game {
                 decks: vec![deck],
                 regions: Vec::new(),
                 permanents: Vec::new(),
+                packs: Vec::new(),
                 next_permanent_id: 1,
             };
 
@@ -88,10 +88,7 @@ impl Game {
                 let interlaced_players = Game::interlace_players(teams_of_players);
                 for (seat, &team_id) in interlaced_players.iter().enumerate() {
                     let player_id = PlayerId((seat + 1) as u8);
-                    let mut player = Player::new(player_id, seat as u8, TeamId(team_id), Pack {
-                        owner_player_id: player_id,
-                        cards: Vec::new(),
-                    });
+                    let mut player = Player::new(player_id, seat as u8, TeamId(team_id), None);
 
                     Game::draw_opening_hand(game, &mut player);
                     game.state.players.push(player);

@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use rng::{AlgomancerRng, AlgomancerRngSeed};
 
 use crate::game::state::deck::{Deck, DeckId};
+use crate::game::state::pack::Pack;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::Player;
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
@@ -89,6 +90,7 @@ pub struct State {
 
     // store data in a generally flat structure, using id's
     // to reference other objects rather than pointers, at least for now
+    pub packs: Vec<Pack>,
     pub teams: Vec<Team>,
     pub players: Vec<Player>,
     pub decks: Vec<Deck>,
@@ -110,6 +112,7 @@ impl State {
             decks: Vec::new(),
             regions: Vec::new(),
             permanents: Vec::new(),
+            packs: Vec::new(),
             next_permanent_id: 1,
         }
     }
