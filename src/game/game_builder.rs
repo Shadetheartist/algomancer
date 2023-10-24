@@ -64,6 +64,7 @@ impl Game {
             // add the prototypes for the resource types, mana converters, shards, and, tokens
             id_num += 1;
             let card_prototype_id = CardPrototypeId(id_num);
+            let mana_converter_prototype_id = card_prototype_id;
             card_prototypes.insert(card_prototype_id, CardPrototype {
                 prototype_id: card_prototype_id,
                 name: "Mana Converter".to_string(),
@@ -155,14 +156,14 @@ impl Game {
 
             match &team_configuration {
                 TeamConfiguration::FFA { num_players } => {
-                    add_players_and_regions(&mut game, &vec![0, *num_players]);
+                    add_players_and_regions(&mut game, &vec![0, *num_players], mana_converter_prototype_id);
                 }
                 TeamConfiguration::Teams { teams_of_players } => {
-                    add_players_and_regions(&mut game, teams_of_players);
+                    add_players_and_regions(&mut game, teams_of_players, mana_converter_prototype_id);
                 }
             }
 
-            fn add_players_and_regions(game: &mut Game, teams_of_players: &Vec<u8>) {
+            fn add_players_and_regions(game: &mut Game, teams_of_players: &Vec<u8>, mana_converter_prototype_id: CardPrototypeId) {
                 let interlaced_players = Game::interlace_players(teams_of_players);
                 for (seat, &team_id) in interlaced_players.iter().enumerate() {
                     let player_id = PlayerId((seat + 1) as u8);
@@ -176,15 +177,9 @@ impl Game {
                     game.state.regions.push(region);
 
                     for _ in 0..2 {
-                        let permanent_id = PermanentId::next(&mut game.state);
-                        game.state.permanents.push(Permanent::Resource {
-                            common: PermanentCommon {
-                                permanent_id: permanent_id,
-                                owner_player_id: player_id,
-                                region_id: region_id,
-                            },
-                            resource_type: Resource::ManaConverter,
-                        })
+                        let prototype = &game.cards_db.card_prototypes[&mana_converter_prototype_id];
+                        let permanent = Permanent::from_card_prototype(prototype, region_id, player_id, &mut game.state);
+                        game.state.permanents.push(permanent)
                     }
                 }
             }

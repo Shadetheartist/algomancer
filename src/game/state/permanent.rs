@@ -1,9 +1,8 @@
 use serde::{Deserialize, Serialize};
 
-use crate::game::state::card::CardId;
+use crate::game::state::card::{CardId, CardPrototype, CardPrototypeId, CardType};
 use crate::game::state::player::PlayerId;
 use crate::game::state::region::RegionId;
-use crate::game::state::resource::Resource;
 use crate::game::state::State;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
@@ -32,14 +31,34 @@ pub enum Permanent {
     },
     Resource {
         common: PermanentCommon,
-        resource_type: Resource,
-        // resources should be cards maybe?
+        card_prototype_id: CardPrototypeId,
     },
     SpellToken {
         common: PermanentCommon,
+        card_prototype_id: CardPrototypeId,
     },
     UnitToken {
         common: PermanentCommon,
+        card_prototype_id: CardPrototypeId,
     },
 }
 
+impl Permanent {
+    pub fn from_card_prototype(card_prototype: &CardPrototype, region_id: RegionId, player_id: PlayerId, state: &mut State) -> Permanent {
+        match card_prototype.card_type {
+            CardType::Resource => {
+                Permanent::Resource {
+                    common: PermanentCommon {
+                        permanent_id: PermanentId::next(state),
+                        owner_player_id: player_id,
+                        region_id: region_id,
+                    },
+                    card_prototype_id: card_prototype.prototype_id,
+                }
+            }
+            _ => {
+                todo!()
+            }
+        }
+    }
+}
