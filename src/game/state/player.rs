@@ -1,13 +1,12 @@
 use serde::{Deserialize, Serialize};
-use crate::game::state::deck::{Deck};
 use crate::game::state::hand::{Hand};
-use crate::game::state::{GameMode, PlayMode, State};
+use crate::game::state::{State};
 use crate::game::state::pack::Pack;
 use crate::game::state::team::TeamId;
 use crate::wrap_index::wrap_index;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
-pub struct PlayerId(pub usize);
+pub struct PlayerId(pub u8);
 
 impl PlayerId {
     pub fn get_player(self, state: &mut State) -> Option<&mut Player> {
@@ -19,7 +18,7 @@ impl PlayerId {
 pub struct Player {
     pub id: PlayerId,
     pub team_id: TeamId,
-    pub seat: usize,
+    pub seat: u8,
     pub is_alive: bool,
     pub has_drafted: bool,
     pub health: i32,
@@ -29,7 +28,7 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(id: PlayerId, seat: usize, team_id: TeamId, pack: Pack) -> Player {
+    pub fn new(id: PlayerId, seat: u8, team_id: TeamId, pack: Pack) -> Player {
         Player {
             id,
             seat,
@@ -43,43 +42,8 @@ impl Player {
         }
     }
 
-    pub fn get_deck<'a>(&'a self, state: &'a State) -> &Deck {
-        match state.deck_mode {
-            GameMode::Standard => {
-                &state.common_deck
-            }
-            GameMode::TeamDraft => {
-                todo!()
-            }
-            GameMode::Constructed => {
-                todo!()
-            }
-        }
-    }
-
-    fn next_neighbor<'a, F>(&'a self, state: &'a State, f: F) -> Option<&Player> where F: Fn(usize, usize) -> i32 {
-        let num_players = state.players.len();
-
-        // start at 1 because we don't want to start at this player's seat
-        for i in 1..num_players {
-            let idx = f(self.seat, i);
-            let wrapped_idx = wrap_index(num_players, idx).expect("a wrapped idx");
-            let neighbor = &state.players[wrapped_idx];
-
-            match state.play_mode {
-                PlayMode::FFA => {
-                    return Some(neighbor);
-                }
-                PlayMode::Teams => {
-                    // if they're not with me, then they're against me
-                    if self.team_id != neighbor.team_id {
-                        return Some(neighbor);
-                    }
-                }
-            }
-        }
-
-        None
+    fn next_neighbor<'a, F>(&'a self, state: &'a State, f: F) -> Option<&Player> where F: Fn(u8, u8) -> i32 {
+        todo!()
     }
 
     // the clockwise neighbor is the next living opponent with a greater seat index. indexes wrap.
@@ -102,16 +66,14 @@ impl State {
 #[cfg(test)]
 mod tests {
     use crate::game::{Game, GameOptions};
-    use crate::game::state::{GameMode, PlayMode};
+    use crate::game::state::{GameMode};
     use crate::game::state::rng::AlgomancerRngSeed;
 
     #[test]
     fn test_neighbors_2p(){
         let options = GameOptions{
             seed: AlgomancerRngSeed::default(),
-            num_players: 2,
-            play_mode: PlayMode::Teams,
-            deck_mode: GameMode::Standard,
+            game_mode: GameMode::new_player_mode(),
         };
 
         let game = Game::new(&options).expect("a game object");
@@ -133,9 +95,7 @@ mod tests {
     fn test_neighbors_4p(){
         let options = GameOptions{
             seed: AlgomancerRngSeed::default(),
-            num_players: 4,
-            play_mode: PlayMode::Teams,
-            deck_mode: GameMode::Standard,
+            game_mode: GameMode::new_player_mode(),
         };
 
         let game = Game::new(&options).expect("a game object");

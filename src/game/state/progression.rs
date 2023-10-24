@@ -84,7 +84,7 @@ impl Phase {
     }
 
     // this returns the next phase & step given the current phase & step
-    pub fn get_next_step(&self, state: &State) -> Phase {
+    pub fn get_next_step(&self, game_mode: &GameMode) -> Phase {
         match self {
             Phase::PrecombatPhase(step) => {
                 match step {
@@ -92,10 +92,10 @@ impl Phase {
                         Phase::PrecombatPhase(PrecombatPhaseStep::Draw)
                     }
                     PrecombatPhaseStep::Draw => {
-                        match state.deck_mode {
-                            GameMode::Standard | GameMode::TeamDraft => Phase::PrecombatPhase(PrecombatPhaseStep::Draft),
-                            // skip draft phase in constructed
-                            GameMode::Constructed => Phase::PrecombatPhase(PrecombatPhaseStep::ITMana),
+                        match &game_mode {
+                            // skip the draft step in constructed
+                            GameMode::Constructed { .. } => Phase::PrecombatPhase(PrecombatPhaseStep::ITMana),
+                            _ => Phase::PrecombatPhase(PrecombatPhaseStep::Draft),
                         }
                     }
                     PrecombatPhaseStep::Draft => {
@@ -185,7 +185,7 @@ impl State {
         self.players.iter_mut().for_each(|p| p.passed_priority = false);
     }
 
-    fn move_card(card_id: CardId, from: &mut Vec<CardId>, to: &mut Vec<CardId>) -> Result<(), &'static str> {
+    pub fn move_card(card_id: CardId, from: &mut Vec<CardId>, to: &mut Vec<CardId>) -> Result<(), &'static str> {
         if let Some(index) = from.iter().position(|&c_id| c_id == card_id) {
             from.remove(index);
             to.push(card_id);
@@ -206,7 +206,7 @@ impl State {
     }
 
     pub fn transition_to_next_step(&mut self) {
-        let next_step = self.step.get_next_step(self);
+        let next_step = self.step.get_next_step(&self.game_mode);
         println!("Transitioning from {:?} to {:?}", self.step, next_step);
 
         self.reset_player_priority();
@@ -227,18 +227,19 @@ impl State {
 
 #[cfg(test)]
 mod tests {
+    use crate::game::state::GameMode;
     use crate::game::state::progression::{MainPhaseStep, Phase, PrecombatPhaseStep};
 
     #[test]
     fn test_phase_next() {
         let initial_phase = Phase::PrecombatPhase(PrecombatPhaseStep::Untap);
-
+        let mode = &GameMode::new_player_mode();
         // there aren't nearly 100 steps in a round,
         // so if we get to the end of a round before the loop is over, the test is successful
         let mut phase = initial_phase.clone();
         for _ in 0..100 {
             println!("{:?}", phase);
-            phase = phase.get_next_step();
+            phase = phase.get_next_step(mode);
 
             // we got from the beginning to the end of the loop, success!
             if phase == Phase::MainPhase(MainPhaseStep::NITMain) {
@@ -247,7 +248,7 @@ mod tests {
         }
 
         // go one more
-        phase = phase.get_next_step();
+        phase = phase.get_next_step(mode);
 
         // we should be back to the initial phase
         assert_eq!(phase, initial_phase);

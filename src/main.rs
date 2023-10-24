@@ -1,7 +1,8 @@
 use game::state;
 use crate::game::action::Action;
 use crate::game::GameOptions;
-use crate::game::state::{GameMode, PlayMode};
+use crate::game::state::{GameMode, TeamConfiguration};
+use crate::game::state::resource::Resource::{Earth, Wood};
 
 mod game;
 mod wrap_index;
@@ -9,9 +10,10 @@ mod wrap_index;
 fn main() {
     let options = GameOptions{
         seed: state::rng::AlgomancerRngSeed::default(),
-        num_players: 4,
-        play_mode: PlayMode::Teams,
-        deck_mode: GameMode::Standard,
+        game_mode: GameMode::LiveDraft{
+            selected_deck_types: vec![Earth, Wood],
+            team_configuration:TeamConfiguration::Teams { players: vec![1, 1] } ,
+        },
     };
 
     let mut game = game::Game::new(&options).expect("game object");

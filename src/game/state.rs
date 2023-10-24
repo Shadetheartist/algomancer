@@ -6,6 +6,8 @@ use crate::game::state::card::{Card};
 use crate::game::state::deck::{Deck, DeckId};
 use crate::game::state::player::Player;
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
+use crate::game::state::resource::Resource;
+use crate::game::state::resource::Resource::{Earth, Wood};
 use crate::game::state::team::Team;
 
 pub mod effect;
@@ -25,23 +27,55 @@ pub mod hand;
 type ObjectId = i32;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
-pub enum PlayMode {
-    FFA,
-    Teams
+pub enum TeamConfiguration {
+    FFA {
+        num_players: u8
+    },
+    Teams {
+        // describes the number of players per team
+        players: Vec<u8>
+    },
+}
+
+// as described in the manual
+// aside from 1v1, i've never played any of these lol
+impl TeamConfiguration {
+    pub fn one_v_one() -> TeamConfiguration {
+        TeamConfiguration::Teams { players: vec![1, 1] }
+    }
+
+    pub fn three_v_three() -> TeamConfiguration {
+        TeamConfiguration::Teams { players: vec![3, 3] }
+    }
+
+    pub fn two_v_one() -> TeamConfiguration {
+        TeamConfiguration::Teams { players: vec![2, 1] }
+    }
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum GameMode {
-    Standard,
-    // todo: PreDraft,
-    TeamDraft,
-    Constructed
+    LiveDraft {
+        selected_deck_types: Vec<Resource>,
+        team_configuration: TeamConfiguration,
+    },
+    PreDraft { team_configuration: TeamConfiguration },
+    TeamDraft { team_configuration: TeamConfiguration },
+    Constructed { team_configuration: TeamConfiguration },
+}
+
+impl GameMode {
+    pub fn new_player_mode() -> GameMode {
+        GameMode::LiveDraft {
+            team_configuration: TeamConfiguration::one_v_one(),
+            selected_deck_types: vec![Earth, Wood]
+        }
+    }
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct State {
-    pub play_mode: PlayMode,
-    pub deck_mode: GameMode,
+    pub game_mode: GameMode,
     pub common_deck: Deck,
     pub rand: AlgomancerRng,
     pub step: Phase,
@@ -57,10 +91,9 @@ pub struct State {
 }
 
 impl State {
-    pub fn new(seed: AlgomancerRngSeed, play_mode: &PlayMode, deck_mode: &GameMode) -> State {
+    pub fn new(seed: AlgomancerRngSeed, game_mode: GameMode) -> State {
         State {
-            play_mode: play_mode.clone(),
-            deck_mode: deck_mode.clone(),
+            game_mode: game_mode.clone(),
             common_deck: Deck::new(DeckId(1)),
             rand: AlgomancerRng::new(seed),
             step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
@@ -75,8 +108,12 @@ impl State {
     // this is useful for testing
     pub fn default() -> State {
         State {
-            play_mode: PlayMode::Teams,
-            deck_mode: GameMode::Standard,
+            game_mode: GameMode::LiveDraft {
+                selected_deck_types: vec![Resource::Fire, Resource::Wood],
+                team_configuration: TeamConfiguration::Teams {
+                    players: vec![1, 1]
+                },
+            },
             common_deck: Deck::new(DeckId(1)),
             rand: AlgomancerRng::new(AlgomancerRngSeed::default()),
             step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
@@ -93,7 +130,6 @@ impl State {
         self.hash(&mut hasher);
         format!("#{:x}", hasher.finish())
     }
-
 }
 
 
@@ -106,7 +142,7 @@ mod tests {
 
     // utility function to avoid code duplication
     // creates a pre-defined rng instance
-    fn setup_rand() -> AlgomancerRng{
+    fn setup_rand() -> AlgomancerRng {
         let seed = AlgomancerRngSeed::default();
 
         // create an rng instance
@@ -123,7 +159,7 @@ mod tests {
     }
 
     #[test]
-    fn test_state_serialization(){
+    fn test_state_serialization() {
         let mut state = State::default();
         state.funny_number = 100;
 
@@ -136,7 +172,7 @@ mod tests {
 
 
     #[test]
-    fn test_rand_deterministic(){
+    fn test_rand_deterministic() {
 
         // create a rng instances
         let mut r1 = setup_rand();
@@ -163,12 +199,10 @@ mod tests {
 
         // so this should not be equal
         assert_ne!(r1_val, r2_val);
-
     }
 
     #[test]
-    fn test_rand_hashable(){
-
+    fn test_rand_hashable() {
         fn hash_it(r: AlgomancerRng) -> u64 {
             // hash it
             let mut hasher = DefaultHasher::new();
@@ -194,6 +228,5 @@ mod tests {
 
         // so this should not be equal
         assert_ne!(r1_hash, r3_hash);
-
     }
 }

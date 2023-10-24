@@ -3,7 +3,7 @@ use crate::game::state::player::{Player};
 use crate::game::state::State;
 
 #[derive(Hash, PartialEq, Eq, Serialize, Deserialize, Clone, Debug, Copy)]
-pub struct TeamId(pub usize);
+pub struct TeamId(pub u8);
 
 #[derive(Hash, PartialEq, Eq, Serialize, Deserialize, Clone, Debug)]
 pub struct Team {
@@ -31,7 +31,7 @@ impl State {
 #[cfg(test)]
 mod tests {
     use crate::game::{Game, GameOptions};
-    use crate::game::state::{GameMode, PlayMode};
+    use crate::game::state::{GameMode, TeamConfiguration};
     use crate::game::state::rng::AlgomancerRngSeed;
     use crate::game::state::team::TeamId;
 
@@ -40,61 +40,12 @@ mod tests {
         // testing two player
         let game = Game::new(&GameOptions {
             seed: AlgomancerRngSeed::default(),
-            num_players: 2,
-            play_mode: PlayMode::Teams,
-            deck_mode: GameMode::Standard,
+            game_mode: GameMode::new_player_mode(),
         }).expect("a game object");
 
         let players = game.state.players_in_team(TeamId(1));
         assert_eq!(game.state.players_in_team(TeamId(1)).iter().count(), 1);
         assert_eq!(game.state.players_in_team(TeamId(2)).iter().count(), 1);
 
-
-        let options = &GameOptions {
-            seed: AlgomancerRngSeed::default(),
-            num_players: 3,
-            play_mode: PlayMode::Teams,
-            deck_mode: GameMode::Standard,
-        };
-        // testing 3 player, shouldn't work
-        let game = Game::new(options);
-        assert_eq!(game.is_err(), true);
-
-        // testing 4 player
-        let game = Game::new(&GameOptions {
-            seed: AlgomancerRngSeed::default(),
-            num_players: 4,
-            play_mode: PlayMode::Teams,
-            deck_mode: GameMode::Standard,
-        }).expect("a game object");
-
-        let players = game.state.players_in_team(TeamId(1));
-        assert_eq!(game.state.players_in_team(TeamId(1)).iter().count(), 2);
-        assert_eq!(game.state.players_in_team(TeamId(2)).iter().count(), 2);
-
-
-        // testing 5 player
-        let options = &GameOptions {
-            seed: AlgomancerRngSeed::default(),
-            num_players: 5,
-            play_mode: PlayMode::Teams,
-            deck_mode: GameMode::Standard,
-        };
-        // testing 3 player, shouldn't work
-        let game = Game::new(options);
-        assert_eq!(game.is_err(), true);
-
-
-        // testing 6 player
-        let game = Game::new(&GameOptions {
-            seed: AlgomancerRngSeed::default(),
-            num_players: 6,
-            play_mode: PlayMode::Teams,
-            deck_mode: GameMode::Standard,
-        }).expect("a game object");
-
-        let players = game.state.players_in_team(TeamId(1));
-        assert_eq!(game.state.players_in_team(TeamId(1)).iter().count(), 3);
-        assert_eq!(game.state.players_in_team(TeamId(2)).iter().count(), 3);
     }
 }

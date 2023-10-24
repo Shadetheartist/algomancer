@@ -2,7 +2,7 @@ use rand::seq::SliceRandom;
 use serde::{Deserialize, Serialize};
 use state::rng::AlgomancerRngSeed;
 use crate::game::state::player::{Player, PlayerId};
-use crate::game::state::{GameMode, effect, PlayMode};
+use crate::game::state::{GameMode, effect, TeamConfiguration};
 use crate::game::state::card::{Card, CardId, CardsDB};
 use crate::game::state::deck::{Deck, DeckId};
 use crate::game::state::pack::Pack;
@@ -10,6 +10,7 @@ use crate::game::state::team::{Team, TeamId};
 
 pub mod state;
 pub mod action;
+pub mod game_builder;
 
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -19,9 +20,7 @@ struct EffectHistoryEntry {
 
 pub struct GameOptions {
     pub seed: AlgomancerRngSeed,
-    pub num_players: usize,
-    pub play_mode: PlayMode,
-    pub deck_mode: GameMode,
+    pub game_mode: GameMode,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -34,67 +33,7 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(options: &GameOptions) -> Result<Game, &str> {
 
-        let mut cards = Vec::new();
-        for i in 0..(54*3+50) {
-            let card_id = i+1;
-            cards.push(Card{
-                card_id: CardId(card_id),
-                name: format!("Card #{}", card_id),
-                text: "No card text".to_string(),
-                costs: vec![],
-                effects: vec![],
-            })
-        }
-        let cards_db = CardsDB { cards };
-
-        let mut state = state::State::new(options.seed, &options.play_mode, &options.deck_mode);
-
-        let mut deck = Deck::new(DeckId(1));
-        for c in &cards_db.cards {
-            deck.cards.push(c.card_id)
-        }
-        deck.cards.shuffle(&mut state.rand.rng);
-
-        state.common_deck = deck;
-
-        let mut game = Game {
-            effect_history: Vec::new(),
-            cards_db: cards_db,
-            state: state,
-
-        };
-
-        // game basically supports 1 or two teams, where 1 is ffa, and 2 is team play
-        let num_teams = 2;
-        let players_per_team = options.num_players / num_teams;
-        if players_per_team * num_teams != options.num_players {
-            return Err("odd number of players not allowed since they won't fit nicely in teams");
-        }
-
-        for t in 0..num_teams {
-            let team_id = t + 1;
-
-            game.state.teams.push(Team{
-                id: TeamId(team_id),
-                passed_priority: false,
-                has_priority: false,
-                has_initiative: false,
-            });
-
-            for p in 0..players_per_team {
-                let player_seat = p + t * num_teams;
-                let player_id = PlayerId(player_seat + 1);
-                game.state.players.push(Player::new(player_id, player_seat, TeamId(team_id), Pack {
-                    owner: player_id,
-                    cards: vec![],
-                }));
-            }
-        }
-
-        Ok(game)
-    }
 
     pub fn print_history(&self) {
         println!();
@@ -145,7 +84,7 @@ impl Game {
 mod tests {
     use crate::game::state::effect::EffectBuilder;
     use crate::game::state::GameMode;
-    use super::{Game, GameOptions, PlayMode};
+    use super::{Game, GameOptions, TeamConfiguration};
     use super::state::effect::special::SpecialEffect;
     use super::state::effect::Effect;
     use crate::game::state::rng::AlgomancerRngSeed;
@@ -155,9 +94,7 @@ mod tests {
     fn test_is_over() {
         let game_options = GameOptions {
             seed: AlgomancerRngSeed::default(),
-            num_players: 4,
-            play_mode: PlayMode::Teams,
-            deck_mode: GameMode::Standard,
+            game_mode: GameMode::new_player_mode(),
         };
 
         // apply effect to a game, each mutating its state somehow
@@ -177,9 +114,7 @@ mod tests {
     fn test_action_replay() {
         let game_options = GameOptions {
             seed: AlgomancerRngSeed::default(),
-            num_players: 8,
-            play_mode: PlayMode::Teams,
-            deck_mode: GameMode::Standard,
+            game_mode: GameMode::new_player_mode(),
         };
 
         // apply effect to a game, each mutating its state somehow
@@ -211,9 +146,7 @@ mod tests {
     fn test_game_serialization() {
         let game_options = GameOptions {
             seed: AlgomancerRngSeed::default(),
-            num_players: 2,
-            play_mode: PlayMode::Teams,
-            deck_mode: GameMode::Standard,
+            game_mode: GameMode::new_player_mode(),
         };
 
         let mut game = Game::new(&game_options).expect("game object");

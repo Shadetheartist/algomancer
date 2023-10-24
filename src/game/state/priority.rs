@@ -38,6 +38,7 @@ impl State {
 
 #[cfg(test)]
 mod tests {
+    use crate::game::state::pack::Pack;
     use crate::game::state::player::{Player, PlayerId};
     use crate::game::state::State;
     use crate::game::state::team::TeamId;
@@ -48,7 +49,7 @@ mod tests {
         // test with no players with passed priority
         let mut state = State::default();
         for i in 0..4 {
-            let mut player = Player::new(PlayerId(0), 0, TeamId(0));
+            let mut player = Player::new(PlayerId(0), 0, TeamId(0), Pack{ owner: PlayerId(0), cards: vec![] });
             player.passed_priority = false;
             state.players.push(player);
         }
