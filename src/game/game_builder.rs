@@ -10,11 +10,11 @@ use crate::game::state::card::{Card, CardId, CardsDB};
 use crate::game::state::deck::{Deck, DeckId};
 use crate::game::state::pack::Pack;
 use crate::game::state::player::{Player, PlayerId};
-use crate::game::state::team::{Team, TeamId};
+use crate::game::state::team::TeamId;
 
 #[derive(Debug)]
 pub enum NewGameError {
-    InvalidConfiguration(&'static str),
+    //InvalidConfiguration(&'static str),
     NotSupportedYet(String),
 }
 
@@ -130,7 +130,7 @@ impl Game {
     }
 
 
-    fn draw_opening_hand(mut game: &mut Game, mut player: &mut Player) {
+    fn draw_opening_hand(game: &mut Game, player: &mut Player) {
         for _ in 0..16 {
             State::
             move_card(

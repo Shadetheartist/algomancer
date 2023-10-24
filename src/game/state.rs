@@ -13,7 +13,6 @@ use crate::game::state::team::Team;
 
 pub mod effect;
 pub mod card;
-pub mod zone;
 pub mod player;
 pub mod progression;
 pub mod resource;
@@ -30,6 +29,7 @@ type ObjectId = i32;
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum TeamConfiguration {
     // this can't be generalized to teams of 1 since it also affects how the turn progresses.
+    // and includes the introduction of 'intent cards'
     FFA {
         num_players: u8
     },
@@ -41,6 +41,7 @@ pub enum TeamConfiguration {
 
 // as described in the manual
 // aside from 1v1, i've never played any of these lol
+#[allow(dead_code)]
 impl TeamConfiguration {
     pub fn one_v_one() -> TeamConfiguration {
         TeamConfiguration::Teams { teams_of_players: vec![1, 1] }
