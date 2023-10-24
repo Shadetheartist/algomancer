@@ -6,7 +6,7 @@ impl Game {
     pub fn apply_draft_action(&self, state: &mut State, action: &Action) {
         if let Action::Draft { player_id, .. } = action {
 
-            let mut player = player_id.get_player(state).unwrap();
+            let player = player_id.get_player(state).unwrap();
 
             // todo: constructed vs draft (constructed draw and draft are combined)
             // todo: set hand to cards selected in draft

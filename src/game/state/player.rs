@@ -42,7 +42,7 @@ impl Player {
         }
     }
 
-    fn next_neighbor<'a, F>(&'a self, _: &'a State, f: F) -> Option<&Player> where F: Fn(u8, u8) -> i32 {
+    fn next_neighbor<'a, F>(&'a self, _: &'a State, _: F) -> Option<&Player> where F: Fn(u8, u8) -> i32 {
         todo!()
     }
 

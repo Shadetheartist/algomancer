@@ -97,6 +97,14 @@ impl Game {
     }
 
     /// distributes the various players as evenly as possible amongst the seats at the table
+    fn interlace_players(teams_of_players: &Vec<u8>) -> Vec<u8> {
+        // fleshes out the vec of u8 into a more formal structure so
+        // we don't lose track of what team each player is on during the interlacing process
+        let teams: Vec<(u8, u8)> = teams_of_players.iter().enumerate().map(|(i, &t)| (i as u8, t)).collect();
+        Self::interlace_evenly(&teams)
+    }
+
+    /// distributes the various items as evenly as possible amongst indices of the resulting vector
     /// by minimising the 'gap' for each element, which is calculated as the difference between the
     /// desired and actual positions for the next occurrence of each character.
     /// It selects the character with the smallest gap to place next in the result.
@@ -127,20 +135,6 @@ impl Game {
         result.into_iter().collect()
     }
 
-    fn interlace_players(teams_of_players: &Vec<u8>) {
-        if teams_of_players.len() < 2 {
-            panic!("not supposed to call this for FFA, there's only one team set")
-        }
-
-        // get a ascending sort of the team sizes
-        let mut teams_of_players = teams_of_players.clone();
-        teams_of_players.sort();
-
-        // fleshes out the vec of u8 into a more formal structure so
-        // we don't lose track of what team each player is on during the interlacing process
-        let teams: Vec<(u8, u8)> = teams_of_players.iter().enumerate().map(|(i, &t)| (i as u8, t)).collect();
-        let interlaced = Self::interlace_evenly(&teams);
-    }
 
     fn draw_opening_hand(mut game: &mut Game, mut player: &mut Player) {
         for _ in 0..16 {
@@ -162,7 +156,27 @@ mod tests {
     use crate::game::Game;
 
     #[test]
-    fn test_interlace_interlace_evenly() {
+    fn test_interlace_players() {
+
+        //1v1
+        let teams_of_players = vec![1, 1];
+        assert_eq!(Game::interlace_players(&teams_of_players), vec![0, 1]);
+
+        // 2v2
+        let teams_of_players = vec![2, 2];
+        assert_eq!(Game::interlace_players(&teams_of_players), vec![0, 1, 0, 1]);
+
+        // exotic ooh
+        let teams_of_players = vec![6, 5, 2, 9];
+        assert_eq!(Game::interlace_players(&teams_of_players), vec![3, 0, 1, 3, 0, 3, 1, 3, 0, 2, 3, 1, 0, 3, 3, 1, 0, 3, 0, 1, 2, 3]);
+    }
+
+    #[test]
+    fn test_interlace_evenly() {
+
+        //FFA
+        let counts = vec![(0, 6)];
+        assert_eq!(Game::interlace_evenly(&counts), vec![0, 0, 0, 0, 0, 0]);
 
         //1v1
         let counts = vec![(0, 1), (1, 1)];

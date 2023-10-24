@@ -44,7 +44,6 @@ mod tests {
             game_mode: GameMode::new_player_mode(),
         }).expect("a game object");
 
-        let players = game.state.players_in_team(TeamId(1));
         assert_eq!(game.state.players_in_team(TeamId(1)).iter().count(), 1);
         assert_eq!(game.state.players_in_team(TeamId(2)).iter().count(), 1);
 

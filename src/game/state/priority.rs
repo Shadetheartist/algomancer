@@ -10,6 +10,9 @@ struct Priority {}
 
 impl State {
     pub fn all_players_passed_priority(&self) -> bool {
+        if self.players.len() == 0 {
+            panic!("wtf there's no players")
+        }
         !self.players.iter().any(|p| p.passed_priority == false)
     }
 
@@ -47,8 +50,9 @@ mod tests {
     fn test_all_players_passed_priority(){
 
         // test with no players with passed priority
+        // this player creation process is mighty scuffed
         let mut state = State::default();
-        for i in 0..4 {
+        for _ in 0..state.players.len() {
             let mut player = Player::new(PlayerId(0), 0, TeamId(0), Pack{ owner: PlayerId(0), cards: vec![] });
             player.passed_priority = false;
             state.players.push(player);
@@ -57,7 +61,7 @@ mod tests {
 
 
         // test all but one player with passed priority
-        for mut player in state.players.iter_mut() {
+        for player in state.players.iter_mut() {
             player.passed_priority = true;
         }
         state.players[0].passed_priority = false;
@@ -65,7 +69,7 @@ mod tests {
 
 
         // test all players with passed priority
-        for mut player in state.players.iter_mut() {
+        for player in state.players.iter_mut() {
             player.passed_priority = true;
         }
         assert_eq!(state.all_players_passed_priority(), true);
