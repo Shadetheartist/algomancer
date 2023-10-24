@@ -1,6 +1,20 @@
+use std::collections::HashMap;
+use std::hash::{Hash, Hasher};
+
 use serde::{Deserialize, Serialize};
 
 use crate::game::state::resource::Costs;
+
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy, Ord, PartialOrd)]
+pub struct CardPrototypeId(pub usize);
+
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+pub struct CardPrototype {
+    pub prototype_id: CardPrototypeId,
+    pub name: String,
+    pub text: String,
+    pub costs: Costs,
+}
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct CardId(pub usize);
@@ -8,18 +22,24 @@ pub struct CardId(pub usize);
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Card {
     pub card_id: CardId,
-    pub name: String,
-    pub text: String,
-    pub costs: Costs,
+    pub prototype_id: CardPrototypeId,
 }
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct CardsDB {
-    pub cards: Vec<Card>
+    pub card_prototypes: HashMap<CardPrototypeId, CardPrototype>,
+    pub card_instances: Vec<Card>,
 }
 
-impl CardsDB {
-    pub fn get_card(&self, card_id: CardId) -> Option<&Card> {
-        self.cards.iter().find(|c| c.card_id == card_id)
+impl Hash for CardsDB {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        let mut entries: Vec<(&CardPrototypeId, &CardPrototype)> = self.card_prototypes.iter().collect();
+        entries.sort_by_key(|a| a.0);
+        for (k, v) in entries {
+            k.hash(state);
+            v.hash(state);
+        }
+
+        self.card_instances.hash(state);
     }
 }

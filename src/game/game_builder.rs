@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::error::Error;
 use std::fmt;
 
@@ -6,13 +7,13 @@ use rand::prelude::SliceRandom;
 use crate::game::{Game, GameOptions};
 use crate::game::game_builder::NewGameError::NotSupportedYet;
 use crate::game::state::{GameMode, State, TeamConfiguration};
-use crate::game::state::card::{Card, CardId, CardsDB};
+use crate::game::state::card::{CardPrototype, CardPrototypeId, CardsDB};
 use crate::game::state::deck::{Deck, DeckId};
 use crate::game::state::permanent::{Permanent, PermanentCommon, PermanentId};
 use crate::game::state::player::{Player, PlayerId};
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
 use crate::game::state::region::Region;
-use crate::game::state::resource::Resource;
+use crate::game::state::resource::{Faction, Resource};
 use crate::game::state::rng::AlgomancerRng;
 use crate::game::state::team::TeamId;
 
@@ -46,20 +47,56 @@ impl Game {
         if let GameMode::LiveDraft { team_configuration, .. } = &options.game_mode {
             let mut algomancer_rng = AlgomancerRng::new(options.seed);
 
-            let mut cards = Vec::new();
+            let mut cards = HashMap::new();
+            let mut id_num = 0;
             for i in 0..(54 * 3 + 50) {
-                let card_id = i + 1;
-                cards.push(Card {
-                    card_id: CardId(card_id),
-                    name: format!("Card #{}", card_id),
-                    text: "No card text".to_string(),
+                id_num = i + 1;
+                let card_prototype_id = CardPrototypeId(id_num);
+                cards.insert(card_prototype_id, CardPrototype {
+                    prototype_id: card_prototype_id,
+                    name: format!("Card #{}", id_num),
+                    text: format!("Text for card #{}.", id_num),
                     costs: Vec::new(),
-                })
+                });
             }
-            let cards_db = CardsDB { cards };
+
+            // add the prototypes for the resource types, mana converters, shards, and, tokens
+            id_num += 1;
+            let card_prototype_id = CardPrototypeId(id_num);
+            cards.insert(card_prototype_id, CardPrototype {
+                prototype_id: card_prototype_id,
+                name: "Mana Converter".to_string(),
+                text: "At the beginning of the mana step, you may exchange this for another resource.".to_string(),
+                costs: Vec::new(),
+            });
+
+            id_num += 1;
+            let card_prototype_id = CardPrototypeId(id_num);
+            cards.insert(card_prototype_id, CardPrototype {
+                prototype_id: card_prototype_id,
+                name: "Shard".to_string(),
+                text: "(Shards add no affinity, but all resources including this can be expended for [1]).".to_string(),
+                costs: Vec::new(),
+            });
+
+            for r in vec![Faction::Earth, Faction::Wood, Faction::Water, Faction::Fire, Faction::Metal] {
+                id_num += 1;
+                let card_prototype_id = CardPrototypeId(id_num);
+                cards.insert(card_prototype_id, CardPrototype {
+                    prototype_id: card_prototype_id,
+                    name: format!("{:?}", r),
+                    text: format!("When I enter play, if you have [{:?} {:?} {:?}], take a shard.", r, r, r),
+                    costs: Vec::new(),
+                });
+            }
+
+            let cards_db = CardsDB {
+                card_prototypes: cards,
+                card_instances: vec![]
+            };
 
             let mut deck = Deck::new(DeckId(1));
-            for c in &cards_db.cards {
+            for c in &cards_db.card_instances {
                 deck.cards.push(c.card_id)
             }
             deck.cards.shuffle(&mut algomancer_rng.rng);

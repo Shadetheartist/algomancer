@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 use rng::{AlgomancerRng, AlgomancerRngSeed};
 
 use crate::game::state::deck::{Deck, DeckId};
-use crate::game::state::hand::Hand;
 use crate::game::state::pack::Pack;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::Player;

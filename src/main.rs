@@ -37,7 +37,7 @@ fn main() {
         counter += 1;
     }
 
-    let json = serde_json::to_string_pretty(&game.state).expect("serialized game json");
+    let json = serde_json::to_string_pretty(&game).expect("serialized game json");
     println!("{json}");
 
 }
