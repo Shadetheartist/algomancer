@@ -5,7 +5,7 @@ use crate::game::state::player::PlayerId;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Pack {
-    pub owner: PlayerId,
+    pub owner_player_id: PlayerId,
     pub cards: Vec<CardId>
 }
 

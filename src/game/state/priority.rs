@@ -53,7 +53,7 @@ mod tests {
         // this player creation process is mighty scuffed
         let mut state = State::default();
         for _ in 0..state.players.len() {
-            let mut player = Player::new(PlayerId(0), 0, TeamId(0), Pack{ owner: PlayerId(0), cards: vec![] });
+            let mut player = Player::new(PlayerId(0), 0, TeamId(0), Pack{ owner_player_id: PlayerId(0), cards: vec![] });
             player.passed_priority = false;
             state.players.push(player);
         }

@@ -58,8 +58,7 @@ impl Effect {
     pub fn mutate_state(&self, state: &mut state::State) {
         match self {
             Self::Special(effect) => effect.mutate_state(state),
-            Self::Heal { amount, .. } => state.funny_number -= amount,
-            Self::Damage { amount, .. } => state.funny_number += amount,
+            _ => {}
         }
     }
 }

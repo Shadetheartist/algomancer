@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::game::state::State;
+use crate::game::state::{GameMode, State};
 use crate::game::state::hand::Hand;
 use crate::game::state::pack::Pack;
 use crate::game::state::team::TeamId;
@@ -39,6 +39,21 @@ impl Player {
             hand: Hand::new(),
             pack,
             passed_priority: false,
+        }
+    }
+
+    pub fn draw_card(&mut self, state: &mut State) {
+
+        match &state.game_mode {
+            GameMode::LiveDraft { .. } => {
+                let mut deck = state.get_deck_mut(state.common_deck_id).expect("a common deck");
+                if let Some(top_card_id) = deck.top_card_id() {
+                    State::move_card(top_card_id, &mut deck.cards, &mut self.hand.cards).expect("card should have moved");
+                }
+            },
+            _ => {
+                todo!()
+            },
         }
     }
 

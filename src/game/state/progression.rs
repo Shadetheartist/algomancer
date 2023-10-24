@@ -196,13 +196,13 @@ impl State {
     }
 
     fn take_draw_step_cards(&mut self) {
-        self.players.iter_mut().for_each(|p| {
-            for _ in 0..2 {
-                if let Some(top_card_id) = self.common_deck.top_card_id() {
-                    Self::move_card(top_card_id, &mut self.common_deck.cards, &mut p.hand.cards).expect("card should have moved");
-                }
-            }
+        let mut players = std::mem::take(&mut self.players);
+
+        players.iter_mut().for_each(|p| {
+            p.draw_card(self)
         });
+
+        self.players = players
     }
 
     pub fn transition_to_next_step(&mut self) {

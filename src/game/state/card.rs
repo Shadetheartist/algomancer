@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-use crate::game::state::effect::EffectBuilder;
 use crate::game::state::resource::Costs;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
@@ -12,7 +11,6 @@ pub struct Card {
     pub name: String,
     pub text: String,
     pub costs: Costs,
-    pub effects: Vec<EffectBuilder>
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]

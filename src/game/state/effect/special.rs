@@ -19,6 +19,6 @@ impl SpecialEffect {
     }
 
     pub fn mutate_state(&self, state: &mut state::State) {
-        state.funny_number = self.effect_number
+
     }
 }

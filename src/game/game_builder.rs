@@ -9,7 +9,11 @@ use crate::game::state::{GameMode, State, TeamConfiguration};
 use crate::game::state::card::{Card, CardId, CardsDB};
 use crate::game::state::deck::{Deck, DeckId};
 use crate::game::state::pack::Pack;
+use crate::game::state::permanent::{Permanent, PermanentCommon, PermanentId};
 use crate::game::state::player::{Player, PlayerId};
+use crate::game::state::progression::{Phase, PrecombatPhaseStep};
+use crate::game::state::region::Region;
+use crate::game::state::rng::AlgomancerRng;
 use crate::game::state::team::TeamId;
 
 #[derive(Debug)]
@@ -29,65 +33,98 @@ impl fmt::Display for NewGameError {
 impl Game {
     pub fn new(options: &GameOptions) -> Result<Game, NewGameError> {
         match &options.game_mode {
-            GameMode::LiveDraft { team_configuration, .. } => {
-                let mut cards = Vec::new();
-                for i in 0..(54 * 3 + 50) {
-                    let card_id = i + 1;
-                    cards.push(Card {
-                        card_id: CardId(card_id),
-                        name: format!("Card #{}", card_id),
-                        text: "No card text".to_string(),
-                        costs: vec![],
-                        effects: vec![],
-                    })
-                }
-                let cards_db = CardsDB { cards };
-
-                let mut state = State::new(options.seed, options.game_mode.clone());
-
-                let mut deck = Deck::new(DeckId(1));
-                for c in &cards_db.cards {
-                    deck.cards.push(c.card_id)
-                }
-                deck.cards.shuffle(&mut state.rand.rng);
-
-                state.common_deck = deck;
-
-                let mut game = Game {
-                    effect_history: Vec::new(),
-                    cards_db: cards_db,
-                    state: state,
-
-                };
-
-                fn add_players(game: &mut Game, teams_of_players: &Vec<u8>){
-                    let interlaced_players = Game::interlace_players(teams_of_players);
-                    for (seat, &team_id) in interlaced_players.iter().enumerate() {
-                        let player_id = PlayerId((seat + 1) as u8);
-                        let mut player = Player::new(player_id, seat as u8, TeamId(team_id), Pack {
-                            owner: player_id,
-                            cards: vec![],
-                        });
-                        Game::draw_opening_hand(game, &mut player);
-                        game.state.players.push(player);
-                    }
-                }
-
-                match &team_configuration {
-                    TeamConfiguration::FFA { num_players } => {
-                        add_players(&mut game, &vec![0, *num_players]);
-                    }
-                    TeamConfiguration::Teams { teams_of_players } => {
-                        add_players(&mut game, teams_of_players);
-                    }
-                }
-
-                Ok(game)
+            GameMode::LiveDraft { .. } => {
+                Self::build_live_draft(options)
             }
             game_mode @ _ => {
                 Err(NotSupportedYet(format!("the game mode [{:?}] is not yet supported", game_mode)))
             }
         }
+    }
+
+    fn build_live_draft(options: &GameOptions) -> Result<Game, NewGameError> {
+        if let GameMode::LiveDraft { team_configuration, .. } = &options.game_mode {
+            let mut algomancer_rng = AlgomancerRng::new(options.seed);
+
+            let mut cards = Vec::new();
+            for i in 0..(54 * 3 + 50) {
+                let card_id = i + 1;
+                cards.push(Card {
+                    card_id: CardId(card_id),
+                    name: format!("Card #{}", card_id),
+                    text: "No card text".to_string(),
+                    costs: Vec::new(),
+                })
+            }
+            let cards_db = CardsDB { cards };
+
+            let mut deck = Deck::new(DeckId(1));
+            for c in &cards_db.cards {
+                deck.cards.push(c.card_id)
+            }
+            deck.cards.shuffle(&mut algomancer_rng.rng);
+
+            let mut state = State {
+                game_mode: options.game_mode.clone(),
+                common_deck_id: deck.deck_id,
+                rand: algomancer_rng,
+                step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
+                players: Vec::new(),
+                teams: Vec::new(),
+                decks: vec![deck],
+                regions: Vec::new(),
+                permanents: Vec::new(),
+                next_permanent_id: 1,
+            };
+
+
+            let mut game = Game {
+                effect_history: Vec::new(),
+                cards_db: cards_db,
+                state: state,
+            };
+
+            fn add_players_and_regions(game: &mut Game, teams_of_players: &Vec<u8>){
+                let interlaced_players = Game::interlace_players(teams_of_players);
+                for (seat, &team_id) in interlaced_players.iter().enumerate() {
+                    let player_id = PlayerId((seat + 1) as u8);
+                    let mut player = Player::new(player_id, seat as u8, TeamId(team_id), Pack {
+                        owner_player_id: player_id,
+                        cards: Vec::new(),
+                    });
+
+                    Game::draw_opening_hand(game, &mut player);
+                    game.state.players.push(player);
+
+                    let region = Region::from_player_id(&player_id);
+                    let region_id = region.region_id;
+                    game.state.regions.push(region);
+
+                    let initial_resources = vec![
+                        Permanent::Resource {
+                            common: PermanentCommon {
+                                permanent_id: PermanentId::next(&mut game.state),
+                                owner_player_id: player_id,
+                                region_id: region_id,
+                            }
+                        },
+                    ];
+                }
+            }
+
+            match &team_configuration {
+                TeamConfiguration::FFA { num_players } => {
+                    add_players_and_regions(&mut game, &vec![0, *num_players]);
+                }
+                TeamConfiguration::Teams { teams_of_players } => {
+                    add_players_and_regions(&mut game, teams_of_players);
+                }
+            }
+
+            return Ok(game)
+        }
+
+        panic!("don't call this if the game mode isn't live draft")
     }
 
     /// distributes the various players as evenly as possible amongst the seats at the table
@@ -132,12 +169,7 @@ impl Game {
 
     fn draw_opening_hand(game: &mut Game, player: &mut Player) {
         for _ in 0..16 {
-            State::
-            move_card(
-                game.state.common_deck.top_card_id().expect("the deck should have a top card"),
-                &mut game.state.common_deck.cards,
-                &mut player.hand.cards)
-                .expect("enough cards to draw the opening hand");
+            player.draw_card(&mut game.state)
         }
     }
 }

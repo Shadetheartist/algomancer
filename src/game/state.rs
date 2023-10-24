@@ -6,8 +6,10 @@ use serde::{Deserialize, Serialize};
 use rng::{AlgomancerRng, AlgomancerRngSeed};
 
 use crate::game::state::deck::{Deck, DeckId};
+use crate::game::state::permanent::Permanent;
 use crate::game::state::player::Player;
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
+use crate::game::state::region::Region;
 use crate::game::state::resource::Resource;
 use crate::game::state::team::Team;
 
@@ -23,6 +25,8 @@ pub mod stack;
 pub mod pack;
 pub mod deck;
 pub mod hand;
+pub mod region;
+pub mod permanent;
 
 type ObjectId = i32;
 
@@ -79,7 +83,7 @@ impl GameMode {
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct State {
     pub game_mode: GameMode,
-    pub common_deck: Deck,
+    pub common_deck_id: DeckId,
     pub rand: AlgomancerRng,
     pub step: Phase,
 
@@ -88,38 +92,25 @@ pub struct State {
     pub teams: Vec<Team>,
     pub players: Vec<Player>,
     pub decks: Vec<Deck>,
-
-    // using this for testing
-    pub funny_number: i32,
+    pub regions: Vec<Region>,
+    pub permanents: Vec<Permanent>,
+    pub next_permanent_id: usize,
 }
 
 impl State {
-    pub fn new(seed: AlgomancerRngSeed, game_mode: GameMode) -> State {
-        State {
-            game_mode: game_mode.clone(),
-            common_deck: Deck::new(DeckId(1)),
-            rand: AlgomancerRng::new(seed),
-            step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
-            players: Vec::new(),
-            teams: Vec::new(),
-            decks: Vec::new(),
-
-            funny_number: 0,
-        }
-    }
-
     // this is useful for testing
     pub fn default() -> State {
         State {
             game_mode: GameMode::new_player_mode(),
-            common_deck: Deck::new(DeckId(1)),
+            common_deck_id: DeckId(0),
             rand: AlgomancerRng::new(AlgomancerRngSeed::default()),
             step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
             players: Vec::new(),
             teams: Vec::new(),
             decks: Vec::new(),
-
-            funny_number: 0,
+            regions: Vec::new(),
+            permanents: Vec::new(),
+            next_permanent_id: 1,
         }
     }
 
@@ -128,6 +119,7 @@ impl State {
         self.hash(&mut hasher);
         format!("#{:x}", hasher.finish())
     }
+
 }
 
 

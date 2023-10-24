@@ -61,6 +61,7 @@ Progression
 
 Actions
 - a set of effects which are all resolved as a unit
+- auto-resolve if it's the only action a player has left
 
 Effects
 - effects go on the stack
