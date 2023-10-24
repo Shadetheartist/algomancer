@@ -29,12 +29,13 @@ type ObjectId = i32;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum TeamConfiguration {
+    // this can't be generalized to teams of 1 since it also affects how the turn progresses.
     FFA {
         num_players: u8
     },
     Teams {
         // describes the number of players per team
-        players: Vec<u8>
+        teams_of_players: Vec<u8>
     },
 }
 
@@ -42,15 +43,15 @@ pub enum TeamConfiguration {
 // aside from 1v1, i've never played any of these lol
 impl TeamConfiguration {
     pub fn one_v_one() -> TeamConfiguration {
-        TeamConfiguration::Teams { players: vec![1, 1] }
+        TeamConfiguration::Teams { teams_of_players: vec![1, 1] }
     }
 
     pub fn three_v_three() -> TeamConfiguration {
-        TeamConfiguration::Teams { players: vec![3, 3] }
+        TeamConfiguration::Teams { teams_of_players: vec![3, 3] }
     }
 
     pub fn two_v_one() -> TeamConfiguration {
-        TeamConfiguration::Teams { players: vec![2, 1] }
+        TeamConfiguration::Teams { teams_of_players: vec![2, 1] }
     }
 }
 

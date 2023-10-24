@@ -60,31 +60,25 @@ impl Game {
 
                 };
 
+                fn add_players(game: &mut Game, teams_of_players: &Vec<u8>){
+                    let interlaced_players = Game::interlace_players(teams_of_players);
+                    for (seat, &team_id) in interlaced_players.iter().enumerate() {
+                        let player_id = PlayerId((seat + 1) as u8);
+                        let mut player = Player::new(player_id, seat as u8, TeamId(team_id), Pack {
+                            owner: player_id,
+                            cards: vec![],
+                        });
+                        Game::draw_opening_hand(game, &mut player);
+                        game.state.players.push(player);
+                    }
+                }
+
                 match &team_configuration {
                     TeamConfiguration::FFA { num_players } => {
-                        for t in 0..*num_players {
-                            let team_id = t + 1;
-
-                            game.state.teams.push(Team {
-                                id: TeamId(team_id),
-                                passed_priority: false,
-                                has_priority: false,
-                                has_initiative: false,
-                            });
-
-                            let player_id = PlayerId(team_id);
-                            let mut player = Player::new(player_id, team_id, TeamId(team_id), Pack {
-                                owner: player_id,
-                                cards: vec![],
-                            });
-
-                            Self::draw_opening_hand(&mut game, &mut player);
-
-                            game.state.players.push(player);
-                        }
+                        add_players(&mut game, &vec![0, *num_players]);
                     }
-                    TeamConfiguration::Teams { players } => {
-                        Self::interlace_players(players);
+                    TeamConfiguration::Teams { teams_of_players } => {
+                        add_players(&mut game, teams_of_players);
                     }
                 }
 
