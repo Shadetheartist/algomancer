@@ -3,7 +3,7 @@ use game::state;
 use crate::game::action::Action;
 use crate::game::GameOptions;
 use crate::game::state::{GameMode, TeamConfiguration};
-use crate::game::state::resource::Resource::{Earth, Wood};
+use crate::game::state::resource::Faction::{Earth, Wood};
 
 mod game;
 mod wrap_index;
@@ -37,7 +37,7 @@ fn main() {
         counter += 1;
     }
 
-    let json = serde_json::to_string_pretty(&game).expect("serialized game json");
+    let json = serde_json::to_string_pretty(&game.state).expect("serialized game json");
     println!("{json}");
 
 }

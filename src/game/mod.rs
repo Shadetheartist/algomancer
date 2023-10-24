@@ -11,7 +11,7 @@ pub mod game_builder;
 
 
 #[derive(Serialize, Deserialize, Debug)]
-struct EffectHistoryEntry {
+pub struct EffectHistoryEntry {
     effect: Box<effect::Effect>,
 }
 
@@ -22,11 +22,11 @@ pub struct GameOptions {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Game {
-    state: state::State,
+    pub state: state::State,
     // effect history is separate from the game state, so that we don't have to
     // consider the effect history in the state hash, this isn't a blockchain, thank god
-    effect_history: Vec<EffectHistoryEntry>,
-    cards_db: CardsDB,
+    pub effect_history: Vec<EffectHistoryEntry>,
+    pub cards_db: CardsDB,
 }
 
 impl Game {

@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::game::state::card::CardId;
 use crate::game::state::player::PlayerId;
 use crate::game::state::region::RegionId;
+use crate::game::state::resource::{Faction, Resource};
 use crate::game::state::State;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
@@ -31,6 +32,8 @@ pub enum Permanent {
     },
     Resource {
         common: PermanentCommon,
+        resource_type: Resource,
+        // resources should be cards maybe?
     },
     SpellToken {
         common: PermanentCommon,

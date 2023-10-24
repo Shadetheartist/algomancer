@@ -12,6 +12,7 @@ use crate::game::state::permanent::{Permanent, PermanentCommon, PermanentId};
 use crate::game::state::player::{Player, PlayerId};
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
 use crate::game::state::region::Region;
+use crate::game::state::resource::Resource;
 use crate::game::state::rng::AlgomancerRng;
 use crate::game::state::team::TeamId;
 
@@ -77,12 +78,20 @@ impl Game {
                 next_permanent_id: 1,
             };
 
-
             let mut game = Game {
                 effect_history: Vec::new(),
                 cards_db: cards_db,
                 state: state,
             };
+
+            match &team_configuration {
+                TeamConfiguration::FFA { num_players } => {
+                    add_players_and_regions(&mut game, &vec![0, *num_players]);
+                }
+                TeamConfiguration::Teams { teams_of_players } => {
+                    add_players_and_regions(&mut game, teams_of_players);
+                }
+            }
 
             fn add_players_and_regions(game: &mut Game, teams_of_players: &Vec<u8>){
                 let interlaced_players = Game::interlace_players(teams_of_players);
@@ -97,24 +106,17 @@ impl Game {
                     let region_id = region.region_id;
                     game.state.regions.push(region);
 
-                    let initial_resources = vec![
-                        Permanent::Resource {
+                    for _ in 0..2 {
+                        let permanent_id = PermanentId::next(&mut game.state);
+                        game.state.permanents.push(Permanent::Resource {
                             common: PermanentCommon {
-                                permanent_id: PermanentId::next(&mut game.state),
+                                permanent_id: permanent_id,
                                 owner_player_id: player_id,
                                 region_id: region_id,
-                            }
-                        },
-                    ];
-                }
-            }
-
-            match &team_configuration {
-                TeamConfiguration::FFA { num_players } => {
-                    add_players_and_regions(&mut game, &vec![0, *num_players]);
-                }
-                TeamConfiguration::Teams { teams_of_players } => {
-                    add_players_and_regions(&mut game, teams_of_players);
+                            },
+                            resource_type: Resource::ManaConverter
+                        })
+                    }
                 }
             }
 

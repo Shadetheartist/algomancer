@@ -6,12 +6,13 @@ use serde::{Deserialize, Serialize};
 use rng::{AlgomancerRng, AlgomancerRngSeed};
 
 use crate::game::state::deck::{Deck, DeckId};
+use crate::game::state::hand::Hand;
 use crate::game::state::pack::Pack;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::Player;
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
 use crate::game::state::region::Region;
-use crate::game::state::resource::Resource;
+use crate::game::state::resource::Faction;
 use crate::game::state::team::Team;
 
 pub mod effect;
@@ -64,7 +65,7 @@ impl TeamConfiguration {
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum GameMode {
     LiveDraft {
-        selected_deck_types: Vec<Resource>,
+        selected_deck_types: Vec<Faction>,
         team_configuration: TeamConfiguration,
     },
     PreDraft { team_configuration: TeamConfiguration },
@@ -76,7 +77,7 @@ impl GameMode {
     pub fn new_player_mode() -> GameMode {
         GameMode::LiveDraft {
             team_configuration: TeamConfiguration::one_v_one(),
-            selected_deck_types: vec![Resource::Earth, Resource::Wood]
+            selected_deck_types: vec![Faction::Earth, Faction::Wood]
         }
     }
 }
