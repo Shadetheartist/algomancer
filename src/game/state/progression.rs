@@ -1,7 +1,9 @@
 use serde::{Deserialize, Serialize};
 
 use crate::game::state::{GameMode, State};
-use crate::game::state::card::CardId;
+use crate::game::state::card::{Card, CardId};
+use crate::game::state::deck::Deck;
+use crate::game::state::player::{Player, PlayerId};
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum Phase {
@@ -178,31 +180,74 @@ impl Phase {
 
 impl State {
     fn reset_player_draft_flags(&mut self) {
-        self.players.iter_mut().for_each(|t| t.has_drafted = false)
+        self.players_mut().iter_mut().for_each(|t| t.has_drafted = false)
     }
 
     fn reset_player_priority(&mut self) {
-        self.players.iter_mut().for_each(|p| p.passed_priority = false);
+        self.players_mut().iter_mut().for_each(|p| p.passed_priority = false);
     }
 
-    pub fn move_card(card_id: CardId, from: &mut Vec<CardId>, to: &mut Vec<CardId>) -> Result<(), &'static str> {
-        if let Some(index) = from.iter().position(|&c_id| c_id == card_id) {
-            from.remove(index);
-            to.push(card_id);
+    pub fn move_card(card_id: CardId, from: &mut Vec<Card>, to: &mut Vec<Card>) -> Result<(), &'static str> {
+        if let Some(index) = from.iter().position(|c| c.card_id == card_id) {
+            let card = from.remove(index);
+            to.push(card);
             Ok(())
         } else {
             Err("cannot move card, it does not exist in 'from' vec")
         }
     }
 
-    fn take_draw_step_cards(&mut self) {
-        let mut players = std::mem::take(&mut self.players);
+    pub fn player_draw_n_cards(&mut self, player_id: PlayerId, n: usize){
+        // trying to get this to work with closures was not working
+        // because of issues with double mutable borrows on self
+        // this is due to the nested style of the data
+        for r in &mut self.regions {
+            for p in &mut r.players {
+                if p.player_id != player_id {
+                    continue
+                }
 
-        players.iter_mut().for_each(|p| {
-            p.draw_card(self)
-        });
+                if !p.is_alive {
+                    continue
+                }
 
-        self.players = players
+                match self.game_mode {
+                    GameMode::LiveDraft { .. } => {
+                        if let Some(deck) = &mut self.common_deck {
+                            for _ in 0..n {
+                                if let Some(top_card) = deck.top_card() {
+                                    State::move_card(top_card.card_id, &mut deck.cards, &mut p.hand.cards).expect("card should have moved");
+                                }
+                            }
+                        } else {
+                            panic!("player is supposed to draw from the common deck in live-draft, but it doesn't exist");
+                        }
+                    },
+                    GameMode::TeamDraft { .. } => {
+                        // weird, this needs a common deck per team i guess
+                        todo!()
+                    }
+                    GameMode::PreDraft { .. } | GameMode::Constructed { .. } => {
+                        if let Some(player_deck) = &mut p.player_deck {
+                            for _ in 0..n {
+                                if let Some(top_card) = player_deck.top_card() {
+                                    State::move_card(top_card.card_id, &mut player_deck.cards, &mut p.hand.cards).expect("card should have moved");
+                                }
+                            }
+                        } else {
+                            panic!("player is supposed to draw from their own deck in pre-draft & constructed, but it doesn't exist");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fn each_player_takes_draw_step_cards(&mut self) {
+        let player_ids: Vec<PlayerId> = self.players().into_iter().map(|p| p.player_id).collect();
+        for p_id in player_ids {
+            self.player_draw_n_cards(p_id, 2);
+        }
     }
 
     pub fn transition_to_next_step(&mut self) {
@@ -216,7 +261,7 @@ impl State {
                 self.reset_player_draft_flags()
             }
             Phase::PrecombatPhase(PrecombatPhaseStep::Draw) => {
-                self.take_draw_step_cards()
+                self.each_player_takes_draw_step_cards()
             }
             _ => {}
         }

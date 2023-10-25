@@ -1,24 +1,39 @@
 use serde::{Deserialize, Serialize};
 
-use crate::game::state::{GameMode, State};
+use crate::game::state::{State};
+use crate::game::state::deck::{Deck};
 use crate::game::state::hand::Hand;
-use crate::game::state::pack::PackId;
-use crate::game::state::team::TeamId;
+use crate::game::state::pack::{Pack};
+
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+pub struct TeamId(pub u8);
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct PlayerId(pub u8);
 
 impl PlayerId {
     pub fn get_player(self, state: &mut State) -> Option<&mut Player> {
-        state.players.iter_mut().find(|p| p.id == self)
+        for r in state.regions.iter_mut() {
+            match r.players.iter_mut().find(|p| p.player_id == self) {
+                None => {
+                    continue
+                }
+                Some(player) => {
+                    return Some(player);
+                }
+            }
+        }
+
+        None
     }
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Player {
-    pub id: PlayerId,
+    pub player_id: PlayerId,
     pub team_id: TeamId,
-    pub pack_id: Option<PackId>,
+    pub pack: Option<Pack>,
+    pub player_deck: Option<Deck>,
     pub seat: u8,
     pub is_alive: bool,
     pub has_drafted: bool,
@@ -28,32 +43,18 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(id: PlayerId, seat: u8, team_id: TeamId, option: Option<PackId>) -> Player {
+    pub fn new(player_id: PlayerId, seat: u8, team_id: TeamId, deck: Option<Deck>, pack: Option<Pack>) -> Player {
         Player {
-            id,
+            player_id,
             seat,
             team_id,
+            player_deck: deck,
             is_alive: true,
             has_drafted: false,
             health: 30,
             hand: Hand::new(),
             passed_priority: false,
-            pack_id: Option::from(PackId(0)),
-        }
-    }
-
-    pub fn draw_card(&mut self, state: &mut State) {
-
-        match &state.game_mode {
-            GameMode::LiveDraft { .. } => {
-                let mut deck = state.get_deck_mut(state.common_deck_id).expect("a common deck");
-                if let Some(top_card_id) = deck.top_card_id() {
-                    State::move_card(top_card_id, &mut deck.cards, &mut self.hand.cards).expect("card should have moved");
-                }
-            },
-            _ => {
-                todo!()
-            },
+            pack: pack,
         }
     }
 
@@ -72,11 +73,36 @@ impl Player {
     }
 }
 
+
 impl State {
-    pub fn living_players(self, state: &State) -> Vec<&Player> {
-        state.players.iter().filter(|p| p.is_alive).collect()
+    pub fn players(&self) -> Vec<&Player> {
+        self.regions.iter().fold(Vec::new(), |mut acc, region| {
+            acc.extend(&region.players);
+            acc
+        })
+    }
+
+    pub fn players_mut(&mut self) -> Vec<&mut Player> {
+        self.regions.iter_mut().fold(Vec::new(), |mut acc, region| {
+            acc.extend(&mut region.players);
+            acc
+        })
+    }
+
+    pub fn living_players_in_team(&self, team_id: TeamId) -> Vec<&Player> {
+        self.players().into_iter().filter(|p| p.team_id == team_id && p.is_alive).collect()
+    }
+
+    pub fn teams(&self) -> Vec<TeamId> {
+        self.players().into_iter().fold(Vec::new(), |mut acc, player| {
+            if acc.iter().find(|&t_id| *t_id == player.team_id) == None {
+                acc.push(player.team_id)
+            }
+            acc
+        })
     }
 }
+
 
 #[cfg(test)]
 mod tests {

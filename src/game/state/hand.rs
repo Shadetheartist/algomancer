@@ -1,11 +1,10 @@
 use serde::{Deserialize, Serialize};
-
-use crate::game::state::card::CardId;
+use crate::game::state::card::Card;
 
 // a hand is a collection of cards without an order
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Hand {
-    pub cards: Vec<CardId>,
+    pub cards: Vec<Card>,
 }
 
 impl Hand {

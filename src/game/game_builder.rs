@@ -7,15 +7,14 @@ use rand::prelude::SliceRandom;
 use crate::game::{Game, GameOptions};
 use crate::game::game_builder::NewGameError::NotSupportedYet;
 use crate::game::state::{GameMode, State, TeamConfiguration};
-use crate::game::state::card::{Card, CardId, CardPrototype, CardPrototypeId, CardsDB, CardType};
-use crate::game::state::deck::{Deck, DeckId};
+use crate::game::state::card::{Card, CardId, CardPrototype, CardPrototypeId, CardPrototypeDatabase, CardType};
+use crate::game::state::deck::{Deck};
 use crate::game::state::permanent::{Permanent, PermanentCommon, PermanentId};
-use crate::game::state::player::{Player, PlayerId};
+use crate::game::state::player::{Player, PlayerId, TeamId};
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
-use crate::game::state::region::Region;
+use crate::game::state::region::{Region, RegionId};
 use crate::game::state::resource::{Cost, Faction, Resource};
 use crate::game::state::rng::AlgomancerRng;
-use crate::game::state::team::TeamId;
 
 #[derive(Debug)]
 pub enum NewGameError {
@@ -107,14 +106,14 @@ impl Game {
 
             // takes all the non-token, non-resource card prototypes and maps them to card instances
             let mut card_id_counter = 0;
-            let cards_for_deck = card_prototypes.values()
-                .filter(|c| {
+            let cards_for_deck = card_prototypes.iter()
+                .filter(|(card_id, c)| {
                     match c.card_type {
                         CardType::Resource | CardType::UnitToken | CardType::SpellToken => false,
                         CardType::Unit | CardType::Spell => true,
                     }
                 })
-                .map(|c| {
+                .map(|(card_id, c)| {
                     card_id_counter += 1;
                     Card {
                         card_id: CardId(card_id_counter),
@@ -123,28 +122,21 @@ impl Game {
                 })
                 .collect();
 
-            let cards_db = CardsDB {
-                card_prototypes,
-                card_instances: cards_for_deck,
+            let cards_db = CardPrototypeDatabase {
+                prototypes: card_prototypes,
             };
 
-            let mut deck = Deck::new(DeckId(1));
-            for c in &cards_db.card_instances {
-                deck.cards.push(c.card_id)
-            }
+
+            let mut deck = Deck::new();
+            deck.cards = cards_for_deck;
             deck.cards.shuffle(&mut algomancer_rng.rng);
 
             let mut state = State {
                 game_mode: options.game_mode.clone(),
-                common_deck_id: deck.deck_id,
+                common_deck: Some(deck),
                 rand: algomancer_rng,
                 step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
-                players: Vec::new(),
-                teams: Vec::new(),
-                decks: vec![deck],
                 regions: Vec::new(),
-                permanents: Vec::new(),
-                packs: Vec::new(),
                 next_permanent_id: 1,
             };
 
@@ -167,20 +159,35 @@ impl Game {
                 let interlaced_players = Game::interlace_players(teams_of_players);
                 for (seat, &team_id) in interlaced_players.iter().enumerate() {
                     let player_id = PlayerId((seat + 1) as u8);
-                    let mut player = Player::new(player_id, seat as u8, TeamId(team_id), None);
+                    let team_id = TeamId(team_id + 1);
+                    let mut player = Player::new(player_id, seat as u8, team_id, None, None);
 
-                    Game::draw_opening_hand(game, &mut player);
-                    game.state.players.push(player);
 
-                    let region = Region::from_player_id(&player_id);
-                    let region_id = region.region_id;
-                    game.state.regions.push(region);
+                    let region_id = RegionId(player_id.0);
+
+
+                    let mut permanents = Vec::new();
 
                     for _ in 0..2 {
-                        let prototype = &game.cards_db.card_prototypes[&mana_converter_prototype_id];
-                        let permanent = Permanent::from_card_prototype(prototype, region_id, player_id, &mut game.state);
-                        game.state.permanents.push(permanent)
+                        let prototype = &game.cards_db.prototypes[&mana_converter_prototype_id];
+                        let permanent = Permanent::from_card_prototype(
+                            prototype,
+                            player_id,
+                            &mut game.state
+                        );
+                        permanents.push(permanent)
                     }
+
+                    let region = Region{
+                        region_id: region_id,
+                        owner_player_id: player_id,
+                        players: vec![player],
+                        permanents: permanents,
+                    };
+
+                    game.state.regions.push(region);
+
+                    game.state.player_draw_n_cards(player_id, 16);
                 }
             }
 
@@ -229,12 +236,6 @@ impl Game {
         result.into_iter().collect()
     }
 
-
-    fn draw_opening_hand(game: &mut Game, player: &mut Player) {
-        for _ in 0..16 {
-            player.draw_card(&mut game.state)
-        }
-    }
 }
 
 

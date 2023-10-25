@@ -5,14 +5,12 @@ use serde::{Deserialize, Serialize};
 
 use rng::{AlgomancerRng, AlgomancerRngSeed};
 
-use crate::game::state::deck::{Deck, DeckId};
+use crate::game::state::deck::{Deck};
 use crate::game::state::pack::Pack;
 use crate::game::state::permanent::Permanent;
-use crate::game::state::player::Player;
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
 use crate::game::state::region::Region;
 use crate::game::state::resource::Faction;
-use crate::game::state::team::Team;
 
 pub mod effect;
 pub mod card;
@@ -20,7 +18,6 @@ pub mod player;
 pub mod progression;
 pub mod resource;
 pub mod rng;
-pub mod team;
 pub mod priority;
 pub mod stack;
 pub mod pack;
@@ -84,18 +81,10 @@ impl GameMode {
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct State {
     pub game_mode: GameMode,
-    pub common_deck_id: DeckId,
     pub rand: AlgomancerRng,
     pub step: Phase,
-
-    // store data in a generally flat structure, using id's
-    // to reference other objects rather than pointers, at least for now
-    pub packs: Vec<Pack>,
-    pub teams: Vec<Team>,
-    pub players: Vec<Player>,
-    pub decks: Vec<Deck>,
+    pub common_deck: Option<Deck>,
     pub regions: Vec<Region>,
-    pub permanents: Vec<Permanent>,
     pub next_permanent_id: usize,
 }
 
@@ -104,15 +93,10 @@ impl State {
     pub fn default() -> State {
         State {
             game_mode: GameMode::new_player_mode(),
-            common_deck_id: DeckId(0),
             rand: AlgomancerRng::new(AlgomancerRngSeed::default()),
             step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
-            players: Vec::new(),
-            teams: Vec::new(),
-            decks: Vec::new(),
+            common_deck: Some(Deck::new()),
             regions: Vec::new(),
-            permanents: Vec::new(),
-            packs: Vec::new(),
             next_permanent_id: 1,
         }
     }

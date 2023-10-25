@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use state::rng::AlgomancerRngSeed;
 
 use crate::game::state::{effect, GameMode};
-use crate::game::state::card::CardsDB;
+use crate::game::state::card::CardPrototypeDatabase;
 
 pub mod state;
 pub mod action;
@@ -26,7 +26,7 @@ pub struct Game {
     // effect history is separate from the game state, so that we don't have to
     // consider the effect history in the state hash, this isn't a blockchain, thank god
     pub effect_history: Vec<EffectHistoryEntry>,
-    pub cards_db: CardsDB,
+    pub cards_db: CardPrototypeDatabase,
 }
 
 impl Game {
@@ -42,7 +42,7 @@ impl Game {
 
     // is_over returns true if there are are any living players on at least two teams
     pub fn is_over(&self) -> bool {
-        let filtered = self.state.teams.iter().filter(|&t| !self.state.living_players_in_team(t.id).is_empty());
+        let filtered = self.state.teams().into_iter().filter(|&t| !self.state.living_players_in_team(t).is_empty());
         let count = filtered.take(2).count();
         let result = count < 2;
         result

@@ -12,7 +12,7 @@ impl Game {
             // todo: set hand to cards selected in draft
 
             player.has_drafted = true;
-            println!("Player [{:?}] has selected their draft.", player.id);
+            println!("Player [{:?}] has selected their draft.", player.player_id);
         } else {
             panic!("action should have been draft")
         }

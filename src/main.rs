@@ -13,7 +13,7 @@ fn main() {
         seed: state::rng::AlgomancerRngSeed::default(),
         game_mode: GameMode::LiveDraft{
             selected_deck_types: vec![Earth, Wood],
-            team_configuration:TeamConfiguration::Teams { teams_of_players: vec![1, 1] } ,
+            team_configuration:TeamConfiguration::Teams { teams_of_players: vec![3, 3] } ,
         },
     };
 
@@ -37,7 +37,7 @@ fn main() {
         counter += 1;
     }
 
-    let json = serde_json::to_string_pretty(&game).expect("serialized game json");
+    let json = serde_json::to_string_pretty(&game.state).expect("serialized game json");
     println!("{json}");
 
 }

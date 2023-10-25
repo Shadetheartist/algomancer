@@ -4,36 +4,15 @@
 // players on a team share priority, teams pass priority collectively.
 
 use crate::game::state::State;
-use crate::game::state::team::Team;
 
 struct Priority {}
 
 impl State {
     pub fn all_players_passed_priority(&self) -> bool {
-        if self.players.len() == 0 {
+        if self.players().len() == 0 {
             panic!("wtf there's no players")
         }
-        !self.players.iter().any(|p| p.passed_priority == false)
-    }
-
-    // resets priority state for all teams
-    pub fn reset_priority(&mut self) {
-        self.teams.iter_mut().for_each(|t| {
-            t.passed_priority = true;
-            t.has_priority = false;
-        })
-    }
-
-    // gets the team with initiative right now
-    pub fn get_initiative_team(&mut self) -> &mut Team {
-        self.teams.iter_mut().find(|t| t.has_initiative).unwrap()
-    }
-
-    pub fn begin_window(&mut self) {
-        self.reset_priority();
-
-        let initiative_team = self.get_initiative_team();
-        initiative_team.has_priority = true;
+        !self.players().iter().any(|p| p.passed_priority == false)
     }
 }
 

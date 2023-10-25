@@ -25,7 +25,7 @@ pub struct CardPrototype {
     pub card_type: CardType,
 }
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy, Ord, PartialOrd)]
 pub struct CardId(pub usize);
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
@@ -35,20 +35,17 @@ pub struct Card {
 }
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
-pub struct CardsDB {
-    pub card_prototypes: HashMap<CardPrototypeId, CardPrototype>,
-    pub card_instances: Vec<Card>,
+pub struct CardPrototypeDatabase {
+    pub prototypes: HashMap<CardPrototypeId, CardPrototype>,
 }
 
-impl Hash for CardsDB {
+impl Hash for CardPrototypeDatabase {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        let mut entries: Vec<(&CardPrototypeId, &CardPrototype)> = self.card_prototypes.iter().collect();
+        let mut entries: Vec<(&CardPrototypeId, &CardPrototype)> = self.prototypes.iter().collect();
         entries.sort_by_key(|a| a.0);
         for (k, v) in entries {
             k.hash(state);
             v.hash(state);
         }
-
-        self.card_instances.hash(state);
     }
 }

@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::game::state::card::{CardId, CardPrototype, CardPrototypeId, CardType};
 use crate::game::state::player::PlayerId;
-use crate::game::state::region::RegionId;
 use crate::game::state::State;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
@@ -19,8 +18,7 @@ impl PermanentId {
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct PermanentCommon {
     pub permanent_id: PermanentId,
-    pub owner_player_id: PlayerId,
-    pub region_id: RegionId,
+    pub controller_player_id: PlayerId,
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
@@ -44,14 +42,13 @@ pub enum Permanent {
 }
 
 impl Permanent {
-    pub fn from_card_prototype(card_prototype: &CardPrototype, region_id: RegionId, player_id: PlayerId, state: &mut State) -> Permanent {
+    pub fn from_card_prototype(card_prototype: &CardPrototype, controller_player_id: PlayerId, state: &mut State) -> Permanent {
         match card_prototype.card_type {
             CardType::Resource => {
                 Permanent::Resource {
                     common: PermanentCommon {
                         permanent_id: PermanentId::next(state),
-                        owner_player_id: player_id,
-                        region_id: region_id,
+                        controller_player_id,
                     },
                     card_prototype_id: card_prototype.prototype_id,
                 }

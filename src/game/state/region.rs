@@ -1,21 +1,20 @@
 use serde::{Deserialize, Serialize};
+use crate::game::state::permanent::Permanent;
 
-use crate::game::state::player::PlayerId;
+use crate::game::state::player::{Player, PlayerId};
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
-pub struct RegionId(pub usize);
+pub struct RegionId(pub u8);
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Region {
     pub region_id: RegionId,
-    pub player_id: PlayerId,
+    pub owner_player_id: PlayerId,
+    pub players: Vec<Player>,
+    pub permanents: Vec<Permanent>,
+
 }
 
 impl Region {
-    pub fn from_player_id(player_id: &PlayerId) -> Region {
-        Region {
-            region_id: RegionId(player_id.0 as usize),
-            player_id: player_id.clone()
-        }
-    }
+
 }

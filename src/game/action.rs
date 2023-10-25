@@ -83,13 +83,13 @@ impl Game {
             }
 
             Phase::PrecombatPhase(PrecombatPhaseStep::Draft) => {
-                for p in &self.state.players {
+                for p in &self.state.players() {
                     if !p.has_drafted {
                         valid_actions.insert(Action::Draft {
-                            player_id: p.id,
+                            player_id: p.player_id,
                             hand: Hand {
                                 cards: vec![
-                                    CardId(1)
+
                                 ]
                             },
                         });
@@ -97,7 +97,7 @@ impl Game {
 
                     if !self.is_over() {
                         if !p.passed_priority {
-                            valid_actions.insert(Action::PassPriority(p.id));
+                            valid_actions.insert(Action::PassPriority(p.player_id));
                         }
                     }
                 }
@@ -105,9 +105,9 @@ impl Game {
 
             _ => {
                 if !self.is_over() {
-                    for p in &self.state.players {
+                    for p in &self.state.players() {
                         if !p.passed_priority {
-                            valid_actions.insert(Action::PassPriority(p.id));
+                            valid_actions.insert(Action::PassPriority(p.player_id));
                         }
                     }
                 }
