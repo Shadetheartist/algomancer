@@ -19,7 +19,7 @@ pub enum Action {
     PassPriority(PlayerId),
 
     // a player selects a hand of cards from a draft pack, leaving 10 cards in the pack
-    Draft { player_id: PlayerId, hand: Hand },
+    Draft { player_id: PlayerId, cards_to_keep: Vec<CardId> },
 
     // a card is cast
     Cast(CardId),
@@ -87,11 +87,9 @@ impl Game {
                     if !p.has_drafted {
                         valid_actions.insert(Action::Draft {
                             player_id: p.player_id,
-                            hand: Hand {
-                                cards: vec![
+                            cards_to_keep: vec![
 
-                                ]
-                            },
+                            ],
                         });
                     }
 

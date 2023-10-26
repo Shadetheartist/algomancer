@@ -75,6 +75,14 @@ impl Player {
 
 
 impl State {
+    pub fn player(&self, player_id: PlayerId) -> Option<&Player> {
+        self.players().into_iter().find(|&p| p.player_id == player_id)
+    }
+
+    pub fn player_mut(&mut self, player_id: PlayerId) -> Option<&mut Player> {
+        self.players_mut().into_iter().find(|p| p.player_id == player_id)
+    }
+
     pub fn players(&self) -> Vec<&Player> {
         self.regions.iter().fold(Vec::new(), |mut acc, region| {
             acc.extend(&region.players);
@@ -95,6 +103,7 @@ impl State {
 
     pub fn teams(&self) -> Vec<TeamId> {
         self.players().into_iter().fold(Vec::new(), |mut acc, player| {
+            // add the team to the list if it's no already there
             if acc.iter().find(|&t_id| *t_id == player.team_id) == None {
                 acc.push(player.team_id)
             }
