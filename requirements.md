@@ -2,6 +2,11 @@
 
 ## Design Considerations
 
+
+State Isolation per Region
+- for actions like drafting, after applying the action, there is no need to recompute the actions for other regions
+- isolating action computation to regions may be a big performance boost
+
 Freeplay mode (initial goal)
 - enforces only the base rules of the game, does not handle card abilities at all
 - to allow games to be piloted by players, allowing them to move cards in and out of various zones

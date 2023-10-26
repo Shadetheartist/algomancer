@@ -4,33 +4,44 @@ use crate::game::Game;
 use crate::game::state::{GameMode, State};
 use crate::game::state::card::CardId;
 use crate::game::state::card::CardType::Resource;
-use crate::game::state::pack::Pack;
 use crate::game::state::player::PlayerId;
 
-
 fn combinations<T: Clone>(items: &[T], k: usize) -> Vec<Vec<T>> {
-    if k == 0 {
-        return vec![vec![]];
+    let n = items.len();
+    if k > n {
+        return Vec::new();
     }
 
-    if items.len() == 0 {
-        return vec![];
+    // Compute the number of combinations using the formula n choose k
+    let capacity = (n - k + 1..=n).product::<usize>() / (1..=k).product::<usize>();
+    let mut result = Vec::with_capacity(capacity);
+
+    // Initialize the first combination
+    let mut indices: Vec<usize> = (0..k).collect();
+
+    loop {
+        result.push(indices.iter().map(|&i| items[i].clone()).collect());
+
+        // Generate the next combination in lexicographic order
+        let mut i = k as isize - 1;
+        while i >= 0 {
+            indices[i as usize] += 1;
+            if indices[i as usize] < n - (k - 1 - i as usize) {
+                for j in i + 1..k as isize {
+                    indices[j as usize] = indices[(j - 1) as usize] + 1;
+                }
+                break;
+            }
+            i -= 1;
+        }
+
+        // All combinations generated
+        if i < 0 {
+            break;
+        }
     }
 
-    let mut all_combinations = vec![];
-
-    let (first_item, rest_items) = items.split_at(1);
-
-    // Include the first item
-    for mut combination in combinations(rest_items, k - 1) {
-        combination.push(first_item[0].clone());
-        all_combinations.push(combination);
-    }
-
-    // Exclude the first item
-    all_combinations.extend(combinations(rest_items, k));
-
-    all_combinations
+    result
 }
 
 
