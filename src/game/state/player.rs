@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::game::state::{State};
+use crate::game::state::{GameMode, State};
 use crate::game::state::deck::{Deck};
 use crate::game::state::hand::Hand;
 use crate::game::state::pack::{Pack};
@@ -10,23 +10,6 @@ pub struct TeamId(pub u8);
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct PlayerId(pub u8);
-
-impl PlayerId {
-    pub fn get_player(self, state: &mut State) -> Option<&mut Player> {
-        for r in state.regions.iter_mut() {
-            match r.players.iter_mut().find(|p| p.player_id == self) {
-                None => {
-                    continue
-                }
-                Some(player) => {
-                    return Some(player);
-                }
-            }
-        }
-
-        None
-    }
-}
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Player {
@@ -57,20 +40,6 @@ impl Player {
             pack: pack,
         }
     }
-
-    fn next_neighbor<'a, F>(&'a self, _: &'a State, _: F) -> Option<&Player> where F: Fn(u8, u8) -> i32 {
-        todo!()
-    }
-
-    // the clockwise neighbor is the next living opponent with a greater seat index. indexes wrap.
-    pub fn clockwise_neighbor<'a>(&'a self, state: &'a State) -> Option<&Player> {
-        self.next_neighbor(state, |seat, i| (seat + i) as i32)
-    }
-
-    // the clockwise neighbor is the next living opponent with a lesser seat index. indexes wrap.
-    pub fn counterclockwise_neighbor<'a>(&'a self, state: &'a State) -> Option<&Player> {
-        self.next_neighbor(state, |seat, i| seat as i32 - i as i32)
-    }
 }
 
 
@@ -83,13 +52,40 @@ impl State {
         self.players_mut().into_iter().find(|p| p.player_id == player_id)
     }
 
+    pub fn player_deck_mut(&mut self, player_id: PlayerId) -> &mut Deck {
+        match &self.game_mode {
+            GameMode::LiveDraft { .. } => {
+                if let Some(common_deck) = &mut self.common_deck {
+                    common_deck
+                } else {
+                    panic!("player is supposed to draw from the common deck in live-draft, but it doesn't exist");
+                }
+            },
+            GameMode::PreDraft { .. } | GameMode::Constructed { .. } => {
+                let mut player = self.player_mut(player_id).expect("player");
+                if let Some(player_deck) = player.player_deck.as_mut() {
+                    player_deck
+                } else {
+                    panic!("player is supposed to draw from their own deck in pre-draft & constructed, but it doesn't exist");
+                }
+            },
+            GameMode::TeamDraft { .. } => {
+                // weird, this needs a common deck per team i guess
+                todo!()
+            }
+        }
+    }
+
     pub fn players(&self) -> Vec<&Player> {
         self.regions.iter().flat_map(|r| &r.players).collect()
     }
 
     pub fn players_mut(&mut self) -> Vec<&mut Player> {
         self.regions.iter_mut().flat_map(|r| &mut r.players).collect()
+    }
 
+    pub fn player_ids(&self) -> Vec<PlayerId> {
+        self.regions.iter().flat_map(|r| &r.players).map(|p| p.player_id ).collect()
     }
 
     pub fn living_players_in_team(&self, team_id: TeamId) -> Vec<&Player> {

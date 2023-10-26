@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::game::state::{GameMode, State};
 use crate::game::state::card::{Card, CardId};
 use crate::game::state::deck::Deck;
+use crate::game::state::hand::Hand;
 use crate::game::state::player::{Player, PlayerId};
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
@@ -197,49 +198,23 @@ impl State {
         }
     }
 
+
+
     pub fn player_draw_n_cards(&mut self, player_id: PlayerId, n: usize){
-        // trying to get this to work with closures was not working
-        // because of issues with double mutable borrows on self
-        // this is due to the nested style of the data
-        for r in &mut self.regions {
-            for p in &mut r.players {
-                if p.player_id != player_id {
-                    continue
-                }
 
-                if !p.is_alive {
-                    continue
-                }
-
-                match self.game_mode {
-                    GameMode::LiveDraft { .. } => {
-                        if let Some(deck) = &mut self.common_deck {
-                            for _ in 0..n {
-                                if let Some(top_card) = deck.top_card() {
-                                    State::move_card(top_card.card_id, &mut deck.cards, &mut p.hand.cards).expect("card should have moved");
-                                }
-                            }
-                        } else {
-                            panic!("player is supposed to draw from the common deck in live-draft, but it doesn't exist");
-                        }
-                    },
-                    GameMode::TeamDraft { .. } => {
-                        // weird, this needs a common deck per team i guess
-                        todo!()
-                    }
-                    GameMode::PreDraft { .. } | GameMode::Constructed { .. } => {
-                        if let Some(player_deck) = &mut p.player_deck {
-                            for _ in 0..n {
-                                if let Some(top_card) = player_deck.top_card() {
-                                    State::move_card(top_card.card_id, &mut player_deck.cards, &mut p.hand.cards).expect("card should have moved");
-                                }
-                            }
-                        } else {
-                            panic!("player is supposed to draw from their own deck in pre-draft & constructed, but it doesn't exist");
-                        }
-                    }
-                }
+        let cards = {
+            let mut deck = self.player_deck_mut(player_id);
+            let mut cards = Vec::new();
+            for _ in 0..n {
+                let card = deck.draw().expect("a card");
+                cards.push(card);
             }
+            cards
+        };
+
+        let mut player = self.player_mut(player_id).expect("player");
+        for card in cards {
+            player.hand.cards.push(card);
         }
     }
 
