@@ -84,17 +84,12 @@ impl State {
     }
 
     pub fn players(&self) -> Vec<&Player> {
-        self.regions.iter().fold(Vec::new(), |mut acc, region| {
-            acc.extend(&region.players);
-            acc
-        })
+        self.regions.iter().flat_map(|r| &r.players).collect()
     }
 
     pub fn players_mut(&mut self) -> Vec<&mut Player> {
-        self.regions.iter_mut().fold(Vec::new(), |mut acc, region| {
-            acc.extend(&mut region.players);
-            acc
-        })
+        self.regions.iter_mut().flat_map(|r| &mut r.players).collect()
+
     }
 
     pub fn living_players_in_team(&self, team_id: TeamId) -> Vec<&Player> {
