@@ -84,12 +84,9 @@ impl Game {
             Phase::PrecombatPhase(PrecombatPhaseStep::Draft) => {
                 for p in &self.state.players() {
                     if !p.has_drafted {
-                        valid_actions.insert(Action::Draft {
-                            player_id: p.player_id,
-                            cards_to_keep: vec![
-
-                            ],
-                        });
+                        for a in self.valid_drafts(p.player_id) {
+                            valid_actions.insert(a);
+                        }
                     }
 
                     if !self.is_over() {

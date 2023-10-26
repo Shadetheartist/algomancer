@@ -225,6 +225,15 @@ impl State {
         }
     }
 
+    fn player_moves_pack_into_hand(&mut self) {
+        let mut players = self.players_mut();
+        for p in players {
+            if let Some(pack) = &mut p.pack {
+                p.hand.cards.append(&mut pack.cards);
+            }
+        }
+    }
+
     pub fn transition_to_next_step(&mut self) {
         let next_step = self.step.get_next_step(&self.game_mode);
         println!("Transitioning from {:?} to {:?}", self.step, next_step);
@@ -237,6 +246,9 @@ impl State {
             }
             Phase::PrecombatPhase(PrecombatPhaseStep::Draw) => {
                 self.each_player_takes_draw_step_cards()
+            }
+            Phase::PrecombatPhase(PrecombatPhaseStep::Draft) => {
+                self.player_moves_pack_into_hand()
             }
             _ => {}
         }

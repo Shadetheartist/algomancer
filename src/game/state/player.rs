@@ -52,6 +52,14 @@ impl State {
         self.players_mut().into_iter().find(|p| p.player_id == player_id)
     }
 
+    pub fn player_hand_mut(&mut self, player_id: PlayerId) -> &mut Hand {
+        &mut self.player_mut(player_id).expect("a player").hand
+    }
+
+    pub fn player_pack_mut(&mut self, player_id: PlayerId) -> Option<&mut Pack> {
+        self.player_mut(player_id).expect("a player").pack.as_mut()
+    }
+
     pub fn player_deck_mut(&mut self, player_id: PlayerId) -> &mut Deck {
         match &self.game_mode {
             GameMode::LiveDraft { .. } => {
