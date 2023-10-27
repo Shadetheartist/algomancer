@@ -1,10 +1,13 @@
+use std::collections::HashSet;
+use std::hash::Hash;
+use rand::prelude::{SliceRandom, ThreadRng};
+use rand::{Rng, RngCore};
 use crate::game::action::Action;
-use crate::game::action::Action::Draft;
 use crate::game::Game;
 use crate::game::state::{GameMode, State};
 use crate::game::state::card::CardId;
 use crate::game::state::card::CardType::Resource;
-use crate::game::state::player::PlayerId;
+use crate::game::state::player::{PlayerId};
 
 fn combinations<T: Clone>(items: &[T], k: usize) -> Vec<Vec<T>> {
     let n = items.len();
@@ -44,9 +47,31 @@ fn combinations<T: Clone>(items: &[T], k: usize) -> Vec<Vec<T>> {
     result
 }
 
+fn random_unique_combinations<T: Clone + Ord + Hash, R: RngCore>(rng: &mut R, input: &[T], k: usize, n: usize) -> Vec<Vec<T>> {
+    let mut combinations = Vec::new();
+    let mut seen_combinations = HashSet::new();
+
+    for _ in 0..n {
+        let mut new_combination;
+        loop {
+            let mut shuffled: Vec<T> = input.to_vec();
+            shuffled.shuffle(rng);
+            new_combination = shuffled[0..k].to_vec();
+            new_combination.sort();  // To make it easier to check for duplicates
+            if !seen_combinations.contains(&new_combination) {
+                break;
+            }
+        }
+        seen_combinations.insert(new_combination.clone());
+        combinations.push(new_combination);
+    }
+
+    combinations
+}
 
 impl Game {
     pub fn valid_drafts(&self, player_id: PlayerId) -> Vec<Action> {
+
         let mut actions = Vec::new();
 
         let player = self.state.player(player_id).expect("a player");
@@ -58,6 +83,7 @@ impl Game {
             .map(|card| card.card_id)
             .collect();
 
+
         let num_cards_to_draft = {
             if player.hand.cards.len() >= 10 {
                 player.hand.cards.len() - 10
@@ -66,10 +92,22 @@ impl Game {
             }
         };
 
-        let combinations = combinations(card_ids.as_slice(), num_cards_to_draft);
+
+        let performance_mode = true;
+        let combinations = {
+            if performance_mode {
+                // this generates a random unique set of size `num_options` of combinations of cards
+                let num_options = 128;
+                let mut rng_clone = self.state.rand.rng.clone();
+                random_unique_combinations(&mut rng_clone, &card_ids, num_cards_to_draft, num_options)
+            } else {
+                // this generates an exhaustive list of combinations
+                combinations(card_ids.as_slice(), num_cards_to_draft)
+            }
+        };
 
         for combination in combinations {
-            actions.push(Draft {
+            actions.push(Action::Draft {
                 player_id: player.player_id,
                 cards_to_keep: combination,
             })

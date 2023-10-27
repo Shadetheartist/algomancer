@@ -202,15 +202,12 @@ impl State {
 
     pub fn player_draw_n_cards(&mut self, player_id: PlayerId, n: usize){
 
-        let cards = {
-            let mut deck = self.player_deck_mut(player_id);
-            let mut cards = Vec::new();
-            for _ in 0..n {
-                let card = deck.draw().expect("a card");
-                cards.push(card);
-            }
-            cards
-        };
+        let mut deck = self.player_deck_mut(player_id);
+        let mut cards = Vec::new();
+        for _ in 0..n {
+            let card = deck.draw().expect("a card");
+            cards.push(card);
+        }
 
         let mut player = self.player_mut(player_id).expect("player");
         for card in cards {

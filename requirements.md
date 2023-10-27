@@ -4,8 +4,9 @@
 
 
 State Isolation per Region
-- for actions like drafting, after applying the action, there is no need to recompute the actions for other regions
-- isolating action computation to regions may be a big performance boost
+- for actions like drafting, after applying the action, there is no need to recompute the actions for other regions.  
+  isolating action computation to regions may be a big performance boost. However, to cache actions in state would lead to an enormous state file. 
+  And other than that, we have nowhere to put the data, so action caching would otherwise require a move to long-running processes. which is not the plan.
 
 Freeplay mode (initial goal)
 - enforces only the base rules of the game, does not handle card abilities at all

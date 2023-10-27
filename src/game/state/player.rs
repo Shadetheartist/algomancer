@@ -79,7 +79,7 @@ impl State {
             },
             GameMode::TeamDraft { .. } => {
                 // weird, this needs a common deck per team i guess
-                todo!()
+                todo!("need to implement team draft, which deck the player is drawing from")
             }
         }
     }
