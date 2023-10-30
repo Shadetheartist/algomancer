@@ -144,15 +144,18 @@ impl Game {
                 for card in cards_for_hand {
                     player_hand.cards.push(card);
                 }
+
+
             }
+
+            let region_id = state.region_id_containing_player(*player_id);
+            state.transition_to_next_step(region_id);
 
             match state.game_mode {
                 GameMode::LiveDraft { .. } | GameMode::PreDraft { .. } | GameMode::TeamDraft { .. } => {}
                 GameMode::Constructed { .. } => { todo!() }
             }
 
-            let player = state.player_mut(*player_id).expect("a player");
-            player.has_drafted = true;
 
             println!("Player [{:?}] has selected their draft.", *player_id);
         } else {

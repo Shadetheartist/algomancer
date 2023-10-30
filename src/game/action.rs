@@ -8,6 +8,7 @@ use crate::game::state::card::CardId;
 use crate::game::state::card::CardType::Resource;
 use crate::game::state::player::PlayerId;
 use crate::game::state::progression::{MainPhaseStep, Phase, PrecombatPhaseStep};
+use crate::game::state::progression::Phase::{MainPhase, PrecombatPhase};
 
 mod draft;
 mod pass_priority;
@@ -134,24 +135,45 @@ impl Game {
         for region in &self.state.regions {
 
             match &region.step {
-                Phase::MainPhase(MainPhaseStep::NITMain) => {
+                MainPhase(MainPhaseStep::NITMain) => {
                     // dont put a valid action, for testing
                 }
 
-                Phase::PrecombatPhase(PrecombatPhaseStep::Draft) => {
+                PrecombatPhase(PrecombatPhaseStep::Draft) => {
                     for p in &region.players {
-                        if !p.has_drafted {
-                            for a in self.valid_drafts(p.player_id) {
-                                valid_actions.insert(a);
-                            }
+                        for a in self.valid_drafts(p.player_id) {
+                            valid_actions.insert(a);
                         }
 
-                        if !self.is_over() {
-                            if !p.passed_priority {
-                                valid_actions.insert(Action::PassPriority(p.player_id));
-                            }
+                        if !p.passed_priority {
+                            valid_actions.insert(Action::PassPriority(p.player_id));
                         }
                     }
+                }
+
+                // can only pass priority in the pass pack step when the clockwise neighbour can accept the pack,
+                // as they have integrated theirs into their hand during their draft step
+                // once all players have passed priority, they should be synchronized to enter the mana step
+                PrecombatPhase(PrecombatPhaseStep::PassPack) => {
+                    let neighbour_region = self.state.region_clockwise_neighbour(region.region_id).expect("a neighbouring region");
+                    match &neighbour_region.step {
+                        PrecombatPhase(step) => {
+                            match step {
+                                PrecombatPhaseStep::Draft | PrecombatPhaseStep::PassPack => {
+                                    for p in &region.players {
+                                        if !p.passed_priority {
+                                            valid_actions.insert(Action::PassPriority(p.player_id));
+                                        }
+                                    }
+                                }
+                                _ => {}
+                            }
+
+                        }
+                        _ => {}
+                    }
+
+
                 }
 
                 _ => {

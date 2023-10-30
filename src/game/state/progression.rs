@@ -1,8 +1,6 @@
 use serde::{Deserialize, Serialize};
 
 use crate::game::state::{GameMode, State};
-use crate::game::state::player::PlayerId;
-use crate::game::state::region::RegionId;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum Phase {
@@ -17,6 +15,7 @@ pub enum PrecombatPhaseStep {
     Untap,
     Draw,
     Draft,
+    PassPack,
     ITMana,
     NITMana,
 }
@@ -100,6 +99,9 @@ impl Phase {
                         }
                     }
                     PrecombatPhaseStep::Draft => {
+                        Phase::PrecombatPhase(PrecombatPhaseStep::PassPack)
+                    }
+                    PrecombatPhaseStep::PassPack => {
                         Phase::PrecombatPhase(PrecombatPhaseStep::ITMana)
                     }
                     PrecombatPhaseStep::ITMana => {

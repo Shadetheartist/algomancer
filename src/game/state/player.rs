@@ -19,9 +19,7 @@ pub struct Player {
     pub team_id: TeamId,
     pub pack: Option<Pack>,
     pub player_deck: Option<Deck>,
-    pub seat: u8,
     pub is_alive: bool,
-    pub has_drafted: bool,
     pub health: i32,
     pub hand: Hand,
     pub discard: Discard,
@@ -29,14 +27,12 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(player_id: PlayerId, seat: u8, team_id: TeamId, deck: Option<Deck>, pack: Option<Pack>) -> Player {
+    pub fn new(player_id: PlayerId,team_id: TeamId, deck: Option<Deck>, pack: Option<Pack>) -> Player {
         Player {
             player_id,
-            seat,
             team_id,
             player_deck: deck,
             is_alive: true,
-            has_drafted: false,
             health: 30,
             hand: Hand::new(),
             discard: Discard::new(),

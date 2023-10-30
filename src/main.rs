@@ -1,3 +1,4 @@
+use std::fs;
 use game::state;
 
 use crate::game::action::Action;
@@ -19,7 +20,7 @@ fn main() {
 
     let mut game = game::Game::new(&options).expect("game object");
     let mut counter = 0;
-    while counter < 500 {
+    while counter < 100 {
         let actions: Vec<Action> = game.valid_actions().iter().cloned().collect();
 
         if actions.len() < 1 {
@@ -37,8 +38,8 @@ fn main() {
         counter += 1;
     }
 
-    let json = serde_json::to_string_pretty(&game.state).expect("serialized game json");
-    println!("{json}");
+    let json = serde_json::to_string_pretty(&game).expect("serialized game json");
+    fs::write("game_data.json", json).expect("written game data");
 
 }
 

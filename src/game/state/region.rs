@@ -4,6 +4,7 @@ use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{Player, PlayerId};
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
 use crate::game::state::State;
+use crate::wrap_index::wrap_index;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct RegionId(pub u8);
@@ -14,14 +15,20 @@ pub struct Region {
     pub owner_player_id: PlayerId,
     pub players: Vec<Player>,
     pub permanents: Vec<Permanent>,
-    pub step: Phase
+    pub step: Phase,
 }
 
 impl State {
 
-    fn reset_player_draft_flags_in_region(&mut self, region_id: RegionId) {
-        let players = self.players_in_region_mut(region_id);
-        players.iter_mut().for_each(|t| t.has_drafted = false)
+    pub fn region_clockwise_neighbour(&self, region_id: RegionId) -> Option<&Region>{
+        let self_idx_result = self.regions.iter().enumerate().find(|(_, val)| val.region_id == region_id);
+        match self_idx_result {
+            None => None,
+            Some((self_idx, val)) => {
+                let neighbour_idx = wrap_index(self.regions.len(), self_idx as i32).expect("a wrapped index");
+                Some(&self.regions[neighbour_idx])
+            }
+        }
     }
 
     fn reset_player_priority_in_region(&mut self, region_id: RegionId) {
@@ -74,7 +81,6 @@ impl State {
 
     pub fn transition_to_next_step(&mut self, region_id: RegionId) {
 
-
         let next_step = {
             let region = self.regions.iter().find(|r| r.region_id == region_id).expect("a region");
             let next_step = region.step.get_next_step(&self.game_mode);
@@ -88,9 +94,6 @@ impl State {
         self.reset_player_priority_in_region(region_id);
 
         match next_step {
-            Phase::PrecombatPhase(PrecombatPhaseStep::Untap) => {
-                self.reset_player_draft_flags_in_region(region_id)
-            }
             Phase::PrecombatPhase(PrecombatPhaseStep::Draw) => {
                 self.each_player_in_region_takes_draw_step_cards(region_id)
             }

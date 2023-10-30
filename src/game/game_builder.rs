@@ -159,7 +159,7 @@ impl Game {
                 for (seat, &team_id) in interlaced_players.iter().enumerate() {
                     let player_id = PlayerId((seat + 1) as u8);
                     let team_id = TeamId(team_id + 1);
-                    let player = Player::new(player_id, seat as u8, team_id, None, None);
+                    let player = Player::new(player_id, team_id, None, None);
 
 
                     let region_id = RegionId(player_id.0);

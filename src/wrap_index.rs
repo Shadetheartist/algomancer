@@ -1,11 +1,11 @@
 
 pub fn wrap_index(len: usize, idx: i32) -> Option<usize> {
     if len == 0 {
-        return Some(len)
+        return Some(0)
     }
 
     if idx == 0 {
-        return Some(len)
+        return Some(0)
     }
 
     // on the off-chance we can't actually compute this
@@ -32,12 +32,14 @@ mod tests {
     #[test]
     fn test_wrap_index(){
         assert_eq!(wrap_index(usize::MAX, 333), None);
+        assert_eq!(wrap_index(6, 0).unwrap(), 0);
+        assert_eq!(wrap_index(6, 3).unwrap(), 3);
         assert_eq!(wrap_index(5, 5).unwrap(), 0);
         assert_eq!(wrap_index(5, 6).unwrap(), 1);
         assert_eq!(wrap_index(5, -1).unwrap(), 4);
         assert_eq!(wrap_index(5, -5).unwrap(), 0);
         assert_eq!(wrap_index(10, -5).unwrap(), 5);
         assert_eq!(wrap_index(0, -1).unwrap(), 0);
-        assert_eq!(wrap_index(333, 0).unwrap(), 333);
+        assert_eq!(wrap_index(333, 0).unwrap(), 0);
     }
 }
