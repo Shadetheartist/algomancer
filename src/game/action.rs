@@ -4,7 +4,7 @@ use std::collections::HashSet;
 use serde::{Deserialize, Serialize};
 
 use crate::game::Game;
-use crate::game::state::card::{Card, CardId};
+use crate::game::state::card::CardId;
 use crate::game::state::card::CardType::Resource;
 use crate::game::state::player::PlayerId;
 use crate::game::state::progression::{MainPhaseStep, Phase, PrecombatPhaseStep};

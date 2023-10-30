@@ -5,9 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use rng::{AlgomancerRng, AlgomancerRngSeed};
 
-use crate::game::state::deck::{Deck};
-use crate::game::state::pack::Pack;
-use crate::game::state::permanent::Permanent;
+use crate::game::state::deck::Deck;
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
 use crate::game::state::region::Region;
 use crate::game::state::resource::Faction;
@@ -117,8 +115,6 @@ mod tests {
     use std::hash::{Hash, Hasher};
 
     use crate::game::state::rng::{AlgomancerRng, AlgomancerRngSeed};
-
-    use super::State;
 
     // utility function to avoid code duplication
     // creates a pre-defined rng instance

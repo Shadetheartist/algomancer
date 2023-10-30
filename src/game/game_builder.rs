@@ -7,13 +7,13 @@ use rand::prelude::SliceRandom;
 use crate::game::{Game, GameOptions};
 use crate::game::game_builder::NewGameError::NotSupportedYet;
 use crate::game::state::{GameMode, State, TeamConfiguration};
-use crate::game::state::card::{Card, CardId, CardPrototype, CardPrototypeId, CardPrototypeDatabase, CardType};
-use crate::game::state::deck::{Deck};
-use crate::game::state::permanent::{Permanent, PermanentCommon, PermanentId};
+use crate::game::state::card::{Card, CardId, CardPrototype, CardPrototypeDatabase, CardPrototypeId, CardType};
+use crate::game::state::deck::Deck;
+use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{Player, PlayerId, TeamId};
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
 use crate::game::state::region::{Region, RegionId};
-use crate::game::state::resource::{Cost, Faction, Resource};
+use crate::game::state::resource::{Cost, Faction};
 use crate::game::state::rng::AlgomancerRng;
 
 #[derive(Debug)]
@@ -142,6 +142,7 @@ impl Game {
 
             let mut game = Game {
                 cards_db: cards_db,
+                action_history: Vec::new(),
                 state: state,
             };
 

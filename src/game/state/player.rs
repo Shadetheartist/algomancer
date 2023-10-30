@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
 
 use crate::game::state::{GameMode, State};
-use crate::game::state::deck::{Deck};
+use crate::game::state::deck::Deck;
 use crate::game::state::discard::Discard;
 use crate::game::state::hand::Hand;
-use crate::game::state::pack::{Pack};
+use crate::game::state::pack::Pack;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct TeamId(pub u8);

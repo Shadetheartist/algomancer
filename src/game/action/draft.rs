@@ -1,13 +1,15 @@
 use std::collections::HashSet;
 use std::hash::Hash;
-use rand::prelude::{SliceRandom, ThreadRng};
-use rand::{Rng, RngCore};
+
+use rand::RngCore;
+use rand::prelude::SliceRandom;
+
 use crate::game::action::Action;
 use crate::game::Game;
 use crate::game::state::{GameMode, State};
 use crate::game::state::card::CardId;
 use crate::game::state::card::CardType::Resource;
-use crate::game::state::player::{PlayerId};
+use crate::game::state::player::PlayerId;
 
 fn combinations<T: Clone>(items: &[T], k: usize) -> Vec<Vec<T>> {
     let n = items.len();

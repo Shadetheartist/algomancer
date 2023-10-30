@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
-use crate::game::state::permanent::Permanent;
 
+use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{Player, PlayerId};
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
