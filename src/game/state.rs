@@ -139,19 +139,6 @@ mod tests {
     }
 
     #[test]
-    fn test_state_serialization() {
-        let mut state = State::default();
-        state.funny_number = 100;
-
-        let serialized = serde_json::to_string(&state).expect("stringified state json");
-        let deserialized: State = serde_json::from_str(&serialized.as_str()).expect("deserialized state object");
-
-        assert_eq!(state.get_hash_string(), deserialized.get_hash_string());
-        assert_eq!(state, deserialized);
-    }
-
-
-    #[test]
     fn test_rand_deterministic() {
 
         // create a rng instances

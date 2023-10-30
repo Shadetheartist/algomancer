@@ -141,7 +141,6 @@ impl Game {
             };
 
             let mut game = Game {
-                effect_history: Vec::new(),
                 cards_db: cards_db,
                 state: state,
             };

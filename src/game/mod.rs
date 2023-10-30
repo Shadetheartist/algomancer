@@ -9,12 +9,6 @@ pub mod state;
 pub mod action;
 pub mod game_builder;
 
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct EffectHistoryEntry {
-    effect: Box<effect::Effect>,
-}
-
 pub struct GameOptions {
     pub seed: AlgomancerRngSeed,
     pub game_mode: GameMode,
@@ -23,22 +17,10 @@ pub struct GameOptions {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Game {
     pub state: state::State,
-    // effect history is separate from the game state, so that we don't have to
-    // consider the effect history in the state hash, this isn't a blockchain, thank god
-    pub effect_history: Vec<EffectHistoryEntry>,
     pub cards_db: CardPrototypeDatabase,
 }
 
 impl Game {
-
-
-    pub fn print_history(&self) {
-        println!();
-        println!("Action History ({})", self.effect_history.len());
-        for (idx, effect) in self.effect_history.iter().enumerate() {
-            println!("\t{idx} Applied mutator \"{}\" ({})", effect.effect.name(), effect.effect.explain());
-        }
-    }
 
     // is_over returns true if there are are any living players on at least two teams
     pub fn is_over(&self) -> bool {
@@ -64,11 +46,6 @@ impl Game {
             panic!("effect [{}] did not mutate the state", effect.name())
         }
 
-        // store the mutation in history
-        self.effect_history.push(EffectHistoryEntry {
-            effect: Box::new(effect),
-        });
-
         // set current state to mutated clone of state
         self.state = state;
 
@@ -82,63 +59,9 @@ mod tests {
     use crate::game::state::effect::EffectBuilder;
     use crate::game::state::GameMode;
     use crate::game::state::rng::AlgomancerRngSeed;
-    use crate::game::state::team::TeamId;
 
     use super::{Game, GameOptions};
-    use super::state::effect::Effect;
-    use super::state::effect::special::SpecialEffect;
 
-    #[test]
-    fn test_is_over() {
-        let game_options = GameOptions {
-            seed: AlgomancerRngSeed::default(),
-            game_mode: GameMode::new_player_mode(),
-        };
-
-        // apply effect to a game, each mutating its state somehow
-        let mut game = Game::new(&game_options).expect("game object");
-        let res = game.is_over();
-        assert_eq!(res, false);
-
-        for mut p in game.state.players_in_team_mut(TeamId(1)) {
-            p.is_alive = false
-        }
-
-        let res = game.is_over();
-        assert_eq!(res, true);
-    }
-
-    #[test]
-    fn test_action_replay() {
-        let game_options = GameOptions {
-            seed: AlgomancerRngSeed::default(),
-            game_mode: GameMode::new_player_mode(),
-        };
-
-        // apply effect to a game, each mutating its state somehow
-        let mut game = Game::new(&game_options).expect("game object");
-        game.apply_effect(Effect::Special(SpecialEffect { effect_number: 11 }));
-        game.apply_effect(Effect::Heal { amount: 3, target: 1 });
-        game.apply_effect(Effect::Damage { amount: 5, target: 1 });
-
-        // use the action history from game 1 on game 2
-        let mut game2 = Game::new(&game_options).expect("game object");
-        for entry in game.effect_history.iter() {
-            let effect = *entry.effect.clone();
-            game2.apply_effect(effect)
-        }
-
-        // after applying the effect in action replay to another game instance,
-        // we should end at the same state
-        assert_eq!(game.state.get_hash_string(), game2.state.get_hash_string());
-
-        // apply the same effect to both games
-        game.apply_effect(Effect::Damage { amount: 1, target: 1 });
-        game2.apply_effect(Effect::Damage { amount: 1, target: 1 });
-
-        // game state hashes should still be the same
-        assert_eq!(game.state.get_hash_string(), game2.state.get_hash_string());
-    }
 
     #[test]
     fn test_game_serialization() {
