@@ -9,6 +9,7 @@ use crate::game::Game;
 use crate::game::state::{GameMode, State};
 use crate::game::state::card::CardId;
 use crate::game::state::card::CardType::Resource;
+use crate::game::state::pack::Pack;
 use crate::game::state::player::PlayerId;
 
 fn combinations<T: Clone>(items: &[T], k: usize) -> Vec<Vec<T>> {
@@ -120,32 +121,40 @@ impl Game {
         actions
     }
 
-    pub fn apply_draft_action(&mut self, state: &mut State, action: &Action) {
+    pub fn apply_draft_action(&mut self, mut state: State, action: &Action) -> State {
         if let Action::Draft { player_id, cards_to_keep } = action {
-            {
-                let player_hand = state.player_hand_mut(*player_id);
+            let player_hand = state.player_hand_mut(*player_id);
 
-                let mut cards_for_hand = Vec::new();
-                let mut cards_for_pack = Vec::new();
+            let mut cards_for_hand = Vec::new();
+            let mut cards_for_pack = Vec::new();
 
-                for _ in 0..player_hand.cards.len() {
-                    let card = player_hand.cards.remove(0);
-                    if cards_to_keep.contains(&card.card_id) {
-                        cards_for_hand.push(card);
-                    } else {
-                        cards_for_pack.push(card);
+            for _ in 0..player_hand.cards.len() {
+                let card = player_hand.cards.remove(0);
+                if cards_to_keep.contains(&card.card_id) {
+                    cards_for_hand.push(card);
+                } else {
+                    cards_for_pack.push(card);
+                }
+            }
+
+            if cards_for_pack.len() != 10 {
+                panic!("there must always be 10 cards in the pack")
+            }
+
+            for card in cards_for_hand {
+                player_hand.cards.push(card);
+            }
+
+            let player = state.player_mut(*player_id).expect("a player");
+            match player.pack.as_mut() {
+                None => {
+                    player.pack = Some(Pack { cards: cards_for_pack })
+                }
+                Some(player_pack) => {
+                    for card in cards_for_pack {
+                        player_pack.cards.push(card);
                     }
                 }
-
-                if cards_for_pack.len() != 10 {
-                    panic!("there must always be 10 cards in the pack")
-                }
-
-                for card in cards_for_hand {
-                    player_hand.cards.push(card);
-                }
-
-
             }
 
             let region_id = state.region_id_containing_player(*player_id);
@@ -156,8 +165,10 @@ impl Game {
                 GameMode::Constructed { .. } => { todo!() }
             }
 
-
             println!("Player [{:?}] has selected their draft.", *player_id);
+
+            state
+
         } else {
             panic!("action should have been draft")
         }

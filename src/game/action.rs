@@ -72,10 +72,10 @@ impl Game {
 
         match action {
             Action::PassPriority(_) => {
-                self.apply_pass_priority_action(&mut next_state, &action);
+                next_state = self.apply_pass_priority_action(next_state, &action);
             }
             Action::Draft { .. } => {
-                self.apply_draft_action(&mut next_state, &action);
+                next_state = self.apply_draft_action(next_state, &action);
             }
 
             Action::Cast(_) => {
