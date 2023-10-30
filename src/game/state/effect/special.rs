@@ -18,7 +18,7 @@ impl SpecialEffect {
         format!("Sets the game step to {}", self.effect_number)
     }
 
-    pub fn mutate_state(&self, state: &mut state::State) {
+    pub fn mutate_state(&self, _: &mut state::State) {
 
     }
 }

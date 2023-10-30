@@ -1,8 +1,8 @@
 use std::collections::HashSet;
 use std::hash::Hash;
 
-use rand::RngCore;
 use rand::prelude::SliceRandom;
+use rand::RngCore;
 
 use crate::game::action::Action;
 use crate::game::Game;
@@ -123,7 +123,7 @@ impl Game {
     pub fn apply_draft_action(&mut self, state: &mut State, action: &Action) {
         if let Action::Draft { player_id, cards_to_keep } = action {
             {
-                let mut player_hand = state.player_hand_mut(*player_id);
+                let player_hand = state.player_hand_mut(*player_id);
 
                 let mut cards_for_hand = Vec::new();
                 let mut cards_for_pack = Vec::new();
@@ -151,7 +151,7 @@ impl Game {
                 GameMode::Constructed { .. } => { todo!() }
             }
 
-            let mut player = state.player_mut(*player_id).expect("a player");
+            let player = state.player_mut(*player_id).expect("a player");
             player.has_drafted = true;
 
             println!("Player [{:?}] has selected their draft.", *player_id);

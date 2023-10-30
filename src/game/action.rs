@@ -60,23 +60,23 @@ pub enum DraftValidationError {
 }
 
 impl Game {
-    pub fn apply_action(&mut self, action: &Action) {
-        if let Err(e) = self.validate_action(action) {
+    pub fn apply_action(&mut self, action: Action) {
+        if let Err(_) = self.validate_action(&action) {
             panic!("cannot apply this action, it is not valid");
         };
 
         // todo: teams
         // todo: priority system (need teams)
-        println!("Applying Action [{:?}] during phase [{:?}]", action, self.state.step);
+        println!("Applying Action [{:?}] during phase [{:?}]", &action, self.state.step);
 
         let mut next_state = self.state.clone();
 
         match action {
             Action::PassPriority(_) => {
-                self.apply_pass_priority_action(&mut next_state, action);
+                self.apply_pass_priority_action(&mut next_state, &action);
             }
             Action::Draft { .. } => {
-                self.apply_draft_action(&mut next_state, action);
+                self.apply_draft_action(&mut next_state, &action);
             }
 
             Action::Cast(_) => {
@@ -84,7 +84,9 @@ impl Game {
             }
         }
 
-        self.state = next_state
+        self.action_history.push(action);
+        self.state = next_state;
+
     }
 
     pub fn validate_action(&self, action: &Action) -> Result<(), ActionValidationError> {

@@ -15,14 +15,6 @@ impl Deck {
         }
     }
 
-    pub fn top_card(&self) -> Option<&Card> {
-        if self.cards.len() > 0 {
-            return Some(&self.cards[0]);
-        }
-
-        None
-    }
-
     pub fn draw(&mut self) -> Option<Card> {
         if self.cards.len() > 0 {
             return Some(self.cards.remove(0))

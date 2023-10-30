@@ -36,6 +36,7 @@ pub enum Effect {
     Special(SpecialEffect),
 }
 
+#[allow(dead_code)]
 impl Effect {
 
     pub fn name(&self) -> &str {

@@ -3,8 +3,8 @@ use serde::{Deserialize, Serialize};
 use state::rng::AlgomancerRngSeed;
 
 use crate::game::action::Action;
-use crate::game::state::GameMode;
 use crate::game::state::card::CardPrototypeDatabase;
+use crate::game::state::GameMode;
 
 pub mod state;
 pub mod action;

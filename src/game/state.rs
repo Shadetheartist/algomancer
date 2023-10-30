@@ -17,7 +17,6 @@ pub mod progression;
 pub mod resource;
 pub mod rng;
 pub mod priority;
-pub mod stack;
 pub mod pack;
 pub mod deck;
 pub mod hand;
@@ -100,6 +99,7 @@ impl State {
         }
     }
 
+    #[allow(dead_code)]
     pub fn get_hash_string(&self) -> String {
         let mut hasher = DefaultHasher::new();
         self.hash(&mut hasher);

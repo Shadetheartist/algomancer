@@ -59,10 +59,6 @@ impl State {
         &mut self.player_mut(player_id).expect("a player").hand
     }
 
-    pub fn player_pack_mut(&mut self, player_id: PlayerId) -> Option<&mut Pack> {
-        self.player_mut(player_id).expect("a player").pack.as_mut()
-    }
-
     pub fn player_deck_mut(&mut self, player_id: PlayerId) -> &mut Deck {
         match &self.game_mode {
             GameMode::LiveDraft { .. } => {
@@ -73,7 +69,7 @@ impl State {
                 }
             },
             GameMode::PreDraft { .. } | GameMode::Constructed { .. } => {
-                let mut player = self.player_mut(player_id).expect("player");
+                let player = self.player_mut(player_id).expect("player");
                 if let Some(player_deck) = player.player_deck.as_mut() {
                     player_deck
                 } else {
@@ -95,10 +91,6 @@ impl State {
         self.regions.iter_mut().flat_map(|r| &mut r.players).collect()
     }
 
-    pub fn player_ids(&self) -> Vec<PlayerId> {
-        self.regions.iter().flat_map(|r| &r.players).map(|p| p.player_id ).collect()
-    }
-
     pub fn living_players_in_team(&self, team_id: TeamId) -> Vec<&Player> {
         self.players().into_iter().filter(|p| p.team_id == team_id && p.is_alive).collect()
     }
@@ -116,14 +108,14 @@ impl State {
 
     pub fn player_draw_n_cards(&mut self, player_id: PlayerId, n: usize){
 
-        let mut deck = self.player_deck_mut(player_id);
+        let deck = self.player_deck_mut(player_id);
         let mut cards = Vec::new();
         for _ in 0..n {
             let card = deck.draw().expect("a card");
             cards.push(card);
         }
 
-        let mut player = self.player_mut(player_id).expect("player");
+        let player = self.player_mut(player_id).expect("player");
         for card in cards {
             player.hand.cards.push(card);
         }
@@ -131,7 +123,7 @@ impl State {
 
 
     pub fn player_combines_pack_with_hand(&mut self) {
-        let mut players = self.players_mut();
+        let players = self.players_mut();
         for p in players {
             if let Some(pack) = &mut p.pack {
                 p.hand.cards.append(&mut pack.cards);

@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 
 use crate::game::state::{GameMode, State};
-use crate::game::state::card::{Card, CardId};
 use crate::game::state::player::PlayerId;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
@@ -184,16 +183,6 @@ impl State {
 
     fn reset_player_priority(&mut self) {
         self.players_mut().iter_mut().for_each(|p| p.passed_priority = false);
-    }
-
-    pub fn move_card(card_id: CardId, from: &mut Vec<Card>, to: &mut Vec<Card>) -> Result<(), &'static str> {
-        if let Some(index) = from.iter().position(|c| c.card_id == card_id) {
-            let card = from.remove(index);
-            to.push(card);
-            Ok(())
-        } else {
-            Err("cannot move card, it does not exist in 'from' vec")
-        }
     }
 
     fn each_player_takes_draw_step_cards(&mut self) {

@@ -107,13 +107,13 @@ impl Game {
             // takes all the non-token, non-resource card prototypes and maps them to card instances
             let mut card_id_counter = 0;
             let cards_for_deck = card_prototypes.iter()
-                .filter(|(card_id, c)| {
+                .filter(|(_, c)| {
                     match c.card_type {
                         CardType::Resource | CardType::UnitToken | CardType::SpellToken => false,
                         CardType::Unit | CardType::Spell => true,
                     }
                 })
-                .map(|(card_id, c)| {
+                .map(|(_, c)| {
                     card_id_counter += 1;
                     Card {
                         card_id: CardId(card_id_counter),
@@ -131,7 +131,7 @@ impl Game {
             deck.cards = cards_for_deck;
             deck.cards.shuffle(&mut algomancer_rng.rng);
 
-            let mut state = State {
+            let state = State {
                 game_mode: options.game_mode.clone(),
                 common_deck: Some(deck),
                 rand: algomancer_rng,

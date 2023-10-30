@@ -31,7 +31,7 @@ fn main() {
         sorted_actions.sort();
         sorted_actions.reverse();
 
-        let action = sorted_actions.iter().next().expect("any action");
+        let action = sorted_actions.into_iter().next().expect("any action");
         game.apply_action(action);
 
         counter += 1;

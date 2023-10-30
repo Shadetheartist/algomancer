@@ -5,8 +5,6 @@
 
 use crate::game::state::State;
 
-struct Priority {}
-
 impl State {
     pub fn all_players_passed_priority(&self) -> bool {
         if self.players().len() == 0 {
