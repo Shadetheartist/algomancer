@@ -198,36 +198,10 @@ impl State {
         }
     }
 
-
-
-    pub fn player_draw_n_cards(&mut self, player_id: PlayerId, n: usize){
-
-        let mut deck = self.player_deck_mut(player_id);
-        let mut cards = Vec::new();
-        for _ in 0..n {
-            let card = deck.draw().expect("a card");
-            cards.push(card);
-        }
-
-        let mut player = self.player_mut(player_id).expect("player");
-        for card in cards {
-            player.hand.cards.push(card);
-        }
-    }
-
     fn each_player_takes_draw_step_cards(&mut self) {
         let player_ids: Vec<PlayerId> = self.players().into_iter().map(|p| p.player_id).collect();
         for p_id in player_ids {
             self.player_draw_n_cards(p_id, 2);
-        }
-    }
-
-    fn player_moves_pack_into_hand(&mut self) {
-        let mut players = self.players_mut();
-        for p in players {
-            if let Some(pack) = &mut p.pack {
-                p.hand.cards.append(&mut pack.cards);
-            }
         }
     }
 
@@ -245,7 +219,7 @@ impl State {
                 self.each_player_takes_draw_step_cards()
             }
             Phase::PrecombatPhase(PrecombatPhaseStep::Draft) => {
-                self.player_moves_pack_into_hand()
+                self.player_combines_pack_with_hand()
             }
             _ => {}
         }

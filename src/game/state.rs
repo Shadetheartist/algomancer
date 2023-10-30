@@ -25,6 +25,7 @@ pub mod deck;
 pub mod hand;
 pub mod region;
 pub mod permanent;
+pub mod discard;
 
 type ObjectId = i32;
 
