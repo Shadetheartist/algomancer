@@ -121,7 +121,7 @@ impl Game {
         actions
     }
 
-    pub fn apply_draft_action(&mut self, mut state: State, action: &Action) -> State {
+    pub fn apply_draft_action(&self, mut state: State, action: &Action) -> State {
         if let Action::Draft { player_id, cards_to_keep } = action {
             let player_hand = state.player_hand_mut(*player_id);
 

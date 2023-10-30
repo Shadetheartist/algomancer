@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 use rng::{AlgomancerRng, AlgomancerRngSeed};
 
 use crate::game::state::deck::Deck;
-use crate::game::state::progression::{Phase, PrecombatPhaseStep};
 use crate::game::state::region::Region;
 use crate::game::state::resource::Faction;
 
