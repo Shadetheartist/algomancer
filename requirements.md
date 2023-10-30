@@ -3,6 +3,15 @@
 ## Design Considerations
 
 
+Effect Layering & timestamps (game-step-stamps)
+- 0: Printed stats 
+- 1: Base stats
+- 2: Permanent buffs
+- 3: temporary buffs
+- 4: abilities/static effects
+- 5: attributes
+- 6: Unaware
+
 State Isolation per Region
 - for actions like drafting, after applying the action, there is no need to recompute the actions for other regions.  
   isolating action computation to regions may be a big performance boost. However, to cache actions in state would lead to an enormous state file. 

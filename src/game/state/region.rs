@@ -79,7 +79,7 @@ impl State {
     }
 
 
-    pub fn transition_to_next_step(&mut self, region_id: RegionId) {
+    pub fn transition_to_next_step(mut self, region_id: RegionId) -> State {
 
         let next_step = {
             let region = self.regions.iter().find(|r| r.region_id == region_id).expect("a region");
@@ -107,6 +107,8 @@ impl State {
             let region = self.regions.iter_mut().find(|r| r.region_id == region_id).expect("a region");
             region.step = next_step;
         }
+
+        self
 
     }
 }

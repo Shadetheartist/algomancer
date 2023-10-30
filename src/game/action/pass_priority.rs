@@ -11,7 +11,7 @@ impl Game {
             player.passed_priority = true;
 
             if state.all_players_in_region_passed_priority(region_id) {
-                state.transition_to_next_step(region_id);
+                state = state.transition_to_next_step(region_id);
             }
 
             state

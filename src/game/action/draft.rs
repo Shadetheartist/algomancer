@@ -158,7 +158,7 @@ impl Game {
             }
 
             let region_id = state.region_id_containing_player(*player_id);
-            state.transition_to_next_step(region_id);
+            state = state.transition_to_next_step(region_id);
 
             match state.game_mode {
                 GameMode::LiveDraft { .. } | GameMode::PreDraft { .. } | GameMode::TeamDraft { .. } => {}
