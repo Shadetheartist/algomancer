@@ -135,7 +135,6 @@ impl Game {
                 game_mode: options.game_mode.clone(),
                 common_deck: Some(deck),
                 rand: algomancer_rng,
-                step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
                 regions: Vec::new(),
                 next_permanent_id: 1,
             };
@@ -183,6 +182,7 @@ impl Game {
                         owner_player_id: player_id,
                         players: vec![player],
                         permanents: permanents,
+                        step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap)
                     };
 
                     game.state.regions.push(region);

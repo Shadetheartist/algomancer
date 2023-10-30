@@ -80,7 +80,6 @@ impl GameMode {
 pub struct State {
     pub game_mode: GameMode,
     pub rand: AlgomancerRng,
-    pub step: Phase,
     pub common_deck: Option<Deck>,
     pub regions: Vec<Region>,
     pub next_permanent_id: usize,
@@ -92,7 +91,6 @@ impl State {
         State {
             game_mode: GameMode::new_player_mode(),
             rand: AlgomancerRng::new(AlgomancerRngSeed::default()),
-            step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
             common_deck: Some(Deck::new()),
             regions: Vec::new(),
             next_permanent_id: 1,

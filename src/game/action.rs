@@ -65,9 +65,7 @@ impl Game {
             panic!("cannot apply this action, it is not valid");
         };
 
-        // todo: teams
-        // todo: priority system (need teams)
-        println!("Applying Action [{:?}] during phase [{:?}]", &action, self.state.step);
+        println!("Applying Action [{:?}]", &action);
 
         let mut next_state = self.state.clone();
 
@@ -133,37 +131,41 @@ impl Game {
     pub fn valid_actions(&self) -> HashSet<Action> {
         let mut valid_actions = HashSet::new();
 
-        match &self.state.step {
-            Phase::MainPhase(MainPhaseStep::NITMain) => {
-                // dont put a valid action, for testing
-            }
+        for region in &self.state.regions {
 
-            Phase::PrecombatPhase(PrecombatPhaseStep::Draft) => {
-                for p in &self.state.players() {
-                    if !p.has_drafted {
-                        for a in self.valid_drafts(p.player_id) {
-                            valid_actions.insert(a);
+            match &region.step {
+                Phase::MainPhase(MainPhaseStep::NITMain) => {
+                    // dont put a valid action, for testing
+                }
+
+                Phase::PrecombatPhase(PrecombatPhaseStep::Draft) => {
+                    for p in &region.players {
+                        if !p.has_drafted {
+                            for a in self.valid_drafts(p.player_id) {
+                                valid_actions.insert(a);
+                            }
                         }
-                    }
 
-                    if !self.is_over() {
-                        if !p.passed_priority {
-                            valid_actions.insert(Action::PassPriority(p.player_id));
+                        if !self.is_over() {
+                            if !p.passed_priority {
+                                valid_actions.insert(Action::PassPriority(p.player_id));
+                            }
                         }
                     }
                 }
-            }
 
-            _ => {
-                if !self.is_over() {
-                    for p in &self.state.players() {
-                        if !p.passed_priority {
-                            valid_actions.insert(Action::PassPriority(p.player_id));
+                _ => {
+                    if !self.is_over() {
+                        for p in &region.players {
+                            if !p.passed_priority {
+                                valid_actions.insert(Action::PassPriority(p.player_id));
+                            }
                         }
                     }
                 }
             }
         }
+
 
         valid_actions
     }

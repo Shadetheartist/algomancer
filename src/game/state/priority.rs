@@ -6,10 +6,5 @@
 use crate::game::state::State;
 
 impl State {
-    pub fn all_players_passed_priority(&self) -> bool {
-        if self.players().len() == 0 {
-            panic!("wtf there's no players")
-        }
-        !self.players().iter().any(|p| p.passed_priority == false)
-    }
+
 }

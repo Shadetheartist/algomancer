@@ -5,6 +5,7 @@ use crate::game::state::deck::Deck;
 use crate::game::state::discard::Discard;
 use crate::game::state::hand::Hand;
 use crate::game::state::pack::Pack;
+use crate::game::state::region::RegionId;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct TeamId(pub u8);
@@ -121,15 +122,6 @@ impl State {
         }
     }
 
-
-    pub fn player_combines_pack_with_hand(&mut self) {
-        let players = self.players_mut();
-        for p in players {
-            if let Some(pack) = &mut p.pack {
-                p.hand.cards.append(&mut pack.cards);
-            }
-        }
-    }
 
 }
 

@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::game::state::{GameMode, State};
 use crate::game::state::player::PlayerId;
+use crate::game::state::region::RegionId;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum Phase {
@@ -177,42 +178,7 @@ impl Phase {
 }
 
 impl State {
-    fn reset_player_draft_flags(&mut self) {
-        self.players_mut().iter_mut().for_each(|t| t.has_drafted = false)
-    }
 
-    fn reset_player_priority(&mut self) {
-        self.players_mut().iter_mut().for_each(|p| p.passed_priority = false);
-    }
-
-    fn each_player_takes_draw_step_cards(&mut self) {
-        let player_ids: Vec<PlayerId> = self.players().into_iter().map(|p| p.player_id).collect();
-        for p_id in player_ids {
-            self.player_draw_n_cards(p_id, 2);
-        }
-    }
-
-    pub fn transition_to_next_step(&mut self) {
-        let next_step = self.step.get_next_step(&self.game_mode);
-        println!("Transitioning from {:?} to {:?}", self.step, next_step);
-
-        self.reset_player_priority();
-
-        match next_step {
-            Phase::PrecombatPhase(PrecombatPhaseStep::Untap) => {
-                self.reset_player_draft_flags()
-            }
-            Phase::PrecombatPhase(PrecombatPhaseStep::Draw) => {
-                self.each_player_takes_draw_step_cards()
-            }
-            Phase::PrecombatPhase(PrecombatPhaseStep::Draft) => {
-                self.player_combines_pack_with_hand()
-            }
-            _ => {}
-        }
-
-        self.step = next_step;
-    }
 }
 
 #[cfg(test)]
