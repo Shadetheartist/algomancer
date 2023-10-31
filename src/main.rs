@@ -34,7 +34,14 @@ fn main() {
         sorted_actions.reverse();
 
         let action = sorted_actions.into_iter().next().expect("any action");
-        game.apply_action(action);
+        let result = game.apply_action(action);
+
+        match result {
+            Ok(_) => {}
+            Err(err) => {
+                panic!("{:?}", err)
+            }
+        }
 
         counter += 1;
     }

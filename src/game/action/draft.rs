@@ -10,7 +10,7 @@ use crate::game::state::{GameMode, State};
 use crate::game::state::card::CardId;
 use crate::game::state::card::CardType::Resource;
 use crate::game::state::pack::Pack;
-use crate::game::state::player::PlayerId;
+use crate::game::state::player::{PlayerId, StateError};
 
 fn combinations<T: Clone>(items: &[T], k: usize) -> Vec<Vec<T>> {
     let n = items.len();
@@ -77,7 +77,7 @@ impl Game {
 
         let mut actions = Vec::new();
 
-        let player = self.state.player(player_id).expect("a player");
+        let player = self.state.find_player(player_id).expect("a player");
         let card_ids: Vec<CardId> = player.hand.cards.iter()
             .filter(|card| {
                 let proto = &self.cards_db.prototypes[&card.prototype_id];
@@ -121,7 +121,7 @@ impl Game {
         actions
     }
 
-    pub fn apply_draft_action(&self, mut state: State, action: &Action) -> State {
+    pub fn apply_draft_action(&self, mut state: State, action: &Action) -> Result<State, StateError> {
         if let Action::Draft { player_id, cards_to_keep } = action {
             let player_hand = state.player_hand_mut(*player_id);
 
@@ -138,14 +138,14 @@ impl Game {
             }
 
             if cards_for_pack.len() != 10 {
-                panic!("there must always be 10 cards in the pack")
+                return Err(StateError::InvalidDraft)
             }
 
             for card in cards_for_hand {
                 player_hand.cards.push(card);
             }
 
-            let player = state.player_mut(*player_id).expect("a player");
+            let player = state.find_player_mut(*player_id).expect("a player");
             match player.pack.as_mut() {
                 None => {
                     player.pack = Some(Pack { cards: cards_for_pack })
@@ -157,8 +157,8 @@ impl Game {
                 }
             }
 
-            let region_id = state.region_id_containing_player(*player_id);
-            state = state.transition_to_next_step(region_id);
+            let region_id = state.find_region_id_containing_player(*player_id);
+            state = state.region_transition_to_next_step(region_id);
 
             match state.game_mode {
                 GameMode::LiveDraft { .. } | GameMode::PreDraft { .. } | GameMode::TeamDraft { .. } => {}
@@ -167,7 +167,7 @@ impl Game {
 
             println!("Player [{:?}] has selected their draft.", *player_id);
 
-            state
+            Ok(state)
 
         } else {
             panic!("action should have been draft")

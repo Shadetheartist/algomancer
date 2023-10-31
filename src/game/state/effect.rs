@@ -17,6 +17,7 @@ pub enum EffectBuilder {
 }
 
 impl EffectBuilder {
+    #[allow(dead_code)]
     pub fn build_effect(&self, state: &mut state::State) -> Effect {
         match self {
             Self::RandomDamage { min, max, target, .. } => {

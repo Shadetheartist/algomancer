@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::game::Game;
 use crate::game::state::card::CardId;
 use crate::game::state::card::CardType::Resource;
-use crate::game::state::player::PlayerId;
+use crate::game::state::player::{PlayerId, StateError};
 use crate::game::state::progression::{MainPhaseStep, PrecombatPhaseStep};
 use crate::game::state::progression::Phase::{MainPhase, PrecombatPhase};
 
@@ -61,7 +61,7 @@ pub enum DraftValidationError {
 }
 
 impl Game {
-    pub fn apply_action(&mut self, action: Action) {
+    pub fn apply_action(&mut self, action: Action) -> Result<(), StateError> {
         if let Err(_) = self.validate_action(&action) {
             panic!("cannot apply this action, it is not valid");
         };
@@ -72,10 +72,10 @@ impl Game {
 
         match action {
             Action::PassPriority(_) => {
-                next_state = self.apply_pass_priority_action(next_state, &action);
+                next_state = self.apply_pass_priority_action(next_state, &action)?;
             }
             Action::Draft { .. } => {
-                next_state = self.apply_draft_action(next_state, &action);
+                next_state = self.apply_draft_action(next_state, &action)?;
             }
 
             Action::Cast(_) => {
@@ -86,17 +86,19 @@ impl Game {
         self.action_history.push(action);
         self.state = next_state;
 
+        Ok(())
+
     }
 
     pub fn validate_action(&self, action: &Action) -> Result<(), ActionValidationError> {
         match action {
             Action::PassPriority(_) => {}
             Action::Draft { player_id, cards_to_keep } => {
-                return match self.state.player(*player_id) {
-                    None => {
+                return match self.state.find_player(*player_id) {
+                    Err(_) => {
                         Err(ActionValidationError::PlayerDoesNotExist)
                     }
-                    Some(player) => {
+                    Ok(player) => {
                         if player.hand.cards.len() - cards_to_keep.len() != 10 {
                             // enforce that there must be 10 cards remaining to create the next pack
                             return Err(ActionValidationError::Draft(DraftValidationError::IncorrectNumberOfCardsDrafted))

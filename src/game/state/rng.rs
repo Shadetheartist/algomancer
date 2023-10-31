@@ -20,6 +20,7 @@ impl AlgomancerRng {
             rng
         }
     }
+    #[allow(dead_code)]
     pub fn gen_range<T, R>(&mut self, range: R) -> T
         where
             T: SampleUniform,

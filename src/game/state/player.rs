@@ -5,6 +5,7 @@ use crate::game::state::deck::Deck;
 use crate::game::state::discard::Discard;
 use crate::game::state::hand::Hand;
 use crate::game::state::pack::Pack;
+use crate::game::state::region::RegionId;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct TeamId(pub u8);
@@ -41,33 +42,56 @@ impl Player {
     }
 }
 
+#[derive(Debug)]
+pub enum StateError {
+    PlayerNotFound(PlayerId),
+    RegionNotFound(RegionId),
+    InvalidDraft,
+}
 
 impl State {
-    pub fn player(&self, player_id: PlayerId) -> Option<&Player> {
-        self.players().into_iter().find(|&p| p.player_id == player_id)
+    /// looks through all regions for a player matching the player_id
+    pub fn find_player(&self, player_id: PlayerId) -> Result<&Player, StateError> {
+        let find_result = self.players().into_iter().find(|p| p.player_id == player_id);
+        match find_result {
+            None => {
+                Err(StateError::PlayerNotFound(player_id))
+            }
+            Some(player) => {
+                Ok(player)
+            }
+        }
     }
 
-    pub fn player_mut(&mut self, player_id: PlayerId) -> Option<&mut Player> {
-        self.players_mut().into_iter().find(|p| p.player_id == player_id)
+    pub fn find_player_mut(&mut self, player_id: PlayerId) -> Result<&mut Player, StateError> {
+        let find_result = self.players_mut().into_iter().find(|p| p.player_id == player_id);
+        match find_result {
+            None => {
+                Err(StateError::PlayerNotFound(player_id))
+            }
+            Some(player) => {
+                Ok(player)
+            }
+        }
     }
 
     pub fn player_hand_mut(&mut self, player_id: PlayerId) -> &mut Hand {
-        &mut self.player_mut(player_id).expect("a player").hand
+        &mut self.find_player_mut(player_id).expect("a player").hand
     }
 
-    pub fn player_deck_mut(&mut self, player_id: PlayerId) -> &mut Deck {
+    pub fn get_deck_for_player(&mut self, player_id: PlayerId) -> Result<&mut Deck, StateError> {
         match &self.game_mode {
             GameMode::LiveDraft { .. } => {
                 if let Some(common_deck) = &mut self.common_deck {
-                    common_deck
+                    Ok(common_deck)
                 } else {
                     panic!("player is supposed to draw from the common deck in live-draft, but it doesn't exist");
                 }
             },
             GameMode::PreDraft { .. } | GameMode::Constructed { .. } => {
-                let player = self.player_mut(player_id).expect("player");
+                let player = self.find_player_mut(player_id).expect("player");
                 if let Some(player_deck) = player.player_deck.as_mut() {
-                    player_deck
+                    Ok(player_deck)
                 } else {
                     panic!("player is supposed to draw from their own deck in pre-draft & constructed, but it doesn't exist");
                 }
@@ -101,17 +125,16 @@ impl State {
         })
     }
 
-
     pub fn player_draw_n_cards(&mut self, player_id: PlayerId, n: usize){
 
-        let deck = self.player_deck_mut(player_id);
+        let deck = self.get_deck_for_player(player_id).expect("a deck");
         let mut cards = Vec::new();
         for _ in 0..n {
             let card = deck.draw().expect("a card");
             cards.push(card);
         }
 
-        let player = self.player_mut(player_id).expect("player");
+        let player = self.find_player_mut(player_id).expect("player");
         for card in cards {
             player.hand.cards.push(card);
         }

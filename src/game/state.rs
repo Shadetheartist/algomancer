@@ -67,6 +67,7 @@ pub enum GameMode {
 }
 
 impl GameMode {
+    #[allow(dead_code)]
     pub fn new_player_mode() -> GameMode {
         GameMode::LiveDraft {
             team_configuration: TeamConfiguration::one_v_one(),
@@ -86,6 +87,7 @@ pub struct State {
 
 impl State {
     // this is useful for testing
+    #[allow(dead_code)]
     pub fn default() -> State {
         State {
             game_mode: GameMode::new_player_mode(),
