@@ -158,24 +158,15 @@ impl Game {
                 // once all players have passed priority, they should be synchronized to enter the mana step
                 PrecombatPhase(PrecombatPhaseStep::PassPack) => {
                     let neighbour_region = self.state.region_clockwise_neighbour(region.region_id).expect("a neighbouring region");
-                    match &neighbour_region.step {
-                        PrecombatPhase(step) => {
-                            match step {
-                                PrecombatPhaseStep::Draft | PrecombatPhaseStep::PassPack => {
-                                    for p in &region.players {
-                                        if !p.passed_priority {
-                                            valid_actions.insert(Action::PassPriority(p.player_id));
-                                        }
-                                    }
+                    if let PrecombatPhase(step) = &neighbour_region.step {
+                        if let PrecombatPhaseStep::Draft | PrecombatPhaseStep::PassPack = step {
+                            for p in &region.players {
+                                if !p.passed_priority {
+                                    valid_actions.insert(Action::PassPriority(p.player_id));
                                 }
-                                _ => {}
                             }
-
                         }
-                        _ => {}
                     }
-
-
                 }
 
                 _ => {
