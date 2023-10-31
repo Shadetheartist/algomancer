@@ -196,7 +196,7 @@ mod tests {
         // so if we get to the end of a round before the loop is over, the test is successful
         let mut phase = initial_phase.clone();
         for _ in 0..100 {
-            println!("{:?}", phase);
+            eprintln!("{:?}", phase);
             phase = phase.get_next_step(mode);
 
             // we got from the beginning to the end of the loop, success!

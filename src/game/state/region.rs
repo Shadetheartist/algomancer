@@ -199,7 +199,7 @@ impl State {
 
         {
             let region = self.find_region_mut(region_id).expect("a region");
-            println!("Region {:?} is transitioning from {:?} to {:?}", region.region_id, region.step, next_step);
+            eprintln!("Region {:?} is transitioning from {:?} to {:?}", region.region_id, region.step, next_step);
             region.step = next_step;
         }
 

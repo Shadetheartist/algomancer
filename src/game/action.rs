@@ -66,7 +66,7 @@ impl Game {
             panic!("cannot apply this action, it is not valid");
         };
 
-        println!("Applying Action [{:?}]", &action);
+        eprintln!("Applying Action [{:?}]", &action);
 
         let mut next_state = self.state.clone();
 

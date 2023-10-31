@@ -169,7 +169,7 @@ impl Game {
                 GameMode::Constructed { .. } => { todo!() }
             }
 
-            println!("Player [{:?}] has selected their draft.", *player_id);
+            eprintln!("Player [{:?}] has selected their draft.", *player_id);
 
             Ok(state)
 
