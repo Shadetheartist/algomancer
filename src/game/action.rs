@@ -87,7 +87,6 @@ impl Game {
         self.state = next_state;
 
         Ok(())
-
     }
 
     pub fn validate_action(&self, action: &Action) -> Result<(), ActionValidationError> {
@@ -101,13 +100,13 @@ impl Game {
                     Ok(player) => {
                         if player.hand.cards.len() - cards_to_keep.len() != 10 {
                             // enforce that there must be 10 cards remaining to create the next pack
-                            return Err(ActionValidationError::Draft(DraftValidationError::IncorrectNumberOfCardsDrafted))
+                            return Err(ActionValidationError::Draft(DraftValidationError::IncorrectNumberOfCardsDrafted));
                         }
 
                         // enforce that each card selected actually exists in the player's hand
                         for card_id in cards_to_keep {
                             if player.hand.cards.iter().find(|c| c.card_id == *card_id) == None {
-                                return Err(ActionValidationError::Draft(DraftValidationError::CardNotInHand(*card_id)))
+                                return Err(ActionValidationError::Draft(DraftValidationError::CardNotInHand(*card_id)));
                             }
                         }
 
@@ -117,7 +116,7 @@ impl Game {
                         for card in cards_for_pack {
                             let proto = &self.cards_db.prototypes[&card.prototype_id];
                             if proto.card_type == Resource {
-                                return Err(ActionValidationError::Draft(DraftValidationError::InvalidPackCard(card.card_id)))
+                                return Err(ActionValidationError::Draft(DraftValidationError::InvalidPackCard(card.card_id)));
                             }
                         }
 
@@ -135,21 +134,19 @@ impl Game {
         let mut valid_actions = HashSet::new();
 
         for region in &self.state.regions {
-
             match &region.step {
                 MainPhase(MainPhaseStep::NITMain) => {
                     // dont put a valid action, for testing
                 }
 
                 PrecombatPhase(PrecombatPhaseStep::Draft) => {
-                    for p in &region.players {
-                        for a in self.valid_drafts(p.player_id) {
-                            valid_actions.insert(a);
-                        }
+                    let p = region.sole_player();
+                    for a in self.valid_drafts(p.player_id) {
+                        valid_actions.insert(a);
+                    }
 
-                        if !p.passed_priority {
-                            valid_actions.insert(Action::PassPriority(p.player_id));
-                        }
+                    if !p.passed_priority {
+                        valid_actions.insert(Action::PassPriority(p.player_id));
                     }
                 }
 
@@ -157,15 +154,10 @@ impl Game {
                 // as they have integrated theirs into their hand during their draft step
                 // once all players have passed priority, they should be synchronized to enter the mana step
                 PrecombatPhase(PrecombatPhaseStep::PassPack) => {
-                    let neighbour_region = self.state.region_clockwise_neighbour(region.region_id).expect("a neighbouring region");
-                    if let PrecombatPhase(step) = &neighbour_region.step {
-                        if let PrecombatPhaseStep::Draft | PrecombatPhaseStep::PassPack = step {
-                            for p in &region.players {
-                                if !p.passed_priority {
-                                    valid_actions.insert(Action::PassPriority(p.player_id));
-                                }
-                            }
-                        }
+                    let all_players_ready_to_pass_pack = self.state.regions.iter().all(|r| r.step == PrecombatPhase(PrecombatPhaseStep::PassPack));
+                    let p = region.sole_player();
+                    if !p.passed_priority && all_players_ready_to_pass_pack {
+                        valid_actions.insert(Action::PassPriority(p.player_id));
                     }
                 }
 

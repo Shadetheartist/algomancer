@@ -21,7 +21,7 @@ fn main() {
 
     let mut game = game::Game::new(&options).expect("game object");
     let mut counter = 0;
-    while counter < 20 {
+    while counter < 400 {
         let actions: Vec<Action> = game.valid_actions().iter().cloned().collect();
 
         if actions.len() < 1 {

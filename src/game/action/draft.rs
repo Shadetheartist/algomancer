@@ -123,27 +123,31 @@ impl Game {
 
     pub fn apply_draft_action(&self, mut state: State, action: &Action) -> Result<State, StateError> {
         if let Action::Draft { player_id, cards_to_keep } = action {
-            let player_hand = state.player_hand_mut(*player_id);
+            let cards_for_pack = {
+                let player_hand = state.player_hand_mut(*player_id);
 
-            let mut cards_for_hand = Vec::new();
-            let mut cards_for_pack = Vec::new();
+                let mut cards_for_hand = Vec::new();
+                let mut cards_for_pack = Vec::new();
 
-            for _ in 0..player_hand.cards.len() {
-                let card = player_hand.cards.remove(0);
-                if cards_to_keep.contains(&card.card_id) {
-                    cards_for_hand.push(card);
-                } else {
-                    cards_for_pack.push(card);
+                for _ in 0..player_hand.cards.len() {
+                    let card = player_hand.cards.remove(0);
+                    if cards_to_keep.contains(&card.card_id) {
+                        cards_for_hand.push(card);
+                    } else {
+                        cards_for_pack.push(card);
+                    }
                 }
-            }
 
-            if cards_for_pack.len() != 10 {
-                return Err(StateError::InvalidDraft)
-            }
+                if cards_for_pack.len() != 10 {
+                    return Err(StateError::InvalidDraft)
+                }
 
-            for card in cards_for_hand {
-                player_hand.cards.push(card);
-            }
+                for card in cards_for_hand {
+                    player_hand.cards.push(card);
+                }
+
+                cards_for_pack
+            };
 
             let player = state.find_player_mut(*player_id).expect("a player");
             match player.pack.as_mut() {

@@ -1,4 +1,6 @@
 use serde::{Deserialize, Serialize};
+use crate::game::state::card::{Card, CardId};
+use crate::game::state::pack::Pack;
 
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{Player, PlayerId, StateError};
@@ -19,7 +21,27 @@ pub struct Region {
     pub step: Phase,
 }
 
+impl Region {
+    pub fn sole_player(&self) -> &Player {
+        if self.players.len() == 1 {
+            &self.players[0]
+        } else {
+            panic!("This region must have a single player occupying it to call this function.")
+        }
+    }
+
+    pub fn sole_player_mut(&mut self) -> &mut Player {
+        if self.players.len() == 1 {
+            &mut self.players[0]
+        } else {
+            panic!("This region must have a single player occupying it to call this function.")
+        }
+    }
+}
+
 impl State {
+
+
     pub fn find_region(&self, region_id: RegionId) -> Result<&Region, StateError> {
         match self.regions.iter().find(|r| r.region_id == region_id) {
             None => {
@@ -42,12 +64,23 @@ impl State {
         }
     }
 
+    pub fn region_counterclockwise_neighbour(&self, region_id: RegionId) -> Option<&Region> {
+        let self_idx_result = self.regions.iter().enumerate().find(|(_, val)| val.region_id == region_id);
+        match self_idx_result {
+            None => None,
+            Some((self_idx, _)) => {
+                let neighbour_idx = wrap_index(self.regions.len(), self_idx as i32 - 1).expect("a wrapped index");
+                Some(&self.regions[neighbour_idx])
+            }
+        }
+    }
+
     pub fn region_clockwise_neighbour(&self, region_id: RegionId) -> Option<&Region> {
         let self_idx_result = self.regions.iter().enumerate().find(|(_, val)| val.region_id == region_id);
         match self_idx_result {
             None => None,
             Some((self_idx, _)) => {
-                let neighbour_idx = wrap_index(self.regions.len(), self_idx as i32).expect("a wrapped index");
+                let neighbour_idx = wrap_index(self.regions.len(), (self_idx + 1) as i32).expect("a wrapped index");
                 Some(&self.regions[neighbour_idx])
             }
         }
@@ -91,7 +124,7 @@ impl State {
 
     pub fn players_in_region_mut(&mut self, region_id: RegionId) -> Result<&mut Vec<Player>, StateError> {
         let region = self.find_region_mut(region_id)?;
-        Ok(& mut region.players)
+        Ok(&mut region.players)
     }
 
     pub fn find_region_id_containing_player(&self, player_id: PlayerId) -> RegionId {
@@ -118,16 +151,36 @@ impl State {
         }
     }
 
+    fn each_player_sends_pack_clockwise(mut self) -> State {
+
+        // make a vec of packs, which will be populated where each
+        // index holds it's respective region's neighbours pack
+        let mut packs: Vec<Pack> = Vec::new();
+
+        for region in self.regions.iter() {
+            // by using the counter-clockwise neighbour here, the packs are remapped so
+            // that when we apply the changes, the packs are aligned with the clockwise neighbour
+            let neighbouring_region = self.region_counterclockwise_neighbour(region.region_id).expect("a neighbouring region");
+            let neighbour_pack = neighbouring_region.sole_player().pack.as_ref().expect("a pack");
+            packs.push(neighbour_pack.clone());
+        }
+
+        let mut idx = 0;
+        for pack in packs.into_iter() {
+            self.regions[idx].sole_player_mut().pack = Some(pack);
+            idx += 1
+        }
+
+
+        self
+    }
+
+
     pub fn region_transition_to_next_step(mut self, region_id: RegionId) -> State {
         let next_step = {
-            let region = self.regions.iter().find(|r| r.region_id == region_id).expect("a region");
-            let next_step = region.step.get_next_step(&self.game_mode);
-
-            println!("Region {:?} is transitioning from {:?} to {:?}", region.region_id, region.step, next_step);
-
-            next_step
+            let region = self.find_region(region_id).expect("a region");
+            region.step.get_next_step(&self.game_mode)
         };
-
 
         self.reset_player_priority_in_region(region_id);
 
@@ -138,11 +191,15 @@ impl State {
             Phase::PrecombatPhase(PrecombatPhaseStep::Draft) => {
                 self.players_in_region_combine_packs_with_hand(region_id)
             }
+            Phase::PrecombatPhase(PrecombatPhaseStep::ITMana) => {
+                self = self.each_player_sends_pack_clockwise()
+            }
             _ => {}
         }
 
         {
-            let region = self.regions.iter_mut().find(|r| r.region_id == region_id).expect("a region");
+            let region = self.find_region_mut(region_id).expect("a region");
+            println!("Region {:?} is transitioning from {:?} to {:?}", region.region_id, region.step, next_step);
             region.step = next_step;
         }
 
