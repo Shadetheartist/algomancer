@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 
 use crate::game::state::{GameMode, State};
-use crate::game::state::player::TeamId;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum Phase {

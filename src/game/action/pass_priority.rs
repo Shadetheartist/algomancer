@@ -1,8 +1,8 @@
 use crate::game::action::Action;
 use crate::game::Game;
 use crate::game::state::player::{StateError, TeamId};
-use crate::game::state::progression::Phase::PrecombatPhase;
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
+use crate::game::state::progression::Phase::PrecombatPhase;
 use crate::game::state::region::RegionId;
 use crate::game::state::State;
 

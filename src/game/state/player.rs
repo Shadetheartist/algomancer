@@ -26,6 +26,7 @@ pub struct Player {
     pub hand: Hand,
     pub discard: Discard,
     pub passed_priority: bool,
+    pub resources_played_this_turn: u8,
 }
 
 impl Player {
@@ -40,9 +41,20 @@ impl Player {
             discard: Discard::new(),
             passed_priority: false,
             pack: pack,
+            resources_played_this_turn: 0,
         }
     }
 }
+
+#[derive(Debug)]
+pub enum CardNotPlayableError {
+    CardDoesNotExist,
+    WrongPlayer,
+    NotInPlayableZone,
+    NotInPlayableStep,
+    CardLacksCorrectTiming,
+}
+
 
 #[derive(Debug)]
 pub enum StateError {
@@ -51,6 +63,7 @@ pub enum StateError {
     InvalidDraft,
     InvalidRecycle,
     NoPlayersOnTeam(TeamId),
+    CardNotPlayable(CardNotPlayableError)
 }
 
 impl State {

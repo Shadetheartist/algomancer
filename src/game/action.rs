@@ -14,6 +14,7 @@ use crate::game::state::resource::ResourceType;
 mod draft;
 mod pass_priority;
 mod mana_phase_actions;
+mod play_card;
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Serialize, Deserialize)]
 pub enum Action {
@@ -26,6 +27,9 @@ pub enum Action {
 
     // a card is recycled in exchange for a resource
     RecycleForResource { card_id: CardId, resource_type: ResourceType},
+
+    // a card is played
+    PlayCard { card_id: CardId },
 }
 
 
@@ -83,6 +87,9 @@ impl Game {
             Action::RecycleForResource { .. } => {
                 next_state = self.apply_recycle_for_resource_action(next_state, &action)?;
             }
+            Action::PlayCard { .. } => {
+                next_state = self.apply_play_card_action(next_state, &action)?;
+            }
         }
 
         self.action_history.push(action);
@@ -127,6 +134,7 @@ impl Game {
                 };
             }
             Action::RecycleForResource { .. } => {}
+            Action::PlayCard { .. } => {}
         }
 
         Ok(())

@@ -2,30 +2,38 @@ use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 
 use serde::{Deserialize, Serialize};
-use crate::game::state::deck::Deck;
-use crate::game::state::player::{Player};
-use crate::game::state::region::{Region};
 
-use crate::game::state::resource::{Cost, ResourceType};
 use crate::game::state::{GameMode, State};
 use crate::game::state::card::CardType::Resource;
+use crate::game::state::deck::Deck;
 use crate::game::state::permanent::Permanent;
+use crate::game::state::player::Player;
+use crate::game::state::region::Region;
+use crate::game::state::resource::{Cost, ResourceType};
+
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+pub enum Timing {
+    Default,
+    Haste,
+    Combat,
+    Virus
+}
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum CardType {
     Resource(ResourceType),
     UnitToken,
     SpellToken,
-    Unit,
-    Spell,
+    Unit(Timing),
+    Spell(Timing),
 }
 
 impl CardType {
     /// is not a resource or token - i.e. 'real'
     pub fn is_real(&self) -> bool {
         match self {
-            CardType::Unit  |
-            CardType::Spell => true,
+            CardType::Unit(_)  |
+            CardType::Spell(_) => true,
             _ => false
         }
     }

@@ -8,6 +8,7 @@ use crate::game::{Game, GameOptions};
 use crate::game::game_builder::NewGameError::NotSupportedYet;
 use crate::game::state::{GameMode, State, TeamConfiguration};
 use crate::game::state::card::{Card, CardId, CardPrototype, CardPrototypeDatabase, CardPrototypeId, CardType};
+use crate::game::state::card::Timing::Default;
 use crate::game::state::deck::Deck;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{Player, PlayerId, TeamId};
@@ -57,7 +58,7 @@ impl Game {
                     name: format!("Card #{}", id_num),
                     text: format!("Text for card #{}.", id_num),
                     costs: Cost::free(),
-                    card_type: CardType::Unit,
+                    card_type: CardType::Unit(Default),
                 });
             }
 
@@ -111,7 +112,7 @@ impl Game {
                 .filter(|(_, c)| {
                     match c.card_type {
                         CardType::Resource(_) | CardType::UnitToken | CardType::SpellToken => false,
-                        CardType::Unit | CardType::Spell => true,
+                        CardType::Unit(_) | CardType::Spell(_) => true,
                     }
                 })
                 .map(|(_, c)| {
