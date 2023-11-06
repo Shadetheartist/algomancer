@@ -79,6 +79,7 @@ impl State {
         }
     }
 
+    #[allow(dead_code)]
     pub fn region_clockwise_neighbour(&self, region_id: RegionId) -> Option<&Region> {
         let self_idx_result = self.regions.iter().enumerate().find(|(_, val)| val.region_id == region_id);
         match self_idx_result {
@@ -138,6 +139,14 @@ impl State {
         }).expect("a region containing this player");
 
         region.region_id
+    }
+
+    pub fn find_region_containing_player_mut(&mut self, player_id: PlayerId) -> &mut Region {
+        let region = self.regions.iter_mut().find(|r| {
+            r.players.iter().find(|p| p.player_id == player_id) != None
+        }).expect("a region containing this player");
+
+        region
     }
 
     pub fn find_region_containing_player(&self, player_id: PlayerId) -> Option<(RegionId, PlayerId)> {

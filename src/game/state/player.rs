@@ -55,6 +55,7 @@ pub enum CardNotPlayableError {
     CardLacksCorrectTiming,
     CannotPlayMoreResources,
     MustBePlayedFromHand,
+    CannotCastANonSpellTokenPermanentFromPlay,
 }
 
 
