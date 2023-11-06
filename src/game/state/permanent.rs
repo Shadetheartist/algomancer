@@ -44,7 +44,7 @@ pub enum Permanent {
 impl Permanent {
     pub fn from_card_prototype(card_prototype: &CardPrototype, controller_player_id: PlayerId, state: &mut State) -> Permanent {
         match card_prototype.card_type {
-            CardType::Resource => {
+            CardType::Resource(_) => {
                 Permanent::Resource {
                     common: PermanentCommon {
                         permanent_id: PermanentId::next(state),

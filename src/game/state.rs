@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use rng::{AlgomancerRng, AlgomancerRngSeed};
 
 use crate::game::state::deck::Deck;
+use crate::game::state::player::TeamId;
 use crate::game::state::region::Region;
 use crate::game::state::resource::Faction;
 
@@ -82,7 +83,9 @@ pub struct State {
     pub rand: AlgomancerRng,
     pub common_deck: Option<Deck>,
     pub regions: Vec<Region>,
+    pub initiative_team: TeamId,
     pub next_permanent_id: usize,
+    pub next_card_id: usize,
 }
 
 impl State {
@@ -94,7 +97,9 @@ impl State {
             rand: AlgomancerRng::new(AlgomancerRngSeed::default()),
             common_deck: Some(Deck::new()),
             regions: Vec::new(),
+            initiative_team: TeamId(1),
             next_permanent_id: 1,
+            next_card_id: 1,
         }
     }
 

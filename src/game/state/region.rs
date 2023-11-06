@@ -2,8 +2,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::game::state::pack::Pack;
 use crate::game::state::permanent::Permanent;
-use crate::game::state::player::{Player, PlayerId, StateError};
-use crate::game::state::player::StateError::RegionNotFound;
+use crate::game::state::player::{Player, PlayerId, StateError, TeamId};
+use crate::game::state::player::StateError::{NoPlayersOnTeam, RegionNotFound};
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
 use crate::game::state::State;
 use crate::wrap_index::wrap_index;
@@ -21,6 +21,11 @@ pub struct Region {
 }
 
 impl Region {
+
+    /// This function gets the current player in the region,
+    /// it will panic if there is not exactly one player in the region.
+    /// This serves a dual purpose, as there are many stages in the game where it would be a huge
+    /// error if there wasn't exactly one player in the region, such as the draft step.
     pub fn sole_player(&self) -> &Player {
         if self.players.len() == 1 {
             &self.players[0]
@@ -29,6 +34,7 @@ impl Region {
         }
     }
 
+    /// see sole_player
     pub fn sole_player_mut(&mut self) -> &mut Player {
         if self.players.len() == 1 {
             &mut self.players[0]
@@ -39,7 +45,6 @@ impl Region {
 }
 
 impl State {
-
 
     pub fn find_region(&self, region_id: RegionId) -> Result<&Region, StateError> {
         match self.regions.iter().find(|r| r.region_id == region_id) {
@@ -115,6 +120,7 @@ impl State {
         }
         Ok(!players.iter().any(|p| p.passed_priority == false))
     }
+
 
     pub fn players_in_region(&self, region_id: RegionId) -> Result<&Vec<Player>, StateError> {
         let region = self.find_region(region_id)?;
@@ -204,4 +210,19 @@ impl State {
 
         self
     }
+
+    pub fn players_on_team(&self, team_id: TeamId) -> Result<Vec<&Player>, StateError> {
+        let team_players = self.players().into_iter().filter(|p| p.team_id == team_id).collect();
+        Ok(team_players)
+    }
+
+    pub fn all_players_on_team_passed_priority(&self, team_id: TeamId) -> Result<bool, StateError> {
+        let players = self.players_on_team(team_id)?;
+        if players.len() == 0 {
+            return Err(NoPlayersOnTeam(team_id))
+        }
+        Ok(!players.iter().any(|p| p.passed_priority == false))
+    }
+
+
 }

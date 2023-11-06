@@ -13,7 +13,8 @@ use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{Player, PlayerId, TeamId};
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
 use crate::game::state::region::{Region, RegionId};
-use crate::game::state::resource::{Cost, Faction};
+use crate::game::state::resource::{Cost, Faction, ResourceType};
+use crate::game::state::resource::ResourceType::{ManaConverter, Shard};
 use crate::game::state::rng::AlgomancerRng;
 
 #[derive(Debug)]
@@ -69,7 +70,7 @@ impl Game {
                 name: "Mana Converter".to_string(),
                 text: "At the beginning of the mana step, you may exchange this for another resource.".to_string(),
                 costs: Cost::free(),
-                card_type: CardType::Resource,
+                card_type: CardType::Resource(ManaConverter),
             });
 
             id_num += 1;
@@ -79,7 +80,7 @@ impl Game {
                 name: "Shard".to_string(),
                 text: "(Shards add no affinity, but all resources including this can be expended for [1]).".to_string(),
                 costs: Cost::free(),
-                card_type: CardType::Resource,
+                card_type: CardType::Resource(Shard),
             });
 
             for f in Faction::all() {
@@ -90,7 +91,7 @@ impl Game {
                     name: format!("{:?}", f),
                     text: format!("When I enter play, if you have [{:?} {:?} {:?}], take a shard.", f, f, f),
                     costs: Cost::free(),
-                    card_type: CardType::Resource,
+                    card_type: CardType::Resource(ResourceType::from_faction(f)),
                 });
             }
 
@@ -109,7 +110,7 @@ impl Game {
             let cards_for_deck = card_prototypes.iter()
                 .filter(|(_, c)| {
                     match c.card_type {
-                        CardType::Resource | CardType::UnitToken | CardType::SpellToken => false,
+                        CardType::Resource(_) | CardType::UnitToken | CardType::SpellToken => false,
                         CardType::Unit | CardType::Spell => true,
                     }
                 })
@@ -136,7 +137,9 @@ impl Game {
                 common_deck: Some(deck),
                 rand: algomancer_rng,
                 regions: Vec::new(),
+                initiative_team: TeamId(1),
                 next_permanent_id: 1,
+                next_card_id: card_id_counter + 1,
             };
 
             let mut game = Game {

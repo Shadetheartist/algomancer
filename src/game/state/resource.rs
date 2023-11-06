@@ -1,14 +1,38 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
-pub enum Resource {
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+pub enum ResourceType {
     Fire,
     Earth,
     Water,
     Metal,
     Wood,
     ManaConverter,
-    Shard
+    Shard,
+}
+
+impl ResourceType {
+    pub fn all() -> Vec<ResourceType>{
+        vec![
+            ResourceType::Fire,
+            ResourceType::Earth,
+            ResourceType::Water,
+            ResourceType::Metal,
+            ResourceType::Wood,
+            ResourceType::ManaConverter,
+            ResourceType::Shard,
+        ]
+    }
+
+    pub fn from_faction(faction: Faction) -> ResourceType {
+        match faction {
+            Faction::Fire => ResourceType::Fire,
+            Faction::Earth => ResourceType::Earth,
+            Faction::Water => ResourceType::Water,
+            Faction::Metal => ResourceType::Metal,
+            Faction::Wood => ResourceType::Wood,
+        }
+    }
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
@@ -29,6 +53,18 @@ impl Faction {
             Faction::Metal,
             Faction::Wood,
         ]
+    }
+
+    pub fn from_resource_type(resource_type: ResourceType) -> Option<Faction> {
+        match resource_type {
+            ResourceType::Fire => Some(Faction::Fire),
+            ResourceType::Earth => Some(Faction::Earth),
+            ResourceType::Water => Some(Faction::Water),
+            ResourceType::Metal => Some(Faction::Metal),
+            ResourceType::Wood => Some(Faction::Wood),
+            ResourceType::ManaConverter |
+            ResourceType::Shard => None
+        }
     }
 }
 

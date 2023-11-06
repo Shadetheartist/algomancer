@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::game::state::{GameMode, State};
+use crate::game::state::player::TeamId;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum Phase {
@@ -51,6 +52,7 @@ pub enum MainPhaseStep {
 
 
 impl Phase {
+
     #[allow(dead_code)]
     pub fn is_combat(&self) -> bool {
         match self {
@@ -178,6 +180,7 @@ impl Phase {
         }
     }
 }
+
 
 impl State {
 

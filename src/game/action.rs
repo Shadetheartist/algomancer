@@ -9,9 +9,11 @@ use crate::game::state::card::CardType::Resource;
 use crate::game::state::player::{PlayerId, StateError};
 use crate::game::state::progression::{MainPhaseStep, PrecombatPhaseStep};
 use crate::game::state::progression::Phase::{MainPhase, PrecombatPhase};
+use crate::game::state::resource::ResourceType;
 
 mod draft;
 mod pass_priority;
+mod mana_phase_actions;
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Serialize, Deserialize)]
 pub enum Action {
@@ -22,8 +24,8 @@ pub enum Action {
     // a player selects a hand of cards from a draft pack, leaving 10 cards in the pack
     Draft { player_id: PlayerId, cards_to_keep: Vec<CardId> },
 
-    // a card is cast
-    Cast(CardId),
+    // a card is recycled in exchange for a resource
+    RecycleForResource { card_id: CardId, resource_type: ResourceType},
 }
 
 
@@ -70,6 +72,7 @@ impl Game {
 
         let mut next_state = self.state.clone();
 
+        // action routing
         match action {
             Action::PassPriority(_) => {
                 next_state = self.apply_pass_priority_action(next_state, &action)?;
@@ -77,9 +80,8 @@ impl Game {
             Action::Draft { .. } => {
                 next_state = self.apply_draft_action(next_state, &action)?;
             }
-
-            Action::Cast(_) => {
-                todo!()
+            Action::RecycleForResource { .. } => {
+                next_state = self.apply_recycle_for_resource_action(next_state, &action)?;
             }
         }
 
@@ -115,16 +117,16 @@ impl Game {
                         // enforce that each card left for the pack is not a resource
                         for card in cards_for_pack {
                             let proto = &self.cards_db.prototypes[&card.prototype_id];
-                            if proto.card_type == Resource {
+                            if let Resource(_) = proto.card_type {
                                 return Err(ActionValidationError::Draft(DraftValidationError::InvalidPackCard(card.card_id)));
                             }
-                        }
 
+                        }
                         Ok(())
                     }
                 };
             }
-            Action::Cast(_) => {}
+            Action::RecycleForResource { .. } => {}
         }
 
         Ok(())
@@ -144,10 +146,6 @@ impl Game {
                     for a in self.valid_drafts(p.player_id) {
                         valid_actions.insert(a);
                     }
-
-                    if !p.passed_priority {
-                        valid_actions.insert(Action::PassPriority(p.player_id));
-                    }
                 }
 
                 // can only pass priority in the pass pack step when the clockwise neighbour can accept the pack,
@@ -158,6 +156,14 @@ impl Game {
                     let p = region.sole_player();
                     if !p.passed_priority && all_players_ready_to_pass_pack {
                         valid_actions.insert(Action::PassPriority(p.player_id));
+                    }
+                }
+
+
+                PrecombatPhase(PrecombatPhaseStep::ITMana) | PrecombatPhase(PrecombatPhaseStep::NITMana) => {
+                    let valid_mana_actions = self.valid_mana_phase_actions(region.region_id);
+                    for a in valid_mana_actions {
+                        valid_actions.insert(a);
                     }
                 }
 

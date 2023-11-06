@@ -81,7 +81,10 @@ impl Game {
         let card_ids: Vec<CardId> = player.hand.cards.iter()
             .filter(|card| {
                 let proto = &self.cards_db.prototypes[&card.prototype_id];
-                proto.card_type != Resource
+                if let Resource(_) = proto.card_type {
+                    return false
+                }
+                true
             })
             .map(|card| card.card_id)
             .collect();
@@ -100,7 +103,7 @@ impl Game {
         let combinations = {
             if performance_mode {
                 // this generates a random unique set of size `num_options` of combinations of cards
-                let num_options = 128;
+                let num_options = 3;
                 let mut rng_clone = self.state.rand.rng.clone();
                 random_unique_combinations(&mut rng_clone, &card_ids, num_cards_to_draft, num_options)
             } else {
@@ -115,8 +118,6 @@ impl Game {
                 cards_to_keep: combination,
             })
         }
-
-        dbg!(actions.len());
 
         actions
     }
