@@ -109,7 +109,6 @@ fn valid_play_resource_actions(game: &Game, region_id: RegionId) -> Vec<Action> 
     }
 
     for card in player.hand.cards.iter() {
-
         let proto = game.cards_db.prototypes.get(&card.prototype_id).expect("a card prototype");
         if let Resource(_) = proto.card_type {
             actions.push(Action::PlayCard {
@@ -130,9 +129,7 @@ fn valid_play_haste_actions(game: &Game, region_id: RegionId) -> Vec<Action> {
     let region = game.state.find_region(region_id).expect("a region");
     let player = region.sole_player();
 
-
     for card in player.hand.cards.iter() {
-
         let proto = game.cards_db.prototypes.get(&card.prototype_id).expect("a card prototype");
         if let Unit(Timing::Haste) = proto.card_type {
             actions.push(Action::PlayCard {
