@@ -150,17 +150,18 @@ impl Game {
                 }
 
                 PrecombatPhase(PrecombatPhaseStep::Draft) => {
-                    let p = region.sole_player();
-                    for a in self.valid_drafts(p.player_id) {
+                    for a in self.valid_drafts(region.region_id) {
                         valid_actions.insert(a);
                     }
                 }
 
-                PrecombatPhase(PrecombatPhaseStep::PassPack) => {}
+                PrecombatPhase(PrecombatPhaseStep::PassPack) => {
+                    // no players can take any actions during this step
+                    // after the last player drafts, all regions are automatically transitioned
+                }
 
                 PrecombatPhase(PrecombatPhaseStep::ITMana) | PrecombatPhase(PrecombatPhaseStep::NITMana) => {
-                    let valid_mana_actions = self.valid_mana_phase_actions(region.region_id);
-                    for a in valid_mana_actions {
+                    for a in self.valid_mana_phase_actions(region.region_id) {
                         valid_actions.insert(a);
                     }
                 }

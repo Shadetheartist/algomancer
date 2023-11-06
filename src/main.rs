@@ -150,7 +150,10 @@ fn run_it(){
 }
 
 fn main() {
-    //run_it()
-    cmd_parse()
+    if cfg!(debug_assertions) {
+        run_it()
+    } else {
+        cmd_parse()
+    }
 }
 

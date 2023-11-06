@@ -49,7 +49,6 @@ impl Player {
 #[derive(Debug)]
 pub enum CardNotPlayableError {
     CardDoesNotExist,
-    WrongPlayer,
     NotInPlayableZone,
     NotInPlayableStep,
     CardLacksCorrectTiming,

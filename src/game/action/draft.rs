@@ -6,13 +6,14 @@ use rand::RngCore;
 
 use crate::game::action::Action;
 use crate::game::Game;
-use crate::game::state::{GameMode, State};
+use crate::game::state::{State};
 use crate::game::state::card::CardId;
 use crate::game::state::card::CardType::Resource;
 use crate::game::state::pack::Pack;
-use crate::game::state::player::{PlayerId, StateError};
+use crate::game::state::player::{StateError};
 use crate::game::state::progression::Phase::PrecombatPhase;
 use crate::game::state::progression::PrecombatPhaseStep;
+use crate::game::state::region::RegionId;
 
 fn combinations<T: Clone>(items: &[T], k: usize) -> Vec<Vec<T>> {
     let n = items.len();
@@ -75,7 +76,8 @@ fn random_unique_combinations<T: Clone + Ord + Hash, R: RngCore>(rng: &mut R, in
 }
 
 impl Game {
-    pub fn valid_drafts(&self, player_id: PlayerId) -> Vec<Action> {
+    pub fn valid_drafts(&self, region_id: RegionId) -> Vec<Action> {
+        let player_id = self.state.find_region(region_id).expect("a region").sole_player().player_id;
 
         let mut actions = Vec::new();
 

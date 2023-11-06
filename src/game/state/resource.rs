@@ -55,6 +55,7 @@ impl Faction {
         ]
     }
 
+    #[allow(dead_code)]
     pub fn from_resource_type(resource_type: ResourceType) -> Option<Faction> {
         match resource_type {
             ResourceType::Fire => Some(Faction::Fire),
