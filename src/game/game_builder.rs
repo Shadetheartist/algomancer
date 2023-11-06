@@ -163,7 +163,7 @@ impl Game {
                 for (seat, &team_id) in interlaced_players.iter().enumerate() {
                     let player_id = PlayerId((seat + 1) as u8);
                     let team_id = TeamId(team_id + 1);
-                    let player = Player::new(player_id, team_id, None, None);
+                    let mut player = Player::new(player_id, team_id, None, None);
 
 
                     let region_id = RegionId(player_id.0);
@@ -178,7 +178,10 @@ impl Game {
                             player_id,
                             &mut game.state
                         );
-                        permanents.push(permanent)
+                        permanents.push(permanent);
+
+                        // initial resources count to the first turn
+                        player.resources_played_this_turn += 1;
                     }
 
                     let region = Region{
