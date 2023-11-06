@@ -11,6 +11,8 @@ use crate::game::state::card::CardId;
 use crate::game::state::card::CardType::Resource;
 use crate::game::state::pack::Pack;
 use crate::game::state::player::{PlayerId, StateError};
+use crate::game::state::progression::Phase::PrecombatPhase;
+use crate::game::state::progression::PrecombatPhaseStep;
 
 fn combinations<T: Clone>(items: &[T], k: usize) -> Vec<Vec<T>> {
     let n = items.len();
@@ -165,12 +167,16 @@ impl Game {
             let region_id = state.find_region_id_containing_player(*player_id);
             state = state.region_transition_to_next_step(region_id);
 
-            match state.game_mode {
-                GameMode::LiveDraft { .. } | GameMode::PreDraft { .. } | GameMode::TeamDraft { .. } => {}
-                GameMode::Constructed { .. } => { todo!() }
+            let all_players_passed_packs = state.regions.iter().all(|r| {
+                r.step == PrecombatPhase(PrecombatPhaseStep::PassPack)
+            });
+
+            if all_players_passed_packs {
+                state = state.transition_step_in_all_regions();
             }
 
             eprintln!("Player [{:?}] has selected their draft.", *player_id);
+
 
             Ok(state)
 

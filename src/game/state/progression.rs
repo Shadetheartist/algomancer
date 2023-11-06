@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::game::state::{GameMode, State};
+use crate::game::state::region::RegionId;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum Phase {
@@ -182,7 +183,15 @@ impl Phase {
 
 
 impl State {
+    pub fn transition_step_in_all_regions(mut self) -> Self {
+        let region_ids : Vec<RegionId> = self.regions.iter().map(|r| r.region_id).collect();
 
+        for region_id in region_ids {
+            self = self.region_transition_to_next_step(region_id);
+        }
+
+        self
+    }
 }
 
 #[cfg(test)]

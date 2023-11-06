@@ -156,17 +156,7 @@ impl Game {
                     }
                 }
 
-                // can only pass priority in the pass pack step when the clockwise neighbour can accept the pack,
-                // as they have integrated theirs into their hand during their draft step
-                // once all players have passed priority, they should be synchronized to enter the mana step
-                PrecombatPhase(PrecombatPhaseStep::PassPack) => {
-                    let all_players_ready_to_pass_pack = self.state.regions.iter().all(|r| r.step == PrecombatPhase(PrecombatPhaseStep::PassPack));
-                    let p = region.sole_player();
-                    if !p.passed_priority && all_players_ready_to_pass_pack {
-                        valid_actions.insert(Action::PassPriority(p.player_id));
-                    }
-                }
-
+                PrecombatPhase(PrecombatPhaseStep::PassPack) => {}
 
                 PrecombatPhase(PrecombatPhaseStep::ITMana) | PrecombatPhase(PrecombatPhaseStep::NITMana) => {
                     let valid_mana_actions = self.valid_mana_phase_actions(region.region_id);

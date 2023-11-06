@@ -7,6 +7,8 @@ use crate::game::state::region::RegionId;
 use crate::game::state::State;
 
 impl Game {
+
+
     pub fn apply_pass_priority_action(&self, mut state: State, action: &Action) -> Result<State, StateError> {
         if let Action::PassPriority(player_id) = action {
 
@@ -29,19 +31,9 @@ impl Game {
             // transition all regions after all players on a team have passed
             fn team_pass(mut state: State, team_id: TeamId) -> Result<State, StateError> {
                 if state.all_players_on_team_passed_priority(team_id)? {
-                    state = transition_all_regions(state)
+                    state = state.transition_step_in_all_regions()
                 }
                 Ok(state)
-            }
-
-            fn transition_all_regions(mut state: State) -> State {
-                let region_ids : Vec<RegionId> = state.regions.iter().map(|r| r.region_id).collect();
-
-                for region_id in region_ids {
-                    state = state.region_transition_to_next_step(region_id);
-                }
-
-                state
             }
 
             match current_step {
@@ -52,7 +44,8 @@ impl Game {
                         state = region_pass(state, region_id)?
                     },
                     PrecombatPhaseStep::PassPack => {
-                        state = transition_all_regions(state)
+                        // this is a fake sync step, when the last player finishes their draft,
+                        // all regions automatically transition to ITMana
                     }
                     PrecombatPhaseStep::ITMana => {
                         let team_id = state.initiative_team;
