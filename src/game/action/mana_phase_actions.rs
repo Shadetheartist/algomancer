@@ -1,7 +1,7 @@
 use crate::game::action::Action;
 use crate::game::Game;
-use crate::game::state::card::{Card, FindCardResult};
-use crate::game::state::card::CardType::Resource;
+use crate::game::state::card::{Card, FindCardResult, Timing};
+use crate::game::state::card::CardType::{Resource, Unit};
 use crate::game::state::player::StateError;
 use crate::game::state::region::RegionId;
 use crate::game::state::resource::ResourceType;
@@ -29,6 +29,8 @@ impl Game {
         actions.append(&mut play_resource_actions);
 
         // they may also play cards with haste
+        let mut play_resource_actions = valid_play_haste_actions(self, region_id);
+        actions.append(&mut play_resource_actions);
 
         // if the player can act, they can pass priority -
         // which moves to the next synchronised step when all players on the team pass priority
@@ -110,6 +112,29 @@ fn valid_play_resource_actions(game: &Game, region_id: RegionId) -> Vec<Action> 
 
         let proto = game.cards_db.prototypes.get(&card.prototype_id).expect("a card prototype");
         if let Resource(_) = proto.card_type {
+            actions.push(Action::PlayCard {
+                card_id: card.card_id,
+            })
+        }
+    }
+
+    actions
+}
+
+
+fn valid_play_haste_actions(game: &Game, region_id: RegionId) -> Vec<Action> {
+    let mut actions : Vec<Action> = Vec::new();
+
+    // during the mana phase, players can play cards with haste
+
+    let region = game.state.find_region(region_id).expect("a region");
+    let player = region.sole_player();
+
+
+    for card in player.hand.cards.iter() {
+
+        let proto = game.cards_db.prototypes.get(&card.prototype_id).expect("a card prototype");
+        if let Unit(Timing::Haste) = proto.card_type {
             actions.push(Action::PlayCard {
                 card_id: card.card_id,
             })
