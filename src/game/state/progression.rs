@@ -23,7 +23,6 @@ pub enum PrecombatPhaseStep {
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum CombatPhaseAStep {
-    ITPrepareFormation,
     ITAttack,
     AfterITAttackPriorityWindow,
     NITBlock,
@@ -34,7 +33,6 @@ pub enum CombatPhaseAStep {
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum CombatPhaseBStep {
-    NITPrepareFormation,
     NITAttack,
     AfterNITAttackPriorityWindow,
     ITBlock,
@@ -110,15 +108,12 @@ impl Phase {
                         Phase::PrecombatPhase(PrecombatPhaseStep::NITMana)
                     }
                     PrecombatPhaseStep::NITMana => {
-                        Phase::CombatPhaseA(CombatPhaseAStep::ITPrepareFormation)
+                        Phase::CombatPhaseA(CombatPhaseAStep::ITAttack)
                     }
                 }
             }
             Phase::CombatPhaseA(step) => {
                 match step {
-                    CombatPhaseAStep::ITPrepareFormation => {
-                        Phase::CombatPhaseA(CombatPhaseAStep::ITAttack)
-                    }
                     CombatPhaseAStep::ITAttack => {
                         Phase::CombatPhaseA(CombatPhaseAStep::AfterITAttackPriorityWindow)
                     }
@@ -135,15 +130,12 @@ impl Phase {
                         Phase::CombatPhaseA(CombatPhaseAStep::AfterCombatPriorityWindow)
                     }
                     CombatPhaseAStep::AfterCombatPriorityWindow => {
-                        Phase::CombatPhaseB(CombatPhaseBStep::NITPrepareFormation)
+                        Phase::CombatPhaseB(CombatPhaseBStep::NITAttack)
                     }
                 }
             }
             Phase::CombatPhaseB(step) => {
                 match step {
-                    CombatPhaseBStep::NITPrepareFormation => {
-                        Phase::CombatPhaseB(CombatPhaseBStep::NITAttack)
-                    }
                     CombatPhaseBStep::NITAttack => {
                         Phase::CombatPhaseB(CombatPhaseBStep::AfterNITAttackPriorityWindow)
                     }

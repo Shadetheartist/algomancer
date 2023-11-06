@@ -189,7 +189,6 @@ impl State {
                 _ => true
             }
             Phase::CombatPhaseA(step) => match step {
-                CombatPhaseAStep::ITPrepareFormation |
                 CombatPhaseAStep::ITAttack => is_initiative_team,
                 CombatPhaseAStep::AfterITAttackPriorityWindow => true,
                 CombatPhaseAStep::NITBlock => !is_initiative_team,
@@ -198,7 +197,6 @@ impl State {
                 CombatPhaseAStep::Damage => false,
             },
             Phase::CombatPhaseB(step) => match step {
-                CombatPhaseBStep::NITPrepareFormation |
                 CombatPhaseBStep::NITAttack => !is_initiative_team,
                 CombatPhaseBStep::AfterNITAttackPriorityWindow => true,
                 CombatPhaseBStep::ITBlock => is_initiative_team,

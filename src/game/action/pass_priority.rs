@@ -1,7 +1,7 @@
 use crate::game::action::Action;
 use crate::game::Game;
 use crate::game::state::player::{StateError, TeamId};
-use crate::game::state::progression::{Phase, PrecombatPhaseStep};
+use crate::game::state::progression::{CombatPhaseAStep, Phase, PrecombatPhaseStep};
 use crate::game::state::progression::Phase::PrecombatPhase;
 use crate::game::state::region::RegionId;
 use crate::game::state::State;
@@ -55,9 +55,17 @@ impl Game {
                         let team_id = state.non_initiative_team();
                         state = team_pass(state, team_id)?
                     }
-
                 }
-                Phase::CombatPhaseA(_) => {}
+                Phase::CombatPhaseA(step) => {
+                    match step {
+                        CombatPhaseAStep::ITAttack => {}
+                        CombatPhaseAStep::AfterITAttackPriorityWindow => {}
+                        CombatPhaseAStep::NITBlock => {}
+                        CombatPhaseAStep::AfterNITBlockPriorityWindow => {}
+                        CombatPhaseAStep::Damage => {}
+                        CombatPhaseAStep::AfterCombatPriorityWindow => {}
+                    }
+                }
                 Phase::CombatPhaseB(_) => {}
                 Phase::MainPhase(_) => {}
             }
