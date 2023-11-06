@@ -53,6 +53,8 @@ pub enum CardNotPlayableError {
     NotInPlayableZone,
     NotInPlayableStep,
     CardLacksCorrectTiming,
+    CannotPlayMoreResources,
+    MustBePlayedFromHand,
 }
 
 

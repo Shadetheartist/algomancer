@@ -1,11 +1,12 @@
 use crate::game::action::Action;
 use crate::game::Game;
-use crate::game::state::State;
 use crate::game::state::card::{CardId, CardType, FindCardResult, Timing};
 use crate::game::state::permanent::Permanent;
-use crate::game::state::player::{CardNotPlayableError, PlayerId, StateError};
-use crate::game::state::player::CardNotPlayableError::{CardDoesNotExist, CardLacksCorrectTiming, NotInPlayableStep, NotInPlayableZone, WrongPlayer};
-use crate::game::state::progression::{Phase, PrecombatPhaseStep};
+use crate::game::state::player::{CardNotPlayableError, StateError};
+use crate::game::state::player::CardNotPlayableError::{CannotPlayMoreResources, CardDoesNotExist, CardLacksCorrectTiming, MustBePlayedFromHand, NotInPlayableStep, NotInPlayableZone};
+use crate::game::state::player::StateError::CardNotPlayable;
+use crate::game::state::progression::{MainPhaseStep, Phase, PrecombatPhaseStep};
+use crate::game::state::State;
 
 impl Game {
 
@@ -13,47 +14,13 @@ impl Game {
         if let Action::PlayCard { card_id } = action {
             let card_id = *card_id;
 
-            // if the card is in a playable zone, it will be associated with a player
-            // the player will be in a region, and we need to get the region's step to process the action
-            let (player_id, card) = {
-                // the card is either in a player's hand or discard, cards are not playable from other zones
-                // (except glimpse? which needs some sort of special play area in a region)
-                let find_card_result = state.find_card(card_id).expect("a card");
-                match find_card_result {
-                    FindCardResult::InPlayerHand(player, card) => {
-                        (player.player_id, card)
-                    }
-                    FindCardResult::InPlayerDiscard(player, card) => {
-                        (player.player_id, card)
-                    }
-                    _ => return Err(StateError::CardNotPlayable(NotInPlayableZone)),
+            match self.play_card(state, card_id) {
+                Ok(_state) => {
+                    state = _state
                 }
-            };
-
-            // we need to know the region's step to determine how/which cards are actually playable
-            let region_id = state.find_region_id_containing_player(player_id);
-            let region = state.find_region(region_id).expect("a region");
-            match region.step {
-                Phase::PrecombatPhase(PrecombatPhaseStep::ITMana) |
-                Phase::PrecombatPhase(PrecombatPhaseStep::NITMana) => {
-                    // if the card is being played during this step,
-                    // it must be either a resource or a haste card
-                    let proto = self.cards_db.prototypes.get(&card.prototype_id).expect("a prototype");
-                    match proto.card_type {
-                        CardType::Resource(_) => {
-                            state = self.player_play_card(state, player_id, card_id).expect("a card was played")
-                        }
-                        CardType::Unit(Timing::Haste) => {
-
-                        },
-                        _ => {
-                            return Err(StateError::CardNotPlayable(CardLacksCorrectTiming))
-                        }
-                    }
+                Err(err) => {
+                    return Err(CardNotPlayable(err))
                 }
-                Phase::CombatPhaseA(_) => {}
-                Phase::CombatPhaseB(_) => {}
-                _ => return Err(StateError::CardNotPlayable(NotInPlayableStep))
             }
 
             Ok(state)
@@ -62,9 +29,12 @@ impl Game {
         }
     }
 
-    pub fn player_play_card(&self, mut state: State, player_id: PlayerId, card_id: CardId) -> Result<State, CardNotPlayableError> {
 
-        let (prototype_id, in_hand) = {
+
+    pub fn play_card(&self, mut state: State, card_id: CardId) -> Result<State, CardNotPlayableError> {
+
+
+        let (player_id, prototype_id, in_hand) = {
             let find_card_result = state.find_card(card_id);
 
             // validate that this player can actually play the card
@@ -76,18 +46,10 @@ impl Game {
 
             match find_card_result {
                 FindCardResult::InPlayerHand(player, card) => {
-                    if player.player_id != player_id {
-                        return Err(WrongPlayer);
-                    }
-
-                    (card.prototype_id, true)
+                    (player.player_id, card.prototype_id, true)
                 }
                 FindCardResult::InPlayerDiscard(player, card) => {
-                    if player.player_id != player_id {
-                        return Err(WrongPlayer);
-                    }
-
-                    (card.prototype_id, false)
+                    (player.player_id, card.prototype_id, false)
                 }
                 FindCardResult::InDeck(_, _) |
                 FindCardResult::AsPermanent(_, _) => {
@@ -95,6 +57,85 @@ impl Game {
                 }
             }
         };
+
+        // check the timing requirements
+        {
+            let region_id = state.find_region_id_containing_player(player_id);
+            let region = state.find_region(region_id).expect("a region");
+            let proto = self.cards_db.prototypes.get(&prototype_id).expect("a prototype");
+
+            match &region.step {
+                Phase::PrecombatPhase(step) => {
+                    match step {
+                        PrecombatPhaseStep::ITMana |
+                        PrecombatPhaseStep::NITMana => {
+                            match proto.card_type {
+
+                                // up to two resource cards are allowed during the mana step
+                                CardType::Resource(_) => {
+                                    let player = state.find_player(player_id).expect("a player");
+                                    if player.resources_played_this_turn >= 2 {
+                                        return Err(CannotPlayMoreResources)
+                                    }
+                                }
+
+                                // haste cards are allowed during the mana step
+                                CardType::Unit(Timing::Haste) => {},
+
+                                // card can otherwise not be played during mana
+                                _ => {
+                                    return Err(CardLacksCorrectTiming)
+                                }
+                            }
+                        },
+                        _ => {
+                            return Err(NotInPlayableStep)
+                        }
+                    }
+                }
+                phase @ Phase::CombatPhaseA(_) |
+                phase @ Phase::CombatPhaseB(_) => {
+                    if !phase.is_priority_window() {
+                        return Err(NotInPlayableStep)
+                    }
+
+                    match &proto.card_type {
+                        CardType::UnitToken => {}
+                        CardType::SpellToken => {}
+                        CardType::Spell(timing) |
+                        CardType::Unit(timing) => {
+                            match timing {
+                                Timing::Combat => {}
+                                Timing::Virus => {
+                                    if !in_hand {
+                                        return Err(MustBePlayedFromHand)
+                                    }
+                                }
+                                _ => {
+                                    return Err(CardLacksCorrectTiming)
+                                }
+                            }
+                        }
+                        _ => {
+                            return Err(NotInPlayableStep)
+                        }
+                    }
+                }
+
+                Phase::MainPhase(step) => {
+                    match step {
+                        MainPhaseStep::Regroup => {
+                            return Err(NotInPlayableStep)
+                        }
+                        MainPhaseStep::ITMain => {
+
+                        }
+                        MainPhaseStep::NITMain => {}
+                    }
+                }
+            }
+        }
+
 
         // create the permanent
         let proto = self.cards_db.prototypes.get(&prototype_id).expect("a prototype");

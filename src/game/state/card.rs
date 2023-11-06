@@ -127,7 +127,7 @@ impl State {
         // look for the card on the battlefield
         for region in self.regions.iter() {
             for permanent in region.permanents.iter() {
-                if let Permanent::Unit { card_id: c_id, .. } = permanent {
+                if let Permanent::Unit { card_id: c_id, .. } | Permanent::Unit { card_id: c_id, .. } = permanent {
                     if *c_id == card_id {
                         return Some(FindCardResult::AsPermanent(region, permanent))
                     }

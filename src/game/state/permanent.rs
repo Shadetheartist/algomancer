@@ -33,11 +33,11 @@ pub enum Permanent {
     },
     SpellToken {
         common: PermanentCommon,
-        card_prototype_id: CardPrototypeId,
+        card_id: CardId,
     },
     UnitToken {
         common: PermanentCommon,
-        card_prototype_id: CardPrototypeId,
+        card_id: CardId,
     },
 }
 
