@@ -3,7 +3,7 @@ use crate::game::Game;
 use crate::game::state::player::StateError;
 use crate::game::state::progression::Phase::PrecombatPhase;
 use crate::game::state::progression::PrecombatPhaseStep;
-use crate::game::state::region::{Region, RegionId};
+use crate::game::state::region::RegionId;
 use crate::game::state::State;
 
 impl Game {

@@ -2,8 +2,8 @@ use std::{env, fs, process};
 
 use game::state;
 
-use crate::game::action::Action;
 use crate::game::{Game, GameOptions};
+use crate::game::action::Action;
 use crate::game::state::{GameMode, TeamConfiguration};
 use crate::game::state::resource::Faction::{Earth, Wood};
 
@@ -15,7 +15,7 @@ fn new_game() {
         seed: state::rng::AlgomancerRngSeed::default(),
         game_mode: GameMode::LiveDraft{
             selected_deck_types: vec![Earth, Wood],
-            team_configuration:TeamConfiguration::Teams { teams_of_players: vec![3, 3] } ,
+            team_configuration:TeamConfiguration::Teams { teams_of_players: vec![1, 1] } ,
         },
     };
 

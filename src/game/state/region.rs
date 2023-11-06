@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
-use crate::game::state::card::{Card, CardId};
-use crate::game::state::pack::Pack;
 
+use crate::game::state::pack::Pack;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{Player, PlayerId, StateError};
 use crate::game::state::player::StateError::RegionNotFound;
