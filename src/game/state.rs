@@ -87,6 +87,7 @@ pub struct State {
     pub initiative_team: TeamId,
     pub next_permanent_id: usize,
     pub next_card_id: usize,
+    pub next_formation_id: usize,
 }
 
 impl State {
@@ -101,6 +102,7 @@ impl State {
             initiative_team: TeamId(1),
             next_permanent_id: 1,
             next_card_id: 1,
+            next_formation_id: 1,
         }
     }
 

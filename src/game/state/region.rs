@@ -18,14 +18,14 @@ pub struct Region {
     pub owner_player_id: PlayerId,
     pub players: Vec<Player>,
     pub unformed_permanents: Vec<Permanent>,
-    pub attacking_formation: Option<Formation>,
-    pub defending_formation: Option<DefensiveFormation>,
+    pub attacking_formation: Option<Formation<Permanent>>,
+    pub defending_formation: Option<DefensiveFormation<Permanent>>,
     pub step: Phase,
 }
 
 impl Region {
 
-    pub fn formations(&self) -> Vec<&Formation> {
+    pub fn formations(&self) -> Vec<&Formation<Permanent>> {
         let mut formations = Vec::new();
 
         if let Some(f) = self.attacking_formation.as_ref() {

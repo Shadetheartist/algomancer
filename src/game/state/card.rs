@@ -83,7 +83,7 @@ pub enum FindCardResult<'a> {
     InPlayerDiscard(&'a Player, &'a Card),
     InDeck(&'a Deck, &'a Card),
     AsPermanentInRegion(&'a Region, &'a Permanent),
-    AsPermanentInFormation(&'a Region, &'a Formation, &'a Permanent),
+    AsPermanentInFormation(&'a Region, &'a Formation<Permanent>, &'a Permanent),
 }
 
 impl Card {
@@ -138,7 +138,7 @@ impl State {
 
             // the card could be in a formation
             for formation in region.formations().iter() {
-                for permanent in formation.permanents_iter() {
+                for permanent in formation.cells_iter() {
                     if let Permanent::Unit { card_id: c_id, .. } = permanent {
                         if *c_id == card_id {
                             return Some(FindCardResult::AsPermanentInFormation(region, formation, permanent))

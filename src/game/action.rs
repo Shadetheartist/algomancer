@@ -6,9 +6,11 @@ use serde::{Deserialize, Serialize};
 use crate::game::Game;
 use crate::game::state::card::CardId;
 use crate::game::state::card::CardType::Resource;
+use crate::game::state::formation::Formation;
 use crate::game::state::player::{PlayerId, StateError};
-use crate::game::state::progression::{MainPhaseStep, PrecombatPhaseStep};
-use crate::game::state::progression::Phase::{MainPhase, PrecombatPhase};
+use crate::game::state::progression::{CombatPhaseAStep, MainPhaseStep, PrecombatPhaseStep};
+use crate::game::state::progression::Phase::{CombatPhaseA, MainPhase, PrecombatPhase};
+use crate::game::state::region::RegionId;
 use crate::game::state::resource::ResourceType;
 
 mod draft;
@@ -32,7 +34,7 @@ pub enum Action {
     // a card is played
     PlayCard { card_id: CardId },
 
-    Attack { card_id: CardId },
+    Attack { home_region_id: RegionId, under_attack_region_id: RegionId, formation: Formation<CardId> },
 }
 
 
@@ -93,7 +95,9 @@ impl Game {
             Action::PlayCard { .. } => {
                 next_state = self.apply_play_card_action(next_state, &action)?;
             }
-            Action::Attack { .. } => {}
+            Action::Attack { .. } => {
+                next_state = self.apply_attack_action(next_state, &action)?;
+            }
         }
 
         self.action_history.push(action);
@@ -164,6 +168,12 @@ impl Game {
 
                 PrecombatPhase(PrecombatPhaseStep::ITMana) | PrecombatPhase(PrecombatPhaseStep::NITMana) => {
                     for a in self.valid_mana_phase_actions(region.region_id) {
+                        valid_actions.insert(a);
+                    }
+                }
+
+                CombatPhaseA(CombatPhaseAStep::ITAttack) => {
+                    for a in self.valid_attack_actions(region.region_id) {
                         valid_actions.insert(a);
                     }
                 }

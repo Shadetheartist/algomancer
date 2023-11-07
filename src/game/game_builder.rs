@@ -142,6 +142,7 @@ impl Game {
                 initiative_team: TeamId(1),
                 next_permanent_id: 1,
                 next_card_id: card_id_counter + 1,
+                next_formation_id: 1,
             };
 
             let mut game = Game {

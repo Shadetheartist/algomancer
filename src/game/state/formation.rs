@@ -10,12 +10,12 @@ use crate::game::state::State;
 pub struct FormationId(pub usize);
 
 #[derive(Debug, Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
-pub struct Formation {
+pub struct Formation<T> {
     formation_id: FormationId,
     owner_player_id: PlayerId,
     is_locked: bool,
-    top_row: Vec<Option<Permanent>>,
-    bot_row: Vec<Option<Permanent>>,
+    top_row: Vec<Option<T>>,
+    bot_row: Vec<Option<T>>,
 }
 
 
@@ -47,8 +47,8 @@ pub enum FormationError {
 /// a formation has two fixed rows, and infinite columns
 /// when unlocked, empty columns exist on either side of a column containing a permanent,
 /// to facilitate inserting a permanent into 'template cells'
-impl<'a> Formation {
-    pub fn new(id: FormationId, owner_player_id: PlayerId) -> Formation {
+impl<'a, T> Formation<T> {
+    pub fn new(id: FormationId, owner_player_id: PlayerId) -> Formation<T> {
         Formation {
             formation_id: id,
             owner_player_id: owner_player_id,
@@ -101,13 +101,13 @@ impl<'a> Formation {
         self.is_locked = true;
     }
 
-    pub fn permanents_iter<'b>(&'b self) -> Box<dyn Iterator<Item=&'b Permanent> + 'b> {
+    pub fn cells_iter<'b>(&'b self) -> Box<dyn Iterator<Item=&'b T> + 'b> {
         let top_iter = self.top_row.iter().filter(|cell| cell.is_some()).map(|cell| cell.as_ref().expect("a permanent"));
         let bot_iter = self.bot_row.iter().filter(|cell| cell.is_some()).map(|cell| cell.as_ref().expect("a permanent"));
         Box::new(top_iter.chain(bot_iter))
     }
 
-    pub fn get_at(&'a self, pos: FormationPos) -> Result<Option<&'a Permanent>, FormationError> {
+    pub fn get_at(&'a self, pos: FormationPos) -> Result<Option<&'a T>, FormationError> {
         match pos {
             FrontRow(col) => {
                 if col >= self.top_row.len() {
@@ -127,7 +127,7 @@ impl<'a> Formation {
     }
 
 
-    pub fn insert_at(&mut self, pos: FormationPos, permanent: Permanent) -> Result<(), FormationError> {
+    pub fn insert_at(&mut self, pos: FormationPos, permanent: T) -> Result<(), FormationError> {
         // validate the insert
         {
             let cell = self.get_at(pos)?;
@@ -182,8 +182,7 @@ impl<'a> Formation {
         Ok(())
     }
 
-    pub fn remove_at(&mut self, pos: FormationPos, collapse: bool) -> Result<Permanent, FormationError> {
-
+    pub fn remove_at(&mut self, pos: FormationPos) -> Result<T, FormationError> {
 
         let cell = self.get_at(pos)?;
         if let None = cell {
@@ -195,8 +194,8 @@ impl<'a> Formation {
                 // if a unit is removed from the front, the unit behind it moves up to replace it
                 // (works even if the replacement is None)
                 let replacement = std::mem::replace(&mut self.bot_row[col], None);
-                let permanent = std::mem::replace(&mut self.top_row[col], replacement);
-                let permanent = permanent.expect("a permanent");
+                let item = std::mem::replace(&mut self.top_row[col], replacement);
+                let item = item.expect("a permanent");
 
                 // locked formations don't have their columns automatically removed
                 if !self.is_locked {
@@ -205,7 +204,7 @@ impl<'a> Formation {
                     if col != 0 && col != self.top_row.len() - 1 {
                         // re-check the top cell, if it's None, then the bottom cell is also None.
                         // and therefore the column needs to be removed entirely
-                        if self.top_row[col] == None {
+                        if self.top_row[col].is_none() {
                             self.top_row.remove(col);
                             self.bot_row.remove(col);
                         }
@@ -219,14 +218,14 @@ impl<'a> Formation {
                     }
                 }
 
-                Ok(permanent)
+                Ok(item)
             }
             BackRow(col) => {
-                let permanent = std::mem::replace(&mut self.bot_row[col], None);
-                let permanent = permanent.expect("a permanent");
+                let item = std::mem::replace(&mut self.bot_row[col], None);
+                let item = item.expect("a permanent");
 
                 // units being removed from the back row should never cause a collapse
-                Ok(permanent)
+                Ok(item)
             }
         }
     }
@@ -243,43 +242,34 @@ impl<'a> Formation {
 }
 
 #[derive(Debug, Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
-pub struct DefensiveFormation {
+pub struct DefensiveFormation<T> {
     pub attacking_formation_id: FormationId,
-    pub formation: Formation,
+    pub formation: Formation<T>,
 }
 
-impl DefensiveFormation {
-    pub fn from_attacking_formation(id: FormationId, owner_player_id: PlayerId, attacking_formation: &Formation) -> Result<DefensiveFormation, FormationError> {
+impl <T> DefensiveFormation<T> {
+    pub fn from_attacking_formation<A>(id: FormationId, owner_player_id: PlayerId, attacking_formation: &Formation<A>) -> Result<DefensiveFormation<T>, FormationError> {
         if !attacking_formation.is_locked {
             return Err(FormationMustBeLocked);
         }
 
         // fill defensive formation with cells to match each column in the offensive formation
-        let defensive_row: Vec<Option<Permanent>> = attacking_formation.top_row.iter().map(|_| None).collect();
         let defensive_formation = DefensiveFormation {
             attacking_formation_id: attacking_formation.formation_id,
             formation: Formation {
                 formation_id: id,
                 owner_player_id: owner_player_id,
                 is_locked: true, // defensive formations start locked
-                top_row: defensive_row.clone(),
-                bot_row: defensive_row,
+                top_row: attacking_formation.top_row.iter().map(|_| None).collect(),
+                bot_row: attacking_formation.top_row.iter().map(|_| None).collect(),
             },
         };
 
         Ok(defensive_formation)
     }
-
-    pub fn find_attacking_formation<'a>(&self, state: &'a State) -> Option<&'a Formation>{
-        state.regions
-            .iter()
-            .filter(|r| r.attacking_formation.is_some())
-            .map(|r| r.attacking_formation.as_ref().unwrap())
-            .find(|f| f.formation_id == self.attacking_formation_id)
-    }
 }
 
-fn print_row(row: &Vec<Option<Permanent>>) {
+fn print_row<T>(row: &Vec<Option<T>>) {
     for p in row {
         match p {
             None => {
@@ -327,19 +317,19 @@ mod tests {
 
         formation.print();
 
-        formation.remove_at(FormationPos::FrontRow(1), true).expect("inserted permanent");
+        formation.remove_at(FormationPos::FrontRow(1)).expect("inserted permanent");
 
         formation.print();
 
-        formation.remove_at(FormationPos::FrontRow(1), true).expect("inserted permanent");
+        formation.remove_at(FormationPos::FrontRow(1)).expect("inserted permanent");
 
         formation.print();
 
-        formation.remove_at(FormationPos::FrontRow(1), true).expect("inserted permanent");
+        formation.remove_at(FormationPos::FrontRow(1)).expect("inserted permanent");
 
         formation.print();
 
-        formation.remove_at(FormationPos::FrontRow(1), true).expect("inserted permanent");
+        formation.remove_at(FormationPos::FrontRow(1)).expect("inserted permanent");
 
         formation.print();
 
@@ -348,7 +338,7 @@ mod tests {
         formation.insert_at(FormationPos::FrontRow(0), fake_permanent()).expect("inserted permanent");
         formation.print();
 
-        formation.remove_at(FormationPos::FrontRow(2), true).expect("inserted permanent");
+        formation.remove_at(FormationPos::FrontRow(2)).expect("inserted permanent");
         formation.print();
     }
 
