@@ -1,7 +1,8 @@
 use crate::game::action::Action;
 use crate::game::Game;
 use crate::game::state::card::CardId;
-use crate::game::state::formation::{Formation, FormationId};
+use crate::game::state::formation::{Formation, FormationId, FormationPos};
+use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{PlayerId, StateError};
 use crate::game::state::region::RegionId;
 use crate::game::state::State;
@@ -23,6 +24,10 @@ impl Game {
         let clockwise_neighbour_id = self.state.region_clockwise_neighbour(region_id).expect("a neighbour").region_id;
 
         let mut formation = Formation::new(FormationId(self.state.next_formation_id), player.player_id);
+        let some_permanent = region.unformed_permanents.first().expect("some permanent to exist");
+        if let Permanent::Resource { common, card_prototype_id } = some_permanent {
+            formation.insert_at(FormationPos::FrontRow(0), common.permanent_id).expect("permanent inserted into formation");
+        }
 
         actions.push(Action::Attack {
             home_region_id: region_id,

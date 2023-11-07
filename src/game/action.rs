@@ -7,6 +7,7 @@ use crate::game::Game;
 use crate::game::state::card::CardId;
 use crate::game::state::card::CardType::Resource;
 use crate::game::state::formation::Formation;
+use crate::game::state::permanent::PermanentId;
 use crate::game::state::player::{PlayerId, StateError};
 use crate::game::state::progression::{CombatPhaseAStep, MainPhaseStep, PrecombatPhaseStep};
 use crate::game::state::progression::Phase::{CombatPhaseA, MainPhase, PrecombatPhase};
@@ -34,7 +35,7 @@ pub enum Action {
     // a card is played
     PlayCard { card_id: CardId },
 
-    Attack { home_region_id: RegionId, under_attack_region_id: RegionId, formation: Formation<CardId> },
+    Attack { home_region_id: RegionId, under_attack_region_id: RegionId, formation: Formation<PermanentId> },
 }
 
 

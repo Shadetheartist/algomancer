@@ -180,9 +180,36 @@ impl Game {
         let proto = self.cards_db.prototypes.get(&prototype_id).expect("a prototype");
 
         match proto.card_type {
-            CardType::UnitToken  => {}
+            CardType::Unit(_)  => {
+                let card = {
+                    let find_card_result = state.find_card(card_id).unwrap();
+                    match find_card_result {
+                        FindCardResult::InPlayerHand(_, card) |
+                        FindCardResult::InPlayerDiscard(_, card) => {
+                            card.clone()
+                        }
+                        _ => { panic!("card should be in the player's hand or discard") }
+                    }
+                };
+
+                let permanent = Permanent::from_unit_card(&card, player_id, &mut state, &self.cards_db);
+
+                // add the permanent to the region the player is currently in
+                let region_id = state.find_region_id_containing_player(player_id);
+                let region = state.find_region_mut(region_id).expect("a region");
+                region.unformed_permanents.push(permanent);
+
+                remove_card(&mut state, player_id, card_id, in_hand, in_discard, in_play);
+
+                // special case for resource, need to increment counter
+                if let CardType::Resource(_) = proto.card_type {
+                    let player = state.find_player_mut(player_id).expect("a player");
+                    player.resources_played_this_turn += 1;
+                }
+            }
+
             CardType::SpellToken |
-            CardType::Unit(_) |
+            CardType::UnitToken |
             CardType::Resource(_) => {
                 let permanent = Permanent::from_card_prototype(proto, player_id, &mut state);
 
@@ -199,6 +226,7 @@ impl Game {
                     player.resources_played_this_turn += 1;
                 }
             }
+
             CardType::Spell(_) => {
                 // spells just get cast
                 remove_card(&mut state, player_id, card_id, in_hand, in_discard, in_play);

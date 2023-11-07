@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::game::state::card::{CardId, CardPrototype, CardPrototypeId, CardType};
+use crate::game::state::card::{Card, CardId, CardPrototype, CardPrototypeDatabase, CardPrototypeId, CardType};
 use crate::game::state::player::PlayerId;
 use crate::game::state::State;
 
@@ -42,6 +42,22 @@ pub enum Permanent {
 }
 
 impl Permanent {
+    pub fn from_unit_card(card: &Card, controller_player_id: PlayerId, state: &mut State, db: &CardPrototypeDatabase) -> Permanent {
+        let proto = db.prototypes.get(&card.prototype_id).expect("a prototype");
+
+        if let CardType::Unit(_) = &proto.card_type {
+            Permanent::Unit {
+                common: PermanentCommon {
+                    permanent_id: PermanentId::next(state),
+                    controller_player_id,
+                },
+                card_id: card.card_id
+            }
+        } else {
+            panic!("you need to call this only when the card type is some real card, not a token or resource")
+        }
+    }
+
     pub fn from_card_prototype(card_prototype: &CardPrototype, controller_player_id: PlayerId, state: &mut State) -> Permanent {
         match card_prototype.card_type {
             CardType::Resource(_) => {
@@ -53,8 +69,26 @@ impl Permanent {
                     card_prototype_id: card_prototype.prototype_id,
                 }
             }
+            CardType::UnitToken => {
+                Permanent::UnitToken {
+                    common: PermanentCommon {
+                        permanent_id: PermanentId::next(state),
+                        controller_player_id,
+                    },
+                    card_prototype_id: card_prototype.prototype_id,
+                }
+            }
+            CardType::SpellToken => {
+                Permanent::SpellToken {
+                    common: PermanentCommon {
+                        permanent_id: PermanentId::next(state),
+                        controller_player_id,
+                    },
+                    card_prototype_id: card_prototype.prototype_id,
+                }
+            }
             _ => {
-                todo!()
+                panic!("you need to call this only when the card type is a token or resource")
             }
         }
     }

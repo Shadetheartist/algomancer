@@ -3,12 +3,13 @@ use std::error::Error;
 use std::fmt;
 
 use rand::prelude::SliceRandom;
+use rand::{Rng, RngCore};
 
 use crate::game::{Game, GameOptions};
 use crate::game::game_builder::NewGameError::NotSupportedYet;
 use crate::game::state::{GameMode, State, TeamConfiguration};
 use crate::game::state::card::{Card, CardId, CardPrototype, CardPrototypeDatabase, CardPrototypeId, CardType};
-use crate::game::state::card::Timing::Default;
+use crate::game::state::card::Timing::{Combat, Default, Haste, Virus};
 use crate::game::state::deck::Deck;
 use crate::game::state::formation::{DefensiveFormation, Formation};
 use crate::game::state::permanent::Permanent;
@@ -46,11 +47,28 @@ impl Game {
     }
 
     fn build_live_draft(options: &GameOptions) -> Result<Game, NewGameError> {
+
+
+
         if let GameMode::LiveDraft { team_configuration, .. } = &options.game_mode {
             let mut algomancer_rng = AlgomancerRng::new(options.seed);
 
             let mut card_prototypes = HashMap::new();
             let mut id_num = 0;
+
+            fn random_read_card_type(rng: &mut AlgomancerRng)-> CardType {
+                let r = rng.gen_range(0..8);
+
+                match r {
+                    0 => CardType::Spell(Default),
+                    1 => CardType::Spell(Combat),
+                    2 => CardType::Spell(Virus),
+                    3 => CardType::Unit(Haste),
+                    4 => CardType::Unit(Virus),
+                    _ => CardType::Unit(Default),
+                }
+            };
+
             for i in 0..((10 + 54) * 3) {
                 id_num = i + 1;
                 let card_prototype_id = CardPrototypeId(id_num);
@@ -59,7 +77,7 @@ impl Game {
                     name: format!("Card #{}", id_num),
                     text: format!("Text for card #{}.", id_num),
                     costs: Cost::free(),
-                    card_type: CardType::Unit(Default),
+                    card_type: random_read_card_type(&mut algomancer_rng),
                 });
             }
 
