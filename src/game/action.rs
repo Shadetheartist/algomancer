@@ -15,6 +15,7 @@ mod draft;
 mod pass_priority;
 mod mana_phase_actions;
 mod play_card;
+mod combat;
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Serialize, Deserialize)]
 pub enum Action {
@@ -30,6 +31,8 @@ pub enum Action {
 
     // a card is played
     PlayCard { card_id: CardId },
+
+    Attack { card_id: CardId },
 }
 
 
@@ -90,6 +93,7 @@ impl Game {
             Action::PlayCard { .. } => {
                 next_state = self.apply_play_card_action(next_state, &action)?;
             }
+            Action::Attack { .. } => {}
         }
 
         self.action_history.push(action);
@@ -135,6 +139,7 @@ impl Game {
             }
             Action::RecycleForResource { .. } => {}
             Action::PlayCard { .. } => {}
+            Action::Attack { .. } => {}
         }
 
         Ok(())

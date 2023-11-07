@@ -23,6 +23,7 @@ pub mod hand;
 pub mod region;
 pub mod permanent;
 pub mod discard;
+mod formation;
 
 type ObjectId = i32;
 
