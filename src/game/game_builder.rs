@@ -189,6 +189,7 @@ impl Game {
                         owner_player_id: player_id,
                         players: vec![player],
                         permanents: permanents,
+                        formations: Vec::new(),
                         step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap)
                     };
 

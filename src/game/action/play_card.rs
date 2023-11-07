@@ -49,7 +49,7 @@ impl Game {
                 FindCardResult::InPlayerDiscard(player, card) => {
                     (player.player_id, card.prototype_id, false, true, false)
                 }
-                FindCardResult::AsPermanent(_, permanent) => {
+                FindCardResult::AsPermanentInRegion(_, permanent) => {
                     match permanent {
                         Permanent::SpellToken { common, card_prototype_id } => {
                             (common.controller_player_id, *card_prototype_id, false, false, true)
@@ -59,6 +59,7 @@ impl Game {
                         }
                     }
                 }
+                FindCardResult::AsPermanentInFormation(_, _, _) |
                 FindCardResult::InDeck(_, _) => {
                     return Err(NotInPlayableZone);
                 }

@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::game::state::{GameMode, State};
 use crate::game::state::card::CardType::Resource;
 use crate::game::state::deck::Deck;
+use crate::game::state::formation::Formation;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::Player;
 use crate::game::state::region::Region;
@@ -81,7 +82,8 @@ pub enum FindCardResult<'a> {
     InPlayerHand(&'a Player, &'a Card),
     InPlayerDiscard(&'a Player, &'a Card),
     InDeck(&'a Deck, &'a Card),
-    AsPermanent(&'a Region, &'a Permanent),
+    AsPermanentInRegion(&'a Region, &'a Permanent),
+    AsPermanentInFormation(&'a Region, &'a Formation, &'a Permanent),
 }
 
 impl Card {
@@ -129,7 +131,18 @@ impl State {
             for permanent in region.permanents.iter() {
                 if let Permanent::Unit { card_id: c_id, .. } = permanent {
                     if *c_id == card_id {
-                        return Some(FindCardResult::AsPermanent(region, permanent))
+                        return Some(FindCardResult::AsPermanentInRegion(region, permanent))
+                    }
+                }
+            }
+
+            // the card could be in a formation
+            for formation in region.formations.iter() {
+                for permanent in formation.permanents_iter() {
+                    if let Permanent::Unit { card_id: c_id, .. } = permanent {
+                        if *c_id == card_id {
+                            return Some(FindCardResult::AsPermanentInFormation(region, formation, permanent))
+                        }
                     }
                 }
             }

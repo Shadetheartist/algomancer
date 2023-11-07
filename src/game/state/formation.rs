@@ -1,15 +1,16 @@
+use serde::{Deserialize, Serialize};
 use crate::game::state::formation::FormationError::InvalidPosition;
 use crate::game::state::formation::FormationPos::{BackRow, FrontRow};
 use crate::game::state::formation::RemoveError::NothingToRemove;
 use crate::game::state::permanent::Permanent;
 
-#[derive(Debug)]
+#[derive(Debug, Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Formation {
     top_row: Vec<Option<Permanent>>,
     bot_row: Vec<Option<Permanent>>,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize)]
 pub enum FormationPos {
     FrontRow(usize),
     BackRow(usize),
@@ -41,6 +42,12 @@ impl<'a> Formation {
             top_row: vec![None],
             bot_row: vec![None],
         }
+    }
+
+    pub fn permanents_iter<'b>(&'b self) -> Box<dyn Iterator<Item=&'b Permanent> + 'b> {
+        let top_iter = self.top_row.iter().filter(|cell| cell.is_some()).map(|cell| cell.as_ref().expect("a permanent"));
+        let bot_iter = self.bot_row.iter().filter(|cell| cell.is_some()).map(|cell| cell.as_ref().expect("a permanent"));
+        Box::new(top_iter.chain(bot_iter))
     }
 
     pub fn get_at(&'a self, pos: FormationPos) -> Result<Option<&'a Permanent>, FormationError> {

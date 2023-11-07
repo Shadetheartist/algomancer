@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use crate::game::state::formation::Formation;
 
 use crate::game::state::pack::Pack;
 use crate::game::state::permanent::Permanent;
@@ -17,6 +18,7 @@ pub struct Region {
     pub owner_player_id: PlayerId,
     pub players: Vec<Player>,
     pub permanents: Vec<Permanent>,
+    pub formations: Vec<Formation>,
     pub step: Phase,
 }
 
