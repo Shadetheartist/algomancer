@@ -122,10 +122,16 @@ impl State {
         Ok(!players.iter().any(|p| p.passed_priority == false))
     }
 
+    pub fn all_players_in_region_on_team_passed_priority(&self, region_id: RegionId, team_id: TeamId) -> Result<bool, StateError> {
+        let players = self.players_in_region(region_id)?;
+        let players: Vec<&Player> = players.into_iter().filter(|p| p.team_id == team_id).collect();
+        Ok(!players.iter().any(|p| p.passed_priority == false))
+    }
 
-    pub fn players_in_region(&self, region_id: RegionId) -> Result<&Vec<Player>, StateError> {
+
+    pub fn players_in_region(&self, region_id: RegionId) -> Result<Vec<&Player>, StateError> {
         let region = self.find_region(region_id)?;
-        Ok(&region.players)
+        Ok(region.players.iter().collect())
     }
 
     pub fn players_in_region_mut(&mut self, region_id: RegionId) -> Result<&mut Vec<Player>, StateError> {

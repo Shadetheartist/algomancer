@@ -15,7 +15,7 @@ fn new_game() {
         seed: state::rng::AlgomancerRngSeed::default(),
         game_mode: GameMode::LiveDraft{
             selected_deck_types: vec![Earth, Wood],
-            team_configuration:TeamConfiguration::Teams { teams_of_players: vec![1, 1] } ,
+            team_configuration:TeamConfiguration::Teams { teams_of_players: vec![2, 2] } ,
         },
     };
 
@@ -114,7 +114,7 @@ fn run_it(){
         seed: state::rng::AlgomancerRngSeed::default(),
         game_mode: GameMode::LiveDraft{
             selected_deck_types: vec![Earth, Wood],
-            team_configuration:TeamConfiguration::Teams { teams_of_players: vec![1, 1] } ,
+            team_configuration:TeamConfiguration::Teams { teams_of_players: vec![2, 2] } ,
         },
     };
 

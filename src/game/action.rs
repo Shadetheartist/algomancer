@@ -145,9 +145,6 @@ impl Game {
 
         for region in &self.state.regions {
             match &region.step {
-                MainPhase(MainPhaseStep::NITMain) => {
-                    // dont put a valid action, for testing
-                }
 
                 PrecombatPhase(PrecombatPhaseStep::Draft) => {
                     for a in self.valid_drafts(region.region_id) {
@@ -166,12 +163,15 @@ impl Game {
                     }
                 }
 
+                MainPhase(MainPhaseStep::NITMain) => {
+                    // dont put a valid action, so that during testing
+                    // the game sim stops after one round
+                }
+
                 _ => {
-                    if !self.is_over() {
-                        for p in &region.players {
-                            if !p.passed_priority {
-                                valid_actions.insert(Action::PassPriority(p.player_id));
-                            }
+                    for p in &region.players {
+                        if self.state.player_can_act(p.player_id) {
+                            valid_actions.insert(Action::PassPriority(p.player_id));
                         }
                     }
                 }

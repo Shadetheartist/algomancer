@@ -36,6 +36,10 @@ impl Game {
                 Ok(state)
             }
 
+
+            let initiative_team_id = state.initiative_team;
+            let non_initiative_team_id = state.non_initiative_team();
+
             match current_step {
                 PrecombatPhase(step) => match step {
                     PrecombatPhaseStep::Untap |
@@ -48,22 +52,35 @@ impl Game {
                         // all regions automatically transition to ITMana
                     }
                     PrecombatPhaseStep::ITMana => {
-                        let team_id = state.initiative_team;
-                        state = team_pass(state, team_id)?
+                        state = team_pass(state, initiative_team_id)?
                     }
                     PrecombatPhaseStep::NITMana => {
-                        let team_id = state.non_initiative_team();
-                        state = team_pass(state, team_id)?
+                        state = team_pass(state, non_initiative_team_id)?
                     }
                 }
                 Phase::CombatPhaseA(step) => {
                     match step {
-                        CombatPhaseAStep::ITAttack => {}
-                        CombatPhaseAStep::AfterITAttackPriorityWindow => {}
-                        CombatPhaseAStep::NITBlock => {}
-                        CombatPhaseAStep::AfterNITBlockPriorityWindow => {}
-                        CombatPhaseAStep::Damage => {}
-                        CombatPhaseAStep::AfterCombatPriorityWindow => {}
+                        CombatPhaseAStep::ITAttack => {
+                            state = team_pass(state, initiative_team_id)?;
+                        }
+                        CombatPhaseAStep::AfterITAttackPriorityWindow => {
+                            state = region_pass(state, region_id)?
+                        }
+                        CombatPhaseAStep::NITBlock => {
+                            state = region_pass(state, region_id)?
+                        }
+                        CombatPhaseAStep::AfterNITBlockPriorityWindow => {
+                            state = region_pass(state, region_id)?
+                        }
+                        CombatPhaseAStep::Damage => {
+                            // not an interactive step,
+                            // state modifications for this step will happen
+                            // automatically after the block window is over,
+                            // then it will move the after combat step
+                        }
+                        CombatPhaseAStep::AfterCombatPriorityWindow => {
+                            state = region_pass(state, region_id)?
+                        }
                     }
                 }
                 Phase::CombatPhaseB(_) => {}

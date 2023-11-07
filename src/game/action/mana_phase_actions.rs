@@ -11,13 +11,16 @@ impl Game {
     pub fn valid_mana_phase_actions(&self, region_id: RegionId) -> Vec<Action> {
         let mut actions : Vec<Action> = Vec::new();
 
-
         // quick check to discard any actions of regions where
         // the player does not currently have initiative
         let region = self.state.find_region(region_id).expect("a region");
         let player = region.sole_player();
         if self.state.player_can_act(player.player_id) == false {
             return actions
+        } else {
+            // if the player can act, they can pass priority -
+            // which moves to the next synchronised step when all players on the team pass priority
+            actions.push(Action::PassPriority(player.player_id));
         }
 
         // during the mana phase, players can recycle any of their cards to gain a resource
@@ -31,13 +34,6 @@ impl Game {
         // they may also play cards with haste
         let mut play_resource_actions = valid_play_haste_actions(self, region_id);
         actions.append(&mut play_resource_actions);
-
-        // if the player can act, they can pass priority -
-        // which moves to the next synchronised step when all players on the team pass priority
-
-        if !player.passed_priority {
-            actions.push(Action::PassPriority(player.player_id));
-        }
 
         actions
     }
