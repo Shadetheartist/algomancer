@@ -151,7 +151,7 @@ impl Game {
                 player.discard.cards.remove(card_idx);
             } else if in_play {
                 let region = state.find_region_containing_player_mut(player_id);
-                let permanent_idx = region.permanents.iter().position(|p| {
+                let permanent_idx = region.unformed_permanents.iter().position(|p| {
                     match p {
                         Permanent::SpellToken { common, .. }  => {
                             // can find permanents be casting the CardId to a PermanentId
@@ -168,7 +168,7 @@ impl Game {
                         panic!("permanent not found in play")
                     }
                     Some(idx) => {
-                        region.permanents.remove(idx);
+                        region.unformed_permanents.remove(idx);
                     }
                 }
             } else {
@@ -189,7 +189,7 @@ impl Game {
                 // add the permanent to the region the player is currently in
                 let region_id = state.find_region_id_containing_player(player_id);
                 let region = state.find_region_mut(region_id).expect("a region");
-                region.permanents.push(permanent);
+                region.unformed_permanents.push(permanent);
 
                 remove_card(&mut state, player_id, card_id, in_hand, in_discard, in_play);
 

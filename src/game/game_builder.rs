@@ -10,6 +10,7 @@ use crate::game::state::{GameMode, State, TeamConfiguration};
 use crate::game::state::card::{Card, CardId, CardPrototype, CardPrototypeDatabase, CardPrototypeId, CardType};
 use crate::game::state::card::Timing::Default;
 use crate::game::state::deck::Deck;
+use crate::game::state::formation::{DefensiveFormation, Formation};
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{Player, PlayerId, TeamId};
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
@@ -165,9 +166,7 @@ impl Game {
                     let team_id = TeamId(team_id + 1);
                     let mut player = Player::new(player_id, team_id, None, None);
 
-
                     let region_id = RegionId(player_id.0);
-
 
                     let mut permanents = Vec::new();
 
@@ -188,8 +187,9 @@ impl Game {
                         region_id: region_id,
                         owner_player_id: player_id,
                         players: vec![player],
-                        permanents: permanents,
-                        formations: Vec::new(),
+                        unformed_permanents: permanents,
+                        attacking_formation: None,
+                        defending_formation: None,
                         step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap)
                     };
 

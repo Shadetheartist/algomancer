@@ -4,9 +4,14 @@ use crate::game::state::formation::FormationPos::{BackRow, FrontRow};
 use crate::game::state::formation::RemoveError::NothingToRemove;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::PlayerId;
+use crate::game::state::State;
+
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+pub struct FormationId(pub usize);
 
 #[derive(Debug, Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Formation {
+    formation_id: FormationId,
     owner_player_id: PlayerId,
     is_locked: bool,
     top_row: Vec<Option<Permanent>>,
@@ -43,8 +48,9 @@ pub enum FormationError {
 /// when unlocked, empty columns exist on either side of a column containing a permanent,
 /// to facilitate inserting a permanent into 'template cells'
 impl<'a> Formation {
-    pub fn new(owner_player_id: PlayerId) -> Formation {
+    pub fn new(id: FormationId, owner_player_id: PlayerId) -> Formation {
         Formation {
+            formation_id: id,
             owner_player_id: owner_player_id,
             is_locked: false,
             top_row: vec![None],
@@ -228,17 +234,22 @@ impl<'a> Formation {
     pub fn print(&self) {
         print_row(&self.top_row);
         print_row(&self.bot_row);
-        println!();
+    }
+
+    pub fn rprint(&self) {
+        print_row(&self.bot_row);
+        print_row(&self.top_row);
     }
 }
 
-pub struct DefensiveFormation<'f> {
-    attacking_formation: &'f Formation,
-    formation: Formation,
+#[derive(Debug, Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
+pub struct DefensiveFormation {
+    pub attacking_formation_id: FormationId,
+    pub formation: Formation,
 }
 
-impl<'f> DefensiveFormation<'f> {
-    pub fn from_attacking_formation(owner_player_id: PlayerId, attacking_formation: &Formation) -> Result<DefensiveFormation, FormationError> {
+impl DefensiveFormation {
+    pub fn from_attacking_formation(id: FormationId, owner_player_id: PlayerId, attacking_formation: &Formation) -> Result<DefensiveFormation, FormationError> {
         if !attacking_formation.is_locked {
             return Err(FormationMustBeLocked);
         }
@@ -246,8 +257,9 @@ impl<'f> DefensiveFormation<'f> {
         // fill defensive formation with cells to match each column in the offensive formation
         let defensive_row: Vec<Option<Permanent>> = attacking_formation.top_row.iter().map(|_| None).collect();
         let defensive_formation = DefensiveFormation {
-            attacking_formation,
+            attacking_formation_id: attacking_formation.formation_id,
             formation: Formation {
+                formation_id: id,
                 owner_player_id: owner_player_id,
                 is_locked: true, // defensive formations start locked
                 top_row: defensive_row.clone(),
@@ -258,13 +270,12 @@ impl<'f> DefensiveFormation<'f> {
         Ok(defensive_formation)
     }
 
-    pub fn print(&self) {
-        print_row(&self.attacking_formation.bot_row);
-        print_row(&self.attacking_formation.top_row);
-        print_row(&self.formation.top_row);
-        print_row(&self.formation.bot_row);
-
-        println!();
+    pub fn find_attacking_formation<'a>(&self, state: &'a State) -> Option<&'a Formation>{
+        state.regions
+            .iter()
+            .filter(|r| r.attacking_formation.is_some())
+            .map(|r| r.attacking_formation.as_ref().unwrap())
+            .find(|f| f.formation_id == self.attacking_formation_id)
     }
 }
 
@@ -286,7 +297,7 @@ fn print_row(row: &Vec<Option<Permanent>>) {
 #[cfg(test)]
 mod tests {
     use crate::game::state::card::{CardPrototypeId};
-    use crate::game::state::formation::{DefensiveFormation, Formation, FormationPos};
+    use crate::game::state::formation::{DefensiveFormation, Formation, FormationId, FormationPos};
     use crate::game::state::permanent::{Permanent, PermanentCommon, PermanentId};
     use crate::game::state::player::PlayerId;
 
@@ -302,7 +313,7 @@ mod tests {
 
     #[test]
     fn test_formation() {
-        let mut formation = Formation::new(PlayerId(1));
+        let mut formation = Formation::new(FormationId(1), PlayerId(1));
 
         formation.print();
 
@@ -343,17 +354,19 @@ mod tests {
 
     #[test]
     fn test_defensive_formation() {
-        let mut formation = Formation::new(PlayerId(1));
+        let mut formation = Formation::new(FormationId(1), PlayerId(1));
+
         formation.insert_at(FormationPos::FrontRow(0), fake_permanent()).expect("inserted permanent");
         formation.insert_at(FormationPos::FrontRow(0), fake_permanent()).expect("inserted permanent");
         formation.insert_at(FormationPos::FrontRow(0), fake_permanent()).expect("inserted permanent");
         formation.insert_at(FormationPos::BackRow(2), fake_permanent()).expect("inserted permanent");
         formation.lock();
 
-        let mut defensive_formation = DefensiveFormation::from_attacking_formation(PlayerId(2), &formation).expect("a defensive formation");
+        let mut defensive_formation = DefensiveFormation::from_attacking_formation(FormationId(2), PlayerId(2), &formation).expect("a defensive formation");
 
         defensive_formation.formation.insert_at(FormationPos::FrontRow(0), fake_permanent()).expect("inserted permanent");
-        defensive_formation.print();
+        formation.rprint();
+        defensive_formation.formation.print();
 
     }
 }

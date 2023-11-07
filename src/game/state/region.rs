@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use crate::game::state::formation::Formation;
+use crate::game::state::formation::{DefensiveFormation, Formation};
 
 use crate::game::state::pack::Pack;
 use crate::game::state::permanent::Permanent;
@@ -17,12 +17,27 @@ pub struct Region {
     pub region_id: RegionId,
     pub owner_player_id: PlayerId,
     pub players: Vec<Player>,
-    pub permanents: Vec<Permanent>,
-    pub formations: Vec<Formation>,
+    pub unformed_permanents: Vec<Permanent>,
+    pub attacking_formation: Option<Formation>,
+    pub defending_formation: Option<DefensiveFormation>,
     pub step: Phase,
 }
 
 impl Region {
+
+    pub fn formations(&self) -> Vec<&Formation> {
+        let mut formations = Vec::new();
+
+        if let Some(f) = self.attacking_formation.as_ref() {
+            formations.push(f);
+        }
+
+        if let Some(f) = self.defending_formation.as_ref() {
+            formations.push(&f.formation);
+        }
+
+        formations
+    }
 
     /// This function gets the current player in the region,
     /// it will panic if there is not exactly one player in the region.
