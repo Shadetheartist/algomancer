@@ -129,8 +129,8 @@ impl State {
         // look for the card on the battlefield
         for region in self.regions.iter() {
             for permanent in region.unformed_permanents.iter() {
-                if let Permanent::Unit { card_id: c_id, .. } = permanent {
-                    if *c_id == card_id {
+                if let Permanent::Unit { card, .. } = permanent {
+                    if card.card_id == card_id {
                         return Some(FindCardResult::AsPermanentInRegion(region, permanent))
                     }
                 }
@@ -139,8 +139,8 @@ impl State {
             // the card could be in a formation
             for formation in region.formations().iter() {
                 for permanent in formation.cells_iter() {
-                    if let Permanent::Unit { card_id: c_id, .. } = permanent {
-                        if *c_id == card_id {
+                    if let Permanent::Unit { card, .. } = permanent {
+                        if card.card_id == card_id {
                             return Some(FindCardResult::AsPermanentInFormation(region, formation, permanent))
                         }
                     }

@@ -1,6 +1,6 @@
 use crate::game::action::Action;
 use crate::game::Game;
-use crate::game::state::card::{CardId, CardType, FindCardResult, Timing};
+use crate::game::state::card::{Card, CardId, CardType, FindCardResult, Timing};
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{CardNotPlayableError, PlayerId, StateError};
 use crate::game::state::player::CardNotPlayableError::{CannotCastANonSpellTokenPermanentFromPlay, CannotPlayMoreResources, CardDoesNotExist, CardLacksCorrectTiming, MustBePlayedFromHand, NotInPlayableStep, NotInPlayableZone};
@@ -26,9 +26,12 @@ impl Game {
         } else {
             panic!("only call this when the action is of the correct enum type")
         }
+
+
     }
 
 
+    // this probably should be decomposed into play_card_from_hand / play_spell_token / etc.
     pub fn play_card(&self, mut state: State, card_id: CardId) -> Result<State, CardNotPlayableError> {
 
         // collect info about the card, or discover it doesn't exist or it's not in a playable zone
@@ -66,11 +69,12 @@ impl Game {
             }
         };
 
+        let proto = self.cards_db.prototypes.get(&prototype_id).expect("a prototype");
+
         // check the timing requirements
         {
             let region_id = state.find_region_id_containing_player(player_id);
             let region = state.find_region(region_id).expect("a region");
-            let proto = self.cards_db.prototypes.get(&prototype_id).expect("a prototype");
 
             match &region.step {
                 Phase::PrecombatPhase(step) => {
@@ -140,15 +144,15 @@ impl Game {
             }
         }
 
-        fn remove_card(state: &mut State, player_id: PlayerId, card_id: CardId, in_hand: bool, in_discard: bool, in_play: bool) {
+        fn remove_card(state: &mut State, player_id: PlayerId, card_id: CardId, in_hand: bool, in_discard: bool, in_play: bool) -> Option<Card> {
             // remove the card from the player's hand or discard
             let player = state.find_player_mut(player_id).expect("a player");
             if in_hand {
                 let card_idx = player.hand.cards.iter().position(|c| c.card_id == card_id).expect("a card in hand");
-                player.hand.cards.remove(card_idx);
+                Some(player.hand.cards.remove(card_idx))
             } else if in_discard {
                 let card_idx = player.discard.cards.iter().position(|c| c.card_id == card_id).expect("a card in hand");
-                player.discard.cards.remove(card_idx);
+                Some(player.discard.cards.remove(card_idx))
             } else if in_play {
                 let region = state.find_region_containing_player_mut(player_id);
                 let permanent_idx = region.unformed_permanents.iter().position(|p| {
@@ -169,6 +173,8 @@ impl Game {
                     }
                     Some(idx) => {
                         region.unformed_permanents.remove(idx);
+                        None
+
                     }
                 }
             } else {
@@ -176,30 +182,17 @@ impl Game {
             }
         }
 
-        // create the permanent
-        let proto = self.cards_db.prototypes.get(&prototype_id).expect("a prototype");
-
         match proto.card_type {
             CardType::Unit(_)  => {
-                let card = {
-                    let find_card_result = state.find_card(card_id).unwrap();
-                    match find_card_result {
-                        FindCardResult::InPlayerHand(_, card) |
-                        FindCardResult::InPlayerDiscard(_, card) => {
-                            card.clone()
-                        }
-                        _ => { panic!("card should be in the player's hand or discard") }
-                    }
-                };
 
-                let permanent = Permanent::from_unit_card(&card, player_id, &mut state, &self.cards_db);
+                let card = remove_card(&mut state, player_id, card_id, in_hand, in_discard, in_play).expect("a card");
+
+                let permanent = Permanent::from_unit_card(card, player_id, &mut state, &self.cards_db);
 
                 // add the permanent to the region the player is currently in
                 let region_id = state.find_region_id_containing_player(player_id);
                 let region = state.find_region_mut(region_id).expect("a region");
                 region.unformed_permanents.push(permanent);
-
-                remove_card(&mut state, player_id, card_id, in_hand, in_discard, in_play);
 
                 // special case for resource, need to increment counter
                 if let CardType::Resource(_) = proto.card_type {
@@ -208,9 +201,9 @@ impl Game {
                 }
             }
 
-            CardType::SpellToken |
-            CardType::UnitToken |
-            CardType::Resource(_) => {
+
+            CardType::SpellToken => {
+                todo!("mega sus?");
                 let permanent = Permanent::from_card_prototype(proto, player_id, &mut state);
 
                 // add the permanent to the region the player is currently in
@@ -231,6 +224,14 @@ impl Game {
                 // spells just get cast
                 remove_card(&mut state, player_id, card_id, in_hand, in_discard, in_play);
             }
+
+
+
+            CardType::Resource(_) |
+            CardType::UnitToken => {
+                todo!("does this even make sense?")
+            }
+
         }
 
 

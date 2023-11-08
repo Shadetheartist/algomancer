@@ -25,7 +25,7 @@ pub struct PermanentCommon {
 pub enum Permanent {
     Unit {
         common: PermanentCommon,
-        card_id: CardId,
+        card: Card,
     },
     Resource {
         common: PermanentCommon,
@@ -42,7 +42,7 @@ pub enum Permanent {
 }
 
 impl Permanent {
-    pub fn from_unit_card(card: &Card, controller_player_id: PlayerId, state: &mut State, db: &CardPrototypeDatabase) -> Permanent {
+    pub fn from_unit_card(card: Card, controller_player_id: PlayerId, state: &mut State, db: &CardPrototypeDatabase) -> Permanent {
         let proto = db.prototypes.get(&card.prototype_id).expect("a prototype");
 
         if let CardType::Unit(_) = &proto.card_type {
@@ -51,7 +51,7 @@ impl Permanent {
                     permanent_id: PermanentId::next(state),
                     controller_player_id,
                 },
-                card_id: card.card_id
+                card: card
             }
         } else {
             panic!("you need to call this only when the card type is some real card, not a token or resource")
