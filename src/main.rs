@@ -11,15 +11,7 @@ mod game;
 mod wrap_index;
 
 fn new_game() {
-    let options = GameOptions{
-        seed: state::rng::AlgomancerRngSeed::default(),
-        game_mode: GameMode::LiveDraft{
-            selected_deck_types: vec![Earth, Wood],
-            team_configuration:TeamConfiguration::Teams { teams_of_players: vec![2, 2] } ,
-        },
-    };
-
-    let game = Game::new(&options).expect("game object");
+    let game = Game::new(&options()).expect("game object");
 
     let json = serde_json::to_string(&game).expect("serialized game json");
     print!("{}", json);
@@ -109,16 +101,18 @@ fn cmd_parse(){
     }
 }
 
-fn run_it(){
-    let options = GameOptions{
+fn options() -> GameOptions {
+    GameOptions{
         seed: state::rng::AlgomancerRngSeed::default(),
         game_mode: GameMode::LiveDraft{
             selected_deck_types: vec![Earth, Wood],
             team_configuration:TeamConfiguration::Teams { teams_of_players: vec![2, 2] } ,
         },
-    };
+    }
+}
 
-    let mut game = game::Game::new(&options).expect("game object");
+fn run_it(){
+    let mut game = Game::new(&options()).expect("game object");
     let mut counter = 0;
     while counter < 400 {
         let actions: Vec<Action> = game.valid_actions().iter().cloned().collect();

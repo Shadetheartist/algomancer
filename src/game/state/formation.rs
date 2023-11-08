@@ -1,10 +1,8 @@
 use serde::{Deserialize, Serialize};
-use crate::game::state::formation::FormationError::{FormationMustBeLocked, InvalidPosition};
+use crate::game::state::formation::FormationError::{AttackingFormationMustBeCommitted, FormationAlreadyCommitted, InvalidPosition};
 use crate::game::state::formation::FormationPos::{BackRow, FrontRow};
 use crate::game::state::formation::RemoveError::NothingToRemove;
-use crate::game::state::permanent::Permanent;
 use crate::game::state::player::PlayerId;
-use crate::game::state::State;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct FormationId(pub usize);
@@ -13,7 +11,8 @@ pub struct FormationId(pub usize);
 pub struct Formation<T> {
     formation_id: FormationId,
     owner_player_id: PlayerId,
-    is_locked: bool,
+    padding_cells_enabled: bool,
+    committed: bool,
     top_row: Vec<Option<T>>,
     bot_row: Vec<Option<T>>,
 }
@@ -41,7 +40,8 @@ pub enum FormationError {
     InvalidPosition,
     InsertError(InsertError),
     RemoveError(RemoveError),
-    FormationMustBeLocked,
+    FormationAlreadyCommitted,
+    AttackingFormationMustBeCommitted,
 }
 
 /// a formation has two fixed rows, and infinite columns
@@ -52,16 +52,21 @@ impl<'a, T> Formation<T> {
         Formation {
             formation_id: id,
             owner_player_id: owner_player_id,
-            is_locked: false,
+            padding_cells_enabled: true,
+            committed: false,
             top_row: vec![None],
             bot_row: vec![None],
         }
     }
 
     /// reintroduces padding cells and allows modification until locked.
-    pub fn unlock(&mut self) {
-        if !self.is_locked {
-            return;
+    pub fn enable_padding_cells(&mut self) -> Result<(), FormationError>{
+        if self.committed {
+            return Err(FormationAlreadyCommitted)
+        }
+
+        if self.padding_cells_enabled {
+            return Ok(());
         }
 
         // add column padding
@@ -76,13 +81,19 @@ impl<'a, T> Formation<T> {
             self.bot_row.push(None);
         }
 
-        self.is_locked = false;
+        self.padding_cells_enabled = true;
+
+        Ok(())
     }
 
     /// removes padding cells and stops any modification until unlocked.
-    pub fn lock(&mut self) {
-        if self.is_locked {
-            return;
+    pub fn disable_padding_cells(&mut self) -> Result<(), FormationError>{
+        if self.committed {
+            return Err(FormationAlreadyCommitted)
+        }
+
+        if !self.padding_cells_enabled {
+            return Ok(());
         }
 
         // remove column padding
@@ -98,7 +109,9 @@ impl<'a, T> Formation<T> {
             self.bot_row.remove(l);
         }
 
-        self.is_locked = true;
+        self.padding_cells_enabled = false;
+
+        Ok(())
     }
 
     pub fn cells_iter<'b>(&'b self) -> Box<dyn Iterator<Item=&'b T> + 'b> {
@@ -128,6 +141,10 @@ impl<'a, T> Formation<T> {
 
 
     pub fn insert_at(&mut self, pos: FormationPos, permanent: T) -> Result<(), FormationError> {
+        if self.committed {
+            return Err(FormationAlreadyCommitted)
+        }
+
         // validate the insert
         {
             let cell = self.get_at(pos)?;
@@ -153,8 +170,8 @@ impl<'a, T> Formation<T> {
             FrontRow(col) => {
                 self.top_row[col] = Some(permanent);
 
-                // if unlocked, introduce new padding cells, if needed
-                if !self.is_locked {
+                // introduce new padding cells, if needed
+                if self.padding_cells_enabled {
                     // since new columns must start on the first row, we check here to make sure
                     // that there is column on either side of this one, if not, we make one
 
@@ -183,6 +200,9 @@ impl<'a, T> Formation<T> {
     }
 
     pub fn remove_at(&mut self, pos: FormationPos) -> Result<T, FormationError> {
+        if self.committed {
+            return Err(FormationAlreadyCommitted)
+        }
 
         let cell = self.get_at(pos)?;
         if let None = cell {
@@ -198,7 +218,7 @@ impl<'a, T> Formation<T> {
                 let item = item.expect("a permanent");
 
                 // locked formations don't have their columns automatically removed
-                if !self.is_locked {
+                if self.padding_cells_enabled {
                     // units being removed from the front row may leave an empty column which is not on the edge.
                     // these empty columns are invalid and must be collapsed.
                     if col != 0 && col != self.top_row.len() - 1 {
@@ -230,6 +250,12 @@ impl<'a, T> Formation<T> {
         }
     }
 
+    pub fn commit(&mut self) -> Result<(), FormationError>{
+        self.disable_padding_cells()?;
+        self.committed = true;
+        Ok(())
+    }
+
     pub fn print(&self) {
         print_row(&self.top_row);
         print_row(&self.bot_row);
@@ -249,8 +275,8 @@ pub struct DefensiveFormation<T> {
 
 impl <T> DefensiveFormation<T> {
     pub fn from_attacking_formation<A>(id: FormationId, owner_player_id: PlayerId, attacking_formation: &Formation<A>) -> Result<DefensiveFormation<T>, FormationError> {
-        if !attacking_formation.is_locked {
-            return Err(FormationMustBeLocked);
+        if !attacking_formation.committed {
+            return Err(AttackingFormationMustBeCommitted);
         }
 
         // fill defensive formation with cells to match each column in the offensive formation
@@ -259,7 +285,8 @@ impl <T> DefensiveFormation<T> {
             formation: Formation {
                 formation_id: id,
                 owner_player_id: owner_player_id,
-                is_locked: true, // defensive formations start locked
+                padding_cells_enabled: false, // defensive formations start locked
+                committed: false,
                 top_row: attacking_formation.top_row.iter().map(|_| None).collect(),
                 bot_row: attacking_formation.top_row.iter().map(|_| None).collect(),
             },
@@ -308,6 +335,7 @@ mod tests {
         formation.print();
 
         formation.insert_at(FormationPos::FrontRow(0), fake_permanent()).expect("inserted permanent");
+        formation.print();
         formation.insert_at(FormationPos::FrontRow(0), fake_permanent()).expect("inserted permanent");
         formation.insert_at(FormationPos::FrontRow(0), fake_permanent()).expect("inserted permanent");
 
@@ -350,7 +378,7 @@ mod tests {
         formation.insert_at(FormationPos::FrontRow(0), fake_permanent()).expect("inserted permanent");
         formation.insert_at(FormationPos::FrontRow(0), fake_permanent()).expect("inserted permanent");
         formation.insert_at(FormationPos::BackRow(2), fake_permanent()).expect("inserted permanent");
-        formation.lock();
+        formation.commit().expect("a committed formation");
 
         let mut defensive_formation = DefensiveFormation::from_attacking_formation(FormationId(2), PlayerId(2), &formation).expect("a defensive formation");
 
