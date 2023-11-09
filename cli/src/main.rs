@@ -1,14 +1,10 @@
 use std::{env, fs, process};
 
-use game::state;
-
-use crate::game::{Game, GameOptions};
-use crate::game::action::Action;
-use crate::game::state::{GameMode, TeamConfiguration};
-use crate::game::state::resource::Faction::{Earth, Wood};
-
-mod game;
-mod wrap_index;
+use game_rules_engine::game::state;
+use game_rules_engine::game::{Game, GameOptions};
+use game_rules_engine::game::action::Action;
+use game_rules_engine::game::state::{GameMode, TeamConfiguration};
+use game_rules_engine::game::state::resource::Faction::{Earth, Wood};
 
 fn new_game() {
     let game = Game::new(&options()).expect("game object");
