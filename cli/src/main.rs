@@ -1,13 +1,18 @@
 use std::{env, fs, process};
+use clap::Parser;
 
 use game_rules_engine::game::state;
 use game_rules_engine::game::{Game, GameOptions};
 use game_rules_engine::game::action::Action;
 use game_rules_engine::game::state::{GameMode, TeamConfiguration};
 use game_rules_engine::game::state::resource::Faction::{Earth, Wood};
+use crate::parser::{Cli, Commands};
+use crate::parser::new::{GameModeCommand, LiveDraftArgs, Mode, NewArgs};
+
+mod parser;
 
 fn new_game() {
-    let game = Game::new(&options()).expect("game object");
+    let game = Game::new(&default_options()).expect("game object");
 
     let json = serde_json::to_string(&game).expect("serialized game json");
     print!("{}", json);
@@ -57,7 +62,7 @@ fn apply_action(state_json: &str, action_json: &str) {
     }
 }
 
-fn cmd_parse(){
+fn cmd_parse() {
     let args: Vec<String> = env::args().collect();
 
     if args.len() < 2 {
@@ -73,7 +78,7 @@ fn cmd_parse(){
             }
 
             new_game()
-        },
+        }
 
         "get_actions" => {
             if args.len() != 3 {
@@ -82,7 +87,7 @@ fn cmd_parse(){
             }
 
             get_actions(&args[2])
-        },
+        }
         "apply_action" => {
             if args.len() != 4 {
                 println!("Usage: apply_action <state> <action>");
@@ -97,18 +102,18 @@ fn cmd_parse(){
     }
 }
 
-fn options() -> GameOptions {
-    GameOptions{
+fn default_options() -> GameOptions {
+    GameOptions {
         seed: state::rng::AlgomancerRngSeed::default(),
-        game_mode: GameMode::LiveDraft{
+        game_mode: GameMode::LiveDraft {
             selected_deck_types: vec![Earth, Wood],
-            team_configuration:TeamConfiguration::Teams { teams_of_players: vec![2, 2] } ,
+            team_configuration: TeamConfiguration::Teams { teams_of_players: vec![2, 2] },
         },
     }
 }
 
-fn run_it(){
-    let mut game = Game::new(&options()).expect("game object");
+fn run_it() {
+    let mut game = Game::new(&default_options()).expect("game object");
     let mut counter = 0;
     while counter < 400 {
         let actions: Vec<Action> = game.valid_actions().iter().cloned().collect();
@@ -139,11 +144,57 @@ fn run_it(){
     fs::write("game_data.json", json).expect("written game data");
 }
 
+fn game_options_from_new_args(args: &NewArgs) -> GameOptions {
+    let seed_bytes = args.seed.to_be_bytes();
+
+    match &args.game_mode {
+        GameModeCommand::LiveDraft(args) => {
+            match args {
+                LiveDraftArgs { factions: faction_args, mode } => {
+                    let factions = faction_args.into_iter().map(|f_a| f_a.to_faction()).collect();
+                    GameOptions {
+                        seed: seed_bytes,
+                        game_mode: GameMode::LiveDraft {
+                            selected_deck_types: factions,
+                            team_configuration: match mode {
+                                Mode::OneVsOne => {
+                                    TeamConfiguration::one_v_one()
+                                }
+                                Mode::TwoVsTwo => {
+                                    TeamConfiguration::two_v_two()
+                                }
+                                Mode::ThreeVsThree => {
+                                    TeamConfiguration::three_v_three()
+                                }
+                                Mode::FFA(args) => {
+                                    TeamConfiguration::ffa(args.num_players)
+                                }
+                            },
+                        },
+                    }
+                }
+            }
+        }
+        GameModeCommand::PreDraft => {
+            todo!()
+        }
+        GameModeCommand::TeamDraft => {
+            todo!()
+        }
+        GameModeCommand::Constructed => {
+            todo!()
+        }
+    }
+}
+
 fn main() {
-    if cfg!(debug_assertions) {
-        run_it()
-    } else {
-        cmd_parse()
+    let args = Cli::parse();
+
+    match args.command {
+        Commands::New(args) => {
+            let options = game_options_from_new_args(&args);
+            eprintln!("{:?}", options);
+        }
     }
 }
 

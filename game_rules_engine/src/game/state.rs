@@ -48,12 +48,20 @@ impl TeamConfiguration {
         TeamConfiguration::Teams { teams_of_players: vec![1, 1] }
     }
 
+    pub fn two_v_two() -> TeamConfiguration {
+        TeamConfiguration::Teams { teams_of_players: vec![2, 2] }
+    }
+
     pub fn three_v_three() -> TeamConfiguration {
         TeamConfiguration::Teams { teams_of_players: vec![3, 3] }
     }
 
     pub fn two_v_one() -> TeamConfiguration {
         TeamConfiguration::Teams { teams_of_players: vec![2, 1] }
+    }
+
+    pub fn ffa(num_players: u8) -> TeamConfiguration {
+        TeamConfiguration::FFA { num_players  }
     }
 }
 
