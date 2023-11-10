@@ -203,21 +203,7 @@ impl Game {
 
 
             CardType::SpellToken => {
-                todo!("mega sus?");
-                let permanent = Permanent::from_card_prototype(proto, player_id, &mut state);
-
-                // add the permanent to the region the player is currently in
-                let region_id = state.find_region_id_containing_player(player_id);
-                let region = state.find_region_mut(region_id).expect("a region");
-                region.unformed_permanents.push(permanent);
-
-                remove_card(&mut state, player_id, card_id, in_hand, in_discard, in_play);
-
-                // special case for resource, need to increment counter
-                if let CardType::Resource(_) = proto.card_type {
-                    let player = state.find_player_mut(player_id).expect("a player");
-                    player.resources_played_this_turn += 1;
-                }
+                todo!("what types make sense to cast here?");
             }
 
             CardType::Spell(_) => {

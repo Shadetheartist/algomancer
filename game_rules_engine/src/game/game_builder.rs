@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::error::Error;
 use std::fmt;
 
-use rand::{Rng};
 use rand::prelude::SliceRandom;
 
 use crate::game::{Game, GameOptions};
@@ -66,7 +65,7 @@ impl Game {
                     4 => CardType::Unit(Virus),
                     _ => CardType::Unit(Default),
                 }
-            };
+            }
 
             for i in 0..((10 + 54) * 3) {
                 id_num = i + 1;

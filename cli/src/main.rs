@@ -1,62 +1,17 @@
 use std::collections::HashSet;
-use std::fs;
 
 use clap::Parser;
 use game_rules_engine::game::{Game, GameOptions};
 use game_rules_engine::game::action::Action;
 use game_rules_engine::game::game_builder::NewGameError;
-use game_rules_engine::game::state;
 use game_rules_engine::game::state::{GameMode, TeamConfiguration};
 use game_rules_engine::game::state::player::StateError;
-use game_rules_engine::game::state::resource::Faction::{Earth, Wood};
 
 use crate::parser::{Cli, Commands};
 use crate::parser::actions::{ActionsCommand, ApplyActionArgs, ListActionsArgs};
 use crate::parser::new::{GameModeCommand, LiveDraftArgs, Mode, NewArgs};
 
 mod parser;
-
-fn default_options() -> GameOptions {
-    GameOptions {
-        seed: state::rng::AlgomancerRngSeed::default(),
-        game_mode: GameMode::LiveDraft {
-            selected_deck_types: vec![Earth, Wood],
-            team_configuration: TeamConfiguration::Teams { teams_of_players: vec![2, 2] },
-        },
-    }
-}
-
-fn run_it() {
-    let mut game = Game::new(&default_options()).expect("game object");
-    let mut counter = 0;
-    while counter < 400 {
-        let actions: Vec<Action> = game.valid_actions().iter().cloned().collect();
-
-        if actions.len() < 1 {
-            eprintln!("out of actions");
-            break;
-        }
-
-        let mut sorted_actions = actions.clone();
-        sorted_actions.sort();
-        sorted_actions.reverse();
-
-        let action = sorted_actions.into_iter().next().expect("any action");
-        let result = game.apply_action(action);
-
-        match result {
-            Ok(_) => {}
-            Err(err) => {
-                panic!("{:?}", err)
-            }
-        }
-
-        counter += 1;
-    }
-
-    let json = serde_json::to_string_pretty(&game).expect("serialized game json");
-    fs::write("game_data.json", json).expect("written game data");
-}
 
 fn game_options_from_new_args(args: &NewArgs) -> GameOptions {
     let seed_bytes = args.seed.to_be_bytes();
@@ -108,7 +63,6 @@ enum CLIError {
     FailedToInitializeGame(NewGameError),
 
     FailedToSerializeActions(serde_json::Error),
-    FailedToSerializeAction(serde_json::Error),
     FailedToDeserializeAction(serde_json::Error),
 
     InvalidAction(Action, StateError),
@@ -135,16 +89,7 @@ fn serialize_actions(actions: &HashSet<Action>) -> Result<String, CLIError>{
     let action_serialized: Result<String, serde_json::Error> = serde_json::to_string(actions);
     match action_serialized {
         Ok(action_serialized) => Ok(action_serialized),
-        Err(err) => Err(CLIError::FailedToSerializeAction(err)),
-    }
-}
-
-
-fn serialize_action(action: &Action) -> Result<String, CLIError>{
-    let action_serialized: Result<String, serde_json::Error> = serde_json::to_string(action);
-    match action_serialized {
-        Ok(action_serialized) => Ok(action_serialized),
-        Err(err) => Err(CLIError::FailedToSerializeAction(err)),
+        Err(err) => Err(CLIError::FailedToSerializeActions(err)),
     }
 }
 

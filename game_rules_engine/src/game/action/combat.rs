@@ -24,7 +24,7 @@ impl Game {
 
         let mut formation = Formation::new(FormationId(self.state.next_formation_id), player.player_id);
         let some_permanent = region.unformed_permanents.first().expect("some permanent to exist");
-        if let Permanent::Resource { common, card_prototype_id } = some_permanent {
+        if let Permanent::Resource { common, .. } = some_permanent {
             formation.insert_at(FormationPos::FrontRow(0), common.permanent_id).expect("permanent inserted into formation");
         }
 
@@ -38,7 +38,7 @@ impl Game {
     }
 
     pub fn apply_attack_action(&self, mut state: State, action: &Action) -> Result<State, StateError> {
-        if let Action::Attack { home_region_id, under_attack_region_id, formation } = action {
+        if let Action::Attack { home_region_id, under_attack_region_id, .. } = action {
 
             state.next_formation_id += 1;
 
