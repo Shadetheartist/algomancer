@@ -2,8 +2,8 @@ use std::collections::HashMap;
 use std::error::Error;
 use std::fmt;
 
+use rand::{Rng};
 use rand::prelude::SliceRandom;
-use rand::{Rng, RngCore};
 
 use crate::game::{Game, GameOptions};
 use crate::game::game_builder::NewGameError::NotSupportedYet;
@@ -11,7 +11,6 @@ use crate::game::state::{GameMode, State, TeamConfiguration};
 use crate::game::state::card::{Card, CardId, CardPrototype, CardPrototypeDatabase, CardPrototypeId, CardType};
 use crate::game::state::card::Timing::{Combat, Default, Haste, Virus};
 use crate::game::state::deck::Deck;
-use crate::game::state::formation::{DefensiveFormation, Formation};
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{Player, PlayerId, TeamId};
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};

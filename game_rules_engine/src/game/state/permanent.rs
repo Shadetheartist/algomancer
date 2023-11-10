@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::game::state::card::{Card, CardId, CardPrototype, CardPrototypeDatabase, CardPrototypeId, CardType};
+use crate::game::state::card::{Card, CardPrototype, CardPrototypeDatabase, CardPrototypeId, CardType};
 use crate::game::state::player::PlayerId;
 use crate::game::state::State;
 

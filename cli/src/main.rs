@@ -1,16 +1,17 @@
 use std::collections::HashSet;
 use std::fs;
-use clap::Parser;
 
-use game_rules_engine::game::state;
+use clap::Parser;
 use game_rules_engine::game::{Game, GameOptions};
 use game_rules_engine::game::action::Action;
 use game_rules_engine::game::game_builder::NewGameError;
+use game_rules_engine::game::state;
 use game_rules_engine::game::state::{GameMode, TeamConfiguration};
 use game_rules_engine::game::state::player::StateError;
 use game_rules_engine::game::state::resource::Faction::{Earth, Wood};
+
 use crate::parser::{Cli, Commands};
-use crate::parser::actions::{ActionsCommand, ListActionsArgs, ApplyActionArgs};
+use crate::parser::actions::{ActionsCommand, ApplyActionArgs, ListActionsArgs};
 use crate::parser::new::{GameModeCommand, LiveDraftArgs, Mode, NewArgs};
 
 mod parser;

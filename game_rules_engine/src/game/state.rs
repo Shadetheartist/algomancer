@@ -1,9 +1,8 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
-use serde::{Deserialize, Serialize};
-
 use rng::{AlgomancerRng, AlgomancerRngSeed};
+use serde::{Deserialize, Serialize};
 
 use crate::game::state::deck::Deck;
 use crate::game::state::player::TeamId;

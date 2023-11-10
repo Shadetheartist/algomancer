@@ -6,11 +6,11 @@ use rand::RngCore;
 
 use crate::game::action::Action;
 use crate::game::Game;
-use crate::game::state::{State};
+use crate::game::state::State;
 use crate::game::state::card::CardId;
 use crate::game::state::card::CardType::Resource;
 use crate::game::state::pack::Pack;
-use crate::game::state::player::{StateError};
+use crate::game::state::player::StateError;
 use crate::game::state::progression::Phase::PrecombatPhase;
 use crate::game::state::progression::PrecombatPhaseStep;
 use crate::game::state::region::RegionId;

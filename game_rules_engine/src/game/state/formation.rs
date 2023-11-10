@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+
 use crate::game::state::formation::FormationError::{AttackingFormationMustBeCommitted, FormationAlreadyCommitted, InvalidPosition};
 use crate::game::state::formation::FormationPos::{BackRow, FrontRow};
 use crate::game::state::formation::RemoveError::NothingToRemove;
@@ -313,7 +314,7 @@ fn print_row<T>(row: &Vec<Option<T>>) {
 
 #[cfg(test)]
 mod tests {
-    use crate::game::state::card::{CardPrototypeId};
+    use crate::game::state::card::CardPrototypeId;
     use crate::game::state::formation::{DefensiveFormation, Formation, FormationId, FormationPos};
     use crate::game::state::permanent::{Permanent, PermanentCommon, PermanentId};
     use crate::game::state::player::PlayerId;

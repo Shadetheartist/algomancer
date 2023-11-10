@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-
 use special::SpecialEffect;
 
 use crate::game::state;

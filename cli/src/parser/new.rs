@@ -1,4 +1,3 @@
-use std::ffi::c_char;
 use clap::{Args, Subcommand, ValueEnum};
 use game_rules_engine::game::state::resource::Faction;
 
@@ -12,11 +11,6 @@ pub struct NewArgs {
     #[command(subcommand)]
     pub game_mode: GameModeCommand,
 }
-
-// cli new --seed 1 live_draft  ffa 6
-// cli new --seed 1 live_draft  1v1
-// cli new --seed 1 live_draft  2v2
-// cli new --seed 1 constructed 2v2
 
 #[derive(Debug, Subcommand)]
 #[command(rename_all = "snake_case")]

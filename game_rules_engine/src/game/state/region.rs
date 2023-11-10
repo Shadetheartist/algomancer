@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
-use crate::game::state::formation::{DefensiveFormation, Formation};
 
+use crate::game::state::formation::{DefensiveFormation, Formation};
 use crate::game::state::pack::Pack;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{Player, PlayerId, StateError, TeamId};

@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-
 use state::rng::AlgomancerRngSeed;
 
 use crate::game::action::Action;

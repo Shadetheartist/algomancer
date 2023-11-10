@@ -1,9 +1,8 @@
 use crate::game::action::Action;
 use crate::game::Game;
-use crate::game::state::card::CardId;
 use crate::game::state::formation::{Formation, FormationId, FormationPos};
 use crate::game::state::permanent::Permanent;
-use crate::game::state::player::{PlayerId, StateError};
+use crate::game::state::player::StateError;
 use crate::game::state::region::RegionId;
 use crate::game::state::State;
 

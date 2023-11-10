@@ -1,9 +1,10 @@
+use clap::{Args, Parser, Subcommand, ValueEnum};
+
+use crate::parser::actions::ActionsArgs;
+use crate::parser::new::NewArgs;
+
 pub mod new;
 pub mod actions;
-
-use clap::{Args, Parser, Subcommand, ValueEnum};
-use crate::parser::new::NewArgs;
-use crate::parser::actions::ActionsArgs;
 
 #[derive(Debug, Parser)] // requires `derive` feature
 #[command(name = "algomancer")]
