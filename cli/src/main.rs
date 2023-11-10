@@ -6,25 +6,80 @@ use game_rules_engine::game::action::Action;
 use game_rules_engine::game::game_builder::NewGameError;
 use game_rules_engine::game::state::{GameMode, TeamConfiguration};
 use game_rules_engine::game::state::player::StateError;
+use game_rules_engine::game::state::resource::Faction;
 
 use crate::parser::{Cli, Commands};
 use crate::parser::actions::{ActionsCommand, ApplyActionArgs, ListActionsArgs};
-use crate::parser::new::{GameModeCommand, LiveDraftArgs, Mode, NewArgs};
+use crate::parser::new::{FactionArg, GameModeCommand, LiveDraftArgs, Mode, NewArgs};
 
 mod parser;
 
-fn game_options_from_new_args(args: &NewArgs) -> GameOptions {
+fn main() -> Result<(), CLIError>{
+    let args = Cli::parse();
+
+    match args.command {
+        Commands::New(args) => {
+            print_new_game(&args)?;
+            Ok(())
+        }
+        Commands::Action(args) => {
+            match args.command {
+                ActionsCommand::List(args) => {
+                    list_actions(&args)?;
+                    Ok(())
+                }
+                ActionsCommand::Apply(args) => {
+                    apply_action(&args)?;
+                    Ok(())
+                }
+            }
+        }
+    }
+}
+
+
+#[derive(Debug)]
+enum CLIError {
+    FailedToSerializeGame(serde_json::Error),
+    FailedToDeserializeGame(serde_json::Error),
+    FailedToInitializeGame(NewGameError),
+
+    FailedToSerializeActions(serde_json::Error),
+    FailedToDeserializeAction(serde_json::Error),
+
+    InvalidAction(Action, StateError),
+    NotImplemented,
+}
+
+/// creates a new game instance, serializes it, and prints it to stdout
+fn print_new_game(args: &NewArgs) -> Result<(), CLIError>{
+    let options = game_options_from_new_args(&args)?;
+    let game = Game::new(&options);
+
+    match game {
+        Ok(game) => {
+            let game_json = serialize_game(&game)?;
+            println!("{}", game_json);
+            Ok(())
+        }
+        Err(err) => {
+            Err(CLIError::FailedToInitializeGame(err))
+        }
+    }
+}
+
+/// converts the args from the 'new' command into a GameOptions instance
+fn game_options_from_new_args(args: &NewArgs) -> Result<GameOptions, CLIError> {
     let seed_bytes = args.seed.to_be_bytes();
 
     match &args.game_mode {
         GameModeCommand::LiveDraft(args) => {
             match args {
                 LiveDraftArgs { factions: faction_args, mode } => {
-                    let factions = faction_args.into_iter().map(|f_a| f_a.to_faction()).collect();
-                    GameOptions {
+                    let game_options = GameOptions {
                         seed: seed_bytes,
                         game_mode: GameMode::LiveDraft {
-                            selected_deck_types: factions,
+                            selected_deck_types: unique_factions(faction_args),
                             team_configuration: match mode {
                                 Mode::OneVsOne => {
                                     TeamConfiguration::one_v_one()
@@ -40,33 +95,22 @@ fn game_options_from_new_args(args: &NewArgs) -> GameOptions {
                                 }
                             },
                         },
-                    }
+                    };
+
+                    Ok(game_options)
                 }
             }
         }
         GameModeCommand::PreDraft => {
-            todo!()
+            Err(CLIError::NotImplemented)
         }
         GameModeCommand::TeamDraft => {
-            todo!()
+            Err(CLIError::NotImplemented)
         }
         GameModeCommand::Constructed => {
-            todo!()
+            Err(CLIError::NotImplemented)
         }
     }
-}
-
-#[derive(Debug)]
-enum CLIError {
-    FailedToSerializeGame(serde_json::Error),
-    FailedToDeserializeGame(serde_json::Error),
-    FailedToInitializeGame(NewGameError),
-
-    FailedToSerializeActions(serde_json::Error),
-    FailedToDeserializeAction(serde_json::Error),
-
-    InvalidAction(Action, StateError),
-
 }
 
 fn serialize_game(game: &Game) -> Result<String, CLIError>{
@@ -101,22 +145,6 @@ fn deserialize_action(action_serialized: &str) -> Result<Action, CLIError>{
     }
 }
 
-fn write_new_game_json(args: &NewArgs) -> Result<(), CLIError>{
-    let options = game_options_from_new_args(&args);
-    let game = Game::new(&options);
-
-    match game {
-        Ok(game) => {
-            let game_json = serialize_game(&game)?;
-            println!("{}", game_json);
-            Ok(())
-        }
-        Err(err) => {
-            Err(CLIError::FailedToInitializeGame(err))
-        }
-    }
-}
-
 fn list_actions(args: &ListActionsArgs) -> Result<(), CLIError> {
     let game = deserialize_game(&args.state)?;
     let actions = game.valid_actions();
@@ -139,26 +167,8 @@ fn apply_action(args: &ApplyActionArgs) -> Result<(), CLIError> {
     }
 }
 
-fn main() -> Result<(), CLIError>{
-    let args = Cli::parse();
-
-    match args.command {
-        Commands::New(args) => {
-            write_new_game_json(&args)?;
-            Ok(())
-        }
-        Commands::Action(args) => {
-            match args.command {
-                ActionsCommand::List(args) => {
-                    list_actions(&args)?;
-                    Ok(())
-                }
-                ActionsCommand::Apply(args) => {
-                    apply_action(&args)?;
-                    Ok(())
-                }
-            }
-        }
-    }
+/// get the unique elements of the faction args by converting to hash set and then back to vec
+fn unique_factions(factions: &Vec<FactionArg>) -> Vec<Faction>{
+    let factions_set: HashSet<Faction> = HashSet::from_iter(factions.into_iter().map(|f_a| f_a.to_faction()));
+    factions_set.into_iter().collect()
 }
-

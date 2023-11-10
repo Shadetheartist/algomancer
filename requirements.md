@@ -2,6 +2,9 @@
 
 ## Design Considerations
 
+Action Classes?
+- classify actions into groups so that it can be reported that a class of actions is possible, without enumerating every single one. 
+  - ex: the 'Draft' action class could be valid for a player id, but not enumerating every single valid draft.
 
 Effect Layering & timestamps (game-step-stamps)
 - 0: Printed stats 

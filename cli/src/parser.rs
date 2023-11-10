@@ -21,6 +21,7 @@ pub enum Commands {
     #[command(arg_required_else_help = true)]
     New(NewArgs),
 
+    /// List actions, Apply an Action
     #[command(arg_required_else_help = true)]
     Action(ActionsArgs),
 }

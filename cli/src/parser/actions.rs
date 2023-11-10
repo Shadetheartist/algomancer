@@ -10,9 +10,12 @@ pub struct ActionsArgs {
 #[derive(Debug, Subcommand)]
 #[command(rename_all = "snake_case")]
 pub enum ActionsCommand {
+
+    /// List the valid actions for a given state
     #[command(name = "ls")]
     List(ListActionsArgs),
 
+    /// Apply an action to a given state and receive the resulting state
     #[command()]
     Apply(ApplyActionArgs),
 }
