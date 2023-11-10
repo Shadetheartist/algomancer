@@ -1,7 +1,9 @@
 pub mod new;
+pub mod actions;
 
 use clap::{Args, Parser, Subcommand, ValueEnum};
 use crate::parser::new::NewArgs;
+use crate::parser::actions::ActionsArgs;
 
 #[derive(Debug, Parser)] // requires `derive` feature
 #[command(name = "algomancer")]
@@ -17,4 +19,7 @@ pub enum Commands {
     /// Initialize a new game
     #[command(arg_required_else_help = true)]
     New(NewArgs),
+
+    #[command(arg_required_else_help = true)]
+    Action(ActionsArgs),
 }
