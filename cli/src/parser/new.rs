@@ -64,7 +64,7 @@ impl FactionArg  {
 #[derive(Debug, Args)]
 pub struct LiveDraftArgs {
 
-    #[arg(short, long, num_args = 1)]
+    #[arg(short, long, required = true)]
     pub factions: Vec<FactionArg>,
 
     #[command(subcommand)]
