@@ -14,3 +14,7 @@ clap = { version = "4.4.7", features = ["derive", "cargo"] }
 [[bin]]
 name = "algomancer"
 path = "src/main.rs"
+
+[target.x86_64-pc-windows-gnu]
+linker = "x86_64-w64-mingw32-gcc"
+
