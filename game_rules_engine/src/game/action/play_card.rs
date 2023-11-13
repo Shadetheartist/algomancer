@@ -149,11 +149,9 @@ impl Game {
             // remove the card from the player's hand or discard
             let player = state.find_player_mut(player_id).expect("a player");
             if in_hand {
-                let card_idx = player.hand.cards.iter().position(|c| c.card_id == card_id).expect("a card in hand");
-                Some(player.hand.cards.remove(card_idx))
+                Some(player.hand.remove(card_id).expect("card removed"))
             } else if in_discard {
-                let card_idx = player.discard.cards.iter().position(|c| c.card_id == card_id).expect("a card in hand");
-                Some(player.discard.cards.remove(card_idx))
+                Some(player.discard.remove(card_id).expect("card removed"))
             } else if in_play {
                 let region = state.find_region_containing_player_mut(player_id);
                 let permanent_idx = region.unformed_permanents.iter().position(|p| {

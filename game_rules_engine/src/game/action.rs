@@ -116,19 +116,19 @@ impl Game {
                         Err(ActionValidationError::PlayerDoesNotExist)
                     }
                     Ok(player) => {
-                        if player.hand.cards.len() - cards_to_keep.len() != 10 {
+                        if player.hand.len() - cards_to_keep.len() != 10 {
                             // enforce that there must be 10 cards remaining to create the next pack
                             return Err(ActionValidationError::Draft(DraftValidationError::IncorrectNumberOfCardsDrafted));
                         }
 
                         // enforce that each card selected actually exists in the player's hand
                         for card_id in cards_to_keep {
-                            if player.hand.cards.iter().find(|c| c.card_id == *card_id) == None {
+                            if player.hand.iter().find(|c| c.card_id == *card_id) == None {
                                 return Err(ActionValidationError::Draft(DraftValidationError::CardNotInHand(*card_id)));
                             }
                         }
 
-                        let cards_for_pack = player.hand.cards.iter().filter(|c| !cards_to_keep.contains(&c.card_id));
+                        let cards_for_pack = player.hand.iter().filter(|c| !cards_to_keep.contains(&c.card_id));
 
                         // enforce that each card left for the pack is not a resource
                         for card in cards_for_pack {

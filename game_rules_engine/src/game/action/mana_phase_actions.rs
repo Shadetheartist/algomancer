@@ -56,7 +56,7 @@ impl Game {
 
             let resource_card = Card::from_resource_type(&self.cards_db, &mut state, *resource_type);
 
-            state.find_player_mut(player_id).expect("a player").hand.cards.push(resource_card);
+            state.find_player_mut(player_id).expect("a player").hand.add(resource_card);
 
             Ok(state)
         } else {
@@ -74,7 +74,7 @@ fn valid_recycle_actions(game: &Game, region_id: RegionId) -> Vec<Action> {
     let region = game.state.find_region(region_id).expect("a region");
     let player = region.sole_player();
 
-    for card in player.hand.cards.iter() {
+    for card in player.hand.iter() {
 
         let proto = game.cards_db.prototypes.get(&card.prototype_id).expect("a card prototype");
         if proto.card_type.is_real() == false {
@@ -104,7 +104,7 @@ fn valid_play_resource_actions(game: &Game, region_id: RegionId) -> Vec<Action> 
         return actions
     }
 
-    for card in player.hand.cards.iter() {
+    for card in player.hand.iter() {
         let proto = game.cards_db.prototypes.get(&card.prototype_id).expect("a card prototype");
         if let Resource(_) = proto.card_type {
             actions.push(Action::PlayCard {
@@ -125,7 +125,7 @@ fn valid_play_haste_actions(game: &Game, region_id: RegionId) -> Vec<Action> {
     let region = game.state.find_region(region_id).expect("a region");
     let player = region.sole_player();
 
-    for card in player.hand.cards.iter() {
+    for card in player.hand.iter() {
         let proto = game.cards_db.prototypes.get(&card.prototype_id).expect("a card prototype");
         if let Unit(Timing::Haste) = proto.card_type {
             actions.push(Action::PlayCard {

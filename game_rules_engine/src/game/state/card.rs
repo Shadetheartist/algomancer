@@ -115,12 +115,12 @@ impl State {
 
         // see if the card is in a player's hand or discard
         for player in self.players() {
-            let card = player.hand.cards.iter().find(|c| c.card_id == card_id);
+            let card = player.hand.iter().find(|c| c.card_id == card_id);
             if let Some(card) = card {
                 return Some(FindCardResult::InPlayerHand(&player, card))
             }
 
-            let card = player.discard.cards.iter().find(|c| c.card_id == card_id);
+            let card = player.discard.iter().find(|c| c.card_id == card_id);
             if let Some(card) = card {
                 return Some(FindCardResult::InPlayerDiscard(&player, card))
             }
@@ -152,7 +152,7 @@ impl State {
         match self.game_mode {
             GameMode::LiveDraft { .. } => {
                 let deck = self.common_deck.as_ref().expect("a common deck");
-                let card = deck.cards.iter().find(|c| c.card_id == card_id);
+                let card = deck.iter().find(|c| c.card_id == card_id);
                 if let Some(card) = card {
                     return Some(FindCardResult::InCommonDeck(card))
                 }
@@ -160,7 +160,7 @@ impl State {
             GameMode::Constructed { .. } => {
                 for player in self.players() {
                     let deck = &player.player_deck.as_ref().expect("a player's deck");
-                    let card = deck.cards.iter().find(|c| c.card_id == card_id);
+                    let card = deck.iter().find(|c| c.card_id == card_id);
                     if let Some(card) = card {
                         return Some(FindCardResult::InPlayerDeck(player, card))
                     }

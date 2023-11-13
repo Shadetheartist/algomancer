@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::game::state::{GameMode, State};
 use crate::game::state::card::CardId;
-use crate::game::state::card_collection::CardCollection;
+use crate::game::state::card_collection::{CardCollection, CardCollectionId};
 use crate::game::state::progression::{CombatPhaseAStep, CombatPhaseBStep, MainPhaseStep, Phase, PrecombatPhaseStep};
 use crate::game::state::region::{RegionId};
 
@@ -59,12 +59,15 @@ pub enum CardNotPlayableError {
 pub enum StateError {
     PlayerNotFound(PlayerId),
     RegionNotFound(RegionId),
+    CardCollectionNotFound(CardCollectionId),
+    CardNotFound(CardId),
     InvalidDraft,
     InvalidRecycle,
     NoPlayersOnTeam(TeamId),
     CardNotPlayable(CardNotPlayableError),
     MutationError,
     CannotDrawFromEmptyCollection,
+    CannotDrawFromUnorderedSet,
 }
 
 impl State {
@@ -154,7 +157,7 @@ impl State {
 
         let player = self.find_player_mut(player_id).expect("a player");
         for card in cards {
-            player.hand.cards.push(card);
+            player.hand.add(card);
         }
     }
 
@@ -163,13 +166,12 @@ impl State {
         // remove the card from the player's hand
         let card = {
             let player = self.find_player_mut(player_id).expect("a player");
-            let card_idx = player.hand.cards.iter().position(|c| c.card_id == card_id).expect("a card in hand");
-            player.hand.cards.remove(card_idx)
+            player.hand.remove(card_id).expect("a card was removed")
         };
 
         // add the removed card to the bottom of the deck
         let deck = self.get_deck_for_player(player_id).expect("a deck");
-        deck.cards.push(card);
+        deck.add(card);
     }
 
     /// Returns true if the player is capable of any actions during the current step in their region.

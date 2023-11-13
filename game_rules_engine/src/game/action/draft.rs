@@ -82,7 +82,7 @@ impl Game {
         let mut actions = Vec::new();
 
         let player = self.state.find_player(player_id).expect("a player");
-        let card_ids: Vec<CardId> = player.hand.cards.iter()
+        let card_ids: Vec<CardId> = player.hand.iter()
             .filter(|card| {
                 let proto = &self.cards_db.prototypes[&card.prototype_id];
                 if let Resource(_) = proto.card_type {
@@ -95,8 +95,8 @@ impl Game {
 
 
         let num_cards_to_draft = {
-            if player.hand.cards.len() >= 10 {
-                player.hand.cards.len() - 10
+            if player.hand.len() >= 10 {
+                player.hand.len() - 10
             } else {
                 0
             }
@@ -133,9 +133,9 @@ impl Game {
 
                 let mut cards_for_hand = Vec::new();
                 let mut cards_for_pack = Vec::new();
-
-                for _ in 0..player_hand.cards.len() {
-                    let card = player_hand.cards.remove(0);
+                let card_ids: Vec<CardId> = player_hand.iter().map(|c| c.card_id).collect();
+                for c_id in card_ids {
+                    let card = player_hand.remove(c_id).expect("a card to have been removed");
                     if cards_to_keep.contains(&card.card_id) {
                         cards_for_hand.push(card);
                     } else {
@@ -148,7 +148,7 @@ impl Game {
                 }
 
                 for card in cards_for_hand {
-                    player_hand.cards.push(card);
+                    player_hand.add(card);
                 }
 
                 cards_for_pack
@@ -161,7 +161,7 @@ impl Game {
                 }
                 Some(player_pack) => {
                     for card in cards_for_pack {
-                        player_pack.cards.push(card);
+                        player_pack.add(card);
                     }
                 }
             }

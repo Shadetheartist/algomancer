@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use crate::game::state::card::CardId;
 use crate::game::state::card_collection::CardCollection;
 
 use crate::game::state::formation::{DefensiveFormation, Formation};
@@ -125,7 +126,10 @@ impl State {
         let players = self.players_in_region_mut(region_id).expect("a set of players in a region");
         for p in players {
             if let Some(pack) = &mut p.pack {
-                p.hand.cards.append(&mut pack.cards);
+                let card_ids: Vec<CardId> = pack.iter().map(|c| c.card_id).collect();
+                for c_id in card_ids {
+                    pack.transfer_to(&mut p.hand, c_id).expect("a card was transferred from pack to hand");
+                }
             }
         }
     }
