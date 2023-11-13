@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
 use serde::{Deserialize, Serialize};
 use crate::game::state::card::{Card, CardId};
-use crate::game::state::player::{PlayerId, StateError};
+use crate::game::state::player::{Player, PlayerId, StateError};
 use crate::game::state::State;
 
 
@@ -208,38 +208,63 @@ impl CardCollection {
     }
 }
 
+pub enum FindCardCollectionResult<'a> {
+    CommonDeck(&'a CardCollection),
+    PlayerHand(&'a Player, &'a CardCollection),
+    PlayerDiscard(&'a Player, &'a CardCollection),
+    PlayerDeck(&'a Player, &'a CardCollection),
+    PlayerPack(&'a Player, &'a CardCollection),
+}
+
 impl State {
     pub fn find_card_collection_mut(&mut self, id: CardCollectionId) -> Result<&mut CardCollection, StateError> {
+        match self.find_card_collection(id)? {
+            FindCardCollectionResult::CommonDeck(_) => {
+                Ok(self.common_deck.as_mut().unwrap())
+            }
+            FindCardCollectionResult::PlayerHand(player, _) => {
+                Ok(&mut self.find_player_mut(player.player_id)?.hand)
+            }
+            FindCardCollectionResult::PlayerDiscard(player, _) => {
+                Ok(&mut self.find_player_mut(player.player_id)?.discard)
+            }
+            FindCardCollectionResult::PlayerDeck(player, _) => {
+                Ok(self.find_player_mut(player.player_id)?.player_deck.as_mut().unwrap())
+            }
+            FindCardCollectionResult::PlayerPack(player, _) => {
+                Ok(self.find_player_mut(player.player_id)?.pack.as_mut().unwrap())
+            }
+        }
+    }
 
-        todo!();
-
+    pub fn find_card_collection(&self, id: CardCollectionId) -> Result<FindCardCollectionResult, StateError> {
         /// check if it's the common deck
-        if let Some(deck) = &mut self.common_deck {
+        if let Some(deck) = &self.common_deck {
             if deck.id() == id {
-                return Ok(deck);
+                return Ok(FindCardCollectionResult::CommonDeck(deck));
             }
         }
 
+        let players = self.players();
+
         /// check if it's one of the player's hands
-        if let Some(player) = self.players_mut().into_iter().find(|p| p.hand.id() == id) {
-            return Ok(&mut player.hand);
+        if let Some(player) = players.iter().find(|p| p.hand.id() == id) {
+            return Ok(FindCardCollectionResult::PlayerHand(&player, &player.hand));
         }
 
-
         /// check if it's one of the player's discards
-        if let Some(player) = self.players_mut().into_iter().find(|p| p.discard.id() == id) {
-            return Ok(&mut player.discard);
+        if let Some(player) = players.iter().find(|p| p.discard.id() == id) {
+            return Ok(FindCardCollectionResult::PlayerHand(&player, &player.discard));
         }
 
         /// check if it's one of the player's decks
-        if let Some(player) = self.players_mut().into_iter().find(|p| {
+        if let Some(player) = players.iter().find(|p| {
             if let Some(deck) = &p.player_deck {
                 return deck.id() == id;
             }
             false
         }) {
-            let deck = player.player_deck.as_mut().unwrap();
-            return Ok(deck);
+            return Ok(FindCardCollectionResult::PlayerDeck(&player, &player.player_deck.as_ref().unwrap()));
         }
 
         Err(StateError::CardCollectionNotFound(id))

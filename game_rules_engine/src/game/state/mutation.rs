@@ -44,7 +44,13 @@ impl State {
 
     fn handle_move_card(mut self, from_cc_id: CardCollectionId, to_cc_id: CardCollectionId, card_id: CardId) -> Result<State, StateError> {
 
-        let from_cc = self.find_card_collection_mut(from_cc_id);
+        let card = {
+            let from_cc = self.find_card_collection_mut(from_cc_id)?;
+            from_cc.remove(card_id)?
+        };
+
+        let to_cc = self.find_card_collection_mut(to_cc_id)?;
+        to_cc.add(card);
 
         Ok(self)
     }
