@@ -1,13 +1,13 @@
 use std::collections::HashSet;
 
 use clap::Parser;
-use game_rules_engine::game::{Game, GameOptions};
-use game_rules_engine::game::action::Action;
-use game_rules_engine::game::game_builder::NewGameError;
-use game_rules_engine::game::state::{GameMode};
-use game_rules_engine::game::state::player::StateError;
-use game_rules_engine::game::state::resource::Faction;
-use game_rules_engine::game::state::team_configuration::TeamConfiguration;
+use algomancer_gre::game::{Game, GameOptions};
+use algomancer_gre::game::action::Action;
+use algomancer_gre::game::game_builder::NewGameError;
+use algomancer_gre::game::state::{GameMode};
+use algomancer_gre::game::state::player::StateError;
+use algomancer_gre::game::state::resource::Faction;
+use algomancer_gre::game::state::team_configuration::TeamConfiguration;
 
 use crate::parser::{Cli, Commands};
 use crate::parser::actions::{ActionsCommand, ApplyActionArgs, ListActionsArgs};
@@ -172,4 +172,42 @@ fn apply_action(args: &ApplyActionArgs) -> Result<(), CLIError> {
 fn unique_factions(factions: &Vec<FactionArg>) -> Vec<Faction>{
     let factions_set: HashSet<Faction> = HashSet::from_iter(factions.into_iter().map(|f_a| f_a.to_faction()));
     factions_set.into_iter().collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use game_rules_engine::game::{Game, GameOptions};
+    use game_rules_engine::game::action::Action;
+    use game_rules_engine::game::state::GameMode;
+    use game_rules_engine::game::state::resource::Faction::{Fire, Wood};
+    use game_rules_engine::game::state::team_configuration::TeamConfiguration;
+
+    // utility function to avoid code duplication
+    // creates a pre-defined rng instance
+    #[test]
+    fn run_test_game() {
+        let test_seed_int: u128 = 0;
+        let test_seed = test_seed_int.to_be_bytes();
+        let options = GameOptions {
+            seed: test_seed,
+            game_mode: GameMode::LiveDraft {
+                selected_deck_types: vec![Wood, Fire],
+                team_configuration: TeamConfiguration::Teams {
+                    teams_of_players: vec![1, 1],
+                },
+            },
+        };
+
+        let mut game = Game::new(&options).unwrap();
+
+        for _ in 0..100 {
+            let actions = game.valid_actions();
+            let mut actions_vec: Vec<Action> = actions.into_iter().collect();
+            actions_vec.sort();
+
+            let action = actions_vec.remove(0);
+            let mutations = game.apply_action(action).unwrap();
+
+        }
+    }
 }

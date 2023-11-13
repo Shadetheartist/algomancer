@@ -7,18 +7,22 @@ use crate::game::Game;
 use crate::game::state::card::CardId;
 use crate::game::state::card::CardType::Resource;
 use crate::game::state::formation::Formation;
+use crate::game::state::mutation::StateMutation;
 use crate::game::state::permanent::PermanentId;
 use crate::game::state::player::{PlayerId, StateError};
 use crate::game::state::progression::{CombatPhaseAStep, MainPhaseStep, PrecombatPhaseStep};
 use crate::game::state::progression::Phase::{CombatPhaseA, MainPhase, PrecombatPhase};
 use crate::game::state::region::RegionId;
 use crate::game::state::resource::ResourceType;
+use crate::game::state::State;
 
 mod draft;
 mod pass_priority;
 mod mana_phase_actions;
 mod play_card;
 mod combat;
+
+
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Serialize, Deserialize)]
 pub enum Action {
@@ -36,6 +40,28 @@ pub enum Action {
     PlayCard { card_id: CardId },
 
     Attack { home_region_id: RegionId, under_attack_region_id: RegionId, formation: Formation<PermanentId> },
+}
+
+impl Action {
+    fn generate_state_mutations(&self, game: &Game) -> Vec<StateMutation> {
+        match self {
+            Action::PassPriority(_) => {
+                Vec::new()
+            }
+            Action::Draft { .. } => {
+                Vec::new()
+            }
+            Action::RecycleForResource { .. } => {
+                Vec::new()
+            }
+            Action::PlayCard { .. } => {
+                Vec::new()
+            }
+            Action::Attack { .. } => {
+                Vec::new()
+            }
+        }
+    }
 }
 
 
@@ -73,38 +99,25 @@ pub enum DraftValidationError {
 }
 
 impl Game {
-    pub fn apply_action(&mut self, action: Action) -> Result<(), StateError> {
+    pub fn apply_action(&mut self, action: Action) -> Result<Vec<StateMutation>, StateError> {
         if let Err(_) = self.validate_action(&action) {
             panic!("cannot apply this action, it is not valid");
         };
 
         eprintln!("Applying Action [{:?}]", &action);
 
+        let mutations = action.generate_state_mutations(&self);
+
         let mut next_state = self.state.clone();
 
-        // action routing
-        match action {
-            Action::PassPriority(_) => {
-                next_state = self.apply_pass_priority_action(next_state, &action)?;
-            }
-            Action::Draft { .. } => {
-                next_state = self.apply_draft_action(next_state, &action)?;
-            }
-            Action::RecycleForResource { .. } => {
-                next_state = self.apply_recycle_for_resource_action(next_state, &action)?;
-            }
-            Action::PlayCard { .. } => {
-                next_state = self.apply_play_card_action(next_state, &action)?;
-            }
-            Action::Attack { .. } => {
-                next_state = self.apply_attack_action(next_state, &action)?;
-            }
+        for mutation in &mutations {
+            next_state = next_state.mutate(mutation)?
         }
 
         self.action_history.push(action);
         self.state = next_state;
 
-        Ok(())
+        Ok(mutations)
     }
 
     pub fn validate_action(&self, action: &Action) -> Result<(), ActionValidationError> {
