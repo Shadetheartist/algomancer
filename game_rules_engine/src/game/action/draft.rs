@@ -9,7 +9,7 @@ use crate::game::Game;
 use crate::game::state::State;
 use crate::game::state::card::CardId;
 use crate::game::state::card::CardType::Resource;
-use crate::game::state::pack::Pack;
+use crate::game::state::card_collection::CardCollection;
 use crate::game::state::player::StateError;
 use crate::game::state::progression::Phase::PrecombatPhase;
 use crate::game::state::progression::PrecombatPhaseStep;
@@ -157,7 +157,7 @@ impl Game {
             let player = state.find_player_mut(*player_id).expect("a player");
             match player.pack.as_mut() {
                 None => {
-                    player.pack = Some(Pack { cards: cards_for_pack })
+                    player.pack = Some(CardCollection::new_pack(player.player_id))
                 }
                 Some(player_pack) => {
                     for card in cards_for_pack {

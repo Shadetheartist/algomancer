@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
+use crate::game::state::card_collection::CardCollection;
 
 use crate::game::state::formation::{DefensiveFormation, Formation};
-use crate::game::state::pack::Pack;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{Player, PlayerId, StateError, TeamId};
 use crate::game::state::player::StateError::{NoPlayersOnTeam, RegionNotFound};
@@ -192,7 +192,7 @@ impl State {
 
         // make a vec of packs, which will be populated where each
         // index holds it's respective region's neighbours pack
-        let mut packs: Vec<Pack> = Vec::new();
+        let mut packs: Vec<CardCollection> = Vec::new();
 
         for region in self.regions.iter() {
             // by using the counter-clockwise neighbour here, the packs are remapped so

@@ -6,7 +6,7 @@ use rand::prelude::SliceRandom;
 
 use crate::game::{Game, GameOptions};
 use crate::game::game_builder::NewGameError::NotSupportedYet;
-use crate::game::state::{GameMode, State, TeamConfiguration};
+use crate::game::state::{GameMode, State};
 use crate::game::state::card::{Card, CardId, CardPrototype, CardPrototypeDatabase, CardPrototypeId, CardType};
 use crate::game::state::card::Timing::{Combat, Default, Haste, Virus};
 use crate::game::state::deck::Deck;
@@ -17,6 +17,7 @@ use crate::game::state::region::{Region, RegionId};
 use crate::game::state::resource::{Cost, Faction, ResourceType};
 use crate::game::state::resource::ResourceType::{ManaConverter, Shard};
 use crate::game::state::rng::AlgomancerRng;
+use crate::game::state::team_configuration::TeamConfiguration;
 
 #[derive(Debug)]
 pub enum NewGameError {

@@ -4,9 +4,10 @@ use clap::Parser;
 use game_rules_engine::game::{Game, GameOptions};
 use game_rules_engine::game::action::Action;
 use game_rules_engine::game::game_builder::NewGameError;
-use game_rules_engine::game::state::{GameMode, TeamConfiguration};
+use game_rules_engine::game::state::{GameMode};
 use game_rules_engine::game::state::player::StateError;
 use game_rules_engine::game::state::resource::Faction;
+use game_rules_engine::game::state::team_configuration::TeamConfiguration;
 
 use crate::parser::{Cli, Commands};
 use crate::parser::actions::{ActionsCommand, ApplyActionArgs, ListActionsArgs};

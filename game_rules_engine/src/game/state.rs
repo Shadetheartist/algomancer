@@ -5,9 +5,10 @@ use rng::{AlgomancerRng, AlgomancerRngSeed};
 use serde::{Deserialize, Serialize};
 
 use crate::game::state::deck::Deck;
-use crate::game::state::player::TeamId;
+use crate::game::state::player::{TeamId};
 use crate::game::state::region::Region;
 use crate::game::state::resource::Faction;
+use crate::game::state::team_configuration::TeamConfiguration;
 
 pub mod effect;
 pub mod card;
@@ -16,28 +17,16 @@ pub mod progression;
 pub mod resource;
 pub mod rng;
 pub mod priority;
-pub mod pack;
 pub mod deck;
-pub mod hand;
 pub mod region;
 pub mod permanent;
-pub mod discard;
 pub mod formation;
+pub mod mutation;
+pub mod card_collection;
+pub mod team_configuration;
 
 type ObjectId = i32;
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
-pub enum TeamConfiguration {
-    // this can't be generalized to teams of 1 since it also affects how the turn progresses.
-    // and includes the introduction of 'intent cards'
-    FFA {
-        num_players: u8
-    },
-    Teams {
-        // describes the number of players per team
-        teams_of_players: Vec<u8>
-    },
-}
 
 // as described in the manual
 // aside from 1v1, i've never played any of these lol
@@ -98,6 +87,7 @@ pub struct State {
 }
 
 impl State {
+
     // this is useful for testing
     #[allow(dead_code)]
     pub fn default() -> State {

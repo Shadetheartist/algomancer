@@ -2,12 +2,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::game::state::{GameMode, State};
 use crate::game::state::card::CardId;
+use crate::game::state::card_collection::CardCollection;
 use crate::game::state::deck::Deck;
-use crate::game::state::discard::Discard;
-use crate::game::state::hand::Hand;
-use crate::game::state::pack::Pack;
 use crate::game::state::progression::{CombatPhaseAStep, CombatPhaseBStep, MainPhaseStep, Phase, PrecombatPhaseStep};
-use crate::game::state::region::RegionId;
+use crate::game::state::region::{RegionId};
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct TeamId(pub u8);
@@ -19,26 +17,26 @@ pub struct PlayerId(pub u8);
 pub struct Player {
     pub player_id: PlayerId,
     pub team_id: TeamId,
-    pub pack: Option<Pack>,
+    pub pack: Option<CardCollection>,
     pub player_deck: Option<Deck>,
     pub is_alive: bool,
     pub health: i32,
-    pub hand: Hand,
-    pub discard: Discard,
+    pub hand: CardCollection,
+    pub discard: CardCollection,
     pub passed_priority: bool,
     pub resources_played_this_turn: u8,
 }
 
 impl Player {
-    pub fn new(player_id: PlayerId,team_id: TeamId, deck: Option<Deck>, pack: Option<Pack>) -> Player {
+    pub fn new(player_id: PlayerId,team_id: TeamId, deck: Option<Deck>, pack: Option<CardCollection>) -> Player {
         Player {
             player_id,
             team_id,
             player_deck: deck,
             is_alive: true,
             health: 30,
-            hand: Hand::new(),
-            discard: Discard::new(),
+            hand: CardCollection::new_hand(player_id),
+            discard: CardCollection::new_discard(player_id),
             passed_priority: false,
             pack: pack,
             resources_played_this_turn: 0,
@@ -65,7 +63,8 @@ pub enum StateError {
     InvalidDraft,
     InvalidRecycle,
     NoPlayersOnTeam(TeamId),
-    CardNotPlayable(CardNotPlayableError)
+    CardNotPlayable(CardNotPlayableError),
+    MutationError,
 }
 
 impl State {
@@ -94,7 +93,7 @@ impl State {
         }
     }
 
-    pub fn player_hand_mut(&mut self, player_id: PlayerId) -> &mut Hand {
+    pub fn player_hand_mut(&mut self, player_id: PlayerId) -> &mut CardCollection {
         &mut self.find_player_mut(player_id).expect("a player").hand
     }
 
