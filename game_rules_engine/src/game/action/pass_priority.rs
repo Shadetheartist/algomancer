@@ -2,87 +2,76 @@ use crate::game::action::Action;
 use crate::game::Game;
 use crate::game::state::error::StateError;
 use crate::game::state::mutation::StateMutation;
-use crate::game::state::player::TeamId;
+use crate::game::state::player::{TeamId};
 use crate::game::state::progression::{CombatPhaseAStep, Phase, PrecombatPhaseStep};
 use crate::game::state::progression::Phase::PrecombatPhase;
-use crate::game::state::region::RegionId;
-use crate::game::state::State;
+use crate::game::state::region::{Region};
 
 impl Game {
     pub fn generate_pass_priority_state_mutations(&self, action: &Action) -> Result<Vec<StateMutation>, StateError> {
         if let Action::PassPriority(player_id) = action {
-            let mutations = Vec::new();
+            let mut mutations = Vec::new();
 
+            let state = &self.state;
+            let player = state.find_player(*player_id)?;
+            let region: &Region = state.find_region_containing_player(player.player_id)?;
 
+            mutations.push(StateMutation::SetPlayerPassedPriority { player_id: player.player_id, value: true });
 
-            Ok(mutations)
-        } else {
-            panic!("only call this for pass priority actions")
-        }
-    }
-
-    pub fn apply_pass_priority_action(&self, mut state: State, action: &Action) -> Result<State, StateError> {
-        if let Action::PassPriority(player_id) = action {
-
-            let (region_id, player_id) = state.find_region_containing_player(*player_id).expect("a region with player");
-            {
-                let player = state.find_player_mut(player_id).expect("a player");
-                player.passed_priority = true;
-            }
-
-            let current_step = state.find_region(region_id).expect("a region").step.clone();
-
-            // transition only the region that the player occupies when all players in the region have passed
-            fn region_pass(mut state: State, region_id: RegionId) -> Result<State, StateError> {
-                if state.all_players_in_region_passed_priority(region_id)? {
-                    state = state.region_transition_to_next_step(region_id);
+            /// transition only the region that the player occupies when all players in the region have passed
+            let region_pass = |mutations: &mut Vec<StateMutation>| -> Result<(), StateError> {
+                if state.all_players_in_region_except_passed_priority(region.region_id, player.player_id)? {
+                    let next_phase = region.step.get_next_phase(&self.state.game_mode);
+                    mutations.push(StateMutation::PhaseTransition { region_id: region.region_id, phase: next_phase })
                 }
-                Ok(state)
-            }
+                Ok(())
+            };
 
-            // transition all regions after all players on a team have passed
-            fn team_pass(mut state: State, team_id: TeamId) -> Result<State, StateError> {
+            /// transition all regions after all players on a team have passed
+            let team_pass = |mutations: &mut Vec<StateMutation>, team_id: TeamId| -> Result<(), StateError> {
                 if state.all_players_on_team_passed_priority(team_id)? {
-                    state = state.transition_step_in_all_regions()
+                    for r in &state.regions {
+                        let next_phase = region.step.get_next_phase(&self.state.game_mode);
+                        mutations.push(StateMutation::PhaseTransition { region_id: r.region_id, phase: next_phase })
+                    }
                 }
-                Ok(state)
-            }
-
+                Ok(())
+            };
 
             let initiative_team_id = state.initiative_team;
             let non_initiative_team_id = state.non_initiative_team();
 
-            match current_step {
+            match region.step {
                 PrecombatPhase(step) => match step {
                     PrecombatPhaseStep::Untap |
                     PrecombatPhaseStep::Draw |
                     PrecombatPhaseStep::Draft => {
-                        state = region_pass(state, region_id)?
+                        region_pass(&mut mutations)?
                     },
                     PrecombatPhaseStep::PassPack => {
                         // this is a fake sync step, when the last player finishes their draft,
                         // all regions automatically transition to ITMana
                     }
                     PrecombatPhaseStep::ITMana => {
-                        state = team_pass(state, initiative_team_id)?
+                        team_pass(&mut mutations, initiative_team_id)?;
                     }
                     PrecombatPhaseStep::NITMana => {
-                        state = team_pass(state, non_initiative_team_id)?
+                        team_pass(&mut mutations, non_initiative_team_id)?;
                     }
                 }
                 Phase::CombatPhaseA(step) => {
                     match step {
                         CombatPhaseAStep::ITAttack => {
-                            state = team_pass(state, initiative_team_id)?;
+                            team_pass(&mut mutations, initiative_team_id)?;
                         }
                         CombatPhaseAStep::AfterITAttackPriorityWindow => {
-                            state = region_pass(state, region_id)?
+                            region_pass(&mut mutations)?
                         }
                         CombatPhaseAStep::NITBlock => {
-                            state = region_pass(state, region_id)?
+                            region_pass(&mut mutations)?
                         }
                         CombatPhaseAStep::AfterNITBlockPriorityWindow => {
-                            state = region_pass(state, region_id)?
+                            region_pass(&mut mutations)?
                         }
                         CombatPhaseAStep::Damage => {
                             // not an interactive step,
@@ -91,7 +80,7 @@ impl Game {
                             // then it will move the after combat step
                         }
                         CombatPhaseAStep::AfterCombatPriorityWindow => {
-                            state = region_pass(state, region_id)?
+                            region_pass(&mut mutations)?
                         }
                     }
                 }
@@ -99,9 +88,10 @@ impl Game {
                 Phase::MainPhase(_) => {}
             }
 
-            Ok(state)
+
+            Ok(mutations)
         } else {
-            panic!("action should have been pass priority")
+            panic!("only call this for pass priority actions")
         }
     }
 }

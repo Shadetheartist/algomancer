@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::game::state::card::CardId;
 use crate::game::state::card_collection::CardCollectionId;
 use crate::game::state::error::StateError;
+use crate::game::state::player::PlayerId;
 use crate::game::state::progression::Phase;
 use crate::game::state::region::RegionId;
 use crate::game::state::State;
@@ -16,6 +17,7 @@ use crate::game::state::State;
 /// and the next state.
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum StateMutation {
+    SetPlayerPassedPriority { player_id: PlayerId, value: bool },
     PhaseTransition { region_id: RegionId, phase: Phase },
     MoveCard {
         from_cc_id: CardCollectionId,
@@ -28,8 +30,19 @@ pub enum StateMutation {
 impl State {
     pub fn mutate(mut self, state_mutation: &StateMutation) -> Result<State, StateError> {
         match state_mutation {
+            mutation @ StateMutation::SetPlayerPassedPriority { .. } => self.handle_set_player_passed_priority(mutation),
             mutation @ StateMutation::PhaseTransition { .. } => self.handle_phase_transition(mutation),
             mutation @ StateMutation::MoveCard { .. } => self.handle_move_card(mutation),
+        }
+    }
+
+    fn handle_set_player_passed_priority(mut self, state_mutation: &StateMutation) -> Result<State, StateError> {
+        if let StateMutation::SetPlayerPassedPriority { player_id, value } = *state_mutation {
+            let player = self.find_player_mut(player_id)?;
+            player.passed_priority = value;
+            Ok(self)
+        } else {
+            panic!("only call this for StateMutation::MoveCard")
         }
     }
 

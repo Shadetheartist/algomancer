@@ -43,22 +43,22 @@ pub enum Action {
 }
 
 impl Action {
-    fn generate_state_mutations(&self, game: &Game) -> Vec<StateMutation> {
+    fn generate_state_mutations(&self, game: &Game) -> Result<Vec<StateMutation>, StateError> {
         match self {
-            Action::PassPriority(_) => {
-                Vec::new()
+            action @ Action::PassPriority(_) => {
+                game.generate_pass_priority_state_mutations(&action)
             }
             Action::Draft { .. } => {
-                Vec::new()
+                Ok(Vec::new())
             }
             Action::RecycleForResource { .. } => {
-                Vec::new()
+                Ok(Vec::new())
             }
             Action::PlayCard { .. } => {
-                Vec::new()
+                Ok(Vec::new())
             }
             Action::Attack { .. } => {
-                Vec::new()
+                Ok(Vec::new())
             }
         }
     }
@@ -108,7 +108,8 @@ impl Game {
 
         eprintln!("Applying Action [{:?}]", &action);
 
-        let mutations = action.generate_state_mutations(&self);
+        let mutations = action.generate_state_mutations(&self)?;
+
         if mutations.len() < 1 {
             panic!("no mutations generated from action [{:?}]", action)
         }

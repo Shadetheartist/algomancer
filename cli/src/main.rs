@@ -205,8 +205,13 @@ mod tests {
             let mut actions_vec: Vec<Action> = actions.into_iter().collect();
             actions_vec.sort();
 
+            if actions_vec.len() < 1 {
+                eprintln!("no more actions");
+                break
+            }
             let action = actions_vec.remove(0);
             let mutations = game.apply_action(action).unwrap();
+            eprintln!("{:?}", mutations)
         }
     }
 }

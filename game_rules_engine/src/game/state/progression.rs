@@ -84,7 +84,7 @@ impl Phase {
     }
 
     // this returns the next phase & step given the current phase & step
-    pub fn get_next_step(&self, game_mode: &GameMode) -> Phase {
+    pub fn get_next_phase(&self, game_mode: &GameMode) -> Phase {
         match self {
             Phase::PrecombatPhase(step) => {
                 match step {
@@ -200,7 +200,7 @@ mod tests {
         let mut phase = initial_phase.clone();
         for _ in 0..100 {
             eprintln!("{:?}", phase);
-            phase = phase.get_next_step(mode);
+            phase = phase.get_next_phase(mode);
 
             // we got from the beginning to the end of the loop, success!
             if phase == Phase::MainPhase(MainPhaseStep::NITMain) {
@@ -209,7 +209,7 @@ mod tests {
         }
 
         // go one more
-        phase = phase.get_next_step(mode);
+        phase = phase.get_next_phase(mode);
 
         // we should be back to the initial phase
         assert_eq!(phase, initial_phase);

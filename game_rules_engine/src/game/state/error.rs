@@ -20,6 +20,7 @@ pub enum CardNotPlayableError {
 pub enum StateError {
     PlayerNotFound(PlayerId),
     RegionNotFound(RegionId),
+    NoRegionContainsPlayer(PlayerId),
     CardCollectionNotFound(CardCollectionId),
     CardNotFound(CardId),
     InvalidDraft,

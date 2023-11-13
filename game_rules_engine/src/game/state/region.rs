@@ -135,12 +135,8 @@ impl State {
         }
     }
 
-    pub fn all_players_in_region_passed_priority(&self, region_id: RegionId) -> Result<bool, StateError> {
-        let players = self.players_in_region(region_id)?;
-        if players.len() == 0 {
-            // this may be valid? if a player leaves their region to move to combat in another region
-            panic!("wtf there's no players in the region")
-        }
+    pub fn all_players_in_region_except_passed_priority(&self, region_id: RegionId, except: PlayerId) -> Result<bool, StateError> {
+        let players = self.players_in_region_except(region_id, except)?;
         Ok(!players.iter().any(|p| p.passed_priority == false))
     }
 
@@ -154,6 +150,11 @@ impl State {
     pub fn players_in_region(&self, region_id: RegionId) -> Result<Vec<&Player>, StateError> {
         let region = self.find_region(region_id)?;
         Ok(region.players.iter().collect())
+    }
+
+    pub fn players_in_region_except(&self, region_id: RegionId, player_id: PlayerId) -> Result<Vec<&Player>, StateError> {
+        let region = self.find_region(region_id)?;
+        Ok(region.players.iter().filter(|p| p.player_id != player_id).collect())
     }
 
     pub fn players_in_region_mut(&mut self, region_id: RegionId) -> Result<&mut Vec<Player>, StateError> {
@@ -177,18 +178,17 @@ impl State {
         region
     }
 
-    pub fn find_region_containing_player(&self, player_id: PlayerId) -> Option<(RegionId, PlayerId)> {
+    pub fn find_region_containing_player(&self, player_id: PlayerId) -> Result<&Region, StateError> {
         let find_result = self.regions.iter().find(|r| {
             r.players.iter().find(|p| p.player_id == player_id) != None
         });
 
         match find_result {
             None => {
-                None
+                return Err(StateError::NoRegionContainsPlayer(player_id))
             }
             Some(region) => {
-                let player = region.players.iter().find(|p| p.player_id == player_id).expect("the player we found before");
-                Some((region.region_id, player.player_id))
+                Ok(region)
             }
         }
     }
@@ -221,7 +221,7 @@ impl State {
     pub fn region_transition_to_next_step(mut self, region_id: RegionId) -> State {
         let next_step = {
             let region = self.find_region(region_id).expect("a region");
-            region.step.get_next_step(&self.game_mode)
+            region.step.get_next_phase(&self.game_mode)
         };
 
         self.reset_player_priority_in_region(region_id);
