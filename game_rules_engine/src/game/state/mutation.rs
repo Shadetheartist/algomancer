@@ -1,3 +1,5 @@
+mod player;
+
 use serde::{Deserialize, Serialize};
 
 use crate::game::state::card::CardId;

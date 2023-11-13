@@ -45,6 +45,14 @@ impl Player {
 
 
 impl State {
+
+    pub fn players_iter(&self) -> impl Iterator<Item = &Player> {
+        self.regions.iter().flat_map(|r| &r.players)
+    }
+    pub fn players(&self) -> Vec<&Player> {
+        self.regions.iter().flat_map(|r| &r.players).collect()
+    }
+
     /// looks through all regions for a player matching the player_id
     pub fn find_player(&self, player_id: PlayerId) -> Result<&Player, StateError> {
         let find_result = self.players().into_iter().find(|p| p.player_id == player_id);
@@ -56,54 +64,6 @@ impl State {
                 Ok(player)
             }
         }
-    }
-
-    pub fn find_player_mut(&mut self, player_id: PlayerId) -> Result<&mut Player, StateError> {
-        let find_result = self.players_mut().into_iter().find(|p| p.player_id == player_id);
-        match find_result {
-            None => {
-                Err(StateError::PlayerNotFound(player_id))
-            }
-            Some(player) => {
-                Ok(player)
-            }
-        }
-    }
-
-    pub fn player_hand_mut(&mut self, player_id: PlayerId) -> &mut CardCollection {
-        &mut self.find_player_mut(player_id).expect("a player").hand
-    }
-
-    pub fn get_deck_for_player(&mut self, player_id: PlayerId) -> Result<&mut CardCollection, StateError> {
-        match &self.game_mode {
-            GameMode::LiveDraft { .. } => {
-                if let Some(common_deck) = &mut self.common_deck {
-                    Ok(common_deck)
-                } else {
-                    panic!("player is supposed to draw from the common deck in live-draft, but it doesn't exist");
-                }
-            },
-            GameMode::PreDraft { .. } | GameMode::Constructed { .. } => {
-                let player = self.find_player_mut(player_id).expect("player");
-                if let Some(player_deck) = player.player_deck.as_mut() {
-                    Ok(player_deck)
-                } else {
-                    panic!("player is supposed to draw from their own deck in pre-draft & constructed, but it doesn't exist");
-                }
-            },
-            GameMode::TeamDraft { .. } => {
-                // weird, this needs a common deck per team i guess
-                todo!("need to implement team draft, which deck the player is drawing from")
-            }
-        }
-    }
-
-    pub fn players(&self) -> Vec<&Player> {
-        self.regions.iter().flat_map(|r| &r.players).collect()
-    }
-
-    pub fn players_mut(&mut self) -> Vec<&mut Player> {
-        self.regions.iter_mut().flat_map(|r| &mut r.players).collect()
     }
 
     pub fn living_players_in_team(&self, team_id: TeamId) -> Vec<&Player> {
@@ -118,34 +78,6 @@ impl State {
             }
             acc
         })
-    }
-
-    pub fn player_draw_n_cards(&mut self, player_id: PlayerId, n: usize){
-
-        let deck = self.get_deck_for_player(player_id).expect("a deck");
-        let mut cards = Vec::new();
-        for _ in 0..n {
-            let card = deck.draw().expect("a card");
-            cards.push(card);
-        }
-
-        let player = self.find_player_mut(player_id).expect("a player");
-        for card in cards {
-            player.hand.add(card);
-        }
-    }
-
-    pub fn player_recycle_card(&mut self, player_id: PlayerId, card_id: CardId){
-
-        // remove the card from the player's hand
-        let card = {
-            let player = self.find_player_mut(player_id).expect("a player");
-            player.hand.remove(card_id).expect("a card was removed")
-        };
-
-        // add the removed card to the bottom of the deck
-        let deck = self.get_deck_for_player(player_id).expect("a deck");
-        deck.add(card);
     }
 
     /// Returns true if the player is capable of any actions during the current step in their region.

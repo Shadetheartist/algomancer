@@ -129,13 +129,14 @@ impl Game {
     pub fn apply_draft_action(&self, mut state: State, action: &Action) -> Result<State, StateError> {
         if let Action::Draft { player_id, cards_to_keep } = action {
             let cards_for_pack = {
-                let player_hand = state.player_hand_mut(*player_id);
+                let player = &mut state.find_player_mut(*player_id)?;
 
                 let mut cards_for_hand = Vec::new();
                 let mut cards_for_pack = Vec::new();
-                let card_ids: Vec<CardId> = player_hand.iter().map(|c| c.card_id).collect();
+
+                let card_ids: Vec<CardId> = player.hand.iter().map(|c| c.card_id).collect();
                 for c_id in card_ids {
-                    let card = player_hand.remove(c_id).expect("a card to have been removed");
+                    let card = player.hand.remove(c_id).expect("a card to have been removed");
                     if cards_to_keep.contains(&card.card_id) {
                         cards_for_hand.push(card);
                     } else {
@@ -148,7 +149,7 @@ impl Game {
                 }
 
                 for card in cards_for_hand {
-                    player_hand.add(card);
+                    player.hand.add(card);
                 }
 
                 cards_for_pack
