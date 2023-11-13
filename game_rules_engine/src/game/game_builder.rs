@@ -9,7 +9,7 @@ use crate::game::game_builder::NewGameError::NotSupportedYet;
 use crate::game::state::{GameMode, State};
 use crate::game::state::card::{Card, CardId, CardPrototype, CardPrototypeDatabase, CardPrototypeId, CardType};
 use crate::game::state::card::Timing::{Combat, Default, Haste, Virus};
-use crate::game::state::deck::Deck;
+use crate::game::state::card_collection::CardCollection;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{Player, PlayerId, TeamId};
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
@@ -147,7 +147,7 @@ impl Game {
             };
 
 
-            let mut deck = Deck::new();
+            let mut deck = CardCollection::new_common_deck();
             deck.cards = cards_for_deck;
             deck.cards.shuffle(&mut algomancer_rng.rng);
 

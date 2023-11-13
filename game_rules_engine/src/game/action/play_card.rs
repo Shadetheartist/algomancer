@@ -63,7 +63,8 @@ impl Game {
                     }
                 }
                 FindCardResult::AsPermanentInFormation(_, _, _) |
-                FindCardResult::InDeck(_, _) => {
+                FindCardResult::InCommonDeck(_) |
+                FindCardResult::InPlayerDeck(_, _) => {
                     return Err(NotInPlayableZone);
                 }
             }

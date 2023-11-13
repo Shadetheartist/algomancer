@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 use crate::game::state::{GameMode, State};
 use crate::game::state::card::CardId;
 use crate::game::state::card_collection::CardCollection;
-use crate::game::state::deck::Deck;
 use crate::game::state::progression::{CombatPhaseAStep, CombatPhaseBStep, MainPhaseStep, Phase, PrecombatPhaseStep};
 use crate::game::state::region::{RegionId};
 
@@ -18,7 +17,7 @@ pub struct Player {
     pub player_id: PlayerId,
     pub team_id: TeamId,
     pub pack: Option<CardCollection>,
-    pub player_deck: Option<Deck>,
+    pub player_deck: Option<CardCollection>,
     pub is_alive: bool,
     pub health: i32,
     pub hand: CardCollection,
@@ -28,7 +27,7 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(player_id: PlayerId,team_id: TeamId, deck: Option<Deck>, pack: Option<CardCollection>) -> Player {
+    pub fn new(player_id: PlayerId,team_id: TeamId, deck: Option<CardCollection>, pack: Option<CardCollection>) -> Player {
         Player {
             player_id,
             team_id,
@@ -65,6 +64,7 @@ pub enum StateError {
     NoPlayersOnTeam(TeamId),
     CardNotPlayable(CardNotPlayableError),
     MutationError,
+    CannotDrawFromEmptyCollection,
 }
 
 impl State {
@@ -97,7 +97,7 @@ impl State {
         &mut self.find_player_mut(player_id).expect("a player").hand
     }
 
-    pub fn get_deck_for_player(&mut self, player_id: PlayerId) -> Result<&mut Deck, StateError> {
+    pub fn get_deck_for_player(&mut self, player_id: PlayerId) -> Result<&mut CardCollection, StateError> {
         match &self.game_mode {
             GameMode::LiveDraft { .. } => {
                 if let Some(common_deck) = &mut self.common_deck {

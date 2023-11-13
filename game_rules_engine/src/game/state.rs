@@ -3,8 +3,8 @@ use std::hash::{Hash, Hasher};
 
 use rng::{AlgomancerRng, AlgomancerRngSeed};
 use serde::{Deserialize, Serialize};
+use crate::game::state::card_collection::CardCollection;
 
-use crate::game::state::deck::Deck;
 use crate::game::state::player::{TeamId};
 use crate::game::state::region::Region;
 use crate::game::state::resource::Faction;
@@ -17,7 +17,6 @@ pub mod progression;
 pub mod resource;
 pub mod rng;
 pub mod priority;
-pub mod deck;
 pub mod region;
 pub mod permanent;
 pub mod formation;
@@ -78,7 +77,7 @@ impl GameMode {
 pub struct State {
     pub game_mode: GameMode,
     pub rand: AlgomancerRng,
-    pub common_deck: Option<Deck>,
+    pub common_deck: Option<CardCollection>,
     pub regions: Vec<Region>,
     pub initiative_team: TeamId,
     pub next_permanent_id: usize,
@@ -94,7 +93,7 @@ impl State {
         State {
             game_mode: GameMode::new_player_mode(),
             rand: AlgomancerRng::new(AlgomancerRngSeed::default()),
-            common_deck: Some(Deck::new()),
+            common_deck: Some(CardCollection::new_common_deck()),
             regions: Vec::new(),
             initiative_team: TeamId(1),
             next_permanent_id: 1,

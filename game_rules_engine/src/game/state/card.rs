@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::game::state::{GameMode, State};
 use crate::game::state::card::CardType::Resource;
-use crate::game::state::deck::Deck;
 use crate::game::state::formation::Formation;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::Player;
@@ -81,7 +80,8 @@ impl Hash for CardPrototypeDatabase {
 pub enum FindCardResult<'a> {
     InPlayerHand(&'a Player, &'a Card),
     InPlayerDiscard(&'a Player, &'a Card),
-    InDeck(&'a Deck, &'a Card),
+    InPlayerDeck(&'a Player, &'a Card),
+    InCommonDeck(&'a Card),
     AsPermanentInRegion(&'a Region, &'a Permanent),
     AsPermanentInFormation(&'a Region, &'a Formation<Permanent>, &'a Permanent),
 }
@@ -154,7 +154,7 @@ impl State {
                 let deck = self.common_deck.as_ref().expect("a common deck");
                 let card = deck.cards.iter().find(|c| c.card_id == card_id);
                 if let Some(card) = card {
-                    return Some(FindCardResult::InDeck(&deck, card))
+                    return Some(FindCardResult::InCommonDeck(card))
                 }
             }
             GameMode::Constructed { .. } => {
@@ -162,7 +162,7 @@ impl State {
                     let deck = &player.player_deck.as_ref().expect("a player's deck");
                     let card = deck.cards.iter().find(|c| c.card_id == card_id);
                     if let Some(card) = card {
-                        return Some(FindCardResult::InDeck(deck, card))
+                        return Some(FindCardResult::InPlayerDeck(player, card))
                     }
                 }
             },
