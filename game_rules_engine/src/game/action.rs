@@ -6,15 +6,15 @@ use serde::{Deserialize, Serialize};
 use crate::game::Game;
 use crate::game::state::card::CardId;
 use crate::game::state::card::CardType::Resource;
+use crate::game::state::error::StateError;
 use crate::game::state::formation::Formation;
 use crate::game::state::mutation::StateMutation;
 use crate::game::state::permanent::PermanentId;
-use crate::game::state::player::{PlayerId, StateError};
+use crate::game::state::player::PlayerId;
 use crate::game::state::progression::{CombatPhaseAStep, MainPhaseStep, PrecombatPhaseStep};
 use crate::game::state::progression::Phase::{CombatPhaseA, MainPhase, PrecombatPhase};
 use crate::game::state::region::RegionId;
 use crate::game::state::resource::ResourceType;
-use crate::game::state::State;
 
 mod draft;
 mod pass_priority;
@@ -87,11 +87,13 @@ impl Ord for Action {
     }
 }
 
+#[derive(Debug)]
 pub enum ActionValidationError {
     PlayerDoesNotExist,
     Draft(DraftValidationError),
 }
 
+#[derive(Debug)]
 pub enum DraftValidationError {
     IncorrectNumberOfCardsDrafted,
     CardNotInHand(CardId),
@@ -100,13 +102,16 @@ pub enum DraftValidationError {
 
 impl Game {
     pub fn apply_action(&mut self, action: Action) -> Result<Vec<StateMutation>, StateError> {
-        if let Err(_) = self.validate_action(&action) {
-            panic!("cannot apply this action, it is not valid");
+        if let Err(err) = self.validate_action(&action) {
+            return Err(StateError::InvalidAction(err))
         };
 
         eprintln!("Applying Action [{:?}]", &action);
 
         let mutations = action.generate_state_mutations(&self);
+        if mutations.len() < 1 {
+            panic!("no mutations generated from action [{:?}]", action)
+        }
 
         let mut next_state = self.state.clone();
 

@@ -1,5 +1,5 @@
-use clap::{Args, Subcommand, ValueEnum};
 use algomancer_gre::game::state::resource::Faction;
+use clap::{Args, Subcommand, ValueEnum};
 
 #[derive(Debug, Args)]
 #[command(rename_all = "snake_case")]

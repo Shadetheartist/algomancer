@@ -1,10 +1,12 @@
 use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
-use serde::{Deserialize, Serialize};
-use crate::game::state::card::{Card, CardId};
-use crate::game::state::player::{Player, PlayerId, StateError};
-use crate::game::state::State;
 
+use serde::{Deserialize, Serialize};
+
+use crate::game::state::card::{Card, CardId};
+use crate::game::state::error::StateError;
+use crate::game::state::player::{Player, PlayerId};
+use crate::game::state::State;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct CardCollectionId(pub [char; 6]);

@@ -3,9 +3,9 @@ use std::hash::{Hash, Hasher};
 
 use rng::{AlgomancerRng, AlgomancerRngSeed};
 use serde::{Deserialize, Serialize};
-use crate::game::state::card_collection::CardCollection;
 
-use crate::game::state::player::{TeamId};
+use crate::game::state::card_collection::CardCollection;
+use crate::game::state::player::TeamId;
 use crate::game::state::region::Region;
 use crate::game::state::resource::Faction;
 use crate::game::state::team_configuration::TeamConfiguration;
@@ -23,6 +23,7 @@ pub mod formation;
 pub mod mutation;
 pub mod card_collection;
 pub mod team_configuration;
+pub mod error;
 
 type ObjectId = i32;
 

@@ -1,13 +1,25 @@
 use crate::game::action::Action;
 use crate::game::Game;
-use crate::game::state::player::{StateError, TeamId};
+use crate::game::state::error::StateError;
+use crate::game::state::mutation::StateMutation;
+use crate::game::state::player::TeamId;
 use crate::game::state::progression::{CombatPhaseAStep, Phase, PrecombatPhaseStep};
 use crate::game::state::progression::Phase::PrecombatPhase;
 use crate::game::state::region::RegionId;
 use crate::game::state::State;
 
 impl Game {
+    pub fn generate_pass_priority_state_mutations(&self, action: &Action) -> Result<Vec<StateMutation>, StateError> {
+        if let Action::PassPriority(player_id) = action {
+            let mutations = Vec::new();
 
+
+
+            Ok(mutations)
+        } else {
+            panic!("only call this for pass priority actions")
+        }
+    }
 
     pub fn apply_pass_priority_action(&self, mut state: State, action: &Action) -> Result<State, StateError> {
         if let Action::PassPriority(player_id) = action {

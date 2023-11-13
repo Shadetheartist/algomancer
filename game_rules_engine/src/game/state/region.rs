@@ -1,11 +1,12 @@
 use serde::{Deserialize, Serialize};
+
 use crate::game::state::card::CardId;
 use crate::game::state::card_collection::CardCollection;
-
+use crate::game::state::error::StateError;
+use crate::game::state::error::StateError::{NoPlayersOnTeam, RegionNotFound};
 use crate::game::state::formation::{DefensiveFormation, Formation};
 use crate::game::state::permanent::Permanent;
-use crate::game::state::player::{Player, PlayerId, StateError, TeamId};
-use crate::game::state::player::StateError::{NoPlayersOnTeam, RegionNotFound};
+use crate::game::state::player::{Player, PlayerId, TeamId};
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
 use crate::game::state::State;
 use crate::wrap_index::wrap_index;

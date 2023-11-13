@@ -2,7 +2,7 @@ use crate::game::action::Action;
 use crate::game::Game;
 use crate::game::state::card::{Card, FindCardResult, Timing};
 use crate::game::state::card::CardType::{Resource, Unit};
-use crate::game::state::player::StateError;
+use crate::game::state::error::StateError;
 use crate::game::state::region::RegionId;
 use crate::game::state::resource::ResourceType;
 use crate::game::state::State;

@@ -2,9 +2,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::game::state::{GameMode, State};
 use crate::game::state::card::CardId;
-use crate::game::state::card_collection::{CardCollection, CardCollectionId};
+use crate::game::state::card_collection::CardCollection;
+use crate::game::state::error::StateError;
 use crate::game::state::progression::{CombatPhaseAStep, CombatPhaseBStep, MainPhaseStep, Phase, PrecombatPhaseStep};
-use crate::game::state::region::{RegionId};
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct TeamId(pub u8);
@@ -43,32 +43,6 @@ impl Player {
     }
 }
 
-#[derive(Debug)]
-pub enum CardNotPlayableError {
-    CardDoesNotExist,
-    NotInPlayableZone,
-    NotInPlayableStep,
-    CardLacksCorrectTiming,
-    CannotPlayMoreResources,
-    MustBePlayedFromHand,
-    CannotCastANonSpellTokenPermanentFromPlay,
-}
-
-
-#[derive(Debug)]
-pub enum StateError {
-    PlayerNotFound(PlayerId),
-    RegionNotFound(RegionId),
-    CardCollectionNotFound(CardCollectionId),
-    CardNotFound(CardId),
-    InvalidDraft,
-    InvalidRecycle,
-    NoPlayersOnTeam(TeamId),
-    CardNotPlayable(CardNotPlayableError),
-    MutationError,
-    CannotDrawFromEmptyCollection,
-    CannotDrawFromUnorderedSet,
-}
 
 impl State {
     /// looks through all regions for a player matching the player_id

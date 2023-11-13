@@ -1,8 +1,9 @@
 use serde::{Deserialize, Serialize};
-use crate::game::state::card::{CardId};
-use crate::game::state::card_collection::{CardCollectionId};
-use crate::game::state::player::StateError;
-use crate::game::state::progression::{Phase};
+
+use crate::game::state::card::CardId;
+use crate::game::state::card_collection::CardCollectionId;
+use crate::game::state::error::StateError;
+use crate::game::state::progression::Phase;
 use crate::game::state::region::RegionId;
 use crate::game::state::State;
 
@@ -26,39 +27,33 @@ pub enum StateMutation {
 
 impl State {
     pub fn mutate(mut self, state_mutation: &StateMutation) -> Result<State, StateError> {
-        match *state_mutation {
-            StateMutation::PhaseTransition { region_id, phase } => self.handle_phase_transition(region_id, phase),
-            StateMutation::MoveCard {
-                from_cc_id,
-                to_cc_id,
-                card_id
-            } => {
-                self.handle_move_card(
-                    from_cc_id,
-                    to_cc_id,
-                    card_id,
-                )
-            }
+        match state_mutation {
+            mutation @ StateMutation::PhaseTransition { .. } => self.handle_phase_transition(mutation),
+            mutation @ StateMutation::MoveCard { .. } => self.handle_move_card(mutation),
         }
     }
 
-    fn handle_move_card(mut self, from_cc_id: CardCollectionId, to_cc_id: CardCollectionId, card_id: CardId) -> Result<State, StateError> {
+    fn handle_move_card(mut self, state_mutation: &StateMutation) -> Result<State, StateError> {
+        if let StateMutation::MoveCard { from_cc_id, to_cc_id, card_id } = *state_mutation {
+            let card = {
+                let from_cc = self.find_card_collection_mut(from_cc_id)?;
+                from_cc.remove(card_id)?
+            };
 
-        let card = {
-            let from_cc = self.find_card_collection_mut(from_cc_id)?;
-            from_cc.remove(card_id)?
-        };
+            let to_cc = self.find_card_collection_mut(to_cc_id)?;
+            to_cc.add(card);
 
-        let to_cc = self.find_card_collection_mut(to_cc_id)?;
-        to_cc.add(card);
-
-        Ok(self)
+            Ok(self)
+        } else {
+            panic!("only call this for StateMutation::MoveCard")
+        }
     }
 
-    fn handle_phase_transition(mut self, region_id: RegionId, phase: Phase) -> Result<State, StateError> {
-
-        todo!();
-
-        Ok(self)
+    fn handle_phase_transition(mut self, state_mutation: &StateMutation) -> Result<State, StateError> {
+        if let StateMutation::PhaseTransition {region_id, phase} = *state_mutation {
+            Ok(self.region_transition_to_next_step(region_id))
+        } else {
+            panic!("only call this for StateMutation::PhaseTransition")
+        }
     }
 }

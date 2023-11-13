@@ -6,14 +6,14 @@ use rand::RngCore;
 
 use crate::game::action::Action;
 use crate::game::Game;
-use crate::game::state::State;
 use crate::game::state::card::CardId;
 use crate::game::state::card::CardType::Resource;
 use crate::game::state::card_collection::CardCollection;
-use crate::game::state::player::StateError;
+use crate::game::state::error::StateError;
 use crate::game::state::progression::Phase::PrecombatPhase;
 use crate::game::state::progression::PrecombatPhaseStep;
 use crate::game::state::region::RegionId;
+use crate::game::state::State;
 
 fn combinations<T: Clone>(items: &[T], k: usize) -> Vec<Vec<T>> {
     let n = items.len();

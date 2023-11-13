@@ -1,13 +1,13 @@
 use std::collections::HashSet;
 
-use clap::Parser;
 use algomancer_gre::game::{Game, GameOptions};
 use algomancer_gre::game::action::Action;
 use algomancer_gre::game::game_builder::NewGameError;
-use algomancer_gre::game::state::{GameMode};
-use algomancer_gre::game::state::player::StateError;
+use algomancer_gre::game::state::GameMode;
+use algomancer_gre::game::state::error::StateError;
 use algomancer_gre::game::state::resource::Faction;
 use algomancer_gre::game::state::team_configuration::TeamConfiguration;
+use clap::Parser;
 
 use crate::parser::{Cli, Commands};
 use crate::parser::actions::{ActionsCommand, ApplyActionArgs, ListActionsArgs};
@@ -176,11 +176,11 @@ fn unique_factions(factions: &Vec<FactionArg>) -> Vec<Faction>{
 
 #[cfg(test)]
 mod tests {
-    use game_rules_engine::game::{Game, GameOptions};
-    use game_rules_engine::game::action::Action;
-    use game_rules_engine::game::state::GameMode;
-    use game_rules_engine::game::state::resource::Faction::{Fire, Wood};
-    use game_rules_engine::game::state::team_configuration::TeamConfiguration;
+    use algomancer_gre::game::{Game, GameOptions};
+    use algomancer_gre::game::action::Action;
+    use algomancer_gre::game::state::GameMode;
+    use algomancer_gre::game::state::resource::Faction::{Fire, Wood};
+    use algomancer_gre::game::state::team_configuration::TeamConfiguration;
 
     // utility function to avoid code duplication
     // creates a pre-defined rng instance
@@ -200,14 +200,13 @@ mod tests {
 
         let mut game = Game::new(&options).unwrap();
 
-        for _ in 0..100 {
+        for _ in 0..500 {
             let actions = game.valid_actions();
             let mut actions_vec: Vec<Action> = actions.into_iter().collect();
             actions_vec.sort();
 
             let action = actions_vec.remove(0);
             let mutations = game.apply_action(action).unwrap();
-
         }
     }
 }
