@@ -1,5 +1,3 @@
-use std::hash::{Hasher};
-
 use rng::{AlgomancerRng, AlgomancerRngSeed};
 use serde::{Deserialize, Serialize};
 

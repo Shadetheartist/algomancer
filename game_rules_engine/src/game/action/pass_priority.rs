@@ -19,7 +19,7 @@ impl Game {
 
             mutations.push(StateMutation::Static(SetPlayerPassedPriority { player_id: player.player_id, value: true }));
 
-            /// transition only the region that the player occupies when all players in the region have passed
+            // transition only the region that the player occupies when all players in the region have passed
             let region_pass = |mutations: &mut Vec<StateMutation>| -> Result<(), StateError> {
                 if state.all_players_in_region_except_passed_priority(region.region_id, player.player_id)? {
                     mutations.push(StateMutation::Static(PhaseTransition { region_id: region.region_id }))
@@ -27,7 +27,7 @@ impl Game {
                 Ok(())
             };
 
-            /// transition all regions after all players on a team have passed
+            // transition all regions after all players on a team have passed
             let team_pass = |mutations: &mut Vec<StateMutation>, team_id: TeamId| -> Result<(), StateError> {
                 if state.all_players_on_team_passed_priority(team_id)? {
                     for r in &state.regions {

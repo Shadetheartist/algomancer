@@ -240,7 +240,7 @@ impl State {
     }
 
     pub fn find_card_collection(&self, id: CardCollectionId) -> Result<FindCardCollectionResult, StateError> {
-        /// check if it's the common deck
+        // check if it's the common deck
         if let Some(deck) = &self.common_deck {
             if deck.id() == id {
                 return Ok(FindCardCollectionResult::CommonDeck(deck));
@@ -249,17 +249,17 @@ impl State {
 
         let players = self.players();
 
-        /// check if it's one of the player's hands
+        // check if it's one of the player's hands
         if let Some(player) = players.iter().find(|p| p.hand.id() == id) {
             return Ok(FindCardCollectionResult::PlayerHand(player, &player.hand));
         }
 
-        /// check if it's one of the player's discards
+        // check if it's one of the player's discards
         if let Some(player) = players.iter().find(|p| p.discard.id() == id) {
             return Ok(FindCardCollectionResult::PlayerHand(player, &player.discard));
         }
 
-        /// check if it's one of the player's decks
+        // check if it's one of the player's decks
         if let Some(player) = players.iter().find(|p| {
             if let Some(deck) = &p.player_deck {
                 return deck.id() == id;
