@@ -57,8 +57,8 @@ impl Action {
             Action::PlayCard { .. } => {
                 Ok(Vec::new())
             }
-            Action::Attack { .. } => {
-                Ok(Vec::new())
+            action @ Action::Attack { .. } => {
+                game.generate_attack_mutations(action)
             }
         }
     }

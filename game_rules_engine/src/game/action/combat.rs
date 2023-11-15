@@ -2,9 +2,9 @@ use crate::game::action::Action;
 use crate::game::Game;
 use crate::game::state::error::StateError;
 use crate::game::state::formation::{Formation, FormationId, FormationPos};
+use crate::game::state::mutation::StateMutation;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::region::RegionId;
-use crate::game::state::State;
 
 impl Game {
 
@@ -37,17 +37,16 @@ impl Game {
         actions
     }
 
-    pub fn apply_attack_action(&self, mut state: State, action: &Action) -> Result<State, StateError> {
+    pub fn generate_attack_mutations(&self, action: &Action) -> Result<Vec<StateMutation>, StateError> {
         if let Action::Attack { home_region_id, under_attack_region_id, .. } = action {
+            let mut mutations = Vec::new();
 
-            state.next_formation_id += 1;
+            mutations.append(&mut self.gen_next_phase(*home_region_id));
+            mutations.append(&mut self.gen_next_phase(*under_attack_region_id));
 
-            state = state.region_transition_to_next_step(*home_region_id);
-            state = state.region_transition_to_next_step(*under_attack_region_id);
-
-            Ok(state)
+            Ok(mutations)
         } else {
-            panic!("only call this when the action is of the correct enum type")
+            panic!("only call this for Action::Attack")
         }
     }
 }

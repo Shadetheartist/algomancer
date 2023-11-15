@@ -27,8 +27,6 @@ impl Game {
         } else {
             panic!("only call this when the action is of the correct enum type")
         }
-
-
     }
 
 
