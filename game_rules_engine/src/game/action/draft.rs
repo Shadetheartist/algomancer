@@ -9,7 +9,7 @@ use crate::game::Game;
 use crate::game::state::card::{Card, CardId};
 use crate::game::state::card::CardType::Resource;
 use crate::game::state::error::StateError;
-use crate::game::state::mutation::{StateMutation, StateMutationEvaluator, StaticStateMutation};
+use crate::game::state::mutation::{StateMutation, StaticStateMutation};
 use crate::game::state::mutation::StaticStateMutation::{CreatePackForPlayer, MoveCard, PhaseTransition};
 use crate::game::state::progression::Phase::PrecombatPhase;
 use crate::game::state::progression::PrecombatPhaseStep;
@@ -171,7 +171,7 @@ impl Game {
             // therefore all regions should move the the next step
             if all_other_regions_in_pass_pack_step {
                 for r in &state.regions {
-                    mutations.push(StateMutation::Static(PhaseTransition { region_id: r.region_id }));
+                    mutations.append(&mut self.gen_next_phase(r.region_id));
                 }
             }
 

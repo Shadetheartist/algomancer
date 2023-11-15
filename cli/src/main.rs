@@ -206,6 +206,8 @@ mod tests {
                 eprintln!("no more actions");
                 break;
             }
+            actions_vec.reverse();
+
             let action = actions_vec.remove(0);
             let mutations = game.apply_action(action).unwrap();
             eprintln!("{:?}", mutations)

@@ -72,6 +72,7 @@ impl GameMode {
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct State {
+    pub depth: usize,
     pub game_mode: GameMode,
     pub rand: AlgomancerRng,
     pub common_deck: Option<CardCollection>,
@@ -85,6 +86,7 @@ pub struct State {
 impl Default for State {
     fn default() -> Self {
         State {
+            depth: 0,
             game_mode: GameMode::new_player_mode(),
             rand: AlgomancerRng::new(AlgomancerRngSeed::default()),
             common_deck: Some(CardCollection::new_common_deck()),

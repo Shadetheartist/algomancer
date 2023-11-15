@@ -6,9 +6,22 @@ use crate::game::state::mutation::StaticStateMutation::{PhaseTransition, SetPlay
 use crate::game::state::player::TeamId;
 use crate::game::state::progression::{CombatPhaseAStep, Phase, PrecombatPhaseStep};
 use crate::game::state::progression::Phase::PrecombatPhase;
-use crate::game::state::region::Region;
+use crate::game::state::region::{Region, RegionId};
 
 impl Game {
+
+    pub fn gen_next_phase(&self, region_id: RegionId) -> Vec<StateMutation> {
+        let mut mutations = Vec::new();
+
+        mutations.push(StateMutation::Static(PhaseTransition { region_id: region_id }));
+
+        for p in self.state.players_in_region(region_id).expect("players") {
+            mutations.push(StateMutation::Static(SetPlayerPassedPriority { player_id: p.id, value: false }));
+        }
+
+        mutations
+    }
+
     pub fn generate_pass_priority_state_mutations(&self, action: &Action) -> Result<Vec<StateMutation>, StateError> {
         if let Action::PassPriority(player_id) = action {
             let mut mutations = Vec::new();
@@ -22,16 +35,17 @@ impl Game {
             // transition only the region that the player occupies when all players in the region have passed
             let region_pass = |mutations: &mut Vec<StateMutation>| -> Result<(), StateError> {
                 if state.all_players_in_region_except_passed_priority(region.region_id, player.id)? {
-                    mutations.push(StateMutation::Static(PhaseTransition { region_id: region.region_id }))
+                    mutations.append(&mut self.gen_next_phase(region.region_id))
                 }
                 Ok(())
             };
 
             // transition all regions after all players on a team have passed
             let team_pass = |mutations: &mut Vec<StateMutation>, team_id: TeamId| -> Result<(), StateError> {
-                if state.all_players_on_team_passed_priority(team_id)? {
+                // have to exclude the current player since the state hasn't changed yet (could also solve with an eval)
+                if state.all_players_on_team_passed_priority_except(team_id, *player_id)? {
                     for r in &state.regions {
-                        mutations.push(StateMutation::Static(PhaseTransition { region_id: r.region_id }))
+                        mutations.append(&mut self.gen_next_phase(r.region_id))
                     }
                 }
                 Ok(())

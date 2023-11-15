@@ -106,7 +106,7 @@ impl Game {
             return Err(StateError::InvalidAction(err))
         };
 
-        eprintln!("Applying Action [{:?}]", &action);
+        eprintln!("[{}] Applying Action [{:?}]", self.state.depth, &action);
 
         let mutations = action.generate_state_mutations(self)?;
         let mut static_mutations = Vec::new();
@@ -124,6 +124,8 @@ impl Game {
         }
 
         self.action_history.push(action);
+
+        next_state.depth += 1;
         self.state = next_state;
 
         Ok(static_mutations)

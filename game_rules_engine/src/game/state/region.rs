@@ -259,5 +259,13 @@ impl State {
         Ok(!players.iter().any(|p| !p.passed_priority))
     }
 
+    pub fn all_players_on_team_passed_priority_except(&self, team_id: TeamId, except_player_id: PlayerId) -> Result<bool, StateError> {
+        let players = self.players_on_team(team_id)?;
+        if players.is_empty() {
+            return Err(NoPlayersOnTeam(team_id))
+        }
+        Ok(!players.iter().filter(|p| p.id != except_player_id).any(|p| !p.passed_priority))
+    }
+
 
 }

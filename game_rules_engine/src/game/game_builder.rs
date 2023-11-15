@@ -154,6 +154,7 @@ impl Game {
             }
 
             let state = State {
+                depth: 0,
                 game_mode: options.game_mode.clone(),
                 common_deck: Some(deck),
                 rand: algomancer_rng,
