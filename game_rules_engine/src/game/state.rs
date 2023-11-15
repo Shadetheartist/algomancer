@@ -47,7 +47,7 @@ impl TeamConfiguration {
     }
 
     pub fn ffa(num_players: u8) -> TeamConfiguration {
-        TeamConfiguration::FFA { num_players  }
+        TeamConfiguration::Ffa { num_players  }
     }
 }
 

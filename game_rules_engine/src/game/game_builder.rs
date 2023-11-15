@@ -171,7 +171,7 @@ impl Game {
             };
 
             match &team_configuration {
-                TeamConfiguration::FFA { num_players } => {
+                TeamConfiguration::Ffa { num_players } => {
                     add_players_and_regions(&mut game, &vec![0, *num_players], mana_converter_prototype_id);
                 }
                 TeamConfiguration::Teams { teams_of_players } => {

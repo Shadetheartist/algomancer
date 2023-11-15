@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 pub enum TeamConfiguration {
     // this can't be generalized to teams of 1 since it also affects how the turn progresses.
     // and includes the introduction of 'intent cards'
-    FFA {
+    Ffa {
         num_players: u8
     },
     Teams {
