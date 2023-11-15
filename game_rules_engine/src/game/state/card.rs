@@ -11,7 +11,7 @@ use crate::game::state::player::Player;
 use crate::game::state::region::Region;
 use crate::game::state::resource::{Cost, ResourceType};
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum Timing {
     Default,
     Haste,
@@ -19,7 +19,7 @@ pub enum Timing {
     Virus
 }
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum CardType {
     Resource(ResourceType),
     UnitToken,
@@ -43,7 +43,7 @@ impl CardType {
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy, Ord, PartialOrd)]
 pub struct CardPrototypeId(pub usize);
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct CardPrototype {
     pub prototype_id: CardPrototypeId,
     pub name: String,
@@ -64,17 +64,6 @@ pub struct Card {
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct CardPrototypeDatabase {
     pub prototypes: HashMap<CardPrototypeId, CardPrototype>,
-}
-
-impl Hash for CardPrototypeDatabase {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        let mut entries: Vec<(&CardPrototypeId, &CardPrototype)> = self.prototypes.iter().collect();
-        entries.sort_by_key(|a| a.0);
-        for (k, v) in entries {
-            k.hash(state);
-            v.hash(state);
-        }
-    }
 }
 
 pub enum FindCardResult<'a> {

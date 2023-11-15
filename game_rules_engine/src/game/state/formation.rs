@@ -8,7 +8,7 @@ use crate::game::state::player::PlayerId;
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct FormationId(pub usize);
 
-#[derive(Debug, Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Hash, Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Formation<T> {
     formation_id: FormationId,
     owner_player_id: PlayerId,
@@ -19,7 +19,7 @@ pub struct Formation<T> {
 }
 
 
-#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub enum FormationPos {
     FrontRow(usize),
     BackRow(usize),
@@ -268,7 +268,7 @@ impl<'a, T> Formation<T> {
     }
 }
 
-#[derive(Debug, Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
 pub struct DefensiveFormation<T> {
     pub attacking_formation_id: FormationId,
     pub formation: Formation<T>,

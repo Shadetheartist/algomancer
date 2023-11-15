@@ -8,7 +8,7 @@ use crate::game::state::card::CardId;
 use crate::game::state::card::CardType::Resource;
 use crate::game::state::error::StateError;
 use crate::game::state::formation::Formation;
-use crate::game::state::mutation::StateMutation;
+use crate::game::state::mutation::{StateMutation, StaticStateMutation};
 use crate::game::state::permanent::PermanentId;
 use crate::game::state::player::PlayerId;
 use crate::game::state::progression::{CombatPhaseAStep, MainPhaseStep, PrecombatPhaseStep};
@@ -24,7 +24,7 @@ mod combat;
 
 
 
-#[derive(Debug, Eq, PartialEq, Hash, Clone, Serialize, Deserialize)]
+#[derive(Hash, Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
 pub enum Action {
     // resolves the next stack item, if there are no stack items, it passes priority
     // Once both players pass priority consecutively, the game moves to the next step or phase.
@@ -48,8 +48,8 @@ impl Action {
             action @ Action::PassPriority(_) => {
                 game.generate_pass_priority_state_mutations(&action)
             }
-            Action::Draft { .. } => {
-                Ok(Vec::new())
+            action @ Action::Draft { .. } => {
+                game.generate_draft_mutations(&action)
             }
             Action::RecycleForResource { .. } => {
                 Ok(Vec::new())
@@ -101,7 +101,7 @@ pub enum DraftValidationError {
 }
 
 impl Game {
-    pub fn apply_action(&mut self, action: Action) -> Result<Vec<StateMutation>, StateError> {
+    pub fn apply_action(&mut self, action: Action) -> Result<Vec<StaticStateMutation>, StateError> {
         if let Err(err) = self.validate_action(&action) {
             return Err(StateError::InvalidAction(err))
         };
@@ -109,6 +109,7 @@ impl Game {
         eprintln!("Applying Action [{:?}]", &action);
 
         let mutations = action.generate_state_mutations(&self)?;
+        let mut static_mutations = Vec::new();
 
         if mutations.len() < 1 {
             panic!("no mutations generated from action [{:?}]", action)
@@ -116,14 +117,16 @@ impl Game {
 
         let mut next_state = self.state.clone();
 
-        for mutation in &mutations {
-            next_state = next_state.mutate(mutation)?
+        for mutation in mutations {
+            let static_mutation = mutation.to_static(&next_state)?;
+            next_state = next_state.mutate(&static_mutation)?;
+            static_mutations.push(static_mutation);
         }
 
         self.action_history.push(action);
         self.state = next_state;
 
-        Ok(mutations)
+        Ok(static_mutations)
     }
 
     pub fn validate_action(&self, action: &Action) -> Result<(), ActionValidationError> {

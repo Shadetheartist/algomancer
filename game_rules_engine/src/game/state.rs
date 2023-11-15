@@ -1,4 +1,3 @@
-use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
 use rng::{AlgomancerRng, AlgomancerRngSeed};
@@ -16,7 +15,6 @@ pub mod player;
 pub mod progression;
 pub mod resource;
 pub mod rng;
-pub mod priority;
 pub mod region;
 pub mod permanent;
 pub mod formation;
@@ -53,7 +51,7 @@ impl TeamConfiguration {
     }
 }
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum GameMode {
     LiveDraft {
         selected_deck_types: Vec<Faction>,
@@ -74,7 +72,7 @@ impl GameMode {
     }
 }
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct State {
     pub game_mode: GameMode,
     pub rand: AlgomancerRng,
@@ -102,21 +100,12 @@ impl State {
             next_formation_id: 1,
         }
     }
-
-    #[allow(dead_code)]
-    pub fn get_hash_string(&self) -> String {
-        let mut hasher = DefaultHasher::new();
-        self.hash(&mut hasher);
-        format!("#{:x}", hasher.finish())
-    }
-
 }
 
 
 #[cfg(test)]
 mod tests {
-    use std::collections::hash_map::DefaultHasher;
-    use std::hash::{Hash, Hasher};
+    use std::hash::Hash;
 
     use crate::game::state::rng::{AlgomancerRng, AlgomancerRngSeed};
 
@@ -166,34 +155,5 @@ mod tests {
 
         // so this should not be equal
         assert_ne!(r1_val, r2_val);
-    }
-
-    #[test]
-    fn test_rand_hashable() {
-        fn hash_it(r: AlgomancerRng) -> u64 {
-            // hash it
-            let mut hasher = DefaultHasher::new();
-            r.hash(&mut hasher);
-            hasher.finish()
-        }
-
-        // create an rng instance
-        let r1 = setup_rand();
-        let r2 = setup_rand();
-        let r1_hash = hash_it(r1);
-        let r2_hash = hash_it(r2);
-
-        // these should still be equal
-        assert_eq!(r1_hash, r2_hash);
-
-        // do another rand instance, but this one is different because it's being used once more
-        let mut r3 = setup_rand();
-        r3.gen_range(0..10);
-
-        // this hash should be different from the others
-        let r3_hash = hash_it(r3);
-
-        // so this should not be equal
-        assert_ne!(r1_hash, r3_hash);
     }
 }

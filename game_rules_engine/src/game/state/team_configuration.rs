@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum TeamConfiguration {
     // this can't be generalized to teams of 1 since it also affects how the turn progresses.
     // and includes the introduction of 'intent cards'

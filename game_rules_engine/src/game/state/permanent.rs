@@ -15,13 +15,13 @@ impl PermanentId {
     }
 }
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct PermanentCommon {
     pub permanent_id: PermanentId,
     pub controller_player_id: PlayerId,
 }
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum Permanent {
     Unit {
         common: PermanentCommon,

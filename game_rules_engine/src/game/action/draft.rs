@@ -6,10 +6,12 @@ use rand::RngCore;
 
 use crate::game::action::Action;
 use crate::game::Game;
-use crate::game::state::card::CardId;
+use crate::game::state::card::{Card, CardId};
 use crate::game::state::card::CardType::Resource;
 use crate::game::state::card_collection::CardCollection;
 use crate::game::state::error::StateError;
+use crate::game::state::mutation::{StateMutation, StaticStateMutation};
+use crate::game::state::mutation::StaticStateMutation::{CreatePackForPlayer, MoveCard, PhaseTransition};
 use crate::game::state::progression::Phase::PrecombatPhase;
 use crate::game::state::progression::PrecombatPhaseStep;
 use crate::game::state::region::RegionId;
@@ -124,6 +126,61 @@ impl Game {
         }
 
         actions
+    }
+
+    pub fn generate_draft_mutations(&self, action: &Action) -> Result<Vec<StateMutation>, StateError> {
+        if let Action::Draft { player_id, cards_to_keep } = action {
+            let player_id = *player_id;
+            let mut mutations = Vec::new();
+            let state = &self.state;
+            let player = state.find_player(player_id)?;
+
+            let cards_for_pack: Vec<&Card> = player.hand.iter().filter(|c| !cards_to_keep.contains(&c.card_id)).collect();
+            if cards_for_pack.len() != 10 {
+                return Err(StateError::InvalidDraft)
+            }
+
+            if let None = &player.pack {
+                mutations.push(StateMutation::Static(CreatePackForPlayer { player_id: player.player_id }));
+            }
+
+            for card in cards_for_pack {
+                let card_id = card.card_id;
+                let eval_mutation = StateMutation::Eval(Box::new(move |state| -> Result<StaticStateMutation, StateError> {
+                    let player = state.find_player(player_id)?;
+                    Ok(MoveCard {
+                        from_cc_id: player.hand.id(),
+                        to_cc_id: player.pack.as_ref().unwrap().id(),
+                        card_id: card_id,
+                    })
+                }));
+
+                mutations.push(eval_mutation);
+            }
+
+            let region_id = state.find_region_id_containing_player(player_id);
+            mutations.push(StateMutation::Static(PhaseTransition { region_id }));
+
+            // if all the other regions are in the pass pack step, and we just transitioned to it as
+            // well, then all players are ready to receive their packs
+            let all_other_regions_in_pass_pack_step = state.regions.iter().all(|r| {
+                r.region_id != region_id && r.step == PrecombatPhase(PrecombatPhaseStep::PassPack)
+            });
+
+            // therefore all regions should move the the next step
+            if all_other_regions_in_pass_pack_step {
+                for r in &state.regions {
+                    mutations.push(StateMutation::Static(PhaseTransition { region_id: r.region_id }));
+                }
+            }
+
+            eprintln!("Player [{:?}] has selected their draft.", player_id);
+
+            Ok(mutations)
+
+        } else {
+            panic!("action should have been draft")
+        }
     }
 
     pub fn apply_draft_action(&self, mut state: State, action: &Action) -> Result<State, StateError> {

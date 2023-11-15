@@ -1,18 +1,17 @@
 use serde::{Deserialize, Serialize};
 
-use crate::game::state::{GameMode, State};
-use crate::game::state::card::CardId;
 use crate::game::state::card_collection::CardCollection;
 use crate::game::state::error::StateError;
 use crate::game::state::progression::{CombatPhaseAStep, CombatPhaseBStep, MainPhaseStep, Phase, PrecombatPhaseStep};
+use crate::game::state::State;
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct TeamId(pub u8);
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct PlayerId(pub u8);
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Player {
     pub player_id: PlayerId,
     pub team_id: TeamId,

@@ -2,10 +2,11 @@ use crate::game::action::Action;
 use crate::game::Game;
 use crate::game::state::error::StateError;
 use crate::game::state::mutation::StateMutation;
-use crate::game::state::player::{TeamId};
+use crate::game::state::mutation::StaticStateMutation::{PhaseTransition, SetPlayerPassedPriority};
+use crate::game::state::player::TeamId;
 use crate::game::state::progression::{CombatPhaseAStep, Phase, PrecombatPhaseStep};
 use crate::game::state::progression::Phase::PrecombatPhase;
-use crate::game::state::region::{Region};
+use crate::game::state::region::Region;
 
 impl Game {
     pub fn generate_pass_priority_state_mutations(&self, action: &Action) -> Result<Vec<StateMutation>, StateError> {
@@ -16,13 +17,12 @@ impl Game {
             let player = state.find_player(*player_id)?;
             let region: &Region = state.find_region_containing_player(player.player_id)?;
 
-            mutations.push(StateMutation::SetPlayerPassedPriority { player_id: player.player_id, value: true });
+            mutations.push(StateMutation::Static(SetPlayerPassedPriority { player_id: player.player_id, value: true }));
 
             /// transition only the region that the player occupies when all players in the region have passed
             let region_pass = |mutations: &mut Vec<StateMutation>| -> Result<(), StateError> {
                 if state.all_players_in_region_except_passed_priority(region.region_id, player.player_id)? {
-                    let next_phase = region.step.get_next_phase(&self.state.game_mode);
-                    mutations.push(StateMutation::PhaseTransition { region_id: region.region_id, phase: next_phase })
+                    mutations.push(StateMutation::Static(PhaseTransition { region_id: region.region_id }))
                 }
                 Ok(())
             };
@@ -31,8 +31,7 @@ impl Game {
             let team_pass = |mutations: &mut Vec<StateMutation>, team_id: TeamId| -> Result<(), StateError> {
                 if state.all_players_on_team_passed_priority(team_id)? {
                     for r in &state.regions {
-                        let next_phase = region.step.get_next_phase(&self.state.game_mode);
-                        mutations.push(StateMutation::PhaseTransition { region_id: r.region_id, phase: next_phase })
+                        mutations.push(StateMutation::Static(PhaseTransition { region_id: r.region_id }))
                     }
                 }
                 Ok(())

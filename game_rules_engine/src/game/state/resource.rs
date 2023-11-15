@@ -69,13 +69,13 @@ impl Faction {
     }
 }
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct FactionAffinity {
     pub faction: Faction,
     pub amount: u8
 }
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Cost {
     pub faction_affinities: Vec<FactionAffinity>,
     pub additional_cost: u8,

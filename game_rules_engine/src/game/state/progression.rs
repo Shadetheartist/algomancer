@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::game::state::{GameMode, State};
 use crate::game::state::region::RegionId;
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub enum Phase {
     PrecombatPhase(PrecombatPhaseStep),
     CombatPhaseA(CombatPhaseAStep),
@@ -11,7 +11,7 @@ pub enum Phase {
     MainPhase(MainPhaseStep),
 }
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub enum PrecombatPhaseStep {
     Untap,
     Draw,
@@ -21,7 +21,7 @@ pub enum PrecombatPhaseStep {
     NITMana,
 }
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub enum CombatPhaseAStep {
     ITAttack,
     AfterITAttackPriorityWindow,
@@ -31,7 +31,7 @@ pub enum CombatPhaseAStep {
     AfterCombatPriorityWindow,
 }
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub enum CombatPhaseBStep {
     NITAttack,
     AfterNITAttackPriorityWindow,
@@ -41,7 +41,7 @@ pub enum CombatPhaseBStep {
     AfterCombatPriorityWindow,
 }
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub enum MainPhaseStep {
     Regroup,
     ITMain,

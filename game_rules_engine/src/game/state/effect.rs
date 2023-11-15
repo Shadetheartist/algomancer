@@ -9,7 +9,7 @@ pub mod special;
 // this builder pattern allows for effect preparation before application to the state
 // for instance, if an effect would have a random damage value, the randomness is resolved here
 // and the effect is applied as a regular damage effect
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum EffectBuilder {
     Default(Effect),
     RandomDamage { target: ObjectId, min: i32, max: i32 },
@@ -29,7 +29,7 @@ impl EffectBuilder {
     }
 }
 
-#[derive(Hash, Eq, PartialEq, Serialize, Deserialize, Clone, Debug)]
+#[derive(Eq, PartialEq, Serialize, Deserialize, Clone, Debug)]
 pub enum Effect {
     Damage { target: ObjectId, amount: i32 },
     Heal { target: ObjectId, amount: i32 },

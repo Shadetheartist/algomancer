@@ -1,8 +1,8 @@
-use crate::game::state::error::StateError;
-use crate::game::state::player::{Player, PlayerId};
 use crate::game::state::{GameMode, State};
 use crate::game::state::card::CardId;
 use crate::game::state::card_collection::CardCollection;
+use crate::game::state::error::StateError;
+use crate::game::state::player::{Player, PlayerId};
 
 impl State {
     pub fn find_player_mut(&mut self, player_id: PlayerId) -> Result<&mut Player, StateError> {

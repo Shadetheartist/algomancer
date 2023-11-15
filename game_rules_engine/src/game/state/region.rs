@@ -14,7 +14,7 @@ use crate::wrap_index::wrap_index;
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct RegionId(pub u8);
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Region {
     pub region_id: RegionId,
     pub owner_player_id: PlayerId,
