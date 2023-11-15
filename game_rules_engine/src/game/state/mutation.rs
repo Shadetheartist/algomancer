@@ -32,13 +32,6 @@ impl StateMutation {
     }
 }
 
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
-pub enum DeckPlacement {
-    OnTop,
-    OnBottom,
-    ToIndex(usize),
-}
-
 /// State mutations are an instruction to make the smallest meaningful change in state.
 /// Actions, the next level up, generate a list state mutations, which are then applied to the
 /// state in order.
@@ -140,4 +133,12 @@ impl State {
             panic!("only call this for StateMutation::PhaseTransition")
         }
     }
+}
+
+
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+pub enum DeckPlacement {
+    OnTop,
+    OnBottom,
+    ToIndex(usize),
 }

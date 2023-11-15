@@ -9,7 +9,7 @@ use crate::game::Game;
 use crate::game::state::card::{Card, CardId};
 use crate::game::state::card::CardType::Resource;
 use crate::game::state::error::StateError;
-use crate::game::state::mutation::{StateMutation, StaticStateMutation};
+use crate::game::state::mutation::{StateMutation, StateMutationEvaluator, StaticStateMutation};
 use crate::game::state::mutation::StaticStateMutation::{CreatePackForPlayer, MoveCard, PhaseTransition};
 use crate::game::state::progression::Phase::PrecombatPhase;
 use crate::game::state::progression::PrecombatPhaseStep;
@@ -164,8 +164,8 @@ impl Game {
 
             // if all the other regions are in the pass pack step, and we just transitioned to it as
             // well, then all players are ready to receive their packs
-            let all_other_regions_in_pass_pack_step = state.regions.iter().all(|r| {
-                r.region_id != region_id && r.step == PrecombatPhase(PrecombatPhaseStep::PassPack)
+            let all_other_regions_in_pass_pack_step = state.regions.iter().filter(|r| r.region_id != region_id).all(|r| {
+                r.step == PrecombatPhase(PrecombatPhaseStep::PassPack)
             });
 
             // therefore all regions should move the the next step
