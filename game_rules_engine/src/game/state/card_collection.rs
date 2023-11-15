@@ -175,6 +175,18 @@ impl CardCollection {
         }
     }
 
+    pub fn add_to_bottom(&mut self, card: Card) ->  Result<(), StateError> {
+        match self {
+            CardCollection::Deck { cards, .. } => {
+                cards.push(card);
+                Ok(())
+            }
+            CardCollection::Hand { .. } |
+            CardCollection::Discard { .. } |
+            CardCollection::Pack { .. } => Err(StateError::CardCollectionHasNoOrder(self.id()))
+        }
+    }
+
     pub fn remove(&mut self, card_id: CardId) -> Result<Card, StateError> {
         match self {
             CardCollection::Deck { cards, .. } => {
@@ -227,7 +239,7 @@ impl State {
                 Ok(&mut self.find_player_mut(player.id)?.discard)
             }
             FindCardCollectionResult::PlayerDeck(player, _) => {
-                Ok(self.find_player_mut(player.id)?.deck.as_mut().unwrap())
+                Ok(self.find_player_mut(player.id)?.own_deck.as_mut().unwrap())
             }
             FindCardCollectionResult::PlayerPack(player, _) => {
                 Ok(self.find_player_mut(player.id)?.pack.as_mut().unwrap())
@@ -257,12 +269,12 @@ impl State {
 
         // check if it's one of the player's decks
         if let Some(player) = players.iter().find(|p| {
-            if let Some(deck) = &p.deck {
+            if let Some(deck) = &p.own_deck {
                 return deck.id() == id;
             }
             false
         }) {
-            return Ok(FindCardCollectionResult::PlayerDeck(player, player.deck.as_ref().unwrap()));
+            return Ok(FindCardCollectionResult::PlayerDeck(player, player.own_deck.as_ref().unwrap()));
         }
 
         // check if it's one of the player's pack's

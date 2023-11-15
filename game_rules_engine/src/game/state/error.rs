@@ -22,6 +22,7 @@ pub enum StateError {
     RegionNotFound(RegionId),
     NoRegionContainsPlayer(PlayerId),
     CardCollectionNotFound(CardCollectionId),
+    CardCollectionHasNoOrder(CardCollectionId),
     CardNotFound(CardId),
     InvalidDraft,
     InvalidRecycle,

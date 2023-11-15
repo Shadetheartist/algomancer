@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 
 
-use crate::game::state::card::CardId;
+use crate::game::state::card::{Card, CardId, CardPrototypeDatabase, CardPrototypeId};
 use crate::game::state::card_collection::{CardCollection, CardCollectionId};
 use crate::game::state::error::StateError;
 use crate::game::state::player::PlayerId;
@@ -32,6 +32,12 @@ impl StateMutation {
     }
 }
 
+#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+pub enum DeckPlacement {
+    OnTop,
+    OnBottom,
+    ToIndex(usize),
+}
 
 /// State mutations are an instruction to make the smallest meaningful change in state.
 /// Actions, the next level up, generate a list state mutations, which are then applied to the
@@ -48,19 +54,38 @@ pub enum StaticStateMutation {
         from_cc_id: CardCollectionId,
         to_cc_id: CardCollectionId,
         card_id: CardId,
+        placement: Option<DeckPlacement>
     },
     CreatePackForPlayer { player_id: PlayerId },
+    CreateCard {
+        cc_id: CardCollectionId,
+        card_prototype_id: CardPrototypeId,
+    }
 }
 
 
 
 impl State {
-    pub fn mutate(self, state_mutation: &StaticStateMutation) -> Result<State, StateError> {
+    pub fn mutate(self, db: &CardPrototypeDatabase, state_mutation: &StaticStateMutation) -> Result<State, StateError> {
         match state_mutation {
             mutation @ StaticStateMutation::SetPlayerPassedPriority { .. } => self.handle_set_player_passed_priority(mutation),
             mutation @ StaticStateMutation::PhaseTransition { .. } => self.handle_phase_transition(mutation),
             mutation @ StaticStateMutation::MoveCard { .. } => self.handle_move_card(mutation),
             mutation @ StaticStateMutation::CreatePackForPlayer { .. } => self.handle_create_pack(mutation),
+            mutation @ StaticStateMutation::CreateCard { .. } => self.handle_create_card(db, mutation),
+        }
+    }
+
+    fn handle_create_card(mut self, db: &CardPrototypeDatabase, state_mutation: &StaticStateMutation) -> Result<State, StateError> {
+        if let StaticStateMutation::CreateCard { cc_id, card_prototype_id } = state_mutation {
+            let card = Card::from_prototype_id(db, &mut self, *card_prototype_id);
+
+            let cc = self.find_card_collection_mut(*cc_id)?;
+            cc.add(card);
+
+            Ok(self)
+        } else {
+            panic!("only call this for StateMutation::MoveCard")
         }
     }
 
@@ -75,14 +100,22 @@ impl State {
     }
 
     fn handle_move_card(mut self, state_mutation: &StaticStateMutation) -> Result<State, StateError> {
-        if let StaticStateMutation::MoveCard { from_cc_id, to_cc_id, card_id } = *state_mutation {
+        if let StaticStateMutation::MoveCard { from_cc_id, to_cc_id, card_id, placement } = state_mutation {
             let card = {
-                let from_cc = self.find_card_collection_mut(from_cc_id)?;
-                from_cc.remove(card_id)?
+                let from_cc = self.find_card_collection_mut(*from_cc_id)?;
+                from_cc.remove(*card_id)?
             };
 
-            let to_cc = self.find_card_collection_mut(to_cc_id)?;
-            to_cc.add(card);
+            let to_cc = self.find_card_collection_mut(*to_cc_id)?;
+            if let Some(placement) = placement {
+                match placement {
+                    DeckPlacement::OnBottom => { to_cc.add_to_bottom(card)?; }
+                    DeckPlacement::OnTop => { todo!() }
+                    DeckPlacement::ToIndex(_) => { todo!() }
+                }
+            } else {
+                to_cc.add(card);
+            }
 
             Ok(self)
         } else {

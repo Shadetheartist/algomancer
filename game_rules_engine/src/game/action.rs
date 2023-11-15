@@ -51,8 +51,8 @@ impl Action {
             action @ Action::Draft { .. } => {
                 game.generate_draft_mutations(action)
             }
-            Action::RecycleForResource { .. } => {
-                Ok(Vec::new())
+            action @ Action::RecycleForResource { .. } => {
+                game.generate_recycle_for_resource_mutations(action)
             }
             Action::PlayCard { .. } => {
                 Ok(Vec::new())
@@ -119,7 +119,7 @@ impl Game {
 
         for mutation in mutations {
             let static_mutation = mutation.to_static(&next_state)?;
-            next_state = next_state.mutate(&static_mutation)?;
+            next_state = next_state.mutate(&self.cards_db, &static_mutation)?;
             static_mutations.push(static_mutation);
         }
 

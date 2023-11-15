@@ -1,8 +1,8 @@
 use crate::game::action::Action;
 use crate::game::Game;
 use crate::game::state::card::{Card, CardId, CardType, FindCardResult, Timing};
-use crate::game::state::error::{CardNotPlayableError, StateError};
-use crate::game::state::error::CardNotPlayableError::{CannotCastANonSpellTokenPermanentFromPlay, CannotPlayMoreResources, CardDoesNotExist, CardLacksCorrectTiming, MustBePlayedFromHand, NotInPlayableStep, NotInPlayableZone};
+use crate::game::state::error::{StateError};
+use crate::game::state::error::CardNotPlayableError::{CannotCastANonSpellTokenPermanentFromPlay, CannotPlayMoreResources, CardLacksCorrectTiming, MustBePlayedFromHand, NotInPlayableStep, NotInPlayableZone};
 use crate::game::state::error::StateError::CardNotPlayable;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::PlayerId;
@@ -19,7 +19,7 @@ impl Game {
                     state = _state
                 }
                 Err(err) => {
-                    return Err(CardNotPlayable(err));
+                    return Err(err);
                 }
             }
 
@@ -33,24 +33,17 @@ impl Game {
 
 
     // this probably should be decomposed into play_card_from_hand / play_spell_token / etc.
-    pub fn play_card(&self, mut state: State, card_id: CardId) -> Result<State, CardNotPlayableError> {
+    pub fn play_card(&self, mut state: State, card_id: CardId) -> Result<State, StateError> {
 
         // collect info about the card, or discover it doesn't exist or it's not in a playable zone
         let (player_id, prototype_id, in_hand, in_discard, in_play) = {
-            let find_card_result = state.find_card(card_id);
-
-            // validate that this player can actually play the card
-            if find_card_result.is_none() {
-                return Err(CardDoesNotExist);
-            }
-
-            let find_card_result = find_card_result.expect("a result");
+            let find_card_result = state.find_card(card_id)?;
 
             match find_card_result {
-                FindCardResult::InPlayerHand(player, card) => {
+                FindCardResult::InPlayerHand(player, _, card) => {
                     (player.id, card.prototype_id, true, false, false)
                 }
-                FindCardResult::InPlayerDiscard(player, card) => {
+                FindCardResult::InPlayerDiscard(player, _,  card) => {
                     (player.id, card.prototype_id, false, true, false)
                 }
                 FindCardResult::AsPermanentInRegion(_, permanent) => {
@@ -59,14 +52,14 @@ impl Game {
                             (common.controller_player_id, *card_prototype_id, false, false, true)
                         }
                         _ => {
-                            return Err(CannotCastANonSpellTokenPermanentFromPlay);
+                            return Err(CardNotPlayable(CannotCastANonSpellTokenPermanentFromPlay));
                         }
                     }
                 }
                 FindCardResult::AsPermanentInFormation(_, _, _) |
-                FindCardResult::InCommonDeck(_) |
-                FindCardResult::InPlayerDeck(_, _) => {
-                    return Err(NotInPlayableZone);
+                FindCardResult::InCommonDeck(_, _) |
+                FindCardResult::InPlayerDeck(_, _, _) => {
+                    return Err(CardNotPlayable(NotInPlayableZone));
                 }
             }
         };
@@ -89,7 +82,7 @@ impl Game {
                                 CardType::Resource(_) => {
                                     let player = state.find_player(player_id).expect("a player");
                                     if player.resources_played_this_turn >= 2 {
-                                        return Err(CannotPlayMoreResources);
+                                        return Err(CardNotPlayable(CannotPlayMoreResources));
                                     }
                                 }
 
@@ -98,19 +91,19 @@ impl Game {
 
                                 // card can otherwise not be played during mana
                                 _ => {
-                                    return Err(CardLacksCorrectTiming);
+                                    return Err(CardNotPlayable(CardLacksCorrectTiming));
                                 }
                             }
                         }
                         _ => {
-                            return Err(NotInPlayableStep);
+                            return Err(CardNotPlayable(NotInPlayableStep));
                         }
                     }
                 }
                 phase @ Phase::CombatPhaseA(_) |
                 phase @ Phase::CombatPhaseB(_) => {
                     if !phase.is_priority_window() {
-                        return Err(NotInPlayableStep);
+                        return Err(CardNotPlayable(NotInPlayableStep));
                     }
 
                     match &proto.card_type {
@@ -120,16 +113,16 @@ impl Game {
                                 Timing::Combat => {}
                                 Timing::Virus => {
                                     if !in_hand {
-                                        return Err(MustBePlayedFromHand);
+                                        return Err(CardNotPlayable(MustBePlayedFromHand));
                                     }
                                 }
                                 _ => {
-                                    return Err(CardLacksCorrectTiming);
+                                    return Err(CardNotPlayable(CardLacksCorrectTiming));
                                 }
                             }
                         }
                         _ => {
-                            return Err(NotInPlayableStep);
+                            return Err(CardNotPlayable(NotInPlayableStep));
                         }
                     }
                 }
@@ -137,7 +130,7 @@ impl Game {
                 Phase::MainPhase(step) => {
                     match step {
                         MainPhaseStep::Regroup => {
-                            return Err(NotInPlayableStep);
+                            return Err(CardNotPlayable(NotInPlayableStep));
                         }
                         MainPhaseStep::ITMain => {}
                         MainPhaseStep::NITMain => {}

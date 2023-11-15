@@ -8,14 +8,12 @@ use crate::game::action::Action;
 use crate::game::Game;
 use crate::game::state::card::{Card, CardId};
 use crate::game::state::card::CardType::Resource;
-use crate::game::state::card_collection::CardCollection;
 use crate::game::state::error::StateError;
 use crate::game::state::mutation::{StateMutation, StaticStateMutation};
 use crate::game::state::mutation::StaticStateMutation::{CreatePackForPlayer, MoveCard, PhaseTransition};
 use crate::game::state::progression::Phase::PrecombatPhase;
 use crate::game::state::progression::PrecombatPhaseStep;
 use crate::game::state::region::RegionId;
-use crate::game::state::State;
 
 fn combinations<T: Clone>(items: &[T], k: usize) -> Vec<Vec<T>> {
     let n = items.len();
@@ -146,12 +144,15 @@ impl Game {
 
             for card in cards_for_pack {
                 let card_id = card.card_id;
+                // all these mutations depend on the pack existing, it doesn't yet, but it will when applying these mutations.
+                // so we need to look at that future state to get the pack's id, by using the Eval variant.
                 let eval_mutation = StateMutation::Eval(Box::new(move |state| -> Result<StaticStateMutation, StateError> {
                     let player = state.find_player(player_id)?;
                     Ok(MoveCard {
                         from_cc_id: player.hand.id(),
                         to_cc_id: player.pack.as_ref().unwrap().id(),
                         card_id,
+                        placement: None
                     })
                 }));
 
@@ -177,68 +178,6 @@ impl Game {
             eprintln!("Player [{:?}] has selected their draft.", player_id);
 
             Ok(mutations)
-
-        } else {
-            panic!("action should have been draft")
-        }
-    }
-
-    pub fn apply_draft_action(&self, mut state: State, action: &Action) -> Result<State, StateError> {
-        if let Action::Draft { player_id, cards_to_keep } = action {
-            let cards_for_pack = {
-                let player = &mut state.find_player_mut(*player_id)?;
-
-                let mut cards_for_hand = Vec::new();
-                let mut cards_for_pack = Vec::new();
-
-                let card_ids: Vec<CardId> = player.hand.iter().map(|c| c.card_id).collect();
-                for c_id in card_ids {
-                    let card = player.hand.remove(c_id).expect("a card to have been removed");
-                    if cards_to_keep.contains(&card.card_id) {
-                        cards_for_hand.push(card);
-                    } else {
-                        cards_for_pack.push(card);
-                    }
-                }
-
-                if cards_for_pack.len() != 10 {
-                    return Err(StateError::InvalidDraft)
-                }
-
-                for card in cards_for_hand {
-                    player.hand.add(card);
-                }
-
-                cards_for_pack
-            };
-
-            let player = state.find_player_mut(*player_id).expect("a player");
-            match player.pack.as_mut() {
-                None => {
-                    player.pack = Some(CardCollection::new_pack(player.id))
-                }
-                Some(player_pack) => {
-                    for card in cards_for_pack {
-                        player_pack.add(card);
-                    }
-                }
-            }
-
-            let region_id = state.find_region_id_containing_player(*player_id);
-            state = state.region_transition_to_next_step(region_id);
-
-            let all_players_passed_packs = state.regions.iter().all(|r| {
-                r.step == PrecombatPhase(PrecombatPhaseStep::PassPack)
-            });
-
-            if all_players_passed_packs {
-                state = state.transition_step_in_all_regions();
-            }
-
-            eprintln!("Player [{:?}] has selected their draft.", *player_id);
-
-
-            Ok(state)
 
         } else {
             panic!("action should have been draft")

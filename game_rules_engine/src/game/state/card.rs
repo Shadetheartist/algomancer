@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::game::state::{GameMode, State};
 use crate::game::state::card::CardType::Resource;
+use crate::game::state::card_collection::CardCollection;
+use crate::game::state::error::StateError;
 use crate::game::state::formation::Formation;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::Player;
@@ -62,11 +64,19 @@ pub struct CardPrototypeDatabase {
     pub prototypes: HashMap<CardPrototypeId, CardPrototype>,
 }
 
+impl CardPrototypeDatabase {
+    pub fn resource(&self, resource_type: ResourceType) -> &CardPrototype {
+        self.prototypes.iter().find(|(_, c)| {
+            c.card_type == Resource(resource_type)
+        }).expect("a prototype for this resource").1
+    }
+}
+
 pub enum FindCardResult<'a> {
-    InPlayerHand(&'a Player, &'a Card),
-    InPlayerDiscard(&'a Player, &'a Card),
-    InPlayerDeck(&'a Player, &'a Card),
-    InCommonDeck(&'a Card),
+    InPlayerHand(&'a Player, &'a CardCollection, &'a Card),
+    InPlayerDiscard(&'a Player, &'a CardCollection, &'a Card),
+    InPlayerDeck(&'a Player, &'a CardCollection, &'a Card),
+    InCommonDeck(&'a CardCollection, &'a Card),
     AsPermanentInRegion(&'a Region, &'a Permanent),
     AsPermanentInFormation(&'a Region, &'a Formation<Permanent>, &'a Permanent),
 }
@@ -78,10 +88,10 @@ impl Card {
             c.card_type == Resource(resource_type)
         }).expect("a prototype for this resource");
 
-        Self::from_prototype(db, state, *id)
+        Self::from_prototype_id(db, state, *id)
     }
 
-    pub fn from_prototype(db: &CardPrototypeDatabase, state: &mut State, card_prototype_id: CardPrototypeId) -> Card {
+    pub fn from_prototype_id(db: &CardPrototypeDatabase, state: &mut State, card_prototype_id: CardPrototypeId) -> Card {
         state.next_card_id += 1;
         let proto = db.prototypes.get(&card_prototype_id).expect("a card prototype in the db");
 
@@ -94,18 +104,18 @@ impl Card {
 
 impl State {
 
-    pub fn find_card(&self, card_id: CardId) -> Option<FindCardResult> {
+    pub fn find_card(&self, card_id: CardId) -> Result<FindCardResult, StateError> {
 
         // see if the card is in a player's hand or discard
         for player in self.players() {
             let card = player.hand.iter().find(|c| c.card_id == card_id);
             if let Some(card) = card {
-                return Some(FindCardResult::InPlayerHand(player, card))
+                return Ok(FindCardResult::InPlayerHand(player, &player.hand, card))
             }
 
             let card = player.discard.iter().find(|c| c.card_id == card_id);
             if let Some(card) = card {
-                return Some(FindCardResult::InPlayerDiscard(player, card))
+                return Ok(FindCardResult::InPlayerDiscard(player, &player.discard, card))
             }
         }
 
@@ -114,7 +124,7 @@ impl State {
             for permanent in region.unformed_permanents.iter() {
                 if let Permanent::Unit { card, .. } = permanent {
                     if card.card_id == card_id {
-                        return Some(FindCardResult::AsPermanentInRegion(region, permanent))
+                        return Ok(FindCardResult::AsPermanentInRegion(region, permanent))
                     }
                 }
             }
@@ -124,7 +134,7 @@ impl State {
                 for permanent in formation.cells_iter() {
                     if let Permanent::Unit { card, .. } = permanent {
                         if card.card_id == card_id {
-                            return Some(FindCardResult::AsPermanentInFormation(region, formation, permanent))
+                            return Ok(FindCardResult::AsPermanentInFormation(region, formation, permanent))
                         }
                     }
                 }
@@ -137,21 +147,21 @@ impl State {
                 let deck = self.common_deck.as_ref().expect("a common deck");
                 let card = deck.iter().find(|c| c.card_id == card_id);
                 if let Some(card) = card {
-                    return Some(FindCardResult::InCommonDeck(card))
+                    return Ok(FindCardResult::InCommonDeck(deck, card))
                 }
             }
             GameMode::Constructed { .. } => {
                 for player in self.players() {
-                    let deck = &player.deck.as_ref().expect("a player's deck");
+                    let deck = &player.own_deck.as_ref().expect("a player's deck");
                     let card = deck.iter().find(|c| c.card_id == card_id);
                     if let Some(card) = card {
-                        return Some(FindCardResult::InPlayerDeck(player, card))
+                        return Ok(FindCardResult::InPlayerDeck(player, deck, card))
                     }
                 }
             },
             _ => todo!(),
         }
 
-        None
+        Err(StateError::CardNotFound(card_id))
     }
 }

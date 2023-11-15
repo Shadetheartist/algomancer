@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::game::state::card_collection::CardCollection;
 use crate::game::state::error::StateError;
 use crate::game::state::progression::{CombatPhaseAStep, CombatPhaseBStep, MainPhaseStep, Phase, PrecombatPhaseStep};
-use crate::game::state::State;
+use crate::game::state::{GameMode, State};
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct TeamId(pub u8);
@@ -16,7 +16,7 @@ pub struct Player {
     pub id: PlayerId,
     pub team_id: TeamId,
     pub pack: Option<CardCollection>,
-    pub deck: Option<CardCollection>,
+    pub own_deck: Option<CardCollection>,
     pub is_alive: bool,
     pub health: i32,
     pub hand: CardCollection,
@@ -30,7 +30,7 @@ impl Player {
         Player {
             id: player_id,
             team_id,
-            deck,
+            own_deck: deck,
             is_alive: true,
             health: 30,
             hand: CardCollection::new_hand(player_id),
@@ -38,6 +38,29 @@ impl Player {
             passed_priority: false,
             pack,
             resources_played_this_turn: 0,
+        }
+    }
+
+    pub fn deck<'a>(&'a self, state: &'a State) -> &'a CardCollection {
+        match state.game_mode {
+            GameMode::LiveDraft { .. } => {
+                if let Some(common_deck) = &state.common_deck {
+                    return common_deck
+                } else {
+                    panic!("player is supposed to draw from the common deck in live-draft, but it doesn't exist");
+                }
+            },
+            GameMode::PreDraft { .. } | GameMode::Constructed { .. } => {
+                if let Some(own_deck) = &self.own_deck {
+                    return own_deck
+                } else {
+                    panic!("player is supposed to draw from their own deck in pre-draft & constructed, but it doesn't exist");
+                }
+            },
+            GameMode::TeamDraft { .. } => {
+                // weird, this needs a common deck per team i guess
+                todo!("need to implement team draft, which deck the player is drawing from")
+            }
         }
     }
 }

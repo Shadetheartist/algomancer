@@ -1,11 +1,12 @@
 use crate::game::action::Action;
 use crate::game::Game;
-use crate::game::state::card::{Card, FindCardResult, Timing};
+use crate::game::state::card::{FindCardResult, Timing};
 use crate::game::state::card::CardType::{Resource, Unit};
 use crate::game::state::error::StateError;
+use crate::game::state::mutation::{StateMutation};
+use crate::game::state::mutation::StaticStateMutation::{CreateCard, MoveCard};
 use crate::game::state::region::RegionId;
 use crate::game::state::resource::ResourceType;
-use crate::game::state::State;
 
 impl Game {
     pub fn valid_mana_phase_actions(&self, region_id: RegionId) -> Vec<Action> {
@@ -38,32 +39,42 @@ impl Game {
         actions
     }
 
-    pub fn apply_recycle_for_resource_action(&mut self, mut state: State, action: &Action) -> Result<State, StateError> {
+    pub fn generate_recycle_for_resource_mutations(&self, action: &Action) -> Result<Vec<StateMutation>, StateError> {
         if let Action::RecycleForResource { card_id, resource_type } = action {
             let card_id = *card_id;
+            let mut mutations = Vec::new();
+            let find_card_result = self.state.find_card(card_id)?;
 
-            let player_id = {
-                let find_card_result = state.find_card(card_id).expect("a card");
-                match find_card_result {
-                    FindCardResult::InPlayerHand(player, _) => {
-                        player.id
-                    }
-                    _ => return Err(StateError::InvalidRecycle),
+            match find_card_result {
+                FindCardResult::InPlayerHand(p, cc, _) |
+                FindCardResult::InPlayerDiscard(p, cc, _) |
+                FindCardResult::InPlayerDeck(p, cc, _) => {
+                    let player_deck_id = p.deck(&self.state).id();
+                    mutations.push(StateMutation::Static(MoveCard {
+                        from_cc_id: cc.id(),
+                        to_cc_id: player_deck_id,
+                        card_id: card_id,
+                        placement: None,
+                    }));
+
+                    let resource_prototype = self.cards_db.resource(*resource_type);
+                    mutations.push(StateMutation::Static(CreateCard {
+                        cc_id: p.hand.id(),
+                        card_prototype_id: resource_prototype.prototype_id,
+                    }));
                 }
-            };
+                FindCardResult::InCommonDeck(_, _) |
+                FindCardResult::AsPermanentInRegion(_, _) |
+                FindCardResult::AsPermanentInFormation(_, _, _) => {
+                    return Err(StateError::InvalidRecycle)
+                }
+            }
 
-            state.player_recycle_card(player_id, card_id);
-
-            let resource_card = Card::from_resource_type(&self.cards_db, &mut state, *resource_type);
-
-            state.find_player_mut(player_id).expect("a player").hand.add(resource_card);
-
-            Ok(state)
+            Ok(mutations)
         } else {
-            panic!("only call this when the action is of the correct enum type")
+            panic!("only call this for Action::RecycleForResource")
         }
     }
-
 }
 
 fn valid_recycle_actions(game: &Game, region_id: RegionId) -> Vec<Action> {
