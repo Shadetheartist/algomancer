@@ -53,7 +53,7 @@ impl Game {
                     mutations.push(StateMutation::Static(MoveCard {
                         from_cc_id: cc.id(),
                         to_cc_id: player_deck_id,
-                        card_id: card_id,
+                        card_id,
                         placement: None,
                     }));
 

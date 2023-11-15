@@ -13,7 +13,7 @@ impl Game {
     pub fn gen_next_phase(&self, region_id: RegionId) -> Vec<StateMutation> {
         let mut mutations = Vec::new();
 
-        mutations.push(StateMutation::Static(PhaseTransition { region_id: region_id }));
+        mutations.push(StateMutation::Static(PhaseTransition { region_id }));
 
         for p in self.state.players_in_region(region_id).expect("players") {
             mutations.push(StateMutation::Static(SetPlayerPassedPriority { player_id: p.id, value: false }));

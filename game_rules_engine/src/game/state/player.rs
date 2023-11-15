@@ -45,14 +45,14 @@ impl Player {
         match state.game_mode {
             GameMode::LiveDraft { .. } => {
                 if let Some(common_deck) = &state.common_deck {
-                    return common_deck
+                    common_deck
                 } else {
                     panic!("player is supposed to draw from the common deck in live-draft, but it doesn't exist");
                 }
             },
             GameMode::PreDraft { .. } | GameMode::Constructed { .. } => {
                 if let Some(own_deck) = &self.own_deck {
-                    return own_deck
+                    own_deck
                 } else {
                     panic!("player is supposed to draw from their own deck in pre-draft & constructed, but it doesn't exist");
                 }
