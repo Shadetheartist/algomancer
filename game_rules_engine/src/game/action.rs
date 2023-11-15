@@ -145,7 +145,7 @@ impl Game {
 
                         // enforce that each card selected actually exists in the player's hand
                         for card_id in cards_to_keep {
-                            if player.hand.iter().find(|c| c.card_id == *card_id).is_none() {
+                            if !player.hand.iter().any(|c| c.card_id == *card_id) {
                                 return Err(ActionValidationError::Draft(DraftValidationError::CardNotInHand(*card_id)));
                             }
                         }
@@ -208,8 +208,8 @@ impl Game {
 
                 _ => {
                     for p in &region.players {
-                        if self.state.player_can_act(p.player_id) {
-                            valid_actions.insert(Action::PassPriority(p.player_id));
+                        if self.state.player_can_act(p.id) {
+                            valid_actions.insert(Action::PassPriority(p.id));
                         }
                     }
                 }

@@ -172,14 +172,14 @@ impl Game {
 
             match &team_configuration {
                 TeamConfiguration::Ffa { num_players } => {
-                    add_players_and_regions(&mut game, &vec![0, *num_players], mana_converter_prototype_id);
+                    add_players_and_regions(&mut game, &[0, *num_players], mana_converter_prototype_id);
                 }
                 TeamConfiguration::Teams { teams_of_players } => {
                     add_players_and_regions(&mut game, teams_of_players, mana_converter_prototype_id);
                 }
             }
 
-            fn add_players_and_regions(game: &mut Game, teams_of_players: &Vec<u8>, mana_converter_prototype_id: CardPrototypeId) {
+            fn add_players_and_regions(game: &mut Game, teams_of_players: &[u8], mana_converter_prototype_id: CardPrototypeId) {
                 let interlaced_players = Game::interlace_players(teams_of_players);
                 for (seat, &team_id) in interlaced_players.iter().enumerate() {
                     let player_id = PlayerId((seat + 1) as u8);
@@ -226,7 +226,7 @@ impl Game {
     }
 
     /// distributes the various players as evenly as possible amongst the seats at the table
-    fn interlace_players(teams_of_players: &Vec<u8>) -> Vec<u8> {
+    fn interlace_players(teams_of_players: &[u8]) -> Vec<u8> {
         // fleshes out the vec of u8 into a more formal structure so
         // we don't lose track of what team each player is on during the interlacing process
         let teams: Vec<(u8, u8)> = teams_of_players.iter().enumerate().map(|(i, &t)| (i as u8, t)).collect();
@@ -239,7 +239,7 @@ impl Game {
     /// It selects the character with the smallest gap to place next in the result.
     ///
     /// tuple is `[(team_number, num_players)]`
-    fn interlace_evenly(elements: &Vec<(u8, u8)>) -> Vec<u8> {
+    fn interlace_evenly(elements: &[(u8, u8)]) -> Vec<u8> {
         let total_count: u8 = elements.iter().map(|&(_, count)| count).sum();
         let mut result = Vec::with_capacity(total_count as usize);
         let mut indices = vec![0; elements.len()];

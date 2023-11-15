@@ -15,13 +15,13 @@ impl Game {
 
             let state = &self.state;
             let player = state.find_player(*player_id)?;
-            let region: &Region = state.find_region_containing_player(player.player_id)?;
+            let region: &Region = state.find_region_containing_player(player.id)?;
 
-            mutations.push(StateMutation::Static(SetPlayerPassedPriority { player_id: player.player_id, value: true }));
+            mutations.push(StateMutation::Static(SetPlayerPassedPriority { player_id: player.id, value: true }));
 
             // transition only the region that the player occupies when all players in the region have passed
             let region_pass = |mutations: &mut Vec<StateMutation>| -> Result<(), StateError> {
-                if state.all_players_in_region_except_passed_priority(region.region_id, player.player_id)? {
+                if state.all_players_in_region_except_passed_priority(region.region_id, player.id)? {
                     mutations.push(StateMutation::Static(PhaseTransition { region_id: region.region_id }))
                 }
                 Ok(())

@@ -42,11 +42,11 @@ pub enum Mode {
     ThreeVsThree,
 
     #[command(name = "ffa")]
-    FFA(FFAArgs),
+    Ffa(FfaArgs),
 }
 
 #[derive(Debug, Args)]
-pub struct FFAArgs {
+pub struct FfaArgs {
     pub num_players: u8,
 }
 

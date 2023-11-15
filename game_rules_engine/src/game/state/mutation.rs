@@ -12,10 +12,11 @@ use crate::game::state::State;
 
 mod player;
 
+pub type StateMutationEvaluator = dyn Fn(&State) -> Result<StaticStateMutation, StateError>;
 
 pub enum StateMutation {
     Static(StaticStateMutation),
-    Eval(Box<dyn Fn(&State) -> Result<StaticStateMutation, StateError>>),
+    Eval(Box<StateMutationEvaluator>),
 }
 
 impl StateMutation {

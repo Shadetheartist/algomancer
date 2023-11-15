@@ -14,15 +14,15 @@ impl Game {
         let region = self.state.find_region(region_id).expect("a region");
         let player = region.sole_player();
 
-        if self.state.player_can_act(player.player_id) {
-            actions.push(Action::PassPriority(player.player_id));
+        if self.state.player_can_act(player.id) {
+            actions.push(Action::PassPriority(player.id));
         } else {
             return actions
         }
 
         let clockwise_neighbour_id = self.state.region_clockwise_neighbour(region_id).expect("a neighbour").region_id;
 
-        let mut formation = Formation::new(FormationId(self.state.next_formation_id), player.player_id);
+        let mut formation = Formation::new(FormationId(self.state.next_formation_id), player.id);
         let some_permanent = region.unformed_permanents.first().expect("some permanent to exist");
         if let Permanent::Resource { common, .. } = some_permanent {
             formation.insert_at(FormationPos::FrontRow(0), common.permanent_id).expect("permanent inserted into formation");

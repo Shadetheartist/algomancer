@@ -21,7 +21,7 @@ impl EffectBuilder {
         match self {
             Self::RandomDamage { min, max, target, .. } => {
                 let amount = state.rand.gen_range(*min..*max);
-                
+
                 Effect::Damage { amount, target: *target }
             },
             EffectBuilder::Default(effect) => effect.clone(),
@@ -57,9 +57,8 @@ impl Effect {
     }
 
     pub fn mutate_state(&self, state: &mut state::State) {
-        match self {
-            Self::Special(effect) => effect.mutate_state(state),
-            _ => {}
+        if let Self::Special(effect) = self {
+            effect.mutate_state(state)
         }
     }
 }
@@ -82,7 +81,7 @@ mod tests {
                 assert_eq!(amount, amount)
             },
             _ => {
-                assert!(false)
+                panic!()
             }
         }
 
@@ -94,7 +93,7 @@ mod tests {
                 assert_eq!(amount, amount)
             },
             _ => {
-                assert!(false)
+                panic!()
             }
         }
     }
@@ -111,7 +110,7 @@ mod tests {
                 assert_eq!(3, amount)
             },
             _ => {
-                assert!(false)
+                panic!()
             }
         }
     }

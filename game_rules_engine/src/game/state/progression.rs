@@ -51,33 +51,21 @@ pub enum MainPhaseStep {
 
 impl Phase {
 
-    #[allow(dead_code)]
-    pub fn is_combat(&self) -> bool {
-        match self {
-            Phase::CombatPhaseA(_) => true,
-            Phase::CombatPhaseB(_) => true,
-            _ => false,
-        }
-    }
-
-    #[allow(dead_code)]
     pub fn is_priority_window(&self) -> bool {
         match self {
             Phase::CombatPhaseA(step) => {
-                match step {
-                    CombatPhaseAStep::AfterITAttackPriorityWindow => true,
-                    CombatPhaseAStep::AfterNITBlockPriorityWindow => true,
-                    CombatPhaseAStep::AfterCombatPriorityWindow => true,
-                    _ => false,
-                }
+                matches!(step,
+                    CombatPhaseAStep::AfterITAttackPriorityWindow |
+                    CombatPhaseAStep::AfterNITBlockPriorityWindow |
+                    CombatPhaseAStep::AfterCombatPriorityWindow
+                )
             }
             Phase::CombatPhaseB(step) => {
-                match step {
-                    CombatPhaseBStep::AfterNITAttackPriorityWindow => true,
-                    CombatPhaseBStep::AfterITBlockPriorityWindow => true,
-                    CombatPhaseBStep::AfterCombatPriorityWindow => true,
-                    _ => false,
-                }
+                matches!(step,
+                    CombatPhaseBStep::AfterNITAttackPriorityWindow |
+                    CombatPhaseBStep::AfterITBlockPriorityWindow |
+                    CombatPhaseBStep::AfterCombatPriorityWindow
+                )
             }
             _ => false,
         }
@@ -197,7 +185,7 @@ mod tests {
         let mode = &GameMode::new_player_mode();
         // there aren't nearly 100 steps in a round,
         // so if we get to the end of a round before the loop is over, the test is successful
-        let mut phase = initial_phase.clone();
+        let mut phase = initial_phase;
         for _ in 0..100 {
             eprintln!("{:?}", phase);
             phase = phase.get_next_phase(mode);

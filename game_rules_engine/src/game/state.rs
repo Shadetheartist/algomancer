@@ -82,11 +82,8 @@ pub struct State {
     pub next_formation_id: usize,
 }
 
-impl State {
-
-    // this is useful for testing
-    #[allow(dead_code)]
-    pub fn default() -> State {
+impl Default for State {
+    fn default() -> Self {
         State {
             game_mode: GameMode::new_player_mode(),
             rand: AlgomancerRng::new(AlgomancerRngSeed::default()),
@@ -100,10 +97,9 @@ impl State {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
-    use std::hash::Hash;
+    
 
     use crate::game::state::rng::{AlgomancerRng, AlgomancerRngSeed};
 

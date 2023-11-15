@@ -48,10 +48,10 @@ impl Game {
 
             match find_card_result {
                 FindCardResult::InPlayerHand(player, card) => {
-                    (player.player_id, card.prototype_id, true, false, false)
+                    (player.id, card.prototype_id, true, false, false)
                 }
                 FindCardResult::InPlayerDiscard(player, card) => {
-                    (player.player_id, card.prototype_id, false, true, false)
+                    (player.id, card.prototype_id, false, true, false)
                 }
                 FindCardResult::AsPermanentInRegion(_, permanent) => {
                     match permanent {

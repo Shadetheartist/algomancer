@@ -15,12 +15,12 @@ impl Game {
         // the player does not currently have initiative
         let region = self.state.find_region(region_id).expect("a region");
         let player = region.sole_player();
-        if !self.state.player_can_act(player.player_id) {
+        if !self.state.player_can_act(player.id) {
             return actions
         } else {
             // if the player can act, they can pass priority -
             // which moves to the next synchronised step when all players on the team pass priority
-            actions.push(Action::PassPriority(player.player_id));
+            actions.push(Action::PassPriority(player.id));
         }
 
         // during the mana phase, players can recycle any of their cards to gain a resource
@@ -46,7 +46,7 @@ impl Game {
                 let find_card_result = state.find_card(card_id).expect("a card");
                 match find_card_result {
                     FindCardResult::InPlayerHand(player, _) => {
-                        player.player_id
+                        player.id
                     }
                     _ => return Err(StateError::InvalidRecycle),
                 }

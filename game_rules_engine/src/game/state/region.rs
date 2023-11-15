@@ -117,7 +117,7 @@ impl State {
 
     fn each_player_in_region_takes_draw_step_cards(&mut self, region_id: RegionId) {
         let players = self.players_in_region_mut(region_id).expect("a set of players in a region");
-        let player_ids: Vec<PlayerId> = players.iter().map(|p| p.player_id).collect();
+        let player_ids: Vec<PlayerId> = players.iter().map(|p| p.id).collect();
         for p_id in player_ids {
             self.player_draw_n_cards(p_id, 2);
         }
@@ -154,7 +154,7 @@ impl State {
 
     pub fn players_in_region_except(&self, region_id: RegionId, player_id: PlayerId) -> Result<Vec<&Player>, StateError> {
         let region = self.find_region(region_id)?;
-        Ok(region.players.iter().filter(|p| p.player_id != player_id).collect())
+        Ok(region.players.iter().filter(|p| p.id != player_id).collect())
     }
 
     pub fn players_in_region_mut(&mut self, region_id: RegionId) -> Result<&mut Vec<Player>, StateError> {
@@ -164,7 +164,7 @@ impl State {
 
     pub fn find_region_id_containing_player(&self, player_id: PlayerId) -> RegionId {
         let region = self.regions.iter().find(|r| {
-            r.players.iter().find(|p| p.player_id == player_id).is_some()
+            r.players.iter().any(|p| p.id == player_id)
         }).expect("a region containing this player");
 
         region.region_id
@@ -172,7 +172,7 @@ impl State {
 
     pub fn find_region_containing_player_mut(&mut self, player_id: PlayerId) -> &mut Region {
         let region = self.regions.iter_mut().find(|r| {
-            r.players.iter().find(|p| p.player_id == player_id).is_some()
+            r.players.iter().any(|p| p.id == player_id)
         }).expect("a region containing this player");
 
         region
@@ -180,7 +180,7 @@ impl State {
 
     pub fn find_region_containing_player(&self, player_id: PlayerId) -> Result<&Region, StateError> {
         let find_result = self.regions.iter().find(|r| {
-            r.players.iter().find(|p| p.player_id == player_id).is_some()
+            r.players.iter().any(|p| p.id == player_id)
         });
 
         match find_result {
@@ -207,10 +207,8 @@ impl State {
             packs.push(neighbour_pack.clone());
         }
 
-        let mut idx = 0;
-        for pack in packs.into_iter() {
+        for (idx, pack) in packs.into_iter().enumerate() {
             self.regions[idx].sole_player_mut().pack = Some(pack);
-            idx += 1
         }
 
 

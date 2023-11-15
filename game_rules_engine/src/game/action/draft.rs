@@ -79,7 +79,7 @@ fn random_unique_combinations<T: Clone + Ord + Hash, R: RngCore>(rng: &mut R, in
 
 impl Game {
     pub fn valid_drafts(&self, region_id: RegionId) -> Vec<Action> {
-        let player_id = self.state.find_region(region_id).expect("a region").sole_player().player_id;
+        let player_id = self.state.find_region(region_id).expect("a region").sole_player().id;
 
         let mut actions = Vec::new();
 
@@ -120,7 +120,7 @@ impl Game {
 
         for combination in combinations {
             actions.push(Action::Draft {
-                player_id: player.player_id,
+                player_id: player.id,
                 cards_to_keep: combination,
             })
         }
@@ -141,7 +141,7 @@ impl Game {
             }
 
             if player.pack.is_none() {
-                mutations.push(StateMutation::Static(CreatePackForPlayer { player_id: player.player_id }));
+                mutations.push(StateMutation::Static(CreatePackForPlayer { player_id: player.id }));
             }
 
             for card in cards_for_pack {
@@ -215,7 +215,7 @@ impl Game {
             let player = state.find_player_mut(*player_id).expect("a player");
             match player.pack.as_mut() {
                 None => {
-                    player.pack = Some(CardCollection::new_pack(player.player_id))
+                    player.pack = Some(CardCollection::new_pack(player.id))
                 }
                 Some(player_pack) => {
                     for card in cards_for_pack {

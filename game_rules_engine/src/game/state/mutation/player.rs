@@ -6,7 +6,7 @@ use crate::game::state::player::{Player, PlayerId};
 
 impl State {
     pub fn find_player_mut(&mut self, player_id: PlayerId) -> Result<&mut Player, StateError> {
-        let find_result = self.players_mut().into_iter().find(|p| p.player_id == player_id);
+        let find_result = self.players_mut().into_iter().find(|p| p.id == player_id);
         match find_result {
             None => {
                 Err(StateError::PlayerNotFound(player_id))
@@ -62,7 +62,7 @@ impl State {
             },
             GameMode::PreDraft { .. } | GameMode::Constructed { .. } => {
                 let player = self.find_player_mut(player_id).expect("player");
-                if let Some(player_deck) = player.player_deck.as_mut() {
+                if let Some(player_deck) = player.deck.as_mut() {
                     Ok(player_deck)
                 } else {
                     panic!("player is supposed to draw from their own deck in pre-draft & constructed, but it doesn't exist");

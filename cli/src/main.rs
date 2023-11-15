@@ -15,7 +15,7 @@ use crate::parser::new::{FactionArg, GameModeCommand, LiveDraftArgs, Mode, NewAr
 
 mod parser;
 
-fn main() -> Result<(), CLIError>{
+fn main() -> Result<(), CLIError> {
     let args = Cli::parse();
 
     match args.command {
@@ -53,7 +53,7 @@ enum CLIError {
 }
 
 /// creates a new game instance, serializes it, and prints it to stdout
-fn print_new_game(args: &NewArgs) -> Result<(), CLIError>{
+fn print_new_game(args: &NewArgs) -> Result<(), CLIError> {
     let options = game_options_from_new_args(args)?;
     let game = Game::new(&options);
 
@@ -75,32 +75,29 @@ fn game_options_from_new_args(args: &NewArgs) -> Result<GameOptions, CLIError> {
 
     match &args.game_mode {
         GameModeCommand::LiveDraft(args) => {
-            match args {
-                LiveDraftArgs { factions: faction_args, mode } => {
-                    let game_options = GameOptions {
-                        seed: seed_bytes,
-                        game_mode: GameMode::LiveDraft {
-                            selected_deck_types: unique_factions(faction_args),
-                            team_configuration: match mode {
-                                Mode::OneVsOne => {
-                                    TeamConfiguration::one_v_one()
-                                }
-                                Mode::TwoVsTwo => {
-                                    TeamConfiguration::two_v_two()
-                                }
-                                Mode::ThreeVsThree => {
-                                    TeamConfiguration::three_v_three()
-                                }
-                                Mode::FFA(args) => {
-                                    TeamConfiguration::ffa(args.num_players)
-                                }
-                            },
-                        },
-                    };
+            let LiveDraftArgs { factions: faction_args, mode } = args;
+            let game_options = GameOptions {
+                seed: seed_bytes,
+                game_mode: GameMode::LiveDraft {
+                    selected_deck_types: unique_factions(faction_args),
+                    team_configuration: match mode {
+                        Mode::OneVsOne => {
+                            TeamConfiguration::one_v_one()
+                        }
+                        Mode::TwoVsTwo => {
+                            TeamConfiguration::two_v_two()
+                        }
+                        Mode::ThreeVsThree => {
+                            TeamConfiguration::three_v_three()
+                        }
+                        Mode::Ffa(args) => {
+                            TeamConfiguration::ffa(args.num_players)
+                        }
+                    },
+                },
+            };
 
-                    Ok(game_options)
-                }
-            }
+            Ok(game_options)
         }
         GameModeCommand::PreDraft => {
             Err(CLIError::NotImplemented)
@@ -114,7 +111,7 @@ fn game_options_from_new_args(args: &NewArgs) -> Result<GameOptions, CLIError> {
     }
 }
 
-fn serialize_game(game: &Game) -> Result<String, CLIError>{
+fn serialize_game(game: &Game) -> Result<String, CLIError> {
     let game_serialized: Result<String, serde_json::Error> = serde_json::to_string(game);
     match game_serialized {
         Ok(game_serialized) => Ok(game_serialized),
@@ -122,7 +119,7 @@ fn serialize_game(game: &Game) -> Result<String, CLIError>{
     }
 }
 
-fn deserialize_game(game_serialized: &str) -> Result<Game, CLIError>{
+fn deserialize_game(game_serialized: &str) -> Result<Game, CLIError> {
     let game: Result<Game, serde_json::Error> = serde_json::from_str(game_serialized);
     match game {
         Ok(game) => Ok(game),
@@ -130,7 +127,7 @@ fn deserialize_game(game_serialized: &str) -> Result<Game, CLIError>{
     }
 }
 
-fn serialize_actions(actions: &HashSet<Action>) -> Result<String, CLIError>{
+fn serialize_actions(actions: &HashSet<Action>) -> Result<String, CLIError> {
     let action_serialized: Result<String, serde_json::Error> = serde_json::to_string(actions);
     match action_serialized {
         Ok(action_serialized) => Ok(action_serialized),
@@ -138,7 +135,7 @@ fn serialize_actions(actions: &HashSet<Action>) -> Result<String, CLIError>{
     }
 }
 
-fn deserialize_action(action_serialized: &str) -> Result<Action, CLIError>{
+fn deserialize_action(action_serialized: &str) -> Result<Action, CLIError> {
     let action: Result<Action, serde_json::Error> = serde_json::from_str(action_serialized);
     match action {
         Ok(action) => Ok(action),
@@ -163,13 +160,13 @@ fn apply_action(args: &ApplyActionArgs) -> Result<(), CLIError> {
             let game_serialized = serialize_game(&game)?;
             println!("{}", game_serialized);
             Ok(())
-        },
+        }
         Err(err) => Err(CLIError::InvalidAction(action, err)),
     }
 }
 
 /// get the unique elements of the faction args by converting to hash set and then back to vec
-fn unique_factions(factions: &Vec<FactionArg>) -> Vec<Faction>{
+fn unique_factions(factions: &[FactionArg]) -> Vec<Faction> {
     let factions_set: HashSet<Faction> = HashSet::from_iter(factions.iter().map(|f_a| f_a.to_faction()));
     factions_set.into_iter().collect()
 }
@@ -207,7 +204,7 @@ mod tests {
 
             if actions_vec.is_empty() {
                 eprintln!("no more actions");
-                break
+                break;
             }
             let action = actions_vec.remove(0);
             let mutations = game.apply_action(action).unwrap();

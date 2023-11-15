@@ -31,11 +31,7 @@ pub enum CardType {
 impl CardType {
     /// is not a resource or token - i.e. 'real'
     pub fn is_real(&self) -> bool {
-        match self {
-            CardType::Unit(_)  |
-            CardType::Spell(_) => true,
-            _ => false
-        }
+        matches!(self, CardType::Unit(_) | CardType::Spell(_))
     }
 }
 
@@ -146,7 +142,7 @@ impl State {
             }
             GameMode::Constructed { .. } => {
                 for player in self.players() {
-                    let deck = &player.player_deck.as_ref().expect("a player's deck");
+                    let deck = &player.deck.as_ref().expect("a player's deck");
                     let card = deck.iter().find(|c| c.card_id == card_id);
                     if let Some(card) = card {
                         return Some(FindCardResult::InPlayerDeck(player, card))

@@ -13,10 +13,10 @@ pub struct PlayerId(pub u8);
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Player {
-    pub player_id: PlayerId,
+    pub id: PlayerId,
     pub team_id: TeamId,
     pub pack: Option<CardCollection>,
-    pub player_deck: Option<CardCollection>,
+    pub deck: Option<CardCollection>,
     pub is_alive: bool,
     pub health: i32,
     pub hand: CardCollection,
@@ -28,9 +28,9 @@ pub struct Player {
 impl Player {
     pub fn new(player_id: PlayerId,team_id: TeamId, deck: Option<CardCollection>, pack: Option<CardCollection>) -> Player {
         Player {
-            player_id,
+            id: player_id,
             team_id,
-            player_deck: deck,
+            deck,
             is_alive: true,
             health: 30,
             hand: CardCollection::new_hand(player_id),
@@ -54,7 +54,7 @@ impl State {
 
     /// looks through all regions for a player matching the player_id
     pub fn find_player(&self, player_id: PlayerId) -> Result<&Player, StateError> {
-        let find_result = self.players().into_iter().find(|p| p.player_id == player_id);
+        let find_result = self.players().into_iter().find(|p| p.id == player_id);
         match find_result {
             None => {
                 Err(StateError::PlayerNotFound(player_id))
@@ -72,7 +72,7 @@ impl State {
     pub fn team_ids(&self) -> Vec<TeamId> {
         self.players().into_iter().fold(Vec::new(), |mut acc, player| {
             // add the team to the list if it's no already there
-            if acc.iter().find(|&t_id| *t_id == player.team_id).is_none() {
+            if !acc.iter().any(|t_id| *t_id == player.team_id) {
                 acc.push(player.team_id)
             }
             acc
