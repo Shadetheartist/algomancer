@@ -9,7 +9,7 @@ pub struct PermanentId(pub usize);
 
 impl PermanentId {
     pub fn next(state: &mut State) -> PermanentId {
-        let next = state.next_permanent_id.clone();
+        let next = state.next_permanent_id;
         state.next_permanent_id = next + 1;
         PermanentId(next)
     }
@@ -51,7 +51,7 @@ impl Permanent {
                     permanent_id: PermanentId::next(state),
                     controller_player_id,
                 },
-                card: card
+                card
             }
         } else {
             panic!("you need to call this only when the card type is some real card, not a token or resource")

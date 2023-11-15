@@ -46,10 +46,10 @@ impl Action {
     fn generate_state_mutations(&self, game: &Game) -> Result<Vec<StateMutation>, StateError> {
         match self {
             action @ Action::PassPriority(_) => {
-                game.generate_pass_priority_state_mutations(&action)
+                game.generate_pass_priority_state_mutations(action)
             }
             action @ Action::Draft { .. } => {
-                game.generate_draft_mutations(&action)
+                game.generate_draft_mutations(action)
             }
             Action::RecycleForResource { .. } => {
                 Ok(Vec::new())
@@ -108,10 +108,10 @@ impl Game {
 
         eprintln!("Applying Action [{:?}]", &action);
 
-        let mutations = action.generate_state_mutations(&self)?;
+        let mutations = action.generate_state_mutations(self)?;
         let mut static_mutations = Vec::new();
 
-        if mutations.len() < 1 {
+        if mutations.is_empty() {
             panic!("no mutations generated from action [{:?}]", action)
         }
 
@@ -145,7 +145,7 @@ impl Game {
 
                         // enforce that each card selected actually exists in the player's hand
                         for card_id in cards_to_keep {
-                            if player.hand.iter().find(|c| c.card_id == *card_id) == None {
+                            if player.hand.iter().find(|c| c.card_id == *card_id).is_none() {
                                 return Err(ActionValidationError::Draft(DraftValidationError::CardNotInHand(*card_id)));
                             }
                         }

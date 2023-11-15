@@ -31,7 +31,7 @@ impl Game {
         actions.push(Action::Attack {
             home_region_id: region_id,
             under_attack_region_id: clockwise_neighbour_id,
-            formation: formation,
+            formation,
         });
 
         actions

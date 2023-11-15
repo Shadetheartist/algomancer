@@ -82,9 +82,7 @@ impl Card {
             c.card_type == Resource(resource_type)
         }).expect("a prototype for this resource");
 
-        match resource_type {
-            _ => Self::from_prototype(db, state, *id)
-        }
+        Self::from_prototype(db, state, *id)
     }
 
     pub fn from_prototype(db: &CardPrototypeDatabase, state: &mut State, card_prototype_id: CardPrototypeId) -> Card {
@@ -106,12 +104,12 @@ impl State {
         for player in self.players() {
             let card = player.hand.iter().find(|c| c.card_id == card_id);
             if let Some(card) = card {
-                return Some(FindCardResult::InPlayerHand(&player, card))
+                return Some(FindCardResult::InPlayerHand(player, card))
             }
 
             let card = player.discard.iter().find(|c| c.card_id == card_id);
             if let Some(card) = card {
-                return Some(FindCardResult::InPlayerDiscard(&player, card))
+                return Some(FindCardResult::InPlayerDiscard(player, card))
             }
         }
 

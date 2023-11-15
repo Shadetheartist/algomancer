@@ -21,8 +21,8 @@ impl EffectBuilder {
         match self {
             Self::RandomDamage { min, max, target, .. } => {
                 let amount = state.rand.gen_range(*min..*max);
-                let effect = Effect::Damage { amount, target: *target };
-                effect
+                
+                Effect::Damage { amount, target: *target }
             },
             EffectBuilder::Default(effect) => effect.clone(),
         }

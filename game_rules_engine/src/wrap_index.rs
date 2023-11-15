@@ -16,7 +16,7 @@ pub fn wrap_index(len: usize, idx: i32) -> Option<usize> {
     let i_len = len as i32;
 
     if idx >= 0 {
-        return Some((idx % i_len) as usize)
+        Some((idx % i_len) as usize)
     } else {
         let abs_idx = idx.abs() - 1;
         let e = abs_idx % i_len;

@@ -54,7 +54,7 @@ enum CLIError {
 
 /// creates a new game instance, serializes it, and prints it to stdout
 fn print_new_game(args: &NewArgs) -> Result<(), CLIError>{
-    let options = game_options_from_new_args(&args)?;
+    let options = game_options_from_new_args(args)?;
     let game = Game::new(&options);
 
     match game {
@@ -170,7 +170,7 @@ fn apply_action(args: &ApplyActionArgs) -> Result<(), CLIError> {
 
 /// get the unique elements of the faction args by converting to hash set and then back to vec
 fn unique_factions(factions: &Vec<FactionArg>) -> Vec<Faction>{
-    let factions_set: HashSet<Faction> = HashSet::from_iter(factions.into_iter().map(|f_a| f_a.to_faction()));
+    let factions_set: HashSet<Faction> = HashSet::from_iter(factions.iter().map(|f_a| f_a.to_faction()));
     factions_set.into_iter().collect()
 }
 
@@ -205,7 +205,7 @@ mod tests {
             let mut actions_vec: Vec<Action> = actions.into_iter().collect();
             actions_vec.sort();
 
-            if actions_vec.len() < 1 {
+            if actions_vec.is_empty() {
                 eprintln!("no more actions");
                 break
             }

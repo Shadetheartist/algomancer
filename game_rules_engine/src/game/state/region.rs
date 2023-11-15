@@ -137,13 +137,13 @@ impl State {
 
     pub fn all_players_in_region_except_passed_priority(&self, region_id: RegionId, except: PlayerId) -> Result<bool, StateError> {
         let players = self.players_in_region_except(region_id, except)?;
-        Ok(!players.iter().any(|p| p.passed_priority == false))
+        Ok(!players.iter().any(|p| !p.passed_priority))
     }
 
     pub fn all_players_in_region_on_team_passed_priority(&self, region_id: RegionId, team_id: TeamId) -> Result<bool, StateError> {
         let players = self.players_in_region(region_id)?;
         let players: Vec<&Player> = players.into_iter().filter(|p| p.team_id == team_id).collect();
-        Ok(!players.iter().any(|p| p.passed_priority == false))
+        Ok(!players.iter().any(|p| !p.passed_priority))
     }
 
 
@@ -164,7 +164,7 @@ impl State {
 
     pub fn find_region_id_containing_player(&self, player_id: PlayerId) -> RegionId {
         let region = self.regions.iter().find(|r| {
-            r.players.iter().find(|p| p.player_id == player_id) != None
+            r.players.iter().find(|p| p.player_id == player_id).is_some()
         }).expect("a region containing this player");
 
         region.region_id
@@ -172,7 +172,7 @@ impl State {
 
     pub fn find_region_containing_player_mut(&mut self, player_id: PlayerId) -> &mut Region {
         let region = self.regions.iter_mut().find(|r| {
-            r.players.iter().find(|p| p.player_id == player_id) != None
+            r.players.iter().find(|p| p.player_id == player_id).is_some()
         }).expect("a region containing this player");
 
         region
@@ -180,12 +180,12 @@ impl State {
 
     pub fn find_region_containing_player(&self, player_id: PlayerId) -> Result<&Region, StateError> {
         let find_result = self.regions.iter().find(|r| {
-            r.players.iter().find(|p| p.player_id == player_id) != None
+            r.players.iter().find(|p| p.player_id == player_id).is_some()
         });
 
         match find_result {
             None => {
-                return Err(StateError::NoRegionContainsPlayer(player_id))
+                Err(StateError::NoRegionContainsPlayer(player_id))
             }
             Some(region) => {
                 Ok(region)
@@ -255,10 +255,10 @@ impl State {
 
     pub fn all_players_on_team_passed_priority(&self, team_id: TeamId) -> Result<bool, StateError> {
         let players = self.players_on_team(team_id)?;
-        if players.len() == 0 {
+        if players.is_empty() {
             return Err(NoPlayersOnTeam(team_id))
         }
-        Ok(!players.iter().any(|p| p.passed_priority == false))
+        Ok(!players.iter().any(|p| !p.passed_priority))
     }
 
 

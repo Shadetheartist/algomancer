@@ -40,7 +40,7 @@ impl Game {
             let find_card_result = state.find_card(card_id);
 
             // validate that this player can actually play the card
-            if let None = find_card_result {
+            if find_card_result.is_none() {
                 return Err(CardDoesNotExist);
             }
 

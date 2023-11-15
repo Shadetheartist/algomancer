@@ -1,7 +1,7 @@
-use std::ops::Deref;
 
-use serde::{Deserialize, Serialize, Serializer};
-use serde::ser::SerializeStruct;
+
+use serde::{Deserialize, Serialize};
+
 
 use crate::game::state::card::CardId;
 use crate::game::state::card_collection::{CardCollection, CardCollectionId};
@@ -54,7 +54,7 @@ pub enum StaticStateMutation {
 
 
 impl State {
-    pub fn mutate(mut self, state_mutation: &StaticStateMutation) -> Result<State, StateError> {
+    pub fn mutate(self, state_mutation: &StaticStateMutation) -> Result<State, StateError> {
         match state_mutation {
             mutation @ StaticStateMutation::SetPlayerPassedPriority { .. } => self.handle_set_player_passed_priority(mutation),
             mutation @ StaticStateMutation::PhaseTransition { .. } => self.handle_phase_transition(mutation),
@@ -89,7 +89,7 @@ impl State {
         }
     }
 
-    fn handle_phase_transition(mut self, state_mutation: &StaticStateMutation) -> Result<State, StateError> {
+    fn handle_phase_transition(self, state_mutation: &StaticStateMutation) -> Result<State, StateError> {
         if let StaticStateMutation::PhaseTransition { region_id } = *state_mutation {
             Ok(self.region_transition_to_next_step(region_id))
         } else {

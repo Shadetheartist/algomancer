@@ -15,7 +15,7 @@ impl Game {
         // the player does not currently have initiative
         let region = self.state.find_region(region_id).expect("a region");
         let player = region.sole_player();
-        if self.state.player_can_act(player.player_id) == false {
+        if !self.state.player_can_act(player.player_id) {
             return actions
         } else {
             // if the player can act, they can pass priority -
@@ -77,14 +77,13 @@ fn valid_recycle_actions(game: &Game, region_id: RegionId) -> Vec<Action> {
     for card in player.hand.iter() {
 
         let proto = game.cards_db.prototypes.get(&card.prototype_id).expect("a card prototype");
-        if proto.card_type.is_real() == false {
+        if !proto.card_type.is_real() {
             continue
         }
 
         for resource_type in ResourceType::all() {
             actions.push(Action::RecycleForResource {
-                card_id: card.card_id, resource_type:
-                resource_type
+                card_id: card.card_id, resource_type
             })
         }
     }

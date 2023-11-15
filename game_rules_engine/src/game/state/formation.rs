@@ -52,7 +52,7 @@ impl<'a, T> Formation<T> {
     pub fn new(id: FormationId, owner_player_id: PlayerId) -> Formation<T> {
         Formation {
             formation_id: id,
-            owner_player_id: owner_player_id,
+            owner_player_id,
             padding_cells_enabled: true,
             committed: false,
             top_row: vec![None],
@@ -71,7 +71,7 @@ impl<'a, T> Formation<T> {
         }
 
         // add column padding
-        if self.top_row.len() == 0 {
+        if self.top_row.is_empty() {
             self.top_row.insert(0, None);
             self.bot_row.insert(0, None);
         } else {
@@ -116,8 +116,8 @@ impl<'a, T> Formation<T> {
     }
 
     pub fn cells_iter<'b>(&'b self) -> Box<dyn Iterator<Item=&'b T> + 'b> {
-        let top_iter = self.top_row.iter().filter(|cell| cell.is_some()).map(|cell| cell.as_ref().expect("a permanent"));
-        let bot_iter = self.bot_row.iter().filter(|cell| cell.is_some()).map(|cell| cell.as_ref().expect("a permanent"));
+        let top_iter = self.top_row.iter().filter_map(|cell| cell.as_ref());
+        let bot_iter = self.bot_row.iter().filter_map(|cell| cell.as_ref());
         Box::new(top_iter.chain(bot_iter))
     }
 
@@ -149,7 +149,7 @@ impl<'a, T> Formation<T> {
         // validate the insert
         {
             let cell = self.get_at(pos)?;
-            if let Some(_) = cell {
+            if cell.is_some() {
                 return Err(FormationError::InsertError(InsertError::CellIsOccupied));
             }
 
@@ -157,7 +157,7 @@ impl<'a, T> Formation<T> {
             if let BackRow(col) = &pos {
                 // and there is no permanent in the front row
                 let front_cell = self.get_at(FrontRow(*col))?;
-                if let None = front_cell {
+                if front_cell.is_none() {
                     // cannot insert into the back row if there is not already a permanent
                     // in the front row of this col
                     return Err(FormationError::InsertError(InsertError::FrontCellIsEmpty));
@@ -206,7 +206,7 @@ impl<'a, T> Formation<T> {
         }
 
         let cell = self.get_at(pos)?;
-        if let None = cell {
+        if cell.is_none() {
             return Err(FormationError::RemoveError(NothingToRemove));
         }
 
@@ -214,7 +214,7 @@ impl<'a, T> Formation<T> {
             FrontRow(col) => {
                 // if a unit is removed from the front, the unit behind it moves up to replace it
                 // (works even if the replacement is None)
-                let replacement = std::mem::replace(&mut self.bot_row[col], None);
+                let replacement = self.bot_row[col].take();
                 let item = std::mem::replace(&mut self.top_row[col], replacement);
                 let item = item.expect("a permanent");
 
@@ -242,7 +242,7 @@ impl<'a, T> Formation<T> {
                 Ok(item)
             }
             BackRow(col) => {
-                let item = std::mem::replace(&mut self.bot_row[col], None);
+                let item = self.bot_row[col].take();
                 let item = item.expect("a permanent");
 
                 // units being removed from the back row should never cause a collapse
@@ -285,7 +285,7 @@ impl <T> DefensiveFormation<T> {
             attacking_formation_id: attacking_formation.formation_id,
             formation: Formation {
                 formation_id: id,
-                owner_player_id: owner_player_id,
+                owner_player_id,
                 padding_cells_enabled: false, // defensive formations start locked
                 committed: false,
                 top_row: attacking_formation.top_row.iter().map(|_| None).collect(),

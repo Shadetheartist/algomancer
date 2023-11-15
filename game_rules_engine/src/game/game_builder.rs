@@ -39,7 +39,7 @@ impl Game {
             GameMode::LiveDraft { .. } => {
                 Self::build_live_draft(options)
             }
-            game_mode @ _ => {
+            game_mode => {
                 Err(NotSupportedYet(format!("the game mode [{:?}] is not yet supported", game_mode)))
             }
         }
@@ -165,9 +165,9 @@ impl Game {
             };
 
             let mut game = Game {
-                cards_db: cards_db,
+                cards_db,
                 action_history: Vec::new(),
-                state: state,
+                state,
             };
 
             match &team_configuration {
@@ -204,7 +204,7 @@ impl Game {
                     }
 
                     let region = Region{
-                        region_id: region_id,
+                        region_id,
                         owner_player_id: player_id,
                         players: vec![player],
                         unformed_permanents: permanents,

@@ -36,7 +36,7 @@ impl Player {
             hand: CardCollection::new_hand(player_id),
             discard: CardCollection::new_discard(player_id),
             passed_priority: false,
-            pack: pack,
+            pack,
             resources_played_this_turn: 0,
         }
     }
@@ -72,7 +72,7 @@ impl State {
     pub fn team_ids(&self) -> Vec<TeamId> {
         self.players().into_iter().fold(Vec::new(), |mut acc, player| {
             // add the team to the list if it's no already there
-            if acc.iter().find(|&t_id| *t_id == player.team_id) == None {
+            if acc.iter().find(|&t_id| *t_id == player.team_id).is_none() {
                 acc.push(player.team_id)
             }
             acc

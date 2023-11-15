@@ -140,7 +140,7 @@ impl Game {
                 return Err(StateError::InvalidDraft)
             }
 
-            if let None = &player.pack {
+            if player.pack.is_none() {
                 mutations.push(StateMutation::Static(CreatePackForPlayer { player_id: player.player_id }));
             }
 
@@ -151,7 +151,7 @@ impl Game {
                     Ok(MoveCard {
                         from_cc_id: player.hand.id(),
                         to_cc_id: player.pack.as_ref().unwrap().id(),
-                        card_id: card_id,
+                        card_id,
                     })
                 }));
 

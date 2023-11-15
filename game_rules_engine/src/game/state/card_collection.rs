@@ -110,7 +110,7 @@ impl CardCollection {
     pub fn draw(&mut self) -> Result<Card, StateError> {
         match self {
             CardCollection::Deck { cards, .. } => {
-                if cards.len() == 0 {
+                if cards.is_empty() {
                     return Err(StateError::CannotDrawFromEmptyCollection);
                 }
                 Ok(cards.remove(0))
@@ -251,12 +251,12 @@ impl State {
 
         /// check if it's one of the player's hands
         if let Some(player) = players.iter().find(|p| p.hand.id() == id) {
-            return Ok(FindCardCollectionResult::PlayerHand(&player, &player.hand));
+            return Ok(FindCardCollectionResult::PlayerHand(player, &player.hand));
         }
 
         /// check if it's one of the player's discards
         if let Some(player) = players.iter().find(|p| p.discard.id() == id) {
-            return Ok(FindCardCollectionResult::PlayerHand(&player, &player.discard));
+            return Ok(FindCardCollectionResult::PlayerHand(player, &player.discard));
         }
 
         /// check if it's one of the player's decks
@@ -266,7 +266,7 @@ impl State {
             }
             false
         }) {
-            return Ok(FindCardCollectionResult::PlayerDeck(&player, &player.player_deck.as_ref().unwrap()));
+            return Ok(FindCardCollectionResult::PlayerDeck(player, player.player_deck.as_ref().unwrap()));
         }
 
         Err(StateError::CardCollectionNotFound(id))
