@@ -1,4 +1,4 @@
-use algomancer_gre::game::state::resource::Faction;
+use algomancer_gre::game::state::faction::Faction;
 use clap::{Args, Subcommand, ValueEnum};
 
 #[derive(Debug, Args)]

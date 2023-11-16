@@ -5,7 +5,7 @@ use algomancer_gre::game::action::Action;
 use algomancer_gre::game::game_builder::NewGameError;
 use algomancer_gre::game::state::error::StateError;
 use algomancer_gre::game::state::GameMode;
-use algomancer_gre::game::state::resource::Faction;
+use algomancer_gre::game::state::faction::Faction;
 use algomancer_gre::game::state::team_configuration::TeamConfiguration;
 use clap::Parser;
 
@@ -176,7 +176,7 @@ mod tests {
     use algomancer_gre::game::{Game, GameOptions};
     use algomancer_gre::game::action::Action;
     use algomancer_gre::game::state::GameMode;
-    use algomancer_gre::game::state::resource::Faction::{Fire, Wood};
+    use algomancer_gre::game::state::faction::Faction::{Fire, Wood};
     use algomancer_gre::game::state::team_configuration::TeamConfiguration;
 
     // utility function to avoid code duplication

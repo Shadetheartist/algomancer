@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use crate::game::state::card_collection::CardCollection;
 use crate::game::state::player::TeamId;
 use crate::game::state::region::Region;
-use crate::game::state::resource::Faction;
+use crate::game::state::faction::Faction;
 use crate::game::state::team_configuration::TeamConfiguration;
 
 pub mod card;
@@ -19,6 +19,8 @@ pub mod mutation;
 pub mod card_collection;
 pub mod team_configuration;
 pub mod error;
+pub mod faction;
+pub mod cost;
 
 // as described in the manual
 // aside from 1v1, i've never played any of these lol

@@ -6,12 +6,13 @@ use serde::{Deserialize, Serialize};
 use crate::game::state::{GameMode, State};
 use crate::game::state::card::CardType::Resource;
 use crate::game::state::card_collection::CardCollection;
+use crate::game::state::cost::Cost;
 use crate::game::state::error::StateError;
 use crate::game::state::formation::Formation;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::Player;
 use crate::game::state::region::Region;
-use crate::game::state::resource::{Cost, ResourceType};
+use crate::game::state::resource::{ResourceType};
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum Timing {
