@@ -20,9 +20,6 @@ pub mod card_collection;
 pub mod team_configuration;
 pub mod error;
 
-type ObjectId = i32;
-
-
 // as described in the manual
 // aside from 1v1, i've never played any of these lol
 #[allow(dead_code)]
