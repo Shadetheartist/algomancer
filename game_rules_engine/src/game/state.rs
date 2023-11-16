@@ -7,7 +7,6 @@ use crate::game::state::region::Region;
 use crate::game::state::resource::Faction;
 use crate::game::state::team_configuration::TeamConfiguration;
 
-pub mod effect;
 pub mod card;
 pub mod player;
 pub mod progression;
