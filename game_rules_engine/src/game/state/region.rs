@@ -247,7 +247,7 @@ impl State {
     }
 
     pub fn players_on_team(&self, team_id: TeamId) -> Result<Vec<&Player>, StateError> {
-        let team_players = self.players().into_iter().filter(|p| p.team_id == team_id).collect();
+        let team_players = self.players().filter(|p| p.team_id == team_id).collect();
         Ok(team_players)
     }
 

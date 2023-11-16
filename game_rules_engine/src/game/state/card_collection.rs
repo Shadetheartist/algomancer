@@ -255,7 +255,7 @@ impl State {
             }
         }
 
-        let players = self.players();
+        let players: Vec<&Player> = self.players().collect();
 
         // check if it's one of the player's hands
         if let Some(player) = players.iter().find(|p| p.hand.id() == id) {

@@ -68,16 +68,14 @@ impl Player {
 
 impl State {
 
-    pub fn players_iter(&self) -> impl Iterator<Item = &Player> {
+    /// create an iterator over all the players in the game
+    pub fn players(&self) -> impl Iterator<Item = &Player> {
         self.regions.iter().flat_map(|r| &r.players)
-    }
-    pub fn players(&self) -> Vec<&Player> {
-        self.regions.iter().flat_map(|r| &r.players).collect()
     }
 
     /// looks through all regions for a player matching the player_id
     pub fn find_player(&self, player_id: PlayerId) -> Result<&Player, StateError> {
-        let find_result = self.players().into_iter().find(|p| p.id == player_id);
+        let find_result = self.players().find(|p| p.id == player_id);
         match find_result {
             None => {
                 Err(StateError::PlayerNotFound(player_id))
@@ -89,11 +87,11 @@ impl State {
     }
 
     pub fn living_players_in_team(&self, team_id: TeamId) -> Vec<&Player> {
-        self.players().into_iter().filter(|p| p.team_id == team_id && p.is_alive).collect()
+        self.players().filter(|p| p.team_id == team_id && p.is_alive).collect()
     }
 
     pub fn team_ids(&self) -> Vec<TeamId> {
-        self.players().into_iter().fold(Vec::new(), |mut acc, player| {
+        self.players().fold(Vec::new(), |mut acc, player| {
             // add the team to the list if it's no already there
             if !acc.iter().any(|t_id| *t_id == player.team_id) {
                 acc.push(player.team_id)

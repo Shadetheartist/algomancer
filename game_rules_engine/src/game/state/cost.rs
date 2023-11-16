@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use crate::game::state::faction::FactionAffinity;
-use crate::game::state::resource::ResourceType;
+
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Cost {

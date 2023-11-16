@@ -13,7 +13,7 @@ use crate::game::state::State;
 impl Game {
 
     pub fn generate_play_card_mutations(&self, action: &Action) -> Result<Vec<StateMutation>, StateError> {
-        if let Action::PlayCard { card_id } = action {
+        if let Action::PlayCard { card_id: _ } = action {
             let mutations = Vec::new();
 
             Ok(mutations)
