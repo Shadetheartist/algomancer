@@ -108,7 +108,7 @@ impl Game {
             if performance_mode {
                 // this generates a random unique set of size `num_options` of combinations of cards
                 let num_options = 3;
-                let mut rng_clone = self.state.rand.rng.clone();
+                let mut rng_clone = self.state.rand.clone();
                 random_unique_combinations(&mut rng_clone, &card_ids, num_cards_to_draft, num_options)
             } else {
                 // this generates an exhaustive list of combinations

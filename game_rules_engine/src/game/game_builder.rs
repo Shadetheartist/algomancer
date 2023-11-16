@@ -146,7 +146,7 @@ impl Game {
                 prototypes: card_prototypes,
             };
 
-            cards_for_deck.shuffle(&mut algomancer_rng.rng);
+            cards_for_deck.shuffle(&mut algomancer_rng);
 
             let mut deck = CardCollection::new_common_deck();
             for c in cards_for_deck {
