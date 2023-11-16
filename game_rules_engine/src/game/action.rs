@@ -54,8 +54,8 @@ impl Action {
             action @ Action::RecycleForResource { .. } => {
                 game.generate_recycle_for_resource_mutations(action)
             }
-            Action::PlayCard { .. } => {
-                Ok(Vec::new())
+            action @ Action::PlayCard { .. } => {
+                game.generate_play_card_mutations(action)
             }
             action @ Action::Attack { .. } => {
                 game.generate_attack_mutations(action)

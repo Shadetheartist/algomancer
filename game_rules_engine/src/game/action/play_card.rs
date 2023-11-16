@@ -4,24 +4,42 @@ use crate::game::state::card::{Card, CardId, CardType, FindCardResult, Timing};
 use crate::game::state::error::{StateError};
 use crate::game::state::error::CardNotPlayableError::{CannotCastANonSpellTokenPermanentFromPlay, CannotPlayMoreResources, CardLacksCorrectTiming, MustBePlayedFromHand, NotInPlayableStep, NotInPlayableZone};
 use crate::game::state::error::StateError::CardNotPlayable;
+use crate::game::state::mutation::StateMutation;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::PlayerId;
 use crate::game::state::progression::{MainPhaseStep, Phase, PrecombatPhaseStep};
 use crate::game::state::State;
 
 impl Game {
+
+    pub fn generate_play_card_mutations(&self, action: &Action) -> Result<Vec<StateMutation>, StateError> {
+        if let Action::PlayCard { card_id } = action {
+            let mutations = Vec::new();
+
+            Ok(mutations)
+        } else {
+            panic!("only call this when the action is of the correct enum type")
+        }
+    }
+
     pub fn apply_play_card_action(&self, mut state: State, action: &Action) -> Result<State, StateError> {
         if let Action::PlayCard { card_id } = action {
             let card_id = *card_id;
+            let find_card_result = state.find_card(card_id)?;
 
-            match self.play_card(state, card_id) {
-                Ok(_state) => {
-                    state = _state
+            let (player, cc, card) = match find_card_result {
+                FindCardResult::InPlayerHand(player, cc, card) => (player, cc, card),
+                FindCardResult::InPlayerDiscard(player, cc, card) => (player, cc, card),
+                FindCardResult::AsPermanentInRegion(region, card) => {
+                    todo!("handle spell tokens")
                 }
-                Err(err) => {
-                    return Err(err);
+
+                FindCardResult::InPlayerDeck(_, _, _) |
+                FindCardResult::InCommonDeck(_, _) |
+                FindCardResult::AsPermanentInFormation(_, _, _) => {
+                    return Err(CardNotPlayable(NotInPlayableZone))
                 }
-            }
+            };
 
             Ok(state)
         } else {
