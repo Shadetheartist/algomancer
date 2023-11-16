@@ -22,32 +22,6 @@ impl Game {
         }
     }
 
-    pub fn apply_play_card_action(&self, mut state: State, action: &Action) -> Result<State, StateError> {
-        if let Action::PlayCard { card_id } = action {
-            let card_id = *card_id;
-            let find_card_result = state.find_card(card_id)?;
-
-            let (player, cc, card) = match find_card_result {
-                FindCardResult::InPlayerHand(player, cc, card) => (player, cc, card),
-                FindCardResult::InPlayerDiscard(player, cc, card) => (player, cc, card),
-                FindCardResult::AsPermanentInRegion(region, card) => {
-                    todo!("handle spell tokens")
-                }
-
-                FindCardResult::InPlayerDeck(_, _, _) |
-                FindCardResult::InCommonDeck(_, _) |
-                FindCardResult::AsPermanentInFormation(_, _, _) => {
-                    return Err(CardNotPlayable(NotInPlayableZone))
-                }
-            };
-
-            Ok(state)
-        } else {
-            panic!("only call this when the action is of the correct enum type")
-        }
-    }
-
-
     // this probably should be decomposed into play_card_from_hand / play_spell_token / etc.
     pub fn play_card(&self, mut state: State, card_id: CardId) -> Result<State, StateError> {
 
