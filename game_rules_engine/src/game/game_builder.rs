@@ -5,9 +5,10 @@ use std::fmt;
 use rand::prelude::SliceRandom;
 
 use crate::game::{Game, GameOptions};
+use crate::game::db::{CardPrototype, CardPrototypeDatabase, CardPrototypeId};
 use crate::game::game_builder::NewGameError::NotSupportedYet;
 use crate::game::state::{GameMode, State};
-use crate::game::state::card::{Card, CardId, CardPrototype, CardPrototypeDatabase, CardPrototypeId, CardType};
+use crate::game::state::card::{Card, CardId,  CardType};
 use crate::game::state::card::Timing::{Combat, Default, Haste, Virus};
 use crate::game::state::card_collection::CardCollection;
 use crate::game::state::cost::Cost;
