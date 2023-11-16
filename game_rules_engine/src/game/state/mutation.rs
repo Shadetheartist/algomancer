@@ -12,7 +12,7 @@ use crate::game::state::State;
 
 mod player;
 
-pub type StateMutationEvaluator = dyn Fn(&State) -> Result<StaticStateMutation, StateError>;
+pub type StateMutationEvaluator = dyn Fn(&State) -> Result<StateMutation, StateError>;
 
 pub enum StateMutation {
     Static(StaticStateMutation),
@@ -26,7 +26,8 @@ impl StateMutation {
                 Ok(static_mutation)
             }
             StateMutation::Eval(eval_fn) => {
-                (eval_fn)(state)
+                let evaluated = (eval_fn)(state)?;
+                evaluated.to_static(state)
             }
         }
     }

@@ -146,14 +146,14 @@ impl Game {
                 let card_id = card.card_id;
                 // all these mutations depend on the pack existing, it doesn't yet, but it will when applying these mutations.
                 // so we need to look at that future state to get the pack's id, by using the Eval variant.
-                let eval_mutation = StateMutation::Eval(Box::new(move |state| -> Result<StaticStateMutation, StateError> {
+                let eval_mutation = StateMutation::Eval(Box::new(move |state| -> Result<StateMutation, StateError> {
                     let player = state.find_player(player_id)?;
-                    Ok(MoveCard {
+                    Ok(StateMutation::Static(MoveCard {
                         from_cc_id: player.hand.id(),
                         to_cc_id: player.pack.as_ref().unwrap().id(),
                         card_id,
                         placement: None
-                    })
+                    }))
                 }));
 
                 mutations.push(eval_mutation);
