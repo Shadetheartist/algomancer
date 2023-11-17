@@ -11,8 +11,6 @@ use crate::game::state::player::PlayerId;
 use crate::game::state::region::RegionId;
 use crate::game::state::State;
 
-mod player;
-
 pub type StateMutationEvaluator = dyn Fn(&State) -> Result<StateMutation, StateError>;
 
 pub enum StateMutation {

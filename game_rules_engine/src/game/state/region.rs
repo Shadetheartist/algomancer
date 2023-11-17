@@ -98,7 +98,6 @@ impl State {
         }
     }
 
-    #[allow(dead_code)]
     pub fn region_clockwise_neighbour(&self, region_id: RegionId) -> Option<&Region> {
         let self_idx_result = self.regions.iter().enumerate().find(|(_, val)| val.region_id == region_id);
         match self_idx_result {

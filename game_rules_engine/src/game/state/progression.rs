@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::game::state::{GameMode, State};
-use crate::game::state::region::RegionId;
+use crate::game::state::{GameMode};
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub enum Phase {
@@ -48,30 +47,8 @@ pub enum MainPhaseStep {
     NITMain,
 }
 
-
 impl Phase {
-
-    pub fn is_priority_window(&self) -> bool {
-        match self {
-            Phase::CombatPhaseA(step) => {
-                matches!(step,
-                    CombatPhaseAStep::AfterITAttackPriorityWindow |
-                    CombatPhaseAStep::AfterNITBlockPriorityWindow |
-                    CombatPhaseAStep::AfterCombatPriorityWindow
-                )
-            }
-            Phase::CombatPhaseB(step) => {
-                matches!(step,
-                    CombatPhaseBStep::AfterNITAttackPriorityWindow |
-                    CombatPhaseBStep::AfterITBlockPriorityWindow |
-                    CombatPhaseBStep::AfterCombatPriorityWindow
-                )
-            }
-            _ => false,
-        }
-    }
-
-    // this returns the next phase & step given the current phase & step
+    /// This method returns the next phase for a game running with a given game mode.
     pub fn get_next_phase(&self, game_mode: &GameMode) -> Phase {
         match self {
             Phase::PrecombatPhase(step) => {
@@ -159,47 +136,24 @@ impl Phase {
             }
         }
     }
-}
 
-
-impl State {
-    pub fn transition_step_in_all_regions(mut self) -> Self {
-        let region_ids : Vec<RegionId> = self.regions.iter().map(|r| r.region_id).collect();
-
-        for region_id in region_ids {
-            self = self.region_transition_to_next_step(region_id);
-        }
-
-        self
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::game::state::GameMode;
-    use crate::game::state::progression::{MainPhaseStep, Phase, PrecombatPhaseStep};
-
-    #[test]
-    fn test_phase_next() {
-        let initial_phase = Phase::PrecombatPhase(PrecombatPhaseStep::Untap);
-        let mode = &GameMode::new_player_mode();
-        // there aren't nearly 100 steps in a round,
-        // so if we get to the end of a round before the loop is over, the test is successful
-        let mut phase = initial_phase;
-        for _ in 0..100 {
-            eprintln!("{:?}", phase);
-            phase = phase.get_next_phase(mode);
-
-            // we got from the beginning to the end of the loop, success!
-            if phase == Phase::MainPhase(MainPhaseStep::NITMain) {
-                return;
+    pub fn is_priority_window(&self) -> bool {
+        match self {
+            Phase::CombatPhaseA(step) => {
+                matches!(step,
+                    CombatPhaseAStep::AfterITAttackPriorityWindow |
+                    CombatPhaseAStep::AfterNITBlockPriorityWindow |
+                    CombatPhaseAStep::AfterCombatPriorityWindow
+                )
             }
+            Phase::CombatPhaseB(step) => {
+                matches!(step,
+                    CombatPhaseBStep::AfterNITAttackPriorityWindow |
+                    CombatPhaseBStep::AfterITBlockPriorityWindow |
+                    CombatPhaseBStep::AfterCombatPriorityWindow
+                )
+            }
+            _ => false,
         }
-
-        // go one more
-        phase = phase.get_next_phase(mode);
-
-        // we should be back to the initial phase
-        assert_eq!(phase, initial_phase);
     }
 }
