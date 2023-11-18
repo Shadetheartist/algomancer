@@ -13,6 +13,7 @@ pub struct NewArgs {
     pub game_mode: GameModeCommand,
 }
 
+
 #[derive(Debug, Subcommand)]
 #[command(rename_all = "snake_case")]
 pub enum GameModeCommand {

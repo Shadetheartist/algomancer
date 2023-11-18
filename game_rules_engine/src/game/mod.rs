@@ -16,7 +16,7 @@ pub struct GameOptions {
     pub game_mode: GameMode,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Game {
     pub state: state::State,
     pub action_history: Vec<Action>,

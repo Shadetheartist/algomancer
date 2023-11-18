@@ -1,4 +1,6 @@
 use clap::{Args, Subcommand};
+use algomancer_gre::game::action::Action;
+use algomancer_gre::game::Game;
 
 #[derive(Debug, Args)]
 #[command(rename_all = "snake_case")]
@@ -23,12 +25,16 @@ pub enum ActionsCommand {
 #[derive(Debug, Args)]
 #[command(rename_all = "snake_case")]
 pub struct ListActionsArgs {
-    pub state: String,
+    #[arg(value_parser = crate::json_value_parser::json_value_parser::<Game>)]
+    pub state: Game,
 }
 
 #[derive(Debug, Args)]
 #[command(rename_all = "snake_case")]
 pub struct ApplyActionArgs {
-    pub state: String,
-    pub action: String,
+    #[arg(value_parser = crate::json_value_parser::json_value_parser::<Game>)]
+    pub state: Game,
+
+    #[arg(value_parser = crate::json_value_parser::json_value_parser::<Action>)]
+    pub action: Action,
 }

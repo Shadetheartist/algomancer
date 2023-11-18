@@ -14,6 +14,7 @@ use crate::parser::actions::{ActionsCommand, ApplyActionArgs, ListActionsArgs};
 use crate::parser::new::{FactionArg, GameModeCommand, LiveDraftArgs, Mode, NewArgs};
 
 mod parser;
+mod json_value_parser;
 
 fn main() -> Result<(), CLIError> {
     let args = Cli::parse();
@@ -30,7 +31,7 @@ fn main() -> Result<(), CLIError> {
                     Ok(())
                 }
                 ActionsCommand::Apply(args) => {
-                    apply_action(&args)?;
+                    apply_action(args)?;
                     Ok(())
                 }
             }
@@ -42,11 +43,9 @@ fn main() -> Result<(), CLIError> {
 #[derive(Debug)]
 enum CLIError {
     FailedToSerializeGame(serde_json::Error),
-    FailedToDeserializeGame(serde_json::Error),
     FailedToInitializeGame(NewGameError),
 
     FailedToSerializeActions(serde_json::Error),
-    FailedToDeserializeAction(serde_json::Error),
 
     InvalidAction(Action, StateError),
     NotImplemented,
@@ -119,14 +118,6 @@ fn serialize_game(game: &Game) -> Result<String, CLIError> {
     }
 }
 
-fn deserialize_game(game_serialized: &str) -> Result<Game, CLIError> {
-    let game: Result<Game, serde_json::Error> = serde_json::from_str(game_serialized);
-    match game {
-        Ok(game) => Ok(game),
-        Err(err) => Err(CLIError::FailedToDeserializeGame(err)),
-    }
-}
-
 fn serialize_actions(actions: &HashSet<Action>) -> Result<String, CLIError> {
     let action_serialized: Result<String, serde_json::Error> = serde_json::to_string(actions);
     match action_serialized {
@@ -135,33 +126,22 @@ fn serialize_actions(actions: &HashSet<Action>) -> Result<String, CLIError> {
     }
 }
 
-fn deserialize_action(action_serialized: &str) -> Result<Action, CLIError> {
-    let action: Result<Action, serde_json::Error> = serde_json::from_str(action_serialized);
-    match action {
-        Ok(action) => Ok(action),
-        Err(err) => Err(CLIError::FailedToDeserializeAction(err)),
-    }
-}
-
 fn list_actions(args: &ListActionsArgs) -> Result<(), CLIError> {
-    let game = deserialize_game(&args.state)?;
-    let actions = game.valid_actions();
+    let actions = args.state.valid_actions();
     let actions_json = serialize_actions(&actions)?;
     println!("{}", actions_json);
     Ok(())
 }
 
-fn apply_action(args: &ApplyActionArgs) -> Result<(), CLIError> {
-    let mut game = deserialize_game(&args.state)?;
-    let action = deserialize_action(&args.action)?;
-    let result = game.apply_action(action.clone());
+fn apply_action(mut args: ApplyActionArgs) -> Result<(), CLIError> {
+    let result = args.state.apply_action(args.action.clone());
     match result {
-        Ok(_) => {
-            let game_serialized = serialize_game(&game)?;
+        Ok(_mutations) => {
+            let game_serialized = serialize_game(&args.state)?;
             println!("{}", game_serialized);
             Ok(())
         }
-        Err(err) => Err(CLIError::InvalidAction(action, err)),
+        Err(err) => Err(CLIError::InvalidAction(args.action, err)),
     }
 }
 
