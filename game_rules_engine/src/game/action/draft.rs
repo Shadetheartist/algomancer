@@ -15,6 +15,9 @@ use crate::game::state::error::DraftError::{CardNotInHand, IncorrectNumberOfCard
 use crate::game::state::error::InvalidActionError::InvalidDraft;
 
 use crate::game::state::mutation::{StateMutation};
+use crate::game::state::mutation::create_pack::CreatePackMutation;
+use crate::game::state::mutation::move_card::MoveCardMutation;
+use crate::game::state::mutation::phase_transition::PhaseTransitionMutation;
 use crate::game::state::mutation::StaticStateMutation::{CreatePackForPlayer, MoveCard, PhaseTransition};
 use crate::game::state::player::Player;
 use crate::game::state::progression::Phase::PrecombatPhase;
@@ -73,7 +76,9 @@ impl ActionTrait for DraftAction {
         }
 
         if player.pack.is_none() {
-            mutations.push(StateMutation::Static(CreatePackForPlayer { player_id: player.id }));
+            mutations.push(StateMutation::Static(CreatePackForPlayer(CreatePackMutation{
+                player_id: player.id
+            })));
         }
 
         for card in cards_for_pack {
@@ -82,19 +87,21 @@ impl ActionTrait for DraftAction {
             // so we need to look at that future state to get the pack's id, by using the Eval variant.
             let eval_mutation = StateMutation::Eval(Box::new(move |state| -> Result<StateMutation, StateError> {
                 let player = state.find_player(player_id)?;
-                Ok(StateMutation::Static(MoveCard {
+                Ok(StateMutation::Static(MoveCard(MoveCardMutation{
                     from_cc_id: player.hand.id(),
                     to_cc_id: player.pack.as_ref().unwrap().id(),
                     card_id,
                     placement: None,
-                }))
+                })))
             }));
 
             mutations.push(eval_mutation);
         }
 
         let region_id = state.find_region_id_containing_player(player_id);
-        mutations.push(StateMutation::Static(PhaseTransition { region_id }));
+        mutations.push(StateMutation::Static(
+            PhaseTransition(PhaseTransitionMutation{region_id})
+        ));
 
         // if all the other regions are in the pass pack step, and we just transitioned to it as
         // well, then all players are ready to receive their packs

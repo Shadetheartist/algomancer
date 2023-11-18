@@ -3,6 +3,8 @@ use crate::game::action::{Action, ActionTrait, ActionType};
 use crate::game::db::CardPrototypeDatabase;
 use crate::game::state::card::{CardId, FindCardResult};
 use crate::game::state::error::{InvalidActionError, StateError};
+use crate::game::state::mutation::create_card::CreateCardMutation;
+use crate::game::state::mutation::move_card::MoveCardMutation;
 use crate::game::state::mutation::StateMutation;
 use crate::game::state::mutation::StaticStateMutation::{CreateCard, MoveCard};
 use crate::game::state::player::Player;
@@ -27,18 +29,18 @@ impl ActionTrait for RecycleForResourceAction {
             FindCardResult::InPlayerDiscard(p, cc, _) |
             FindCardResult::InPlayerDeck(p, cc, _) => {
                 let player_deck_id = p.deck(state).id();
-                mutations.push(StateMutation::Static(MoveCard {
+                mutations.push(StateMutation::Static(MoveCard(MoveCardMutation{
                     from_cc_id: cc.id(),
                     to_cc_id: player_deck_id,
                     card_id: self.card_id,
                     placement: None,
-                }));
+                })));
 
                 let resource_prototype = db.resource(self.resource_type);
-                mutations.push(StateMutation::Static(CreateCard {
-                    cc_id: p.hand.id(),
+                mutations.push(StateMutation::Static(CreateCard(CreateCardMutation{
+                    card_collection_id: p.hand.id(),
                     card_prototype_id: resource_prototype.prototype_id,
-                }));
+                })));
             }
             FindCardResult::InCommonDeck(_, _) |
             FindCardResult::AsPermanentInRegion(_, _) |

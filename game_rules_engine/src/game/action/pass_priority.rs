@@ -3,8 +3,8 @@ use crate::game::action::{Action, ActionTrait, ActionType};
 use crate::game::db::CardPrototypeDatabase;
 
 use crate::game::state::error::StateError;
-use crate::game::state::mutation::StateMutation;
-use crate::game::state::mutation::StaticStateMutation::{SetPlayerPassedPriority};
+use crate::game::state::mutation::{StateMutation, StaticStateMutation};
+use crate::game::state::mutation::set_player_passed_priority::SetPlayerPassedPriorityMutation;
 use crate::game::state::player::{Player, TeamId};
 use crate::game::state::progression::{CombatPhaseAStep, Phase, PrecombatPhaseStep};
 use crate::game::state::progression::Phase::PrecombatPhase;
@@ -21,7 +21,11 @@ impl ActionTrait for PassPriorityAction {
         let player = issuer;
         let region: &Region = state.find_region_containing_player(player.id)?;
 
-        mutations.push(StateMutation::Static(SetPlayerPassedPriority { player_id: player.id, value: true }));
+
+        mutations.push(StateMutation::Static(StaticStateMutation::SetPlayerPassedPriority(SetPlayerPassedPriorityMutation{
+            player_id: player.id,
+            value: true
+        })));
 
         // transition only the region that the player occupies when all players in the region have passed
         let region_pass = |mutations: &mut Vec<StateMutation>| -> Result<(), StateError> {

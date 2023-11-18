@@ -36,7 +36,8 @@ impl Debug for CardCollectionId {
     }
 }
 
-
+// i sorta hate this. Must be some better design that allows limited but elegant interoperability
+// between Vec (Deck) & HashSet (Hand/Discard/Pack), something the compiler can use to enforce rules
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum CardCollection {
     Deck { id: CardCollectionId, cards: Vec<Card> },
