@@ -1,9 +1,10 @@
+use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
 
 use crate::game::state::card::CardId;
 use crate::game::state::card_collection::CardCollection;
 use crate::game::state::error::StateError;
-use crate::game::state::error::StateError::{NoPlayersOnTeam, RegionNotFound};
+use crate::game::state::error::EntityNotFoundError;
 use crate::game::state::formation::{DefensiveFormation, Formation};
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{Player, PlayerId, TeamId};
@@ -12,6 +13,13 @@ use crate::game::state::State;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct RegionId(pub u8);
+
+impl Display for RegionId {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Region {
@@ -23,6 +31,7 @@ pub struct Region {
     pub defending_formation: Option<DefensiveFormation<Permanent>>,
     pub step: Phase,
 }
+
 
 impl Region {
 
@@ -64,10 +73,10 @@ impl Region {
 
 impl State {
 
-    pub fn find_region(&self, region_id: RegionId) -> Result<&Region, StateError> {
+    pub fn find_region(&self, region_id: RegionId) -> Result<&Region, EntityNotFoundError> {
         match self.regions.iter().find(|r| r.region_id == region_id) {
             None => {
-                Err(RegionNotFound(region_id))
+                Err(EntityNotFoundError::Region(region_id))
             }
             Some(region) => {
                 Ok(region)
@@ -75,10 +84,10 @@ impl State {
         }
     }
 
-    pub fn find_region_mut(&mut self, region_id: RegionId) -> Result<&mut Region, StateError> {
+    pub fn find_region_mut(&mut self, region_id: RegionId) -> Result<&mut Region, EntityNotFoundError> {
         match self.regions.iter_mut().find(|r| r.region_id == region_id) {
             None => {
-                Err(RegionNotFound(region_id))
+                Err(EntityNotFoundError::Region(region_id))
             }
             Some(region) => {
                 Ok(region)
@@ -176,14 +185,14 @@ impl State {
         region
     }
 
-    pub fn find_region_containing_player(&self, player_id: PlayerId) -> Result<&Region, StateError> {
+    pub fn find_region_containing_player(&self, player_id: PlayerId) -> Result<&Region, EntityNotFoundError> {
         let find_result = self.regions.iter().find(|r| {
             r.players.iter().any(|p| p.id == player_id)
         });
 
         match find_result {
             None => {
-                Err(StateError::NoRegionContainsPlayer(player_id))
+                Err(EntityNotFoundError::Player(player_id))
             }
             Some(region) => {
                 Ok(region)
@@ -252,7 +261,7 @@ impl State {
     pub fn all_players_on_team_passed_priority(&self, team_id: TeamId) -> Result<bool, StateError> {
         let players = self.players_on_team(team_id)?;
         if players.is_empty() {
-            return Err(NoPlayersOnTeam(team_id))
+            panic!("why aren't there any players on this team")
         }
         Ok(!players.iter().any(|p| !p.passed_priority))
     }
@@ -260,7 +269,7 @@ impl State {
     pub fn all_players_on_team_passed_priority_except(&self, team_id: TeamId, except_player_id: PlayerId) -> Result<bool, StateError> {
         let players = self.players_on_team(team_id)?;
         if players.is_empty() {
-            return Err(NoPlayersOnTeam(team_id))
+            panic!("why aren't there any players on this team")
         }
         Ok(!players.iter().filter(|p| p.id != except_player_id).any(|p| !p.passed_priority))
     }

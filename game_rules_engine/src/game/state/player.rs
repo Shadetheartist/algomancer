@@ -1,7 +1,8 @@
+use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
 
 use crate::game::state::card_collection::CardCollection;
-use crate::game::state::error::StateError;
+use crate::game::state::error::{EntityNotFoundError, StateError};
 use crate::game::state::progression::{CombatPhaseAStep, CombatPhaseBStep, MainPhaseStep, Phase, PrecombatPhaseStep};
 use crate::game::state::{GameMode, State};
 use crate::game::state::card::CardId;
@@ -11,6 +12,12 @@ pub struct TeamId(pub u8);
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct PlayerId(pub u8);
+
+impl Display for PlayerId {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Player {
@@ -75,11 +82,11 @@ impl State {
     }
 
     /// looks through all regions for a player matching the player_id
-    pub fn find_player(&self, player_id: PlayerId) -> Result<&Player, StateError> {
+    pub fn find_player(&self, player_id: PlayerId) -> Result<&Player, EntityNotFoundError> {
         let find_result = self.players().find(|p| p.id == player_id);
         match find_result {
             None => {
-                Err(StateError::PlayerNotFound(player_id))
+                Err(EntityNotFoundError::Player(player_id))
             }
             Some(player) => {
                 Ok(player)
@@ -167,12 +174,12 @@ impl State {
 
 // mutable methods relating to state
 impl State {
-    pub fn find_player_mut(&mut self, player_id: PlayerId) -> Result<&mut Player, StateError> {
+    pub fn find_player_mut(&mut self, player_id: PlayerId) -> Result<&mut Player, EntityNotFoundError> {
         let mut players_mut = self.regions.iter_mut().flat_map(|r| &mut r.players);
         let find_result = players_mut.find(|p| p.id == player_id);
         match find_result {
             None => {
-                Err(StateError::PlayerNotFound(player_id))
+                Err(EntityNotFoundError::Player(player_id))
             }
             Some(player) => {
                 Ok(player)

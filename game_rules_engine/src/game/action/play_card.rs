@@ -1,9 +1,8 @@
 use crate::game::action::Action;
 use crate::game::Game;
 use crate::game::state::card::{Card, CardId, CardType, FindCardResult, Timing};
-use crate::game::state::error::{StateError};
-use crate::game::state::error::CardNotPlayableError::{CannotCastANonSpellTokenPermanentFromPlay, CannotPlayMoreResources, CardLacksCorrectTiming, MustBePlayedFromHand, NotInPlayableStep, NotInPlayableZone};
-use crate::game::state::error::StateError::CardNotPlayable;
+use crate::game::state::error::{CardNotPlayableError,StateError};
+use crate::game::state::error::CardNotPlayableError::{CannotCastANonSpellTokenPermanentFromPlay, CannotPlayMoreResources, CardDoesNotExist, CardLacksCorrectTiming, MustBePlayedFromHand, NotInPlayableStep, NotInPlayableZone};
 use crate::game::state::mutation::StateMutation;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::PlayerId;
@@ -23,11 +22,18 @@ impl Game {
     }
 
     // this probably should be decomposed into play_card_from_hand / play_spell_token / etc.
-    pub fn play_card(&self, mut state: State, card_id: CardId) -> Result<State, StateError> {
+    pub fn play_card(&self, mut state: State, card_id: CardId) -> Result<State, CardNotPlayableError> {
 
         // collect info about the card, or discover it doesn't exist or it's not in a playable zone
         let (player_id, prototype_id, in_hand, in_discard, in_play) = {
-            let find_card_result = state.find_card(card_id)?;
+            let find_card_result = match state.find_card(card_id) {
+                Ok(r) => {
+                    r
+                }
+                Err(_) => {
+                    return Err(CardDoesNotExist(card_id))
+                }
+            };
 
             match find_card_result {
                 FindCardResult::InPlayerHand(player, _, card) => {
@@ -42,14 +48,14 @@ impl Game {
                             (common.controller_player_id, *card_prototype_id, false, false, true)
                         }
                         _ => {
-                            return Err(CardNotPlayable(CannotCastANonSpellTokenPermanentFromPlay));
+                            return Err(CannotCastANonSpellTokenPermanentFromPlay(card_id));
                         }
                     }
                 }
                 FindCardResult::AsPermanentInFormation(_, _, _) |
                 FindCardResult::InCommonDeck(_, _) |
                 FindCardResult::InPlayerDeck(_, _, _) => {
-                    return Err(CardNotPlayable(NotInPlayableZone));
+                    return Err(NotInPlayableZone(card_id));
                 }
             }
         };
@@ -72,7 +78,7 @@ impl Game {
                                 CardType::Resource(_) => {
                                     let player = state.find_player(player_id).expect("a player");
                                     if player.resources_played_this_turn >= 2 {
-                                        return Err(CardNotPlayable(CannotPlayMoreResources));
+                                        return Err(CannotPlayMoreResources(card_id));
                                     }
                                 }
 
@@ -81,19 +87,19 @@ impl Game {
 
                                 // card can otherwise not be played during mana
                                 _ => {
-                                    return Err(CardNotPlayable(CardLacksCorrectTiming));
+                                    return Err(CardLacksCorrectTiming(card_id));
                                 }
                             }
                         }
                         _ => {
-                            return Err(CardNotPlayable(NotInPlayableStep));
+                            return Err(NotInPlayableStep(card_id));
                         }
                     }
                 }
                 phase @ Phase::CombatPhaseA(_) |
                 phase @ Phase::CombatPhaseB(_) => {
                     if !phase.is_priority_window() {
-                        return Err(CardNotPlayable(NotInPlayableStep));
+                        return Err(NotInPlayableStep(card_id));
                     }
 
                     match &proto.card_type {
@@ -103,16 +109,16 @@ impl Game {
                                 Timing::Combat => {}
                                 Timing::Virus => {
                                     if !in_hand {
-                                        return Err(CardNotPlayable(MustBePlayedFromHand));
+                                        return Err(MustBePlayedFromHand(card_id));
                                     }
                                 }
                                 _ => {
-                                    return Err(CardNotPlayable(CardLacksCorrectTiming));
+                                    return Err(MustBePlayedFromHand(card_id));
                                 }
                             }
                         }
                         _ => {
-                            return Err(CardNotPlayable(NotInPlayableStep));
+                            return Err(MustBePlayedFromHand(card_id));
                         }
                     }
                 }
@@ -120,7 +126,7 @@ impl Game {
                 Phase::MainPhase(step) => {
                     match step {
                         MainPhaseStep::Regroup => {
-                            return Err(CardNotPlayable(NotInPlayableStep));
+                            return Err(MustBePlayedFromHand(card_id));
                         }
                         MainPhaseStep::ITMain => {}
                         MainPhaseStep::NITMain => {}

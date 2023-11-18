@@ -1,4 +1,4 @@
-
+use std::fmt::{Display, Formatter};
 use std::hash::{Hash};
 
 use serde::{Deserialize, Serialize};
@@ -8,7 +8,7 @@ use crate::game::state::{GameMode, State};
 use crate::game::state::card::CardType::Resource;
 use crate::game::state::card_collection::CardCollection;
 
-use crate::game::state::error::StateError;
+use crate::game::state::error::{EntityNotFoundError};
 use crate::game::state::formation::Formation;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::Player;
@@ -43,6 +43,13 @@ impl CardType {
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy, Ord, PartialOrd)]
 pub struct CardId(pub usize);
+
+impl Display for CardId {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Card {
@@ -83,7 +90,7 @@ impl Card {
 
 impl State {
 
-    pub fn find_card(&self, card_id: CardId) -> Result<FindCardResult, StateError> {
+    pub fn find_card(&self, card_id: CardId) -> Result<FindCardResult, EntityNotFoundError> {
 
         // see if the card is in a player's hand or discard
         for player in self.players() {
@@ -141,6 +148,6 @@ impl State {
             _ => todo!(),
         }
 
-        Err(StateError::CardNotFound(card_id))
+        Err(EntityNotFoundError::Card(card_id))
     }
 }

@@ -4,11 +4,12 @@ use std::hash::Hash;
 use rand::prelude::SliceRandom;
 use rand::RngCore;
 
-use crate::game::action::Action;
+use crate::game::action::{Action};
 use crate::game::Game;
 use crate::game::state::card::{Card, CardId};
 use crate::game::state::card::CardType::Resource;
-use crate::game::state::error::StateError;
+use crate::game::state::error::{InvalidActionError, StateError};
+use crate::game::state::error::DraftError::IncorrectNumberOfCardsDrafted;
 use crate::game::state::mutation::{StateMutation};
 use crate::game::state::mutation::StaticStateMutation::{CreatePackForPlayer, MoveCard, PhaseTransition};
 use crate::game::state::progression::Phase::PrecombatPhase;
@@ -135,7 +136,7 @@ impl Game {
 
             let cards_for_pack: Vec<&Card> = player.hand.iter().filter(|c| !cards_to_keep.contains(&c.card_id)).collect();
             if cards_for_pack.len() != 10 {
-                return Err(StateError::InvalidDraft)
+                return Err(InvalidActionError::InvalidDraft(IncorrectNumberOfCardsDrafted).into())
             }
 
             if player.pack.is_none() {

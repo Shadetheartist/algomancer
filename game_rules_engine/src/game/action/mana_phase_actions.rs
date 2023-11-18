@@ -2,7 +2,7 @@ use crate::game::action::Action;
 use crate::game::Game;
 use crate::game::state::card::{FindCardResult, Timing};
 use crate::game::state::card::CardType::{Resource, Unit};
-use crate::game::state::error::StateError;
+use crate::game::state::error::{InvalidActionError, StateError};
 use crate::game::state::mutation::{StateMutation};
 use crate::game::state::mutation::StaticStateMutation::{CreateCard, MoveCard};
 use crate::game::state::region::RegionId;
@@ -66,7 +66,7 @@ impl Game {
                 FindCardResult::InCommonDeck(_, _) |
                 FindCardResult::AsPermanentInRegion(_, _) |
                 FindCardResult::AsPermanentInFormation(_, _, _) => {
-                    return Err(StateError::InvalidRecycle)
+                    return Err(InvalidActionError::InvalidRecycle.into())
                 }
             }
 

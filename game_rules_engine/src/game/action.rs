@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::game::Game;
 use crate::game::state::card::CardId;
 use crate::game::state::card::CardType::Resource;
-use crate::game::state::error::StateError;
+use crate::game::state::error::{DraftError, InvalidActionError, StateError};
 use crate::game::state::formation::Formation;
 use crate::game::state::mutation::{StateMutation, StaticStateMutation};
 use crate::game::state::permanent::PermanentId;
@@ -87,19 +87,6 @@ impl Ord for Action {
     }
 }
 
-#[derive(Debug)]
-pub enum ActionValidationError {
-    PlayerDoesNotExist,
-    Draft(DraftValidationError),
-}
-
-#[derive(Debug)]
-pub enum DraftValidationError {
-    IncorrectNumberOfCardsDrafted,
-    CardNotInHand(CardId),
-    InvalidPackCard(CardId),
-}
-
 impl Game {
     pub fn apply_action(&mut self, action: Action) -> Result<Vec<StaticStateMutation>, StateError> {
         if let Err(err) = self.validate_action(&action) {
@@ -131,24 +118,24 @@ impl Game {
         Ok(static_mutations)
     }
 
-    pub fn validate_action(&self, action: &Action) -> Result<(), ActionValidationError> {
+    pub fn validate_action(&self, action: &Action) -> Result<(), InvalidActionError> {
         match action {
             Action::PassPriority(_) => {}
             Action::Draft { player_id, cards_to_keep } => {
                 return match self.state.find_player(*player_id) {
                     Err(_) => {
-                        Err(ActionValidationError::PlayerDoesNotExist)
+                        Err(InvalidActionError::PlayerDoesNotExist)
                     }
                     Ok(player) => {
                         if player.hand.len() - cards_to_keep.len() != 10 {
                             // enforce that there must be 10 cards remaining to create the next pack
-                            return Err(ActionValidationError::Draft(DraftValidationError::IncorrectNumberOfCardsDrafted));
+                            return Err(InvalidActionError::InvalidDraft(DraftError::IncorrectNumberOfCardsDrafted));
                         }
 
                         // enforce that each card selected actually exists in the player's hand
                         for card_id in cards_to_keep {
                             if !player.hand.iter().any(|c| c.card_id == *card_id) {
-                                return Err(ActionValidationError::Draft(DraftValidationError::CardNotInHand(*card_id)));
+                                return Err(InvalidActionError::InvalidDraft(DraftError::CardNotInHand(*card_id)));
                             }
                         }
 
@@ -158,7 +145,7 @@ impl Game {
                         for card in cards_for_pack {
                             let proto = &self.cards_db.prototypes[&card.prototype_id];
                             if let Resource(_) = proto.card_type {
-                                return Err(ActionValidationError::Draft(DraftValidationError::InvalidPackCard(card.card_id)));
+                                return Err(InvalidActionError::InvalidDraft(DraftError::InvalidPackCard(card.card_id)));
                             }
 
                         }

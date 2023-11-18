@@ -1,11 +1,11 @@
 use std::collections::HashSet;
-use std::fmt::{Debug, Formatter};
+use std::fmt::{Debug, Display, Formatter};
 use std::hash::{Hash};
 
 use serde::{Deserialize, Serialize};
 
 use crate::game::state::card::{Card, CardId};
-use crate::game::state::error::StateError;
+use crate::game::state::error::{CardCollectionError, EntityNotFoundError, StateError};
 use crate::game::state::player::{Player, PlayerId};
 use crate::game::state::State;
 
@@ -19,6 +19,12 @@ impl CardCollectionId {
             char_array[i] = c;
         }
         CardCollectionId(char_array)
+    }
+}
+
+impl Display for CardCollectionId {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self.0)
     }
 }
 
@@ -90,18 +96,18 @@ impl CardCollection {
         }
     }
 
-    pub fn draw(&mut self) -> Result<Card, StateError> {
+    pub fn draw(&mut self) -> Result<Card, CardCollectionError> {
         match self {
             CardCollection::Deck { cards, .. } => {
                 if cards.is_empty() {
-                    return Err(StateError::CannotDrawFromEmptyCollection);
+                    return Err(CardCollectionError::CannotDrawFromEmptyCollection(self.id()));
                 }
                 Ok(cards.remove(0))
             }
             CardCollection::Hand { .. } |
             CardCollection::Discard { .. } |
             CardCollection::Pack { .. } => {
-                Err(StateError::CannotDrawFromUnorderedSet)
+                Err(CardCollectionError::OrderedUseOfUnorderedSet(self.id()))
             }
         }
     }
@@ -183,7 +189,9 @@ impl CardCollection {
             }
             CardCollection::Hand { .. } |
             CardCollection::Discard { .. } |
-            CardCollection::Pack { .. } => Err(StateError::CardCollectionHasNoOrder(self.id()))
+            CardCollection::Pack { .. } => {
+                Err(CardCollectionError::OrderedUseOfUnorderedSet(self.id()).into())
+            }
         }
     }
 
@@ -193,7 +201,7 @@ impl CardCollection {
                 let idx = cards.iter().position(|c| c.card_id == card_id);
                 match idx {
                     None => {
-                        Err(StateError::CardNotFound(card_id))
+                        Err(EntityNotFoundError::Card(card_id).into())
                     }
                     Some(idx) => {
                         Ok(cards.remove(idx))
@@ -206,7 +214,7 @@ impl CardCollection {
                 let card = cards.iter().find(|c| c.card_id == card_id);
                 match card {
                     None => {
-                        Err(StateError::CardNotFound(card_id))
+                        Err(EntityNotFoundError::Card(card_id).into())
                     }
                     Some(card) => {
                         let card = cards.take(&card.clone()).unwrap();
@@ -287,6 +295,6 @@ impl State {
             return Ok(FindCardCollectionResult::PlayerPack(player, player.pack.as_ref().unwrap()));
         }
 
-        Err(StateError::CardCollectionNotFound(id))
+        Err(EntityNotFoundError::CardCollection(id).into())
     }
 }
