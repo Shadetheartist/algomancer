@@ -1,5 +1,5 @@
 use clap::{Args, Subcommand};
-use algomancer_gre::game::action::Action;
+use algomancer_gre::game::action::{Action};
 use algomancer_gre::game::Game;
 
 #[derive(Debug, Args)]

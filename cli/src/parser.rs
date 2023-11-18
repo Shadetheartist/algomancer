@@ -16,6 +16,7 @@ pub struct Cli {
 }
 
 #[derive(Debug, Subcommand)]
+#[allow(clippy::large_enum_variant)]
 pub enum Commands {
     /// Initialize a new game
     #[command(arg_required_else_help = true)]

@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use algomancer_gre::game::{Game, GameOptions};
-use algomancer_gre::game::action::Action;
+use algomancer_gre::game::action::{Action};
 use algomancer_gre::game::game_builder::NewGameError;
 use algomancer_gre::game::state::error::StateError;
 use algomancer_gre::game::state::GameMode;
@@ -154,7 +154,7 @@ fn unique_factions(factions: &[FactionArg]) -> Vec<Faction> {
 #[cfg(test)]
 mod tests {
     use algomancer_gre::game::{Game, GameOptions};
-    use algomancer_gre::game::action::Action;
+    use algomancer_gre::game::action::{Action};
     use algomancer_gre::game::state::GameMode;
     use algomancer_gre::game::state::faction::Faction::{Fire, Wood};
     use algomancer_gre::game::state::team_configuration::TeamConfiguration;

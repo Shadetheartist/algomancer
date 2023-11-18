@@ -1,25 +1,97 @@
-use crate::game::action::Action;
-use crate::game::Game;
+
+use serde::{Deserialize, Serialize};
+use crate::game::action::{Action, ActionTrait, ActionType};
+use crate::game::db::CardPrototypeDatabase;
+use crate::game::{Game};
 use crate::game::state::card::{Card, CardId, CardType, FindCardResult, Timing};
+use crate::game::state::card::CardType::{Resource, Unit};
 use crate::game::state::error::{CardNotPlayableError,StateError};
 use crate::game::state::error::CardNotPlayableError::{CannotCastANonSpellTokenPermanentFromPlay, CannotPlayMoreResources, CardDoesNotExist, CardLacksCorrectTiming, MustBePlayedFromHand, NotInPlayableStep, NotInPlayableZone};
 use crate::game::state::mutation::StateMutation;
 use crate::game::state::permanent::Permanent;
-use crate::game::state::player::PlayerId;
+use crate::game::state::player::{Player, PlayerId};
 use crate::game::state::progression::{MainPhaseStep, Phase, PrecombatPhaseStep};
 use crate::game::state::State;
 
-impl Game {
 
-    pub fn generate_play_card_mutations(&self, action: &Action) -> Result<Vec<StateMutation>, StateError> {
-        if let Action::PlayCard { card_id: _ } = action {
-            let mutations = Vec::new();
+#[derive(Hash, Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+pub struct PlayCardAction {
+    pub card_id: CardId
+}
 
-            Ok(mutations)
-        } else {
-            panic!("only call this when the action is of the correct enum type")
-        }
+impl ActionTrait for PlayCardAction {
+    fn generate_mutations(&self, _state: &State, _db: &CardPrototypeDatabase, _issuer: &Player) -> Result<Vec<StateMutation>, StateError> {
+        todo!()
     }
+
+    fn get_valid(state: &State, db: &CardPrototypeDatabase) -> Vec<Action> {
+        let mut actions = Vec::new();
+
+        actions.extend(Self::valid_play_resource(state, db));
+        actions.extend(Self::valid_play_haste(state, db));
+
+        actions
+    }
+
+}
+
+impl PlayCardAction {
+
+    fn valid_play_haste(state: &State, db: &CardPrototypeDatabase) -> Vec<Action> {
+        let mut actions : Vec<Action> = Vec::new();
+
+        for region in &state.regions {
+            // assume single player per region at in the mana step
+            let player = region.sole_player();
+
+            for card in player.hand.iter() {
+                let proto = db.prototypes.get(&card.prototype_id).expect("a card prototype");
+                if let Unit(Timing::Haste) = proto.card_type {
+                    actions.push(Action {
+                        issuer_player_id: player.id,
+                        action: ActionType::PlayCard(PlayCardAction {
+                            card_id: card.card_id,
+                        })
+                    })
+                }
+            }
+        }
+
+        actions
+    }
+
+    fn valid_play_resource(state: &State, db: &CardPrototypeDatabase) -> Vec<Action> {
+        let mut actions : Vec<Action> = Vec::new();
+
+        // during the mana phase, players can play up to two resources per turn
+
+        for region in &state.regions {
+            // assume single player per region at in the mana step
+            let player = region.sole_player();
+
+            if player.resources_played_this_turn >= 2 {
+                break
+            }
+
+            for card in player.hand.iter() {
+                let proto = db.prototypes.get(&card.prototype_id).expect("a card prototype");
+                if let Resource(_) = proto.card_type {
+                    actions.push(Action {
+                        issuer_player_id: player.id,
+                        action: ActionType::PlayCard(PlayCardAction {
+                            card_id: card.card_id,
+                        })
+                    })
+                }
+            }
+        }
+
+        actions
+    }
+}
+
+
+impl Game {
 
     // this probably should be decomposed into play_card_from_hand / play_spell_token / etc.
     pub fn play_card(&self, mut state: State, card_id: CardId) -> Result<State, CardNotPlayableError> {

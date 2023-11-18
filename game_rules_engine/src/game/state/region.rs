@@ -23,7 +23,7 @@ impl Display for RegionId {
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub struct Region {
-    pub region_id: RegionId,
+    pub id: RegionId,
     pub owner_player_id: PlayerId,
     pub players: Vec<Player>,
     pub unformed_permanents: Vec<Permanent>,
@@ -74,7 +74,7 @@ impl Region {
 impl State {
 
     pub fn find_region(&self, region_id: RegionId) -> Result<&Region, EntityNotFoundError> {
-        match self.regions.iter().find(|r| r.region_id == region_id) {
+        match self.regions.iter().find(|r| r.id == region_id) {
             None => {
                 Err(EntityNotFoundError::Region(region_id))
             }
@@ -85,7 +85,7 @@ impl State {
     }
 
     pub fn find_region_mut(&mut self, region_id: RegionId) -> Result<&mut Region, EntityNotFoundError> {
-        match self.regions.iter_mut().find(|r| r.region_id == region_id) {
+        match self.regions.iter_mut().find(|r| r.id == region_id) {
             None => {
                 Err(EntityNotFoundError::Region(region_id))
             }
@@ -96,7 +96,7 @@ impl State {
     }
 
     pub fn region_counterclockwise_neighbour(&self, region_id: RegionId) -> Option<&Region> {
-        let self_idx_result = self.regions.iter().enumerate().find(|(_, val)| val.region_id == region_id);
+        let self_idx_result = self.regions.iter().enumerate().find(|(_, val)| val.id == region_id);
         match self_idx_result {
             None => None,
             Some((self_idx, _)) => {
@@ -107,7 +107,7 @@ impl State {
     }
 
     pub fn region_clockwise_neighbour(&self, region_id: RegionId) -> Option<&Region> {
-        let self_idx_result = self.regions.iter().enumerate().find(|(_, val)| val.region_id == region_id);
+        let self_idx_result = self.regions.iter().enumerate().find(|(_, val)| val.id == region_id);
         match self_idx_result {
             None => None,
             Some((self_idx, _)) => {
@@ -174,7 +174,7 @@ impl State {
             r.players.iter().any(|p| p.id == player_id)
         }).expect("a region containing this player");
 
-        region.region_id
+        region.id
     }
 
     pub fn find_region_containing_player_mut(&mut self, player_id: PlayerId) -> &mut Region {
@@ -209,7 +209,7 @@ impl State {
         for region in self.regions.iter() {
             // by using the counter-clockwise neighbour here, the packs are remapped so
             // that when we apply the changes, the packs are aligned with the clockwise neighbour
-            let neighbouring_region = self.region_counterclockwise_neighbour(region.region_id).expect("a neighbouring region");
+            let neighbouring_region = self.region_counterclockwise_neighbour(region.id).expect("a neighbouring region");
             let neighbour_pack = neighbouring_region.sole_player().pack.as_ref().expect("a pack");
             packs.push(neighbour_pack.clone());
         }
@@ -246,7 +246,7 @@ impl State {
 
         {
             let region = self.find_region_mut(region_id).expect("a region");
-            eprintln!("Region {:?} is transitioning from {:?} to {:?}", region.region_id, region.step, next_step);
+            eprintln!("Region {:?} is transitioning from {:?} to {:?}", region.id, region.step, next_step);
             region.step = next_step;
         }
 

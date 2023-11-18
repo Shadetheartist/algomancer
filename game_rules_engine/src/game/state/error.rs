@@ -54,7 +54,6 @@ pub enum DraftError {
 #[derive(Error, Debug)]
 #[error("invalid action")]
 pub enum InvalidActionError {
-    PlayerDoesNotExist,
     InvalidDraft(DraftError),
     InvalidRecycle,
 }

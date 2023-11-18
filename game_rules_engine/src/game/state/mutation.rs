@@ -7,6 +7,7 @@ use crate::game::db::{CardPrototypeDatabase, CardPrototypeId};
 use crate::game::state::card::{Card, CardId, };
 use crate::game::state::card_collection::{CardCollection, CardCollectionId};
 use crate::game::state::error::StateError;
+use crate::game::state::mutation::StaticStateMutation::{PhaseTransition, SetPlayerPassedPriority};
 use crate::game::state::player::PlayerId;
 use crate::game::state::region::RegionId;
 use crate::game::state::State;
@@ -132,6 +133,18 @@ impl State {
         } else {
             panic!("only call this for StateMutation::PhaseTransition")
         }
+    }
+
+    pub fn generate_mutations_for_phase_transition(&self, region_id: RegionId) -> Vec<StateMutation> {
+        let mut mutations = Vec::new();
+
+        mutations.push(StateMutation::Static(PhaseTransition { region_id }));
+
+        for p in self.players_in_region(region_id).expect("players") {
+            mutations.push(StateMutation::Static(SetPlayerPassedPriority { player_id: p.id, value: false }));
+        }
+
+        mutations
     }
 }
 

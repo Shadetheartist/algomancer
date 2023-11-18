@@ -2,68 +2,37 @@ use std::cmp::Ordering;
 use std::collections::HashSet;
 
 use serde::{Deserialize, Serialize};
-
+use crate::game::action::attack::AttackAction;
+use crate::game::action::draft::DraftAction;
+use crate::game::action::pass_priority::PassPriorityAction;
+use crate::game::action::play_card::PlayCardAction;
+use crate::game::action::recycle_for_resource::RecycleForResourceAction;
+use crate::game::db::CardPrototypeDatabase;
 use crate::game::Game;
-use crate::game::state::card::CardId;
-use crate::game::state::card::CardType::Resource;
-use crate::game::state::error::{DraftError, InvalidActionError, StateError};
-use crate::game::state::formation::Formation;
+use crate::game::state::error::{StateError};
 use crate::game::state::mutation::{StateMutation, StaticStateMutation};
-use crate::game::state::permanent::PermanentId;
-use crate::game::state::player::PlayerId;
-use crate::game::state::progression::{CombatPhaseAStep, MainPhaseStep, PrecombatPhaseStep};
-use crate::game::state::progression::Phase::{CombatPhaseA, MainPhase, PrecombatPhase};
-use crate::game::state::region::RegionId;
-use crate::game::state::resource::ResourceType;
+use crate::game::state::player::{Player, PlayerId};
+use crate::game::state::State;
 
 mod draft;
 mod pass_priority;
-mod mana_phase_actions;
 mod play_card;
-mod combat;
+mod recycle_for_resource;
+mod attack;
 
 
+pub trait ActionTrait: Sized {
+    fn generate_mutations(&self, state: &State, db: &CardPrototypeDatabase, issuer: &Player) -> Result<Vec<StateMutation>, StateError>;
+    fn get_valid(state: &State, db: &CardPrototypeDatabase) -> Vec<Action>;
+}
 
 #[derive(Hash, Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
-pub enum Action {
-    // resolves the next stack item, if there are no stack items, it passes priority
-    // Once both players pass priority consecutively, the game moves to the next step or phase.
-    PassPriority(PlayerId),
+pub struct Action {
+    issuer_player_id: PlayerId,
 
-    // a player selects a hand of cards from a draft pack, leaving 10 cards in the pack
-    Draft { player_id: PlayerId, cards_to_keep: Vec<CardId> },
-
-    // a card is recycled in exchange for a resource
-    RecycleForResource { card_id: CardId, resource_type: ResourceType},
-
-    // a card is played
-    PlayCard { card_id: CardId },
-
-    Attack { home_region_id: RegionId, under_attack_region_id: RegionId, formation: Formation<PermanentId> },
+    #[serde(flatten)]
+    action: ActionType
 }
-
-impl Action {
-    fn generate_state_mutations(&self, game: &Game) -> Result<Vec<StateMutation>, StateError> {
-        match self {
-            action @ Action::PassPriority(_) => {
-                game.generate_pass_priority_state_mutations(action)
-            }
-            action @ Action::Draft { .. } => {
-                game.generate_draft_mutations(action)
-            }
-            action @ Action::RecycleForResource { .. } => {
-                game.generate_recycle_for_resource_mutations(action)
-            }
-            action @ Action::PlayCard { .. } => {
-                game.generate_play_card_mutations(action)
-            }
-            action @ Action::Attack { .. } => {
-                game.generate_attack_mutations(action)
-            }
-        }
-    }
-}
-
 
 impl PartialOrd for Action {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
@@ -73,10 +42,10 @@ impl PartialOrd for Action {
 
 impl Ord for Action {
     fn cmp(&self, other: &Self) -> Ordering {
-        match self {
-            Action::PassPriority(_) => {
-                match other {
-                    Action::PassPriority(_) => Ordering::Equal,
+        match self.action {
+            ActionType::PassPriority(_) => {
+                match other.action {
+                    ActionType::PassPriority(_) => Ordering::Equal,
                     _ => Ordering::Less,
                 }
             }
@@ -87,15 +56,36 @@ impl Ord for Action {
     }
 }
 
+#[derive(Hash, Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[serde(tag = "type")]
+pub enum ActionType {
+    PassPriority(PassPriorityAction),
+    Draft(DraftAction),
+    RecycleForResource(RecycleForResourceAction),
+    PlayCard(PlayCardAction),
+    Attack(AttackAction),
+}
+
+impl Action {
+    fn generate_mutations(&self, game: &Game) -> Result<Vec<StateMutation>, StateError> {
+        let issuer_player = game.state.find_player(self.issuer_player_id)?;
+        match &self.action {
+            ActionType::Draft(a) => a.generate_mutations(&game.state, &game.cards_db, issuer_player),
+            ActionType::RecycleForResource(a) => a.generate_mutations(&game.state, &game.cards_db, issuer_player),
+            ActionType::PlayCard(a) => a.generate_mutations(&game.state, &game.cards_db, issuer_player),
+            ActionType::Attack(a) => a.generate_mutations(&game.state, &game.cards_db, issuer_player),
+            ActionType::PassPriority(a) => a.generate_mutations(&game.state, &game.cards_db, issuer_player),
+        }
+    }
+}
+
+
+
 impl Game {
     pub fn apply_action(&mut self, action: Action) -> Result<Vec<StaticStateMutation>, StateError> {
-        if let Err(err) = self.validate_action(&action) {
-            return Err(StateError::InvalidAction(err))
-        };
-
         eprintln!("[{}] Applying Action [{:?}]", self.state.depth, &action);
 
-        let mutations = action.generate_state_mutations(self)?;
+        let mutations = action.generate_mutations(self)?;
         let mut static_mutations = Vec::new();
 
         if mutations.is_empty() {
@@ -118,94 +108,16 @@ impl Game {
         Ok(static_mutations)
     }
 
-    pub fn validate_action(&self, action: &Action) -> Result<(), InvalidActionError> {
-        match action {
-            Action::PassPriority(_) => {}
-            Action::Draft { player_id, cards_to_keep } => {
-                return match self.state.find_player(*player_id) {
-                    Err(_) => {
-                        Err(InvalidActionError::PlayerDoesNotExist)
-                    }
-                    Ok(player) => {
-                        if player.hand.len() - cards_to_keep.len() != 10 {
-                            // enforce that there must be 10 cards remaining to create the next pack
-                            return Err(InvalidActionError::InvalidDraft(DraftError::IncorrectNumberOfCardsDrafted));
-                        }
-
-                        // enforce that each card selected actually exists in the player's hand
-                        for card_id in cards_to_keep {
-                            if !player.hand.iter().any(|c| c.card_id == *card_id) {
-                                return Err(InvalidActionError::InvalidDraft(DraftError::CardNotInHand(*card_id)));
-                            }
-                        }
-
-                        let cards_for_pack = player.hand.iter().filter(|c| !cards_to_keep.contains(&c.card_id));
-
-                        // enforce that each card left for the pack is not a resource
-                        for card in cards_for_pack {
-                            let proto = &self.cards_db.prototypes[&card.prototype_id];
-                            if let Resource(_) = proto.card_type {
-                                return Err(InvalidActionError::InvalidDraft(DraftError::InvalidPackCard(card.card_id)));
-                            }
-
-                        }
-                        Ok(())
-                    }
-                };
-            }
-            Action::RecycleForResource { .. } => {}
-            Action::PlayCard { .. } => {}
-            Action::Attack { .. } => {}
-        }
-
-        Ok(())
-    }
-
     pub fn valid_actions(&self) -> HashSet<Action> {
-        let mut valid_actions = HashSet::new();
+        let mut actions = HashSet::new();
 
-        for region in &self.state.regions {
-            match &region.step {
-
-                PrecombatPhase(PrecombatPhaseStep::Draft) => {
-                    for a in self.valid_drafts(region.region_id) {
-                        valid_actions.insert(a);
-                    }
-                }
-
-                PrecombatPhase(PrecombatPhaseStep::PassPack) => {
-                    // no players can take any actions during this step
-                    // after the last player drafts, all regions are automatically transitioned
-                }
-
-                PrecombatPhase(PrecombatPhaseStep::ITMana) | PrecombatPhase(PrecombatPhaseStep::NITMana) => {
-                    for a in self.valid_mana_phase_actions(region.region_id) {
-                        valid_actions.insert(a);
-                    }
-                }
-
-                CombatPhaseA(CombatPhaseAStep::ITAttack) => {
-                    for a in self.valid_attack_actions(region.region_id) {
-                        valid_actions.insert(a);
-                    }
-                }
-
-                MainPhase(MainPhaseStep::NITMain) => {
-                    // dont put a valid action, so that during testing
-                    // the game sim stops after one round
-                }
-
-                _ => {
-                    for p in &region.players {
-                        if self.state.player_can_act(p.id) {
-                            valid_actions.insert(Action::PassPriority(p.id));
-                        }
-                    }
-                }
-            }
-        }
+        actions.extend(PassPriorityAction::get_valid(&self.state, &self.cards_db));
+        actions.extend(AttackAction::get_valid(&self.state, &self.cards_db));
+        actions.extend(DraftAction::get_valid(&self.state, &self.cards_db));
+        actions.extend(PlayCardAction::get_valid(&self.state, &self.cards_db));
+        actions.extend(RecycleForResourceAction::get_valid(&self.state, &self.cards_db));
 
 
-        valid_actions
+        actions
     }
 }

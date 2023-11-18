@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use state::rng::AlgomancerRngSeed;
 
-use crate::game::action::Action;
+use crate::game::action::{Action};
 use crate::game::db::CardPrototypeDatabase;
 use crate::game::state::GameMode;
 

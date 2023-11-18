@@ -3,18 +3,172 @@ use std::hash::Hash;
 
 use rand::prelude::SliceRandom;
 use rand::RngCore;
+use serde::{Deserialize, Serialize};
 
-use crate::game::action::{Action};
-use crate::game::Game;
+use crate::game::action::{Action, ActionTrait, ActionType};
+use crate::game::db::CardPrototypeDatabase;
+
 use crate::game::state::card::{Card, CardId};
 use crate::game::state::card::CardType::Resource;
 use crate::game::state::error::{InvalidActionError, StateError};
-use crate::game::state::error::DraftError::IncorrectNumberOfCardsDrafted;
+use crate::game::state::error::DraftError::{CardNotInHand, IncorrectNumberOfCardsDrafted, InvalidPackCard};
+use crate::game::state::error::InvalidActionError::InvalidDraft;
+
 use crate::game::state::mutation::{StateMutation};
 use crate::game::state::mutation::StaticStateMutation::{CreatePackForPlayer, MoveCard, PhaseTransition};
+use crate::game::state::player::Player;
 use crate::game::state::progression::Phase::PrecombatPhase;
-use crate::game::state::progression::PrecombatPhaseStep;
-use crate::game::state::region::RegionId;
+use crate::game::state::progression::{Phase, PrecombatPhaseStep};
+
+use crate::game::state::State;
+
+
+#[derive(Hash, Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+pub struct DraftAction {
+    pub cards_to_keep: Vec<CardId>,
+}
+
+
+impl DraftAction {
+
+    fn validate(&self, _state: &State, db: &CardPrototypeDatabase, issuer: &Player) -> Result<(), StateError>{
+        if issuer.hand.len() - self.cards_to_keep.len() != 10 {
+            // enforce that there must be 10 cards remaining to create the next pack
+            return Err(InvalidDraft(IncorrectNumberOfCardsDrafted).into());
+        }
+
+        // enforce that each card selected actually exists in the player's hand
+        for card_id in &self.cards_to_keep {
+            if !issuer.hand.iter().any(|c| c.card_id == *card_id) {
+                return Err(InvalidDraft(CardNotInHand(*card_id)).into());
+            }
+        }
+
+        let cards_for_pack = issuer.hand.iter().filter(|c| !self.cards_to_keep.contains(&c.card_id));
+
+        // enforce that each card left for the pack is not a resource
+        for card in cards_for_pack {
+            let proto = &db.prototypes[&card.prototype_id];
+            if let Resource(_) = proto.card_type {
+                return Err(InvalidDraft(InvalidPackCard(card.card_id)).into());
+            }
+
+        }
+        Ok(())
+    }
+}
+
+impl ActionTrait for DraftAction {
+    fn generate_mutations(&self, state: &State, db: &CardPrototypeDatabase, issuer: &Player) -> Result<Vec<StateMutation>, StateError> {
+        self.validate(state, db, issuer)?;
+
+        let player_id = issuer.id;
+
+        let mut mutations = Vec::new();
+        let player = state.find_player(player_id)?;
+
+        let cards_for_pack: Vec<&Card> = player.hand.iter().filter(|c| !self.cards_to_keep.contains(&c.card_id)).collect();
+        if cards_for_pack.len() != 10 {
+            return Err(InvalidActionError::InvalidDraft(IncorrectNumberOfCardsDrafted).into());
+        }
+
+        if player.pack.is_none() {
+            mutations.push(StateMutation::Static(CreatePackForPlayer { player_id: player.id }));
+        }
+
+        for card in cards_for_pack {
+            let card_id = card.card_id;
+            // all these mutations depend on the pack existing, it doesn't yet, but it will when applying these mutations.
+            // so we need to look at that future state to get the pack's id, by using the Eval variant.
+            let eval_mutation = StateMutation::Eval(Box::new(move |state| -> Result<StateMutation, StateError> {
+                let player = state.find_player(player_id)?;
+                Ok(StateMutation::Static(MoveCard {
+                    from_cc_id: player.hand.id(),
+                    to_cc_id: player.pack.as_ref().unwrap().id(),
+                    card_id,
+                    placement: None,
+                }))
+            }));
+
+            mutations.push(eval_mutation);
+        }
+
+        let region_id = state.find_region_id_containing_player(player_id);
+        mutations.push(StateMutation::Static(PhaseTransition { region_id }));
+
+        // if all the other regions are in the pass pack step, and we just transitioned to it as
+        // well, then all players are ready to receive their packs
+        let all_other_regions_in_pass_pack_step = state.regions.iter().filter(|r| r.id != region_id).all(|r| {
+            r.step == PrecombatPhase(PrecombatPhaseStep::PassPack)
+        });
+
+        // therefore all regions should move the the next step
+        if all_other_regions_in_pass_pack_step {
+            for r in &state.regions {
+                mutations.append(&mut state.generate_mutations_for_phase_transition(r.id));
+            }
+        }
+
+        eprintln!("Player [{:?}] has selected their draft.", player_id);
+
+        Ok(mutations)
+    }
+
+    fn get_valid(state: &State, db: &CardPrototypeDatabase) -> Vec<Action> {
+        let mut actions = Vec::new();
+
+        for region in &state.regions {
+            if let Phase::PrecombatPhase(PrecombatPhaseStep::Draft) = region.step {
+                let player = region.sole_player();
+                let card_ids: Vec<CardId> = player.hand.iter()
+                    .filter(|card| {
+                        let proto = &db.prototypes[&card.prototype_id];
+                        if let Resource(_) = proto.card_type {
+                            return false;
+                        }
+                        true
+                    })
+                    .map(|card| card.card_id)
+                    .collect();
+
+
+                let num_cards_to_draft = {
+                    if player.hand.len() >= 10 {
+                        player.hand.len() - 10
+                    } else {
+                        0
+                    }
+                };
+
+
+                let performance_mode = true;
+                let combinations = {
+                    if performance_mode {
+                        // this generates a random unique set of size `num_options` of combinations of cards
+                        let num_options = 3;
+                        let mut rng_clone = state.rand.clone();
+                        random_unique_combinations(&mut rng_clone, &card_ids, num_cards_to_draft, num_options)
+                    } else {
+                        // this generates an exhaustive list of combinations
+                        combinations(card_ids.as_slice(), num_cards_to_draft)
+                    }
+                };
+
+                for combination in combinations {
+                    actions.push(Action {
+                        issuer_player_id: player.id,
+                        action: ActionType::Draft(DraftAction {
+                            cards_to_keep: combination,
+                        }),
+                    })
+                }
+            }
+        }
+
+        actions
+    }
+}
+
 
 fn combinations<T: Clone>(items: &[T], k: usize) -> Vec<Vec<T>> {
     let n = items.len();
@@ -74,114 +228,4 @@ fn random_unique_combinations<T: Clone + Ord + Hash, R: RngCore>(rng: &mut R, in
     }
 
     combinations
-}
-
-impl Game {
-    pub fn valid_drafts(&self, region_id: RegionId) -> Vec<Action> {
-        let player_id = self.state.find_region(region_id).expect("a region").sole_player().id;
-
-        let mut actions = Vec::new();
-
-        let player = self.state.find_player(player_id).expect("a player");
-        let card_ids: Vec<CardId> = player.hand.iter()
-            .filter(|card| {
-                let proto = &self.cards_db.prototypes[&card.prototype_id];
-                if let Resource(_) = proto.card_type {
-                    return false
-                }
-                true
-            })
-            .map(|card| card.card_id)
-            .collect();
-
-
-        let num_cards_to_draft = {
-            if player.hand.len() >= 10 {
-                player.hand.len() - 10
-            } else {
-                0
-            }
-        };
-
-
-        let performance_mode = true;
-        let combinations = {
-            if performance_mode {
-                // this generates a random unique set of size `num_options` of combinations of cards
-                let num_options = 3;
-                let mut rng_clone = self.state.rand.clone();
-                random_unique_combinations(&mut rng_clone, &card_ids, num_cards_to_draft, num_options)
-            } else {
-                // this generates an exhaustive list of combinations
-                combinations(card_ids.as_slice(), num_cards_to_draft)
-            }
-        };
-
-        for combination in combinations {
-            actions.push(Action::Draft {
-                player_id: player.id,
-                cards_to_keep: combination,
-            })
-        }
-
-        actions
-    }
-
-    pub fn generate_draft_mutations(&self, action: &Action) -> Result<Vec<StateMutation>, StateError> {
-        if let Action::Draft { player_id, cards_to_keep } = action {
-            let player_id = *player_id;
-            let mut mutations = Vec::new();
-            let state = &self.state;
-            let player = state.find_player(player_id)?;
-
-            let cards_for_pack: Vec<&Card> = player.hand.iter().filter(|c| !cards_to_keep.contains(&c.card_id)).collect();
-            if cards_for_pack.len() != 10 {
-                return Err(InvalidActionError::InvalidDraft(IncorrectNumberOfCardsDrafted).into())
-            }
-
-            if player.pack.is_none() {
-                mutations.push(StateMutation::Static(CreatePackForPlayer { player_id: player.id }));
-            }
-
-            for card in cards_for_pack {
-                let card_id = card.card_id;
-                // all these mutations depend on the pack existing, it doesn't yet, but it will when applying these mutations.
-                // so we need to look at that future state to get the pack's id, by using the Eval variant.
-                let eval_mutation = StateMutation::Eval(Box::new(move |state| -> Result<StateMutation, StateError> {
-                    let player = state.find_player(player_id)?;
-                    Ok(StateMutation::Static(MoveCard {
-                        from_cc_id: player.hand.id(),
-                        to_cc_id: player.pack.as_ref().unwrap().id(),
-                        card_id,
-                        placement: None
-                    }))
-                }));
-
-                mutations.push(eval_mutation);
-            }
-
-            let region_id = state.find_region_id_containing_player(player_id);
-            mutations.push(StateMutation::Static(PhaseTransition { region_id }));
-
-            // if all the other regions are in the pass pack step, and we just transitioned to it as
-            // well, then all players are ready to receive their packs
-            let all_other_regions_in_pass_pack_step = state.regions.iter().filter(|r| r.region_id != region_id).all(|r| {
-                r.step == PrecombatPhase(PrecombatPhaseStep::PassPack)
-            });
-
-            // therefore all regions should move the the next step
-            if all_other_regions_in_pass_pack_step {
-                for r in &state.regions {
-                    mutations.append(&mut self.gen_next_phase(r.region_id));
-                }
-            }
-
-            eprintln!("Player [{:?}] has selected their draft.", player_id);
-
-            Ok(mutations)
-
-        } else {
-            panic!("action should have been draft")
-        }
-    }
 }

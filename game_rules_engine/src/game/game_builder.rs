@@ -208,7 +208,7 @@ impl Game {
                     }
 
                     let region = Region{
-                        region_id,
+                        id: region_id,
                         owner_player_id: player_id,
                         players: vec![player],
                         unformed_permanents: permanents,
