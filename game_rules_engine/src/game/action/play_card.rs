@@ -41,6 +41,10 @@ impl PlayCardAction {
         let mut actions : Vec<Action> = Vec::new();
 
         for region in &state.regions {
+            if let Phase::PrecombatPhase(PrecombatPhaseStep::ITMana | PrecombatPhaseStep::NITMana) = region.step {} else {
+                continue
+            }
+
             // assume single player per region at in the mana step
             let player = region.sole_player();
 
@@ -66,6 +70,11 @@ impl PlayCardAction {
         // during the mana phase, players can play up to two resources per turn
 
         for region in &state.regions {
+
+            if let Phase::PrecombatPhase(PrecombatPhaseStep::ITMana | PrecombatPhaseStep::NITMana) = region.step {} else {
+                break
+            }
+
             // assume single player per region at in the mana step
             let player = region.sole_player();
 

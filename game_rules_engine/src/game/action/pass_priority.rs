@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use crate::game::action::{Action, ActionTrait};
+use crate::game::action::{Action, ActionTrait, ActionType};
 use crate::game::db::CardPrototypeDatabase;
 
 use crate::game::state::error::StateError;
@@ -96,8 +96,19 @@ impl ActionTrait for PassPriorityAction {
         Ok(mutations)
     }
 
-    fn get_valid(_state: &State, _db: &CardPrototypeDatabase) -> Vec<Action> {
-        todo!()
+    fn get_valid(state: &State, _db: &CardPrototypeDatabase) -> Vec<Action> {
+        let mut actions = Vec::new();
+
+        for player in state.players() {
+            if state.player_can_act(player.id) {
+                actions.push(Action {
+                    issuer_player_id: player.id,
+                    action: ActionType::PassPriority(PassPriorityAction{})
+                })
+            }
+        }
+
+        actions
     }
 }
 

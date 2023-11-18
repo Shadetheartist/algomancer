@@ -34,6 +34,10 @@ impl ActionTrait for AttackAction {
         let mut actions : Vec<Action> = Vec::new();
 
         for region in &state.regions {
+            if !region.step.is_attack() {
+                continue
+            }
+
             let player = region.sole_player();
 
             if state.player_can_act(player.id) {

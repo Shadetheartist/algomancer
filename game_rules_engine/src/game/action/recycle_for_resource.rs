@@ -6,6 +6,7 @@ use crate::game::state::error::{InvalidActionError, StateError};
 use crate::game::state::mutation::StateMutation;
 use crate::game::state::mutation::StaticStateMutation::{CreateCard, MoveCard};
 use crate::game::state::player::Player;
+use crate::game::state::progression::{Phase, PrecombatPhaseStep};
 use crate::game::state::resource::ResourceType;
 use crate::game::state::State;
 
@@ -55,6 +56,10 @@ impl ActionTrait for RecycleForResourceAction {
         // during the mana phase, players can recycle any of their cards to gain a resource
 
         for region in &state.regions {
+            if let Phase::PrecombatPhase(PrecombatPhaseStep::ITMana | PrecombatPhaseStep::NITMana) = region.step {} else {
+                continue
+            }
+
             let player = region.sole_player();
 
             for card in player.hand.iter() {

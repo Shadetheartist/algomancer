@@ -137,6 +137,22 @@ impl Phase {
         }
     }
 
+    pub fn is_attack(&self) -> bool {
+        match self {
+            Phase::CombatPhaseA(step) => {
+                matches!(step,
+                    CombatPhaseAStep::ITAttack
+                )
+            }
+            Phase::CombatPhaseB(step) => {
+                matches!(step,
+                    CombatPhaseBStep::NITAttack
+                )
+            }
+            _ => false,
+        }
+    }
+
     pub fn is_priority_window(&self) -> bool {
         match self {
             Phase::CombatPhaseA(step) => {
