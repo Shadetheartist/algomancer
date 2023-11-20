@@ -15,7 +15,7 @@ pub struct Deck {
 impl Deck {
     pub fn new(id: CardCollectionId) -> Deck {
         Deck {
-            id: id,
+            id,
             cards: VecDeque::new()
         }
     }

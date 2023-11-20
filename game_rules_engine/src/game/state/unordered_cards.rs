@@ -13,7 +13,7 @@ pub struct UnorderedCards {
 impl UnorderedCards {
     pub fn new(id: CardCollectionId) -> UnorderedCards {
         UnorderedCards {
-            id: id,
+            id,
             cards: Vec::new()
         }
     }
