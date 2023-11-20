@@ -135,6 +135,7 @@ impl Game {
                 }
                 FindCardResult::AsPermanentInFormation(_, _, _) |
                 FindCardResult::InCommonDeck(_, _) |
+                FindCardResult::InPlayerPack(_, _, _) |
                 FindCardResult::InPlayerDeck(_, _, _) => {
                     return Err(NotInPlayableZone(card_id));
                 }

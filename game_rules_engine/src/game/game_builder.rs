@@ -10,8 +10,9 @@ use crate::game::game_builder::NewGameError::NotSupportedYet;
 use crate::game::state::{GameMode, State};
 use crate::game::state::card::{Card, CardId,  CardType};
 use crate::game::state::card::Timing::{Combat, Default, Haste, Virus};
-use crate::game::state::card_collection::CardCollection;
+use crate::game::state::card_collection::CardCollectionId;
 use crate::game::state::cost::Cost;
+use crate::game::state::deck::Deck;
 use crate::game::state::faction::Faction;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{Player, PlayerId, TeamId};
@@ -151,9 +152,9 @@ impl Game {
 
             cards_for_deck.shuffle(&mut algomancer_rng);
 
-            let mut deck = CardCollection::new_common_deck();
+            let mut deck = Deck::new(CardCollectionId::new_common_deck());
             for c in cards_for_deck {
-                deck.add(c)
+                deck.add_to_top(c)
             }
 
             let state = State {

@@ -1,16 +1,29 @@
-use std::collections::HashSet;
 use std::fmt::{Debug, Display, Formatter};
 use std::hash::{Hash};
 
 use serde::{Deserialize, Serialize};
 
-use crate::game::state::card::{Card, CardId};
-use crate::game::state::error::{CardCollectionError, EntityNotFoundError, StateError};
+use crate::game::state::error::{EntityNotFoundError, StateError};
+use crate::game::state::deck::Deck;
 use crate::game::state::player::{Player, PlayerId};
 use crate::game::state::State;
+use crate::game::state::unordered_cards::UnorderedCards;
 
+
+/// CardCollectionId is a Copy type so to keep the values small there's a short encoding scheme
+///
+/// p = player
+/// g = game
+///
+/// h = hand
+/// d = discard
+/// p = pack
+/// D = deck
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Copy)]
 pub struct CardCollectionId(pub [char; 4]);
+
+
+
 
 impl CardCollectionId {
     pub fn from_string(str: &str) -> CardCollectionId {
@@ -19,6 +32,30 @@ impl CardCollectionId {
             char_array[i] = c;
         }
         CardCollectionId(char_array)
+    }
+
+    pub fn new_hand(player_id: PlayerId) -> CardCollectionId {
+        let id_string = format!("p{:0>2}h", player_id.0);
+        CardCollectionId::from_string(id_string.as_str())
+    }
+
+    pub fn new_discard(player_id: PlayerId) -> CardCollectionId {
+        let id_string = format!("p{:0>2}d", player_id.0);
+        CardCollectionId::from_string(id_string.as_str())
+    }
+
+    pub fn new_pack(player_id: PlayerId) -> CardCollectionId {
+        let id_string = format!("p{:0>2}p", player_id.0);
+        CardCollectionId::from_string(id_string.as_str())
+    }
+
+    pub fn new_deck(player_id: PlayerId) -> CardCollectionId {
+        let id_string = format!("p{:0>2}D", player_id.0);
+        CardCollectionId::from_string(id_string.as_str())
+    }
+
+    pub fn new_common_deck() -> CardCollectionId {
+        CardCollectionId::from_string("g__D")
     }
 }
 
@@ -36,222 +73,48 @@ impl Debug for CardCollectionId {
     }
 }
 
-// i sorta hate this. Must be some better design that allows limited but elegant interoperability
-// between Vec (Deck) & HashSet (Hand/Discard/Pack), something the compiler can use to enforce rules
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
-pub enum CardCollection {
-    Deck { id: CardCollectionId, cards: Vec<Card> },
-    Hand { id: CardCollectionId, cards: HashSet<Card> },
-    Discard { id: CardCollectionId, cards: HashSet<Card> },
-    Pack { id: CardCollectionId, cards: HashSet<Card> },
-}
-
-
-/// CardCollectionId is a Copy type so to keep the values small there's a short encoding scheme
-///
-/// p = player
-/// g = game
-///
-/// h = hand
-/// d = discard
-/// p = pack
-/// D = deck
-impl CardCollection {
-    pub fn new_hand(player_id: PlayerId) -> CardCollection {
-        let id_string = format!("p{:0>2}h", player_id.0);
-        CardCollection::Hand {
-            id: CardCollectionId::from_string(id_string.as_str()),
-            cards: HashSet::new(),
-        }
-    }
-
-    pub fn new_discard(player_id: PlayerId) -> CardCollection {
-        let id_string = format!("p{:0>2}d", player_id.0);
-        CardCollection::Discard {
-            id: CardCollectionId::from_string(id_string.as_str()),
-            cards: HashSet::new(),
-        }
-    }
-
-    pub fn new_pack(player_id: PlayerId) -> CardCollection {
-        let id_string = format!("p{:0>2}p", player_id.0);
-        CardCollection::Pack {
-            id: CardCollectionId::from_string(id_string.as_str()),
-            cards: HashSet::new(),
-        }
-    }
-
-    pub fn new_deck(player_id: PlayerId) -> CardCollection {
-        let id_string = format!("p{:0>2}D", player_id.0);
-        CardCollection::Deck {
-            id: CardCollectionId::from_string(id_string.as_str()),
-            cards: Vec::new(),
-        }
-    }
-
-    pub fn new_common_deck() -> CardCollection {
-        let id_string = "g__D";
-        CardCollection::Deck {
-            id: CardCollectionId::from_string(id_string),
-            cards: Vec::new(),
-        }
-    }
-
-    pub fn draw(&mut self) -> Result<Card, CardCollectionError> {
-        match self {
-            CardCollection::Deck { cards, .. } => {
-                if cards.is_empty() {
-                    return Err(CardCollectionError::CannotDrawFromEmptyCollection(self.id()));
-                }
-                Ok(cards.remove(0))
-            }
-            CardCollection::Hand { .. } |
-            CardCollection::Discard { .. } |
-            CardCollection::Pack { .. } => {
-                Err(CardCollectionError::OrderedUseOfUnorderedSet(self.id()))
-            }
-        }
-    }
-
-    pub fn id(&self) -> CardCollectionId {
-        match self {
-            CardCollection::Deck { id, .. } |
-            CardCollection::Hand { id, .. } |
-            CardCollection::Discard { id, .. } |
-            CardCollection::Pack { id, .. } => {
-                *id
-            }
-        }
-    }
-
-    pub fn len(&self) -> usize {
-        match self {
-            CardCollection::Deck { cards, .. } => {
-                cards.len()
-            }
-            CardCollection::Hand { cards, .. } |
-            CardCollection::Discard { cards, .. } |
-            CardCollection::Pack { cards, .. } => {
-                cards.len()
-            }
-        }
-    }
-
-    pub fn is_empty(&self) -> bool {
-        match self {
-            CardCollection::Deck { cards, .. } => {
-                cards.is_empty()
-            }
-            CardCollection::Hand { cards, .. } |
-            CardCollection::Discard { cards, .. } |
-            CardCollection::Pack { cards, .. } => {
-                cards.is_empty()
-            }
-        }
-    }
-
-    pub fn iter<'a>(&'a self) -> Box<dyn Iterator<Item=&'a Card> + 'a> {
-        match self {
-            CardCollection::Deck { cards, .. } => {
-                Box::new(cards.iter())
-            }
-            CardCollection::Hand { cards, .. } |
-            CardCollection::Discard { cards, .. } |
-            CardCollection::Pack { cards, .. } => {
-                Box::new(cards.iter())
-            }
-        }
-    }
-
-    pub fn transfer_to(&mut self, receiver: &mut CardCollection, card_id: CardId) -> Result<(), StateError>{
-        let card = self.remove(card_id)?;
-        receiver.add(card);
-        Ok(())
-    }
-
-    pub fn add(&mut self, card: Card) {
-        match self {
-            CardCollection::Deck { cards, .. } => {
-                cards.push(card);
-            }
-            CardCollection::Hand { cards, .. } |
-            CardCollection::Discard { cards, .. } |
-            CardCollection::Pack { cards, .. } => {
-                cards.insert(card);
-            }
-        }
-    }
-
-    pub fn add_to_bottom(&mut self, card: Card) ->  Result<(), StateError> {
-        match self {
-            CardCollection::Deck { cards, .. } => {
-                cards.push(card);
-                Ok(())
-            }
-            CardCollection::Hand { .. } |
-            CardCollection::Discard { .. } |
-            CardCollection::Pack { .. } => {
-                Err(CardCollectionError::OrderedUseOfUnorderedSet(self.id()).into())
-            }
-        }
-    }
-
-    pub fn remove(&mut self, card_id: CardId) -> Result<Card, StateError> {
-        match self {
-            CardCollection::Deck { cards, .. } => {
-                let idx = cards.iter().position(|c| c.card_id == card_id);
-                match idx {
-                    None => {
-                        Err(EntityNotFoundError::Card(card_id).into())
-                    }
-                    Some(idx) => {
-                        Ok(cards.remove(idx))
-                    }
-                }
-            }
-            CardCollection::Hand { cards, .. } |
-            CardCollection::Discard { cards, .. } |
-            CardCollection::Pack { cards, .. } => {
-                let card = cards.iter().find(|c| c.card_id == card_id);
-                match card {
-                    None => {
-                        Err(EntityNotFoundError::Card(card_id).into())
-                    }
-                    Some(card) => {
-                        let card = cards.take(&card.clone()).unwrap();
-                        Ok(card)
-                    }
-                }
-            }
-        }
-    }
+pub enum FindCardCollectionMutResult<'a> {
+    CommonDeck(&'a mut Deck),
+    PlayerHand(PlayerId, &'a mut UnorderedCards),
+    PlayerDiscard(PlayerId, &'a mut UnorderedCards),
+    PlayerDeck(PlayerId, &'a mut Deck),
+    PlayerPack(PlayerId, &'a mut UnorderedCards),
 }
 
 pub enum FindCardCollectionResult<'a> {
-    CommonDeck(&'a CardCollection),
-    PlayerHand(&'a Player, &'a CardCollection),
-    PlayerDiscard(&'a Player, &'a CardCollection),
-    PlayerDeck(&'a Player, &'a CardCollection),
-    PlayerPack(&'a Player, &'a CardCollection),
+    CommonDeck(&'a Deck),
+    PlayerHand(&'a Player, &'a UnorderedCards),
+    PlayerDiscard(&'a Player, &'a UnorderedCards),
+    PlayerDeck(&'a Player, &'a Deck),
+    PlayerPack(&'a Player, &'a UnorderedCards),
 }
 
 impl State {
-    pub fn find_card_collection_mut(&mut self, id: CardCollectionId) -> Result<&mut CardCollection, StateError> {
+    pub fn find_card_collection_mut(&mut self, id: CardCollectionId) -> Result<FindCardCollectionMutResult, StateError> {
         match self.find_card_collection(id)? {
             FindCardCollectionResult::CommonDeck(_) => {
-                Ok(self.common_deck.as_mut().unwrap())
+                let collection = self.common_deck.as_mut().unwrap();
+                Ok(FindCardCollectionMutResult::CommonDeck(collection))
             }
             FindCardCollectionResult::PlayerHand(player, _) => {
-                Ok(&mut self.find_player_mut(player.id)?.hand)
+                let player = self.find_player_mut(player.id)?;
+                let collection = &mut player.hand;
+                Ok(FindCardCollectionMutResult::PlayerHand(player.id, collection))
             }
             FindCardCollectionResult::PlayerDiscard(player, _) => {
-                Ok(&mut self.find_player_mut(player.id)?.discard)
+                let player = self.find_player_mut(player.id)?;
+                let collection = &mut player.discard;
+                Ok(FindCardCollectionMutResult::PlayerDiscard(player.id, collection))
             }
             FindCardCollectionResult::PlayerDeck(player, _) => {
-                Ok(self.find_player_mut(player.id)?.own_deck.as_mut().unwrap())
+                let player = self.find_player_mut(player.id)?;
+                let collection = player.own_deck.as_mut().unwrap();
+                Ok(FindCardCollectionMutResult::PlayerDeck(player.id, collection))
             }
             FindCardCollectionResult::PlayerPack(player, _) => {
-                Ok(self.find_player_mut(player.id)?.pack.as_mut().unwrap())
+                let player = self.find_player_mut(player.id)?;
+                let collection = player.pack.as_mut().unwrap();
+                Ok(FindCardCollectionMutResult::PlayerPack(player.id, collection))
             }
         }
     }
@@ -259,7 +122,7 @@ impl State {
     pub fn find_card_collection(&self, id: CardCollectionId) -> Result<FindCardCollectionResult, StateError> {
         // check if it's the common deck
         if let Some(deck) = &self.common_deck {
-            if deck.id() == id {
+            if deck.id == id {
                 return Ok(FindCardCollectionResult::CommonDeck(deck));
             }
         }
@@ -267,19 +130,19 @@ impl State {
         let players: Vec<&Player> = self.players().collect();
 
         // check if it's one of the player's hands
-        if let Some(player) = players.iter().find(|p| p.hand.id() == id) {
+        if let Some(player) = players.iter().find(|p| p.hand.id == id) {
             return Ok(FindCardCollectionResult::PlayerHand(player, &player.hand));
         }
 
         // check if it's one of the player's discards
-        if let Some(player) = players.iter().find(|p| p.discard.id() == id) {
+        if let Some(player) = players.iter().find(|p| p.discard.id == id) {
             return Ok(FindCardCollectionResult::PlayerHand(player, &player.discard));
         }
 
         // check if it's one of the player's decks
         if let Some(player) = players.iter().find(|p| {
             if let Some(deck) = &p.own_deck {
-                return deck.id() == id;
+                return deck.id == id;
             }
             false
         }) {
@@ -289,7 +152,7 @@ impl State {
         // check if it's one of the player's pack's
         if let Some(player) = players.iter().find(|p| {
             if let Some(pack) = &p.pack {
-                return pack.id() == id;
+                return pack.id == id;
             }
             false
         }) {

@@ -2,7 +2,6 @@ use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
 
 use crate::game::state::card::CardId;
-use crate::game::state::card_collection::CardCollection;
 use crate::game::state::error::StateError;
 use crate::game::state::error::EntityNotFoundError;
 use crate::game::state::formation::{DefensiveFormation, Formation};
@@ -10,6 +9,7 @@ use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{Player, PlayerId, TeamId};
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
 use crate::game::state::State;
+use crate::game::state::unordered_cards::UnorderedCards;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct RegionId(pub u8);
@@ -204,7 +204,7 @@ impl State {
 
         // make a vec of packs, which will be populated where each
         // index holds it's respective region's neighbours pack
-        let mut packs: Vec<CardCollection> = Vec::new();
+        let mut packs: Vec<UnorderedCards> = Vec::new();
 
         for region in self.regions.iter() {
             // by using the counter-clockwise neighbour here, the packs are remapped so

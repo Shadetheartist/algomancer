@@ -1,10 +1,11 @@
 use rng::{AlgomancerRng, AlgomancerRngSeed};
 use serde::{Deserialize, Serialize};
+use crate::game::state::card_collection::CardCollectionId;
 
-use crate::game::state::card_collection::CardCollection;
 use crate::game::state::player::TeamId;
 use crate::game::state::region::Region;
 use crate::game::state::faction::Faction;
+use crate::game::state::deck::Deck;
 use crate::game::state::team_configuration::TeamConfiguration;
 
 pub mod card;
@@ -21,6 +22,8 @@ pub mod team_configuration;
 pub mod error;
 pub mod faction;
 pub mod cost;
+pub mod deck;
+pub mod unordered_cards;
 
 // as described in the manual
 // aside from 1v1, i've never played any of these lol
@@ -73,7 +76,7 @@ pub struct State {
     pub depth: usize,
     pub game_mode: GameMode,
     pub rand: AlgomancerRng,
-    pub common_deck: Option<CardCollection>,
+    pub common_deck: Option<Deck>,
     pub regions: Vec<Region>,
     pub initiative_team: TeamId,
     pub next_permanent_id: usize,
@@ -87,7 +90,7 @@ impl Default for State {
             depth: 0,
             game_mode: GameMode::new_player_mode(),
             rand: AlgomancerRng::new(AlgomancerRngSeed::default()),
-            common_deck: Some(CardCollection::new_common_deck()),
+            common_deck: Some(Deck::new(CardCollectionId::new_common_deck())),
             regions: Vec::new(),
             initiative_team: TeamId(1),
             next_permanent_id: 1,

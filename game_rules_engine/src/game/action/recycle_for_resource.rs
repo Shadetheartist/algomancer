@@ -4,7 +4,7 @@ use crate::game::db::CardPrototypeDatabase;
 use crate::game::state::card::{CardId, FindCardResult};
 use crate::game::state::error::{InvalidActionError, StateError};
 use crate::game::state::mutation::create_card::CreateCardMutation;
-use crate::game::state::mutation::move_card::MoveCardMutation;
+use crate::game::state::mutation::move_card::{MoveCardMutation, Placement, To};
 use crate::game::state::mutation::StateMutation;
 use crate::game::state::mutation::StaticStateMutation::{CreateCard, MoveCard};
 use crate::game::state::player::Player;
@@ -25,23 +25,23 @@ impl ActionTrait for RecycleForResourceAction {
         let find_card_result = state.find_card(self.card_id)?;
 
         match find_card_result {
-            FindCardResult::InPlayerHand(p, cc, _) |
-            FindCardResult::InPlayerDiscard(p, cc, _) |
-            FindCardResult::InPlayerDeck(p, cc, _) => {
-                let player_deck_id = p.deck(state).id();
+            FindCardResult::InPlayerHand(p, cc, _) => {
+                let player_deck_id = p.deck(state).id;
                 mutations.push(StateMutation::Static(MoveCard(MoveCardMutation{
-                    from_cc_id: cc.id(),
-                    to_cc_id: player_deck_id,
+                    from: cc.id,
+                    to: To::Ordered(player_deck_id, Placement::OnBottom),
                     card_id: self.card_id,
-                    placement: None,
                 })));
 
                 let resource_prototype = db.resource(self.resource_type);
                 mutations.push(StateMutation::Static(CreateCard(CreateCardMutation{
-                    card_collection_id: p.hand.id(),
+                    card_collection_id: p.hand.id,
                     card_prototype_id: resource_prototype.prototype_id,
                 })));
             }
+            FindCardResult::InPlayerPack(_, _, _) |
+            FindCardResult::InPlayerDiscard(_, _, _) |
+            FindCardResult::InPlayerDeck(_, _, _) |
             FindCardResult::InCommonDeck(_, _) |
             FindCardResult::AsPermanentInRegion(_, _) |
             FindCardResult::AsPermanentInFormation(_, _, _) => {

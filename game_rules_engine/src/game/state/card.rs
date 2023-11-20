@@ -6,14 +6,15 @@ use crate::game::db::{CardPrototypeDatabase, CardPrototypeId};
 
 use crate::game::state::{GameMode, State};
 use crate::game::state::card::CardType::Resource;
-use crate::game::state::card_collection::CardCollection;
 
 use crate::game::state::error::{EntityNotFoundError};
 use crate::game::state::formation::Formation;
+use crate::game::state::deck::Deck;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::Player;
 use crate::game::state::region::Region;
 use crate::game::state::resource::{ResourceType};
+use crate::game::state::unordered_cards::UnorderedCards;
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum Timing {
@@ -59,10 +60,11 @@ pub struct Card {
 
 
 pub enum FindCardResult<'a> {
-    InPlayerHand(&'a Player, &'a CardCollection, &'a Card),
-    InPlayerDiscard(&'a Player, &'a CardCollection, &'a Card),
-    InPlayerDeck(&'a Player, &'a CardCollection, &'a Card),
-    InCommonDeck(&'a CardCollection, &'a Card),
+    InPlayerHand(&'a Player, &'a UnorderedCards, &'a Card),
+    InPlayerDiscard(&'a Player, &'a UnorderedCards, &'a Card),
+    InPlayerDeck(&'a Player, &'a Deck, &'a Card),
+    InPlayerPack(&'a Player, &'a UnorderedCards, &'a Card),
+    InCommonDeck(&'a Deck, &'a Card),
     AsPermanentInRegion(&'a Region, &'a Permanent),
     AsPermanentInFormation(&'a Region, &'a Formation<Permanent>, &'a Permanent),
 }

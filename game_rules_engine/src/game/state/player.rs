@@ -1,11 +1,12 @@
 use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
 
-use crate::game::state::card_collection::CardCollection;
+use crate::game::state::card_collection::{CardCollectionId};
 use crate::game::state::error::{EntityNotFoundError, StateError};
 use crate::game::state::progression::{CombatPhaseAStep, CombatPhaseBStep, MainPhaseStep, Phase, PrecombatPhaseStep};
 use crate::game::state::{GameMode, State};
-use crate::game::state::card::CardId;
+use crate::game::state::deck::Deck;
+use crate::game::state::unordered_cards::UnorderedCards;
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct TeamId(pub u8);
@@ -23,33 +24,33 @@ impl Display for PlayerId {
 pub struct Player {
     pub id: PlayerId,
     pub team_id: TeamId,
-    pub pack: Option<CardCollection>,
-    pub own_deck: Option<CardCollection>,
+    pub pack: Option<UnorderedCards>,
+    pub own_deck: Option<Deck>,
     pub is_alive: bool,
     pub health: i32,
-    pub hand: CardCollection,
-    pub discard: CardCollection,
+    pub hand: UnorderedCards,
+    pub discard: UnorderedCards,
     pub passed_priority: bool,
     pub resources_played_this_turn: u8,
 }
 
 impl Player {
-    pub fn new(player_id: PlayerId,team_id: TeamId, deck: Option<CardCollection>, pack: Option<CardCollection>) -> Player {
+    pub fn new(player_id: PlayerId, team_id: TeamId, deck: Option<Deck>, pack: Option<UnorderedCards>) -> Player {
         Player {
             id: player_id,
             team_id,
             own_deck: deck,
             is_alive: true,
             health: 30,
-            hand: CardCollection::new_hand(player_id),
-            discard: CardCollection::new_discard(player_id),
+            hand: UnorderedCards::new(CardCollectionId::new_hand(player_id)),
+            discard: UnorderedCards::new(CardCollectionId::new_discard(player_id)),
             passed_priority: false,
             pack,
             resources_played_this_turn: 0,
         }
     }
 
-    pub fn deck<'a>(&'a self, state: &'a State) -> &'a CardCollection {
+    pub fn deck<'a>(&'a self, state: &'a State) -> &'a Deck {
         match state.game_mode {
             GameMode::LiveDraft { .. } => {
                 if let Some(common_deck) = &state.common_deck {
@@ -203,21 +204,7 @@ impl State {
         }
     }
 
-
-    pub fn player_recycle_card(&mut self, player_id: PlayerId, card_id: CardId){
-
-        // remove the card from the player's hand
-        let card = {
-            let player = self.find_player_mut(player_id).expect("a player");
-            player.hand.remove(card_id).expect("a card was removed")
-        };
-
-        // add the removed card to the bottom of the deck
-        let deck = self.player_deck(player_id).expect("a deck");
-        deck.add(card);
-    }
-
-    pub fn player_deck(&mut self, player_id: PlayerId) -> Result<&mut CardCollection, StateError> {
+    pub fn player_deck(&mut self, player_id: PlayerId) -> Result<&mut Deck, StateError> {
         match &self.game_mode {
             GameMode::LiveDraft { .. } => {
                 if let Some(common_deck) = &mut self.common_deck {

@@ -37,8 +37,9 @@ pub enum EntityNotFoundError {
 pub enum CardCollectionError {
     #[error("card collection [{0}] is empty, and cannot be drawn from")]
     CannotDrawFromEmptyCollection(CardCollectionId),
-    #[error("card collection [{0}] does not have an intrinsic order to it")]
-    OrderedUseOfUnorderedSet(CardCollectionId),
+
+    #[error("card collection [{0}] is not being used properly due to its order/unordered-ness")]
+    UnexpectedOrdering(CardCollectionId),
 }
 
 
@@ -73,4 +74,7 @@ pub enum StateError {
 
     #[error("action is invalid")]
     InvalidAction(#[from] InvalidActionError),
+
+    #[error("some other error")]
+    Other
 }

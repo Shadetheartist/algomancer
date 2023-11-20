@@ -16,7 +16,7 @@ use crate::game::state::error::InvalidActionError::InvalidDraft;
 
 use crate::game::state::mutation::{StateMutation};
 use crate::game::state::mutation::create_pack::CreatePackMutation;
-use crate::game::state::mutation::move_card::MoveCardMutation;
+use crate::game::state::mutation::move_card::{MoveCardMutation, To};
 use crate::game::state::mutation::phase_transition::PhaseTransitionMutation;
 use crate::game::state::mutation::StaticStateMutation::{CreatePackForPlayer, MoveCard, PhaseTransition};
 use crate::game::state::player::Player;
@@ -88,10 +88,9 @@ impl ActionTrait for DraftAction {
             let eval_mutation = StateMutation::Eval(Box::new(move |state| -> Result<StateMutation, StateError> {
                 let player = state.find_player(player_id)?;
                 Ok(StateMutation::Static(MoveCard(MoveCardMutation{
-                    from_cc_id: player.hand.id(),
-                    to_cc_id: player.pack.as_ref().unwrap().id(),
+                    from: player.hand.id,
+                    to: To::Unordered(player.pack.as_ref().unwrap().id),
                     card_id,
-                    placement: None,
                 })))
             }));
 
