@@ -6,9 +6,10 @@ use crate::game::state::error::{EntityNotFoundError, StateError};
 use crate::game::state::progression::{CombatPhaseAStep, CombatPhaseBStep, MainPhaseStep, Phase, PrecombatPhaseStep};
 use crate::game::state::{GameMode, State};
 use crate::game::state::deck::Deck;
+use crate::game::state::stack::Next;
 use crate::game::state::unordered_cards::UnorderedCards;
 
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub struct TeamId(pub u8);
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
@@ -20,7 +21,7 @@ impl Display for PlayerId {
     }
 }
 
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Player {
     pub id: PlayerId,
     pub team_id: TeamId,
@@ -30,7 +31,6 @@ pub struct Player {
     pub health: i32,
     pub hand: UnorderedCards,
     pub discard: UnorderedCards,
-    pub passed_priority: bool,
     pub resources_played_this_turn: u8,
 }
 
@@ -44,7 +44,6 @@ impl Player {
             health: 30,
             hand: UnorderedCards::new(CardCollectionId::new_hand(player_id)),
             discard: UnorderedCards::new(CardCollectionId::new_discard(player_id)),
-            passed_priority: false,
             pack,
             resources_played_this_turn: 0,
         }
@@ -114,60 +113,69 @@ impl State {
     /// as well as if they are waiting to receive priority during an action window
     pub fn player_can_act(&self, player_id: PlayerId) -> bool {
         let player = self.find_player(player_id).expect("a player");
-
-        // if the player has passed priority then they cannot do anything until they receive priority again.
-        if player.passed_priority {
-            return false
-        }
-
         let region_id = self.find_region_id_containing_player(player_id);
         let region = self.find_region(region_id).expect("a region");
 
+        match region.stack.next() {
+            Next::PassPriority(active_player_id) => {
+                if active_player_id != player_id {
+                    return false
+                }
+            }
+            _ => {}
+        }
+
+        let initiative_team = self.initiative_team();
+        
         let has_initiative_action_window = {
             // otherwise if the player is on the initiative team (and implicitly, has not passed)
-            if self.initiative_team == player.team_id {
+            if initiative_team == player.team_id {
                 true
             } else {
                 // otherwise if the player is on the non-initiative team,
                 // then they cannot act until all the players on the initiative team have passed
-                self.all_players_on_team_passed_priority(self.initiative_team).expect("a result")
+                // self.all_players_on_team_passed_priority(initiative_team).expect("a result")
+                false
             }
         };
 
         match &region.step {
             Phase::PrecombatPhase(step) => match step {
-                PrecombatPhaseStep::ITMana => self.initiative_team == player.team_id,
-                PrecombatPhaseStep::NITMana => self.initiative_team != player.team_id,
+                PrecombatPhaseStep::ITMana => initiative_team == player.team_id,
+                PrecombatPhaseStep::NITMana => initiative_team != player.team_id,
                 _ => true
             }
             Phase::CombatPhaseA(step) => match step {
-                CombatPhaseAStep::ITAttack => self.initiative_team == player.team_id,
+                CombatPhaseAStep::ITAttack => initiative_team == player.team_id,
                 CombatPhaseAStep::AfterITAttackPriorityWindow => has_initiative_action_window,
-                CombatPhaseAStep::NITBlock => self.initiative_team != player.team_id,
+                CombatPhaseAStep::NITBlock => initiative_team != player.team_id,
                 CombatPhaseAStep::AfterNITBlockPriorityWindow => has_initiative_action_window,
                 CombatPhaseAStep::Damage => false,
                 CombatPhaseAStep::AfterCombatPriorityWindow => has_initiative_action_window,
             },
             Phase::CombatPhaseB(step) => match step {
-                CombatPhaseBStep::NITAttack => self.initiative_team != player.team_id,
+                CombatPhaseBStep::NITAttack => initiative_team != player.team_id,
                 CombatPhaseBStep::AfterNITAttackPriorityWindow => has_initiative_action_window,
-                CombatPhaseBStep::ITBlock => self.initiative_team == player.team_id,
+                CombatPhaseBStep::ITBlock => initiative_team == player.team_id,
                 CombatPhaseBStep::AfterITBlockPriorityWindow => has_initiative_action_window,
                 CombatPhaseBStep::Damage => false,
                 CombatPhaseBStep::AfterCombatPriorityWindow => has_initiative_action_window,
             },
             Phase::MainPhase(step) => match step {
                 MainPhaseStep::Regroup => false,
-                MainPhaseStep::ITMain => self.initiative_team == player.team_id,
-                MainPhaseStep::NITMain => self.initiative_team != player.team_id
+                MainPhaseStep::ITMain => initiative_team == player.team_id,
+                MainPhaseStep::NITMain => initiative_team != player.team_id
             }
         }
 
     }
 
+    pub fn initiative_team(&self) -> TeamId {
+        self.find_player(self.initiative_player).unwrap().team_id
+    }
 
     pub fn non_initiative_team(&self) -> TeamId {
-        self.team_ids().into_iter().find(|&t| t != self.initiative_team).expect("a non-initative team")
+        self.team_ids().into_iter().find(|&t| t != self.initiative_team()).expect("a non-initative team")
     }
 
 }

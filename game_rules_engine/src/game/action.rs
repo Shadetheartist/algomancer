@@ -96,8 +96,10 @@ impl Game {
 
         for mutation in mutations {
             let static_mutation = mutation.to_static(&next_state)?;
-            next_state = next_state.mutate(&self.cards_db, &static_mutation)?;
-            static_mutations.push(static_mutation);
+            for sub_mutation in static_mutation {
+                next_state = next_state.mutate(&self.cards_db, &sub_mutation)?;
+                static_mutations.push(sub_mutation);
+            }
         }
 
         self.action_history.push(action);

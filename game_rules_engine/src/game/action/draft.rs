@@ -85,13 +85,13 @@ impl ActionTrait for DraftAction {
             let card_id = card.card_id;
             // all these mutations depend on the pack existing, it doesn't yet, but it will when applying these mutations.
             // so we need to look at that future state to get the pack's id, by using the Eval variant.
-            let eval_mutation = StateMutation::Eval(Box::new(move |state| -> Result<StateMutation, StateError> {
+            let eval_mutation = StateMutation::Eval(Box::new(move |state| -> Result<Option<StateMutation>, StateError> {
                 let player = state.find_player(player_id)?;
-                Ok(StateMutation::Static(MoveCard(MoveCardMutation{
+                Ok(Some(StateMutation::Static(MoveCard(MoveCardMutation{
                     from: player.hand.id,
                     to: To::Unordered(player.pack.as_ref().unwrap().id),
                     card_id,
-                })))
+                }))))
             }));
 
             mutations.push(eval_mutation);

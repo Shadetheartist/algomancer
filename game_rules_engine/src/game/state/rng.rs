@@ -2,7 +2,7 @@ use rand::{Error, Rng, RngCore, SeedableRng};
 use rand::distributions::uniform::{SampleRange, SampleUniform};
 use serde::{Deserialize, Serialize};
 
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct AlgomancerRng(rand_pcg::Mcg128Xsl64);
 
 pub type AlgomancerRngSeed = [u8; 16];

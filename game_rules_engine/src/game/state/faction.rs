@@ -35,7 +35,7 @@ impl Faction {
     }
 }
 
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct FactionAffinity {
     pub faction: Faction,
     pub amount: u8

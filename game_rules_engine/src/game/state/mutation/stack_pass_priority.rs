@@ -11,23 +11,24 @@ use crate::game::state::State;
 
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct PhaseTransitionMutation {
+pub struct StackPassPriorityMutation {
     pub region_id: RegionId,
 }
 
-impl StateMutator for PhaseTransitionMutation {
+impl StateMutator for StackPassPriorityMutation {
     fn mutate_state(&self, mut state: State, _: &CardPrototypeDatabase) -> Result<State, StateError> {
-        state = state.region_transition_to_next_step(self.region_id);
+        let region = state.find_region_mut(self.region_id)?;
+        region.stack.pass_priority();
         Ok(state)
     }
 }
 
 #[macro_export]
-macro_rules! phase_transition {
+macro_rules! stack_pass_priority {
     ($mutations:ident, $region_id:expr) => {
         $mutations.push(crate::game::state::mutation::StateMutation::Static(
-            crate::game::state::mutation::StaticStateMutation::PhaseTransition(
-            crate::game::state::mutation::PhaseTransitionMutation {
+            crate::game::state::mutation::StaticStateMutation::StackPassPriority(
+            crate::game::state::mutation::StackPassPriorityMutation {
                 region_id: $region_id,
             },
         )));

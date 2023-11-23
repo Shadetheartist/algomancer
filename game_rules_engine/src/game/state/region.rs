@@ -8,6 +8,7 @@ use crate::game::state::formation::{DefensiveFormation, Formation};
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{Player, PlayerId, TeamId};
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
+use crate::game::state::stack::Stack;
 use crate::game::state::State;
 use crate::game::state::unordered_cards::UnorderedCards;
 
@@ -21,7 +22,7 @@ impl Display for RegionId {
 }
 
 
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Region {
     pub id: RegionId,
     pub owner_player_id: PlayerId,
@@ -30,6 +31,7 @@ pub struct Region {
     pub attacking_formation: Option<Formation<Permanent>>,
     pub defending_formation: Option<DefensiveFormation<Permanent>>,
     pub step: Phase,
+    pub stack: Stack,
 }
 
 
@@ -117,11 +119,6 @@ impl State {
         }
     }
 
-    fn reset_player_priority_in_region(&mut self, region_id: RegionId) {
-        let players = self.players_in_region_mut(region_id).expect("a set of players in a region");
-        players.iter_mut().for_each(|p| p.passed_priority = false);
-    }
-
     fn each_player_in_region_takes_draw_step_cards(&mut self, region_id: RegionId) {
         let players = self.players_in_region_mut(region_id).expect("a set of players in a region");
         let player_ids: Vec<PlayerId> = players.iter().map(|p| p.id).collect();
@@ -141,18 +138,6 @@ impl State {
             }
         }
     }
-
-    pub fn all_players_in_region_except_passed_priority(&self, region_id: RegionId, except: PlayerId) -> Result<bool, StateError> {
-        let players = self.players_in_region_except(region_id, except)?;
-        Ok(!players.iter().any(|p| !p.passed_priority))
-    }
-
-    pub fn all_players_in_region_on_team_passed_priority(&self, region_id: RegionId, team_id: TeamId) -> Result<bool, StateError> {
-        let players = self.players_in_region(region_id)?;
-        let players: Vec<&Player> = players.into_iter().filter(|p| p.team_id == team_id).collect();
-        Ok(!players.iter().any(|p| !p.passed_priority))
-    }
-
 
     pub fn players_in_region(&self, region_id: RegionId) -> Result<Vec<&Player>, StateError> {
         let region = self.find_region(region_id)?;
@@ -210,7 +195,7 @@ impl State {
             // by using the counter-clockwise neighbour here, the packs are remapped so
             // that when we apply the changes, the packs are aligned with the clockwise neighbour
             let neighbouring_region = self.region_counterclockwise_neighbour(region.id).expect("a neighbouring region");
-            let neighbour_pack = neighbouring_region.sole_player().pack.as_ref().expect("a pack");
+            let neighbour_pack = neighbouring_region.sole_player().pack.as_ref().expect("a neighbouring pack");
             packs.push(neighbour_pack.clone());
         }
 
@@ -228,8 +213,6 @@ impl State {
             let region = self.find_region(region_id).expect("a region");
             region.step.get_next_phase(&self.game_mode)
         };
-
-        self.reset_player_priority_in_region(region_id);
 
         match next_step {
             Phase::PrecombatPhase(PrecombatPhaseStep::Draw) => {
@@ -257,24 +240,6 @@ impl State {
         let team_players = self.players().filter(|p| p.team_id == team_id).collect();
         Ok(team_players)
     }
-
-    pub fn all_players_on_team_passed_priority(&self, team_id: TeamId) -> Result<bool, StateError> {
-        let players = self.players_on_team(team_id)?;
-        if players.is_empty() {
-            panic!("why aren't there any players on this team")
-        }
-        Ok(!players.iter().any(|p| !p.passed_priority))
-    }
-
-    pub fn all_players_on_team_passed_priority_except(&self, team_id: TeamId, except_player_id: PlayerId) -> Result<bool, StateError> {
-        let players = self.players_on_team(team_id)?;
-        if players.is_empty() {
-            panic!("why aren't there any players on this team")
-        }
-        Ok(!players.iter().filter(|p| p.id != except_player_id).any(|p| !p.passed_priority))
-    }
-
-
 }
 
 pub fn wrap_index(len: usize, idx: i32) -> Option<usize> {

@@ -3,17 +3,19 @@ use crate::game::state::card_collection::CardCollectionId;
 use crate::game::state::player::{PlayerId};
 use crate::game::state::region::RegionId;
 use thiserror::Error;
+use crate::game::state::permanent::PermanentId;
 
 #[derive(Error, Debug)]
 #[error("card not playable")]
 pub enum CardNotPlayableError {
     CardDoesNotExist(CardId),
+    NotUnderPlayersControl(CardId),
     NotInPlayableZone(CardId),
     NotInPlayableStep(CardId),
     CardLacksCorrectTiming(CardId),
     CannotPlayMoreResources(CardId),
     MustBePlayedFromHand(CardId),
-    CannotCastANonSpellTokenPermanentFromPlay(CardId),
+    CannotCastANonSpellTokenPermanentFromPlay(PermanentId),
 }
 
 #[derive(Error, Debug)]
@@ -74,6 +76,9 @@ pub enum StateError {
 
     #[error("action is invalid")]
     InvalidAction(#[from] InvalidActionError),
+
+    #[error("player [{0:?}] cannot pass priority")]
+    CannotPassPriority(PlayerId),
 
     #[error("some other error")]
     Other

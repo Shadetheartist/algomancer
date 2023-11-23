@@ -21,6 +21,7 @@ use crate::game::state::region::{Region, RegionId};
 use crate::game::state::resource::{ ResourceType};
 use crate::game::state::resource::ResourceType::{ManaConverter, Shard};
 use crate::game::state::rng::AlgomancerRng;
+use crate::game::state::stack::Stack;
 use crate::game::state::team_configuration::TeamConfiguration;
 
 #[derive(Debug)]
@@ -163,7 +164,7 @@ impl Game {
                 common_deck: Some(deck),
                 rand: algomancer_rng,
                 regions: Vec::new(),
-                initiative_team: TeamId(1),
+                initiative_player: PlayerId(1),
                 next_permanent_id: 1,
                 next_card_id: card_id_counter + 1,
                 next_formation_id: 1,
@@ -215,7 +216,8 @@ impl Game {
                         unformed_permanents: permanents,
                         attacking_formation: None,
                         defending_formation: None,
-                        step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap)
+                        step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
+                        stack: Stack::new(),
                     };
 
                     game.state.regions.push(region);

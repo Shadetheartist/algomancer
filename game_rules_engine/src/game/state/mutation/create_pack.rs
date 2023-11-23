@@ -8,7 +8,7 @@ use crate::game::state::player::PlayerId;
 use crate::game::state::State;
 use crate::game::state::unordered_cards::UnorderedCards;
 
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct CreatePackMutation {
     pub player_id: PlayerId,
 }

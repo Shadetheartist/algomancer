@@ -1,32 +1,32 @@
 use serde::{Deserialize, Serialize};
 use crate::game::db::{CardPrototype, CardPrototypeDatabase, CardPrototypeId};
 
-use crate::game::state::card::{Card,  CardType};
+use crate::game::state::card::{Card, CardId, CardType};
 use crate::game::state::player::PlayerId;
 use crate::game::state::State;
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
-pub struct PermanentId(pub usize);
+pub type PermanentId = CardId;
 
 impl PermanentId {
     pub fn next(state: &mut State) -> PermanentId {
         let next = state.next_permanent_id;
         state.next_permanent_id = next + 1;
-        PermanentId(next)
+        Self(next)
     }
 }
 
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct PermanentCommon {
     pub permanent_id: PermanentId,
     pub controller_player_id: PlayerId,
 }
 
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum Permanent {
     Unit {
         common: PermanentCommon,
         card: Card,
+        // modifications: SomeModificationType
     },
     Resource {
         common: PermanentCommon,

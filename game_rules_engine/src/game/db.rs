@@ -8,7 +8,7 @@ use crate::game::state::resource::ResourceType;
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy, Ord, PartialOrd)]
 pub struct CardPrototypeId(pub usize);
 
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct CardPrototype {
     pub prototype_id: CardPrototypeId,
     pub name: String,
@@ -17,7 +17,7 @@ pub struct CardPrototype {
     pub card_type: CardType,
 }
 
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct CardPrototypeDatabase {
     pub prototypes: HashMap<CardPrototypeId, CardPrototype>,
 }

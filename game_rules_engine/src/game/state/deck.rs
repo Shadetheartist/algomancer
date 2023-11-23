@@ -6,7 +6,7 @@ use crate::game::state::card_collection::CardCollectionId;
 use crate::game::state::error::{EntityNotFoundError, StateError};
 
 
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Deck {
     pub id: CardCollectionId,
     cards: VecDeque<Card>

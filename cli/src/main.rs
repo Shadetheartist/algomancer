@@ -153,6 +153,7 @@ fn unique_factions(factions: &[FactionArg]) -> Vec<Faction> {
 
 #[cfg(test)]
 mod tests {
+    use std::time::Instant;
     use algomancer_gre::game::{Game, GameOptions};
     use algomancer_gre::game::action::{Action};
     use algomancer_gre::game::state::GameMode;
@@ -177,8 +178,12 @@ mod tests {
 
         let mut game = Game::new(&options).unwrap();
 
+
         for _ in 0..500 {
+            let start = Instant::now();
             let actions = game.valid_actions();
+            let get_valid_duration = start.elapsed();
+
             let mut actions_vec: Vec<Action> = actions.into_iter().collect();
             actions_vec.sort();
 
@@ -189,8 +194,11 @@ mod tests {
             actions_vec.reverse();
 
             let action = actions_vec.remove(0);
+            let start = Instant::now();
             let mutations = game.apply_action(action).unwrap();
-            eprintln!("{:?}", mutations)
+
+            let apply_duration = start.elapsed();
+            eprintln!("t_get {:?} | t_apply: {:?} | mutations {:?}\n", get_valid_duration, apply_duration, mutations)
         }
     }
 }

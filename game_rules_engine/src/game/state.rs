@@ -2,7 +2,7 @@ use rng::{AlgomancerRng, AlgomancerRngSeed};
 use serde::{Deserialize, Serialize};
 use crate::game::state::card_collection::CardCollectionId;
 
-use crate::game::state::player::TeamId;
+use crate::game::state::player::PlayerId;
 use crate::game::state::region::Region;
 use crate::game::state::faction::Faction;
 use crate::game::state::deck::Deck;
@@ -24,6 +24,7 @@ pub mod faction;
 pub mod cost;
 pub mod deck;
 pub mod unordered_cards;
+pub mod stack;
 
 // as described in the manual
 // aside from 1v1, i've never played any of these lol
@@ -50,7 +51,7 @@ impl TeamConfiguration {
     }
 }
 
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum GameMode {
     LiveDraft {
         selected_deck_types: Vec<Faction>,
@@ -71,14 +72,14 @@ impl GameMode {
     }
 }
 
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct State {
     pub depth: usize,
     pub game_mode: GameMode,
     pub rand: AlgomancerRng,
     pub common_deck: Option<Deck>,
     pub regions: Vec<Region>,
-    pub initiative_team: TeamId,
+    pub initiative_player: PlayerId,
     pub next_permanent_id: usize,
     pub next_card_id: usize,
     pub next_formation_id: usize,
@@ -92,7 +93,7 @@ impl Default for State {
             rand: AlgomancerRng::new(AlgomancerRngSeed::default()),
             common_deck: Some(Deck::new(CardCollectionId::new_common_deck())),
             regions: Vec::new(),
-            initiative_team: TeamId(1),
+            initiative_player: PlayerId(1),
             next_permanent_id: 1,
             next_card_id: 1,
             next_formation_id: 1,

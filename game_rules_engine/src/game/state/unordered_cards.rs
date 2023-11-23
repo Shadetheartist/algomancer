@@ -4,7 +4,7 @@ use crate::game::state::card::{Card, CardId};
 use crate::game::state::card_collection::CardCollectionId;
 use crate::game::state::error::{EntityNotFoundError, StateError};
 
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct UnorderedCards {
     pub id: CardCollectionId,
     cards: Vec<Card>

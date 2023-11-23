@@ -7,20 +7,20 @@ use crate::game::state::mutation::StateMutator;
 use crate::game::state::State;
 
 
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum Placement {
     OnTop,
     OnBottom,
     ToIndex(usize),
 }
 
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum To {
     Ordered(CardCollectionId, Placement),
     Unordered(CardCollectionId)
 }
 
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct MoveCardMutation {
     pub from: CardCollectionId,
     pub to: To,

@@ -6,7 +6,7 @@ use crate::game::state::error::StateError;
 use crate::game::state::mutation::StateMutator;
 use crate::game::state::State;
 
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct CreateCardMutation {
     pub card_collection_id: CardCollectionId,
     pub card_prototype_id: CardPrototypeId

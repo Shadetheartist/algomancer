@@ -9,6 +9,7 @@ use crate::game::state::error::{CardNotPlayableError,StateError};
 use crate::game::state::error::CardNotPlayableError::{CannotCastANonSpellTokenPermanentFromPlay, CannotPlayMoreResources, CardDoesNotExist, CardLacksCorrectTiming, MustBePlayedFromHand, NotInPlayableStep, NotInPlayableZone};
 use crate::game::state::mutation::StateMutation;
 use crate::game::state::permanent::Permanent;
+use crate::game::state::permanent::Permanent::SpellToken;
 use crate::game::state::player::{Player, PlayerId};
 use crate::game::state::progression::{MainPhaseStep, Phase, PrecombatPhaseStep};
 use crate::game::state::State;
@@ -19,9 +20,54 @@ pub struct PlayCardAction {
     pub card_id: CardId
 }
 
+impl PlayCardAction {
+
+}
+
 impl ActionTrait for PlayCardAction {
-    fn generate_mutations(&self, _state: &State, _db: &CardPrototypeDatabase, _issuer: &Player) -> Result<Vec<StateMutation>, StateError> {
-        todo!()
+    fn generate_mutations(&self, state: &State, _db: &CardPrototypeDatabase, issuer: &Player) -> Result<Vec<StateMutation>, StateError> {
+        let card = match state.find_card(self.card_id)? {
+            FindCardResult::InPlayerHand(player, _, card) => {
+                if player.id != issuer.id {
+                    return Err(CardNotPlayableError::NotUnderPlayersControl(self.card_id).into())
+                }
+            }
+
+            // must be grafting or modifying from discard
+            FindCardResult::InPlayerDiscard(player, _, _) => {
+                if player.id != issuer.id {
+                    return Err(CardNotPlayableError::NotUnderPlayersControl(self.card_id).into())
+                }
+
+                todo!("card must be either grafting or augmenting")
+            }
+
+            // must be casting a spell token
+            FindCardResult::AsPermanentInRegion(_, permanent) => {
+                if let SpellToken {common, ..} = permanent {
+                    if common.controller_player_id != issuer.id {
+                        return Err(CardNotPlayableError::NotUnderPlayersControl(common.permanent_id).into())
+                    }
+                } else {
+                    let id = match permanent {
+                        Permanent::Unit { common, .. } => { common.permanent_id }
+                        Permanent::Resource { common, .. } => { common.permanent_id }
+                        Permanent::UnitToken { common, .. } => { common.permanent_id }
+                        SpellToken { .. } => panic!("how did it come to this")
+                    };
+                    return Err(CardNotPlayableError::CannotCastANonSpellTokenPermanentFromPlay(id).into())
+                }
+            }
+
+            FindCardResult::InPlayerDeck(_, _, _) |
+            FindCardResult::InPlayerPack(_, _, _) |
+            FindCardResult::InCommonDeck(_, _) |
+            FindCardResult::AsPermanentInFormation(_, _, _) => {
+                return Err(CardNotPlayableError::NotInPlayableZone(self.card_id).into())
+            }
+        };
+
+        Ok(Vec::new())
     }
 
     fn get_valid(state: &State, db: &CardPrototypeDatabase) -> Vec<Action> {
