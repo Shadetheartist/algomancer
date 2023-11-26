@@ -6,7 +6,9 @@ pub mod pass_priority;
 pub mod stack_pass_priority;
 pub mod stack_add_priority;
 pub mod stack_clear_priority;
+pub mod player_mutations;
 
+use std::fmt::{Debug, Formatter};
 use serde::{Deserialize, Serialize};
 use crate::{phase_transition, stack_add_priority, stack_clear_priority};
 use crate::game::db::{CardPrototypeDatabase};
@@ -15,6 +17,7 @@ use crate::game::state::mutation::create_card::CreateCardMutation;
 use crate::game::state::mutation::create_pack::CreatePackMutation;
 use crate::game::state::mutation::move_card::MoveCardMutation;
 use crate::game::state::mutation::phase_transition::PhaseTransitionMutation;
+use crate::game::state::mutation::player_mutations::{UpdatePlayerAliveMutation, UpdatePlayerHealthMutation};
 use crate::game::state::mutation::stack_add_priority::StackAddPriorityMutation;
 use crate::game::state::mutation::stack_clear_priority::StackClearPriorityMutation;
 use crate::game::state::mutation::stack_pass_priority::StackPassPriorityMutation;
@@ -27,11 +30,13 @@ pub trait StateMutator {
 }
 
 pub type StateMutationEvaluator = dyn Fn(&State) -> Result<Option<StateMutation>, StateError>;
+pub type StateMutationEvaluatorVec = dyn Fn(&State) -> Result<Vec<StateMutation>, StateError>;
 
 pub enum StateMutation {
     Static(StaticStateMutation),
     Vec(Vec<StateMutation>),
     Eval(Box<StateMutationEvaluator>),
+    EvalVec(Box<StateMutationEvaluatorVec>),
 }
 
 impl StateMutation {
@@ -58,7 +63,14 @@ impl StateMutation {
                     }
                 }
             }
-
+            StateMutation::EvalVec(eval_fn) => {
+                let state_mutation = (eval_fn)(state)?;
+                let mut statics = Vec::new();
+                for m in state_mutation {
+                    statics.extend(m.to_static(state)?)
+                }
+                Ok(statics)
+            }
         }
     }
 }
@@ -78,13 +90,15 @@ pub enum StaticStateMutation {
     PhaseTransition(PhaseTransitionMutation),
     MoveCard(MoveCardMutation),
     CreatePackForPlayer(CreatePackMutation),
-    CreateCard(CreateCardMutation)
+    CreateCard(CreateCardMutation),
+    UpdatePlayerHealth(UpdatePlayerHealthMutation),
+    UpdatePlayerAlive(UpdatePlayerAliveMutation),
 }
 
 
 
 impl State {
-    pub fn mutate(self, db: &CardPrototypeDatabase, state_mutation: &StaticStateMutation) -> Result<State, StateError> {
+    pub fn mutate(mut self, db: &CardPrototypeDatabase, state_mutation: &StaticStateMutation) -> Result<State, StateError> {
         match state_mutation {
             StaticStateMutation::StackClearPriority(m) => m.mutate_state(self, db),
             StaticStateMutation::StackAddPriority(m) => m.mutate_state(self, db),
@@ -93,6 +107,8 @@ impl State {
             StaticStateMutation::MoveCard(m) => m.mutate_state(self, db),
             StaticStateMutation::CreatePackForPlayer(m) => m.mutate_state(self, db),
             StaticStateMutation::CreateCard(m) => m.mutate_state(self, db),
+            StaticStateMutation::UpdatePlayerHealth(m) => m.mutate_state(self, db),
+            StaticStateMutation::UpdatePlayerAlive(m) => m.mutate_state(self, db),
         }
     }
 }
@@ -116,6 +132,8 @@ impl State {
     }
 }
 
+
+
 #[macro_export]
 macro_rules! sm_static {
     ($sm_enum:ident, $arg:expr) => {
@@ -125,9 +143,27 @@ macro_rules! sm_static {
     };
 }
 
+#[macro_use]
+#[macro_export]
+macro_rules! sm_vec {
+    ($items:expr) => {
+        $crate::game::state::mutation::StateMutation::Vec(vec![$items])
+    };
+}
+
+
+#[macro_use]
 #[macro_export]
 macro_rules! sm_eval {
     ($func:expr) => {
         $crate::game::state::mutation::StateMutation::Eval(Box::new($func))
+    };
+}
+
+#[macro_use]
+#[macro_export]
+macro_rules! sm_eval_vec {
+    ($func:expr) => {
+        $crate::game::state::mutation::StateMutation::EvalVec(Box::new($func))
     };
 }

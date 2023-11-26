@@ -85,7 +85,9 @@ impl Game {
     pub fn apply_action(&mut self, action: Action) -> Result<Vec<StaticStateMutation>, StateError> {
         eprintln!("[{}] Applying Action [{:?}]", self.state.depth, &action);
 
-        let mutations = action.generate_mutations(self)?;
+        let mut mutations = action.generate_mutations(self)?;
+        mutations.extend(self.state.generate_state_based_mutations());
+
         let mut static_mutations = Vec::new();
 
         if mutations.is_empty() {
@@ -98,8 +100,11 @@ impl Game {
             let static_mutation = mutation.to_static(&next_state)?;
             for sub_mutation in static_mutation {
                 next_state = next_state.mutate(&self.cards_db, &sub_mutation)?;
+                eprintln!("- {:?}", &sub_mutation);
                 static_mutations.push(sub_mutation);
             }
+
+
         }
 
         self.action_history.push(action);
