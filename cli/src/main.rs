@@ -4,10 +4,13 @@ use algomancer_gre::game::{Game, GameOptions};
 use algomancer_gre::game::action::{Action};
 use algomancer_gre::game::game_builder::NewGameError;
 use algomancer_gre::game::state::error::StateError;
-use algomancer_gre::game::state::GameMode;
+use algomancer_gre::game::state::{GameMode, State};
 use algomancer_gre::game::state::faction::Faction;
 use algomancer_gre::game::state::team_configuration::TeamConfiguration;
 use clap::Parser;
+use serde::{Serialize};
+use algomancer_gre::game::db::CardPrototypeDatabase;
+use algomancer_gre::game::state::mutation::StaticStateMutation;
 
 use crate::parser::{Cli, Commands, Output};
 use crate::parser::actions::{ActionsCommand, ApplyActionArgs, ListActionsArgs};
@@ -60,7 +63,7 @@ fn print_new_game(args: &NewArgs) -> Result<(), CLIError> {
 
     match game {
         Ok(game) => {
-            let game_json = serialize_game(&game, &args.output)?;
+            let game_json = serialize_game(&game, &args.output, None)?;
             println!("{}", game_json);
             Ok(())
         }
@@ -112,22 +115,46 @@ fn game_options_from_new_args(args: &NewArgs) -> Result<GameOptions, CLIError> {
     }
 }
 
-fn serialize_game(game: &Game, output: &Output) -> Result<String, CLIError> {
+fn serialize_game(game: &Game, output: &Output, mutations: Option<Vec<StaticStateMutation>>) -> Result<String, CLIError> {
 
     let game_serialized: Result<String, serde_json::Error>;
 
     match output {
         Output::Full => {
-            game_serialized = serde_json::to_string(game);
+            match mutations {
+                None => game_serialized = serde_json::to_string(game),
+                Some(mutations) => game_serialized = serde_json::to_string(&GameAndMutations {
+                    game,
+                    mutations
+                }),
+            }
         }
         Output::State => {
-            game_serialized = serde_json::to_string(&game.state);
+            match mutations {
+                None => game_serialized = serde_json::to_string(game),
+                Some(mutations) => game_serialized = serde_json::to_string(&StateAndMutations {
+                    state: &game.state,
+                    mutations
+                }),
+            }
         }
         Output::Database => {
-            game_serialized = serde_json::to_string(&game.cards_db);
+            match mutations {
+                None => game_serialized = serde_json::to_string(game),
+                Some(mutations) => game_serialized = serde_json::to_string(&DBAndMutations {
+                    database: &game.cards_db,
+                    mutations
+                }),
+            }
         }
         Output::History => {
-            game_serialized = serde_json::to_string(&game.action_history);
+            match mutations {
+                None => game_serialized = serde_json::to_string(game),
+                Some(mutations) => game_serialized = serde_json::to_string(&HistoryAndMutations {
+                    history: &game.action_history,
+                    mutations
+                }),
+            }
         }
     }
 
@@ -155,9 +182,15 @@ fn list_actions(args: &ListActionsArgs) -> Result<(), CLIError> {
 fn apply_action(mut args: ApplyActionArgs, output: &Output) -> Result<(), CLIError> {
     let result = args.state.apply_action(args.action.clone());
     match result {
-        Ok(_mutations) => {
-            let game_serialized = serialize_game(&args.state, output)?;
-            println!("{}", game_serialized);
+        Ok(mutations) => {
+            if args.mutations {
+                let game_serialized = serialize_game(&args.state, output, Some(mutations))?;
+                println!("{}", game_serialized);
+            } else {
+                let game_serialized = serialize_game(&args.state, output, None)?;
+                println!("{}", game_serialized);
+            }
+
             Ok(())
         }
         Err(err) => Err(CLIError::InvalidAction(args.action, err)),
@@ -201,7 +234,7 @@ mod tests {
         for _ in 0..500 {
             let start = Instant::now();
             let actions = game.valid_actions();
-            let get_valid_duration = start.elapsed();
+            let _get_valid_duration = start.elapsed();
 
             let mut actions_vec: Vec<Action> = actions.into_iter().collect();
             actions_vec.sort();
@@ -214,10 +247,34 @@ mod tests {
 
             let action = actions_vec.remove(0);
             let start = Instant::now();
-            let mutations = game.apply_action(action).unwrap();
+            let _mutations = game.apply_action(action).unwrap();
 
-            let apply_duration = start.elapsed();
+            let _apply_duration = start.elapsed();
             //eprintln!("t_get {:?} | t_apply: {:?} | mutations {:?}\n", get_valid_duration, apply_duration, mutations)
         }
     }
+}
+
+#[derive(Serialize)]
+struct GameAndMutations<'a> {
+    game: &'a Game,
+    mutations: Vec<StaticStateMutation>,
+}
+
+#[derive(Serialize)]
+struct StateAndMutations<'a> {
+    state: &'a State,
+    mutations: Vec<StaticStateMutation>,
+}
+
+#[derive(Serialize)]
+struct DBAndMutations<'a> {
+    database: &'a CardPrototypeDatabase,
+    mutations: Vec<StaticStateMutation>,
+}
+
+#[derive(Serialize)]
+struct HistoryAndMutations<'a> {
+    history: &'a Vec<Action>,
+    mutations: Vec<StaticStateMutation>,
 }

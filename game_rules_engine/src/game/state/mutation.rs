@@ -83,6 +83,7 @@ impl StateMutation {
 /// that they can coherently display what happened between the application of the last action
 /// and the next state.
 #[derive(Clone, Serialize, Deserialize, Debug)]
+#[serde(tag = "type")]
 pub enum StaticStateMutation {
     StackClearPriority(StackClearPriorityMutation),
     StackAddPriority(StackAddPriorityMutation),

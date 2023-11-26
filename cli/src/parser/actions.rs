@@ -36,6 +36,9 @@ pub struct ListActionsArgs {
 #[derive(Debug, Args)]
 #[command(rename_all = "snake_case")]
 pub struct ApplyActionArgs {
+    #[arg(short, long)]
+    pub mutations: bool,
+
     #[arg(value_parser = crate::json_value_parser::json_value_parser::<Game>)]
     pub state: Game,
 

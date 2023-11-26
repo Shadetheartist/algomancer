@@ -1,7 +1,7 @@
 use std::fmt::{Debug, Display, Formatter};
 use std::hash::{Hash};
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use crate::game::state::error::{EntityNotFoundError, StateError};
 use crate::game::state::deck::Deck;
@@ -19,11 +19,40 @@ use crate::game::state::unordered_cards::UnorderedCards;
 /// d = discard
 /// p = pack
 /// D = deck
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Copy)]
+#[derive(Hash, Eq, PartialEq, Clone, Copy)]
 pub struct CardCollectionId(pub [char; 4]);
 
+impl Serialize for CardCollectionId {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where
+            S: Serializer,
+    {
+        let string: String = self.0.iter().collect();
+        serializer.serialize_str(&string)
+    }
+}
 
+impl<'de> Deserialize<'de> for CardCollectionId {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+        where
+            D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        let mut chars = s.chars();
+        let array = [
+            chars.next().ok_or_else(|| serde::de::Error::custom("Expected a string with at least 4 characters"))?,
+            chars.next().ok_or_else(|| serde::de::Error::custom("Expected a string with at least 4 characters"))?,
+            chars.next().ok_or_else(|| serde::de::Error::custom("Expected a string with at least 4 characters"))?,
+            chars.next().ok_or_else(|| serde::de::Error::custom("Expected a string with at least 4 characters"))?,
+        ];
 
+        if chars.next().is_some() {
+            return Err(serde::de::Error::custom("Expected a string with exactly 4 characters"));
+        }
+
+        Ok(CardCollectionId(array))
+    }
+}
 
 impl CardCollectionId {
     pub fn from_string(str: &str) -> CardCollectionId {
