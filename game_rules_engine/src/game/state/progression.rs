@@ -2,6 +2,8 @@
 use serde::{Deserialize, Serialize};
 
 use crate::game::state::{GameMode};
+use crate::game::state::player::TeamId;
+
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub enum Phase {
@@ -46,6 +48,11 @@ pub enum MainPhaseStep {
     Regroup,
     ITMain,
     NITMain,
+}
+
+pub enum Teams {
+    IT,
+    NIT,
 }
 
 impl Phase {
@@ -182,6 +189,9 @@ impl Phase {
             }
             _ => false,
         }
+    }
+    pub fn active_team(&self) -> TeamId {
+        panic!()
     }
 
     pub fn is_team_sync_step(&self) -> bool {

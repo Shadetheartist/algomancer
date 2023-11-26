@@ -11,29 +11,50 @@ impl State {
 
         mutations = add_sba_player(self, mutations);
         mutations = add_sba_damage(self, mutations);
-
-        mutations.push(
-            sm_eval_vec!(move |state| {
-                let mut mutations = Vec::new();
-                for r in &state.regions {
-                    match r.stack.next() {
-                        Next::TransitionStep => {
-                            mutations.push(state.generate_mutation_for_phase_transition(r.id));
-                        }
-                        Next::PassPriority(_) => {
-                        }
-                        Next::ResolveEffect(_) => {
-                        }
-                    }
-                }
-
-                Ok(mutations)
-            })
-        );
-
+        mutations = add_sba_transition(self, mutations);
 
         mutations
     }
+}
+
+fn add_sba_transition(state: &State, mut mutations: Vec<StateMutation>) -> Vec<StateMutation> {
+
+    // for team sync steps, we move all regions together to the next step
+    // once all players on a team have passed priority
+
+    for r in &state.regions {
+        match r.stack.next() {
+            Next::TransitionStep => {
+                if r.step.is_team_sync_step() {
+                    mutations.push(state.generate_mutation_for_phase_transition(r.id));
+
+                    // todo
+                    // let all_players_on_team_passed_priority = state.players_on_team(player.team_id)?.into_iter().all(|p| {
+                    //     let p_region = state.find_region_containing_player(p.id).expect("a region");
+                    //     if let Next::TransitionStep = p_region.stack.next() {
+                    //         true
+                    //     } else {
+                    //         false
+                    //     }
+                    // });
+
+                    // if all_players_on_team_passed_priority {
+                    //     for r in &state.regions {
+                    //         mutations.push(state.generate_mutation_for_phase_transition(r.id));
+                    //     }
+                    // }
+                } else {
+                    mutations.push(state.generate_mutation_for_phase_transition(r.id));
+                }
+            }
+            Next::PassPriority(_) => {
+            }
+            Next::ResolveEffect(_) => {
+            }
+        }
+    }
+
+    mutations
 }
 
 fn add_sba_player(state: &State, mut mutations: Vec<StateMutation>) -> Vec<StateMutation> {

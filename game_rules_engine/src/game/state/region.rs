@@ -63,6 +63,15 @@ impl Region {
         }
     }
 
+    pub fn sole_team_player(&self, team_id: TeamId) -> &Player {
+        let players_on_team: Vec<&Player> = self.players.iter().filter(|p| p.team_id == team_id).collect();
+        if players_on_team.len() == 1 {
+            players_on_team[0]
+        } else {
+            panic!("This region must have a single player on team {:?} occupying it to call this function.", team_id)
+        }
+    }
+
     /// see sole_player
     pub fn sole_player_mut(&mut self) -> &mut Player {
         if self.players.len() == 1 {
