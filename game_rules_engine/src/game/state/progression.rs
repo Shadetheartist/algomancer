@@ -1,3 +1,4 @@
+
 use serde::{Deserialize, Serialize};
 
 use crate::game::state::{GameMode};
@@ -48,6 +49,7 @@ pub enum MainPhaseStep {
 }
 
 impl Phase {
+
     /// This method returns the next phase for a game running with a given game mode.
     pub fn get_next_phase(&self, game_mode: &GameMode) -> Phase {
         match self {
@@ -170,6 +172,44 @@ impl Phase {
                 )
             }
             _ => false,
+        }
+    }
+
+    pub fn is_global_sync_step(&self) -> bool {
+        match self {
+            Phase::PrecombatPhase(step) => {
+                matches!(step, PrecombatPhaseStep::PassPack)
+            }
+            _ => false,
+        }
+    }
+
+    pub fn is_team_sync_step(&self) -> bool {
+        match self {
+            Phase::PrecombatPhase(step) => {
+                matches!(step,
+                    PrecombatPhaseStep::ITMana |
+                    PrecombatPhaseStep::NITMana
+                )
+            }
+            Phase::CombatPhaseA(step) => {
+                matches!(step,
+                    CombatPhaseAStep::ITAttack |
+                    CombatPhaseAStep::NITBlock
+                )
+            }
+            Phase::CombatPhaseB(step) => {
+                matches!(step,
+                    CombatPhaseBStep::NITAttack |
+                    CombatPhaseBStep::ITBlock
+                )
+            }
+            Phase::MainPhase(step) => {
+                matches!(step,
+                    MainPhaseStep::ITMain |
+                    MainPhaseStep::NITMain
+                )
+            }
         }
     }
 }

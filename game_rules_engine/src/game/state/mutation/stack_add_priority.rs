@@ -28,8 +28,8 @@ impl StateMutator for StackAddPriorityMutation {
 #[macro_export]
 macro_rules! stack_add_priority {
     ($mutations:ident, $region_id:expr, $player_id:expr) => {
-        $mutations.push(crate::game::state::mutation::StateMutation::Static(
-            crate::game::state::mutation::StaticStateMutation::StackAddPriority(
+        $mutations.push($crate::game::state::mutation::StateMutation::Static(
+            $crate::game::state::mutation::StaticStateMutation::StackAddPriority(
             crate::game::state::mutation::StackAddPriorityMutation {
                 region_id: $region_id,
                 player_id: $player_id,

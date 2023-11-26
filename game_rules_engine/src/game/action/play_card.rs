@@ -26,8 +26,8 @@ impl PlayCardAction {
 
 impl ActionTrait for PlayCardAction {
     fn generate_mutations(&self, state: &State, _db: &CardPrototypeDatabase, issuer: &Player) -> Result<Vec<StateMutation>, StateError> {
-        let card = match state.find_card(self.card_id)? {
-            FindCardResult::InPlayerHand(player, _, card) => {
+        match state.find_card(self.card_id)? {
+            FindCardResult::InPlayerHand(player, _, _card) => {
                 if player.id != issuer.id {
                     return Err(CardNotPlayableError::NotUnderPlayersControl(self.card_id).into())
                 }
@@ -87,8 +87,17 @@ impl PlayCardAction {
         let mut actions : Vec<Action> = Vec::new();
 
         for region in &state.regions {
-            if let Phase::PrecombatPhase(PrecombatPhaseStep::ITMana | PrecombatPhaseStep::NITMana) = region.step {} else {
-                continue
+            let player = region.sole_player();
+            if player.team_id == state.initiative_team() {
+                if let Phase::PrecombatPhase(PrecombatPhaseStep::ITMana) = region.step {}
+                else {
+                    continue
+                }
+            } else {
+                if let Phase::PrecombatPhase(PrecombatPhaseStep::NITMana) = region.step {}
+                else {
+                    continue
+                }
             }
 
             // assume single player per region at in the mana step

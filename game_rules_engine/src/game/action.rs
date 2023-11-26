@@ -119,7 +119,6 @@ impl Game {
         actions.extend(PlayCardAction::get_valid(&self.state, &self.cards_db));
         actions.extend(RecycleForResourceAction::get_valid(&self.state, &self.cards_db));
 
-
         actions
     }
 }

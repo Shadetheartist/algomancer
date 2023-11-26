@@ -198,7 +198,7 @@ mod tests {
             let mutations = game.apply_action(action).unwrap();
 
             let apply_duration = start.elapsed();
-            eprintln!("t_get {:?} | t_apply: {:?} | mutations {:?}\n", get_valid_duration, apply_duration, mutations)
+            //eprintln!("t_get {:?} | t_apply: {:?} | mutations {:?}\n", get_valid_duration, apply_duration, mutations)
         }
     }
 }

@@ -25,8 +25,8 @@ impl StateMutator for PhaseTransitionMutation {
 #[macro_export]
 macro_rules! phase_transition {
     ($mutations:ident, $region_id:expr) => {
-        $mutations.push(crate::game::state::mutation::StateMutation::Static(
-            crate::game::state::mutation::StaticStateMutation::PhaseTransition(
+        $mutations.push($crate::game::state::mutation::StateMutation::Static(
+            $crate::game::state::mutation::StaticStateMutation::PhaseTransition(
             crate::game::state::mutation::PhaseTransitionMutation {
                 region_id: $region_id,
             },

@@ -209,7 +209,7 @@ impl Game {
                         player.resources_played_this_turn += 1;
                     }
 
-                    let region = Region{
+                    let mut region = Region{
                         id: region_id,
                         owner_player_id: player_id,
                         players: vec![player],
@@ -217,8 +217,10 @@ impl Game {
                         attacking_formation: None,
                         defending_formation: None,
                         step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
-                        stack: Stack::new(),
+                        stack: Stack::default(),
                     };
+
+                    region.stack.push_priority(player_id);
 
                     game.state.regions.push(region);
 

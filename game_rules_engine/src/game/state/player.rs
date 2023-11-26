@@ -112,62 +112,71 @@ impl State {
     /// This considers which team has initiative, and what step the player is experiencing,
     /// as well as if they are waiting to receive priority during an action window
     pub fn player_can_act(&self, player_id: PlayerId) -> bool {
-        let player = self.find_player(player_id).expect("a player");
-        let region_id = self.find_region_id_containing_player(player_id);
-        let region = self.find_region(region_id).expect("a region");
+        let region = self.find_region_containing_player(player_id).expect("the player must be in a region");
+        let player = self.find_player(player_id).expect("the player was supposed to be in this region");
 
-        match region.stack.next() {
+        let player_is_on_initiative_team = player.team_id == self.initiative_team();
+
+        let active_on_stack = match region.stack.next() {
             Next::PassPriority(active_player_id) => {
-                if active_player_id != player_id {
-                    return false
+                active_player_id == player_id
+            }
+            _ => false
+        };
+
+        let has_initiative_in_region = match region.step {
+            Phase::PrecombatPhase(step) => {
+                match step {
+                    // these are async
+                    PrecombatPhaseStep::Untap => true,
+                    PrecombatPhaseStep::Draw => true,
+
+                    // during the draft step, players implicitly pass priority be selecting a draft
+                    PrecombatPhaseStep::Draft => false,
+
+                    // the pass pack is a global sync step, you can't pass priority here
+                    // players instead wait for the last player to reach this step, then all regions
+                    // transition to the next step automatically
+                    PrecombatPhaseStep::PassPack => false,
+                    PrecombatPhaseStep::ITMana => player_is_on_initiative_team && active_on_stack,
+                    PrecombatPhaseStep::NITMana => !player_is_on_initiative_team && active_on_stack
                 }
             }
-            _ => {}
-        }
+            Phase::CombatPhaseA(step) => {
+                match step {
+                    CombatPhaseAStep::ITAttack => player_is_on_initiative_team && active_on_stack,
+                    CombatPhaseAStep::AfterITAttackPriorityWindow => active_on_stack,
+                    CombatPhaseAStep::NITBlock => !player_is_on_initiative_team && active_on_stack,
+                    CombatPhaseAStep::AfterNITBlockPriorityWindow => active_on_stack,
 
-        let initiative_team = self.initiative_team();
-        
-        let has_initiative_action_window = {
-            // otherwise if the player is on the initiative team (and implicitly, has not passed)
-            if initiative_team == player.team_id {
-                true
-            } else {
-                // otherwise if the player is on the non-initiative team,
-                // then they cannot act until all the players on the initiative team have passed
-                // self.all_players_on_team_passed_priority(initiative_team).expect("a result")
-                false
+                    // this step happens, but is really just a step where mutations are applied,
+                    // players don't take any actions
+                    CombatPhaseAStep::Damage => false,
+
+                    CombatPhaseAStep::AfterCombatPriorityWindow => active_on_stack,
+                }
+            }
+            Phase::CombatPhaseB(step) => {
+                match step {
+                    CombatPhaseBStep::NITAttack => !player_is_on_initiative_team && active_on_stack,
+                    CombatPhaseBStep::AfterNITAttackPriorityWindow => active_on_stack,
+                    CombatPhaseBStep::ITBlock => player_is_on_initiative_team && active_on_stack,
+                    CombatPhaseBStep::AfterITBlockPriorityWindow => active_on_stack,
+                    CombatPhaseBStep::Damage => false, // see above
+                    CombatPhaseBStep::AfterCombatPriorityWindow => active_on_stack,
+                }
+            }
+            Phase::MainPhase(step) => {
+                match step {
+                    // just a cleanup step, no user interaction
+                    MainPhaseStep::Regroup => false,
+                    MainPhaseStep::ITMain => player_is_on_initiative_team && active_on_stack,
+                    MainPhaseStep::NITMain => !player_is_on_initiative_team && active_on_stack,
+                }
             }
         };
 
-        match &region.step {
-            Phase::PrecombatPhase(step) => match step {
-                PrecombatPhaseStep::ITMana => initiative_team == player.team_id,
-                PrecombatPhaseStep::NITMana => initiative_team != player.team_id,
-                _ => true
-            }
-            Phase::CombatPhaseA(step) => match step {
-                CombatPhaseAStep::ITAttack => initiative_team == player.team_id,
-                CombatPhaseAStep::AfterITAttackPriorityWindow => has_initiative_action_window,
-                CombatPhaseAStep::NITBlock => initiative_team != player.team_id,
-                CombatPhaseAStep::AfterNITBlockPriorityWindow => has_initiative_action_window,
-                CombatPhaseAStep::Damage => false,
-                CombatPhaseAStep::AfterCombatPriorityWindow => has_initiative_action_window,
-            },
-            Phase::CombatPhaseB(step) => match step {
-                CombatPhaseBStep::NITAttack => initiative_team != player.team_id,
-                CombatPhaseBStep::AfterNITAttackPriorityWindow => has_initiative_action_window,
-                CombatPhaseBStep::ITBlock => initiative_team == player.team_id,
-                CombatPhaseBStep::AfterITBlockPriorityWindow => has_initiative_action_window,
-                CombatPhaseBStep::Damage => false,
-                CombatPhaseBStep::AfterCombatPriorityWindow => has_initiative_action_window,
-            },
-            Phase::MainPhase(step) => match step {
-                MainPhaseStep::Regroup => false,
-                MainPhaseStep::ITMain => initiative_team == player.team_id,
-                MainPhaseStep::NITMain => initiative_team != player.team_id
-            }
-        }
-
+        return has_initiative_in_region
     }
 
     pub fn initiative_team(&self) -> TeamId {
@@ -177,6 +186,7 @@ impl State {
     pub fn non_initiative_team(&self) -> TeamId {
         self.team_ids().into_iter().find(|&t| t != self.initiative_team()).expect("a non-initative team")
     }
+
 
 }
 

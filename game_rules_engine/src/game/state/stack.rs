@@ -24,14 +24,16 @@ pub struct Stack {
     stack: Vec<Effect>
 }
 
-impl Stack {
-    pub fn new() -> Self {
+impl Default for Stack {
+    fn default() -> Self {
         Self {
             priority: Vec::new(),
             stack: Vec::new(),
         }
     }
+}
 
+impl Stack {
     pub fn push_effect(&mut self, state: &State, effect: Effect){
         self.stack.push(effect);
         self.priority.extend(state.players().map(|p| p.id));
@@ -72,17 +74,10 @@ impl Stack {
 
     pub fn resolve_next_effect(&mut self) -> Option<Result<Vec<StateMutation>, StateError>> {
         let effect = self.stack.pop();
-        match effect {
-            None => {
-                None
-            }
-            Some(effect) => {
-                Some(self.resolve_effect(effect))
-            }
-        }
+        effect.map(|effect| self.resolve_effect(effect))
     }
 
-    fn resolve_effect(&self, effect: Effect) -> Result<Vec<StateMutation>, StateError>{
+    fn resolve_effect(&self, _effect: Effect) -> Result<Vec<StateMutation>, StateError>{
         Ok(Vec::new())
     }
 }

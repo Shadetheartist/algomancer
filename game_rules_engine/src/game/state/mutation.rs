@@ -30,7 +30,7 @@ pub type StateMutationEvaluator = dyn Fn(&State) -> Result<Option<StateMutation>
 
 pub enum StateMutation {
     Static(StaticStateMutation),
-    StaticVec(Vec<StaticStateMutation>),
+    Vec(Vec<StateMutation>),
     Eval(Box<StateMutationEvaluator>),
 }
 
@@ -40,8 +40,12 @@ impl StateMutation {
             StateMutation::Static(static_mutation) => {
                 Ok(vec![static_mutation])
             }
-            StateMutation::StaticVec(static_mutations) => {
-                Ok(static_mutations)
+            StateMutation::Vec(mutations) => {
+                let mut statics = Vec::new();
+                for m in mutations {
+                    statics.extend(m.to_static(state)?)
+                }
+                Ok(statics)
             }
             StateMutation::Eval(eval_fn) => {
                 let state_mutation = (eval_fn)(state)?;

@@ -26,8 +26,8 @@ impl StateMutator for StackPassPriorityMutation {
 #[macro_export]
 macro_rules! stack_pass_priority {
     ($mutations:ident, $region_id:expr) => {
-        $mutations.push(crate::game::state::mutation::StateMutation::Static(
-            crate::game::state::mutation::StaticStateMutation::StackPassPriority(
+        $mutations.push($crate::game::state::mutation::StateMutation::Static(
+            $crate::game::state::mutation::StaticStateMutation::StackPassPriority(
             crate::game::state::mutation::StackPassPriorityMutation {
                 region_id: $region_id,
             },
