@@ -3,6 +3,15 @@
 version = 3
 
 [[package]]
+name = "algomacros"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "algomancer_cli"
 version = "0.1.0"
 dependencies = [
@@ -16,6 +25,7 @@ dependencies = [
 name = "algomancer_gre"
 version = "0.1.0"
 dependencies = [
+ "algomacros",
  "rand",
  "rand_pcg",
  "serde",

@@ -3,7 +3,7 @@ use crate::game::action::{Action, ActionTrait, ActionType};
 use crate::game::db::CardPrototypeDatabase;
 
 use crate::game::state::error::StateError;
-use crate::game::state::mutation::{StateMutation, StaticStateMutation};
+use crate::game::state::mutation::{StateMutation};
 use crate::game::state::player::{Player};
 use crate::game::state::stack::Next;
 use crate::game::state::State;
@@ -20,7 +20,9 @@ impl ActionTrait for PassPriorityAction {
         let player = issuer;
         let region = state.find_region_containing_player(player.id)?;
 
+        // consider what the next stack item is
         match region.stack.next() {
+            // if there is nothing left on the stack, we transition to the next step
             Next::TransitionStep => {
                 // need to check if the current step is a globally synchronized step.
                 // if so, we dont execute this mutation until all regions reach the same step.

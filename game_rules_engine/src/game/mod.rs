@@ -9,6 +9,7 @@ pub mod state;
 pub mod action;
 pub mod game_builder;
 pub mod db;
+pub mod state_based_actions;
 
 #[derive(Debug)]
 pub struct GameOptions {

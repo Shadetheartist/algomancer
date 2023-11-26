@@ -26,30 +26,6 @@ pub mod deck;
 pub mod unordered_cards;
 pub mod stack;
 
-// as described in the manual
-// aside from 1v1, i've never played any of these lol
-#[allow(dead_code)]
-impl TeamConfiguration {
-    pub fn one_v_one() -> TeamConfiguration {
-        TeamConfiguration::Teams { teams_of_players: vec![1, 1] }
-    }
-
-    pub fn two_v_two() -> TeamConfiguration {
-        TeamConfiguration::Teams { teams_of_players: vec![2, 2] }
-    }
-
-    pub fn three_v_three() -> TeamConfiguration {
-        TeamConfiguration::Teams { teams_of_players: vec![3, 3] }
-    }
-
-    pub fn two_v_one() -> TeamConfiguration {
-        TeamConfiguration::Teams { teams_of_players: vec![2, 1] }
-    }
-
-    pub fn ffa(num_players: u8) -> TeamConfiguration {
-        TeamConfiguration::Ffa { num_players  }
-    }
-}
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum GameMode {

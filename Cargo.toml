@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
+    "algomacros",
     "cli",
     "game_rules_engine",
 ]

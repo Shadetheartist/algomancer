@@ -9,7 +9,6 @@ use crate::game::state::mutation::StateMutation;
 use crate::game::state::mutation::StaticStateMutation::{CreateCard, MoveCard};
 use crate::game::state::player::Player;
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
-use crate::game::state::progression::Phase::PrecombatPhase;
 use crate::game::state::resource::ResourceType;
 use crate::game::state::State;
 
