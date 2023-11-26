@@ -1,5 +1,6 @@
 use algomancer_gre::game::state::faction::Faction;
 use clap::{Args, Subcommand, ValueEnum};
+use crate::parser::Output;
 
 #[derive(Debug, Args)]
 #[command(rename_all = "snake_case")]
@@ -7,6 +8,9 @@ pub struct NewArgs {
     /// a 128 bit unsigned integer used as seed for the random number generator
     #[arg(short, long, default_value = "0")]
     pub seed: u128,
+
+    #[arg(short, long, default_value="full")]
+    pub output: Output,
 
     /// A game mode to initialize the game with
     #[command(subcommand)]

@@ -1,4 +1,4 @@
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
 
 use crate::parser::actions::ActionsArgs;
 use crate::parser::new::NewArgs;
@@ -25,4 +25,12 @@ pub enum Commands {
     /// List actions, Apply an Action
     #[command(arg_required_else_help = true)]
     Action(ActionsArgs),
+}
+
+#[derive(Debug, ValueEnum, Clone)]
+pub enum Output {
+    Full,
+    State,
+    Database,
+    History,
 }

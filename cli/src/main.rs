@@ -9,7 +9,7 @@ use algomancer_gre::game::state::faction::Faction;
 use algomancer_gre::game::state::team_configuration::TeamConfiguration;
 use clap::Parser;
 
-use crate::parser::{Cli, Commands};
+use crate::parser::{Cli, Commands, Output};
 use crate::parser::actions::{ActionsCommand, ApplyActionArgs, ListActionsArgs};
 use crate::parser::new::{FactionArg, GameModeCommand, LiveDraftArgs, Mode, NewArgs};
 
@@ -30,8 +30,8 @@ fn main() -> Result<(), CLIError> {
                     list_actions(&args)?;
                     Ok(())
                 }
-                ActionsCommand::Apply(args) => {
-                    apply_action(args)?;
+                ActionsCommand::Apply(apply_args) => {
+                    apply_action(apply_args, &args.output)?;
                     Ok(())
                 }
             }
@@ -51,6 +51,8 @@ enum CLIError {
     NotImplemented,
 }
 
+
+
 /// creates a new game instance, serializes it, and prints it to stdout
 fn print_new_game(args: &NewArgs) -> Result<(), CLIError> {
     let options = game_options_from_new_args(args)?;
@@ -58,7 +60,7 @@ fn print_new_game(args: &NewArgs) -> Result<(), CLIError> {
 
     match game {
         Ok(game) => {
-            let game_json = serialize_game(&game)?;
+            let game_json = serialize_game(&game, &args.output)?;
             println!("{}", game_json);
             Ok(())
         }
@@ -110,8 +112,25 @@ fn game_options_from_new_args(args: &NewArgs) -> Result<GameOptions, CLIError> {
     }
 }
 
-fn serialize_game(game: &Game) -> Result<String, CLIError> {
-    let game_serialized: Result<String, serde_json::Error> = serde_json::to_string(game);
+fn serialize_game(game: &Game, output: &Output) -> Result<String, CLIError> {
+
+    let game_serialized: Result<String, serde_json::Error>;
+
+    match output {
+        Output::Full => {
+            game_serialized = serde_json::to_string(game);
+        }
+        Output::State => {
+            game_serialized = serde_json::to_string(&game.state);
+        }
+        Output::Database => {
+            game_serialized = serde_json::to_string(&game.cards_db);
+        }
+        Output::History => {
+            game_serialized = serde_json::to_string(&game.action_history);
+        }
+    }
+
     match game_serialized {
         Ok(game_serialized) => Ok(game_serialized),
         Err(err) => Err(CLIError::FailedToSerializeGame(err)),
@@ -133,11 +152,11 @@ fn list_actions(args: &ListActionsArgs) -> Result<(), CLIError> {
     Ok(())
 }
 
-fn apply_action(mut args: ApplyActionArgs) -> Result<(), CLIError> {
+fn apply_action(mut args: ApplyActionArgs, output: &Output) -> Result<(), CLIError> {
     let result = args.state.apply_action(args.action.clone());
     match result {
         Ok(_mutations) => {
-            let game_serialized = serialize_game(&args.state)?;
+            let game_serialized = serialize_game(&args.state, output)?;
             println!("{}", game_serialized);
             Ok(())
         }

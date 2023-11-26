@@ -1,10 +1,14 @@
 use clap::{Args, Subcommand};
 use algomancer_gre::game::action::{Action};
 use algomancer_gre::game::Game;
+use crate::parser::Output;
 
 #[derive(Debug, Args)]
 #[command(rename_all = "snake_case")]
 pub struct ActionsArgs {
+    #[arg(short, long, default_value="full")]
+    pub output: Output,
+
     #[command(subcommand)]
     pub command: ActionsCommand,
 }
