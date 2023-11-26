@@ -8,7 +8,7 @@ pub mod stack_add_priority;
 pub mod stack_clear_priority;
 pub mod player_mutations;
 
-use std::fmt::{Debug, Formatter};
+use std::fmt::{Debug};
 use serde::{Deserialize, Serialize};
 use crate::{phase_transition, stack_add_priority, stack_clear_priority};
 use crate::game::db::{CardPrototypeDatabase};
@@ -116,10 +116,12 @@ impl State {
 
 
 impl State {
-    pub fn generate_mutations_for_phase_transition(&self, region_id: RegionId) -> Vec<StateMutation> {
+    pub fn generate_mutation_for_phase_transition(&self, region_id: RegionId) -> StateMutation {
         let mut mutations = Vec::new();
 
-        phase_transition!(mutations, region_id);
+        let next_phase = self.find_region(region_id).expect("a region").step.get_next_phase(&self.game_mode);
+
+        phase_transition!(mutations, region_id, next_phase);
 
         stack_clear_priority!(mutations, region_id);
 
@@ -128,10 +130,9 @@ impl State {
             stack_add_priority!(mutations, region_id, p.id);
         }
 
-        mutations
+        StateMutation::Vec(mutations)
     }
 }
-
 
 
 #[macro_export]

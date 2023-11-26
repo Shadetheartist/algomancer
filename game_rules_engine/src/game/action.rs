@@ -86,7 +86,6 @@ impl Game {
         eprintln!("[{}] Applying Action [{:?}]", self.state.depth, &action);
 
         let mut mutations = action.generate_mutations(self)?;
-        mutations.extend(self.state.generate_state_based_mutations());
 
         let mut static_mutations = Vec::new();
 
@@ -100,11 +99,31 @@ impl Game {
             let static_mutation = mutation.to_static(&next_state)?;
             for sub_mutation in static_mutation {
                 next_state = next_state.mutate(&self.cards_db, &sub_mutation)?;
-                eprintln!("- {:?}", &sub_mutation);
                 static_mutations.push(sub_mutation);
             }
+        }
 
 
+        // just keep applying state based actions until there is nothing left to do
+        loop {
+            let starting_mutations = static_mutations.len();
+            let state_based_mutations = self.state.generate_state_based_mutations();
+            for mutation in state_based_mutations {
+                let static_mutation = mutation.to_static(&next_state)?;
+                for sub_mutation in static_mutation {
+                    next_state = next_state.mutate(&self.cards_db, &sub_mutation)?;
+                    static_mutations.push(sub_mutation);
+                }
+            }
+
+            // stop when the number of static mutations didn't grow
+            if starting_mutations == static_mutations.len() {
+                break;
+            }
+        }
+
+        for m in &static_mutations {
+            eprintln!("- {:?}", &m);
         }
 
         self.action_history.push(action);

@@ -30,10 +30,10 @@ impl ActionTrait for PassPriorityAction {
                 if region.step.is_global_sync_step() && all_regions_ready_to_transition {
                     // when the last region to reach the step arrives, we move all regions in the game to the next step.
                     for r in &state.regions {
-                        mutations.extend(state.generate_mutations_for_phase_transition(r.id));
+                        mutations.push(state.generate_mutation_for_phase_transition(r.id));
                     }
                 } else {
-                    mutations.extend(state.generate_mutations_for_phase_transition(region.id));
+                    mutations.push(state.generate_mutation_for_phase_transition(region.id));
                 }
             }
             Next::PassPriority(_) => {
@@ -63,7 +63,7 @@ impl ActionTrait for PassPriorityAction {
 
                             if all_players_passed_priority {
                                 for r in &future_state.regions {
-                                    sub_mutations.extend(future_state.generate_mutations_for_phase_transition(r.id));
+                                    sub_mutations.push(future_state.generate_mutation_for_phase_transition(r.id));
                                 }
                             }
 

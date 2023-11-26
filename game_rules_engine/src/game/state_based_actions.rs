@@ -3,12 +3,14 @@ use crate::game::state::mutation::StateMutation;
 use crate::game::state::stack::Next;
 use crate::game::state::State;
 use crate::{sm_eval, sm_eval_vec, sm_static, sm_vec};
+use crate::game::state::progression::{CombatPhaseAStep, CombatPhaseBStep, Phase};
 
 impl State {
     pub fn generate_state_based_mutations(&self) -> Vec<StateMutation> {
         let mut mutations = Vec::new();
 
         mutations = add_sba_player(self, mutations);
+        mutations = add_sba_damage(self, mutations);
 
         mutations.push(
             sm_eval_vec!(move |state| {
@@ -16,7 +18,7 @@ impl State {
                 for r in &state.regions {
                     match r.stack.next() {
                         Next::TransitionStep => {
-                            mutations.extend(state.generate_mutations_for_phase_transition(r.id));
+                            mutations.push(state.generate_mutation_for_phase_transition(r.id));
                         }
                         Next::PassPriority(_) => {
                         }
@@ -53,6 +55,19 @@ fn add_sba_player(state: &State, mut mutations: Vec<StateMutation>) -> Vec<State
                 // if the player died we don't really care what else happens to them
                 continue;
             }
+        }
+    }
+
+    mutations
+}
+
+fn add_sba_damage(state: &State, mut mutations: Vec<StateMutation>) -> Vec<StateMutation> {
+    for r in &state.regions {
+        match r.step {
+            Phase::CombatPhaseA(CombatPhaseAStep::Damage) |  Phase::CombatPhaseB(CombatPhaseBStep::Damage) => {
+                eprintln!("Doing damage...");
+            }
+            _ => {}
         }
     }
 

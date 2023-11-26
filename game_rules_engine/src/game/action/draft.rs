@@ -97,21 +97,21 @@ impl ActionTrait for DraftAction {
             mutations.push(eval_mutation);
         }
 
-        let region_id = state.find_region_id_containing_player(player_id);
+        let region = state.find_region_containing_player(player_id)?;
         mutations.push(StateMutation::Static(
-            PhaseTransition(PhaseTransitionMutation{region_id})
+            PhaseTransition(PhaseTransitionMutation{region_id: region.id, to_phase: region.step.get_next_phase(&state.game_mode) })
         ));
 
         // if all the other regions are in the pass pack step, and we just transitioned to it as
         // well, then all players are ready to receive their packs
-        let all_other_regions_in_pass_pack_step = state.regions.iter().filter(|r| r.id != region_id).all(|r| {
+        let all_other_regions_in_pass_pack_step = state.regions.iter().filter(|r| r.id !=  region.id).all(|r| {
             r.step == PrecombatPhase(PrecombatPhaseStep::PassPack)
         });
 
         // therefore all regions should move the the next step
         if all_other_regions_in_pass_pack_step {
             for r in &state.regions {
-                mutations.append(&mut state.generate_mutations_for_phase_transition(r.id));
+                mutations.push(state.generate_mutation_for_phase_transition(r.id));
             }
         }
 

@@ -24,8 +24,8 @@ impl ActionTrait for AttackAction {
     fn generate_mutations(&self, state: &State, _db: &CardPrototypeDatabase, _issuer: &Player) -> Result<Vec<StateMutation>, StateError> {
         let mut mutations = Vec::new();
 
-        mutations.append(&mut state.generate_mutations_for_phase_transition(self.home_region_id));
-        mutations.append(&mut state.generate_mutations_for_phase_transition(self.under_attack_region_id));
+        mutations.push(state.generate_mutation_for_phase_transition(self.home_region_id));
+        mutations.push(state.generate_mutation_for_phase_transition(self.under_attack_region_id));
 
         Ok(mutations)
     }
