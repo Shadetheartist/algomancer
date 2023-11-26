@@ -9,9 +9,9 @@ impl State {
     pub fn generate_state_based_mutations(&self) -> Vec<StateMutation> {
         let mut mutations = Vec::new();
 
+        mutations = add_sba_transition(self, mutations);
         mutations = add_sba_player(self, mutations);
         mutations = add_sba_damage(self, mutations);
-        mutations = add_sba_transition(self, mutations);
 
         mutations
     }
@@ -23,26 +23,27 @@ fn add_sba_transition(state: &State, mut mutations: Vec<StateMutation>) -> Vec<S
     // once all players on a team have passed priority
 
     for r in &state.regions {
-        match r.stack.next() {
+        let next  = r.stack.next();
+        match next {
             Next::TransitionStep => {
                 if r.step.is_team_sync_step() {
-                    mutations.push(state.generate_mutation_for_phase_transition(r.id));
 
-                    // todo
-                    // let all_players_on_team_passed_priority = state.players_on_team(player.team_id)?.into_iter().all(|p| {
-                    //     let p_region = state.find_region_containing_player(p.id).expect("a region");
-                    //     if let Next::TransitionStep = p_region.stack.next() {
-                    //         true
-                    //     } else {
-                    //         false
-                    //     }
-                    // });
+                    let active_team_id = r.active_team_id(state).expect("an active team in the region");
 
-                    // if all_players_on_team_passed_priority {
-                    //     for r in &state.regions {
-                    //         mutations.push(state.generate_mutation_for_phase_transition(r.id));
-                    //     }
-                    // }
+                    let all_players_on_team_passed_priority = state.players_on_team(active_team_id).expect("players on the team").into_iter().all(|p| {
+                        let p_region = state.find_region_containing_player(p.id).expect("a region");
+                        if let Next::TransitionStep = p_region.stack.next() {
+                            true
+                        } else {
+                            false
+                        }
+                    });
+
+                    if all_players_on_team_passed_priority {
+                        for r in &state.regions {
+                            mutations.push(state.generate_mutation_for_phase_transition(r.id));
+                        }
+                    }
                 } else {
                     mutations.push(state.generate_mutation_for_phase_transition(r.id));
                 }
@@ -82,11 +83,11 @@ fn add_sba_player(state: &State, mutations: Vec<StateMutation>) -> Vec<StateMuta
     mutations
 }
 
-fn add_sba_damage(state: &State, mutations: Vec<StateMutation>) -> Vec<StateMutation> {
+fn add_sba_damage(state: &State, mut mutations: Vec<StateMutation>) -> Vec<StateMutation> {
     for r in &state.regions {
         match r.step {
             Phase::CombatPhaseA(CombatPhaseStep::Damage) | Phase::CombatPhaseB(CombatPhaseStep::Damage) => {
-                eprintln!("Doing damage...");
+                mutations.push(state.generate_mutation_for_phase_transition(r.id));
             }
             _ => {}
         }

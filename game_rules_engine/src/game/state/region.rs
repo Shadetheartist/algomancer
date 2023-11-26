@@ -80,6 +80,18 @@ impl Region {
             panic!("This region must have a single player occupying it to call this function.")
         }
     }
+
+    pub fn active_team_id(&self, state: &State) -> Option<TeamId> {
+        let active_team = self.step.active_team()?;
+        match active_team {
+            Team::IT => {
+                Some(state.initiative_team())
+            }
+            Team::NIT => {
+                Some(state.non_initiative_team())
+            }
+        }
+    }
 }
 
 impl State {
@@ -249,6 +261,8 @@ impl State {
         let team_players = self.players().filter(|p| p.team_id == team_id).collect();
         Ok(team_players)
     }
+
+
 }
 
 pub fn wrap_index(len: usize, idx: i32) -> Option<usize> {

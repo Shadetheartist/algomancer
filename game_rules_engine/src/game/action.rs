@@ -106,8 +106,9 @@ impl Game {
 
         // just keep applying state based actions until there is nothing left to do
         loop {
-            let starting_mutations = static_mutations.len();
-            let state_based_mutations = self.state.generate_state_based_mutations();
+            let num_starting_mutations = static_mutations.len();
+
+            let state_based_mutations = next_state.generate_state_based_mutations();
             for mutation in state_based_mutations {
                 let static_mutation = mutation.to_static(&next_state)?;
                 for sub_mutation in static_mutation {
@@ -117,7 +118,7 @@ impl Game {
             }
 
             // stop when the number of static mutations didn't grow
-            if starting_mutations == static_mutations.len() {
+            if num_starting_mutations == static_mutations.len() {
                 break;
             }
         }

@@ -2,7 +2,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::game::state::{GameMode};
-use crate::game::state::player::TeamId;
+
 
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
@@ -130,8 +130,14 @@ impl Phase {
             _ => false,
         }
     }
-    pub fn active_team(&self) -> TeamId {
-        panic!()
+    pub fn active_team(&self) -> Option<Team> {
+        match self {
+            Phase::PrecombatPhase(PrecombatPhaseStep::Mana(team)) => Some(*team),
+            Phase::CombatPhaseA(CombatPhaseStep::Attack(team) | CombatPhaseStep::Block(team)) |
+            Phase::CombatPhaseB(CombatPhaseStep::Attack(team) | CombatPhaseStep::Block(team)) => Some(*team),
+            Phase::MainPhase(MainPhaseStep::Main(team)) => Some(*team),
+            _ => None
+        }
     }
 
     pub fn is_team_sync_step(&self) -> bool {
