@@ -115,3 +115,19 @@ impl State {
         mutations
     }
 }
+
+#[macro_export]
+macro_rules! sm_static {
+    ($sm_enum:ident, $arg:expr) => {
+        $crate::game::state::mutation::StateMutation::Static(
+            $crate::game::state::mutation::StaticStateMutation::$sm_enum($arg)
+        )
+    };
+}
+
+#[macro_export]
+macro_rules! sm_eval {
+    ($func:expr) => {
+        $crate::game::state::mutation::StateMutation::Eval(Box::new($func))
+    };
+}

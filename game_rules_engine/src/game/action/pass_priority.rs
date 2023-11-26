@@ -4,11 +4,11 @@ use crate::game::db::CardPrototypeDatabase;
 
 use crate::game::state::error::StateError;
 use crate::game::state::mutation::{StateMutation, StaticStateMutation};
-use crate::game::state::mutation::stack_pass_priority::StackPassPriorityMutation;
 use crate::game::state::player::{Player};
 use crate::game::state::stack::Next;
 use crate::game::state::State;
-use crate::stack_pass_priority;
+use crate::{sm_eval, sm_static};
+use crate::game::state::mutation::stack_pass_priority::StackPassPriorityMutation;
 
 #[derive(Hash, Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
 pub struct PassPriorityAction {}
@@ -35,13 +35,14 @@ impl ActionTrait for PassPriorityAction {
                 }
             }
             Next::PassPriority(_) => {
-                stack_pass_priority!(mutations, region.id);
+                mutations.push(sm_static!(StackPassPriority, StackPassPriorityMutation{
+                    region_id: region.id
+                }));
 
                 let region_id = region.id;
                 let player_id = player.id;
-                let eval = StateMutation::Eval(Box::new(
-                    move |future_state| {
-                        let region = future_state.find_region(region_id)?;
+                let eval = sm_eval!(move |future_state| {
+                    let region = future_state.find_region(region_id)?;
                         let player = future_state.find_player(player_id)?;
                         if region.step.is_team_sync_step() {
                             let mut sub_mutations: Vec<StateMutation> = Vec::new();
@@ -68,8 +69,7 @@ impl ActionTrait for PassPriorityAction {
                         } else {
                             Ok(None)
                         }
-                    }
-                ));
+                });
 
                 mutations.push(eval);
             }
