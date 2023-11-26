@@ -28,7 +28,7 @@ macro_rules! stack_clear_priority {
     ($mutations:ident, $region_id:expr) => {
         $mutations.push($crate::game::state::mutation::StateMutation::Static(
             $crate::game::state::mutation::StaticStateMutation::StackClearPriority(
-            crate::game::state::mutation::StackClearPriorityMutation {
+            $crate::game::state::mutation::StackClearPriorityMutation {
                 region_id: $region_id,
             },
         )));

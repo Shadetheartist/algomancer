@@ -7,7 +7,7 @@ use crate::game::state::error::EntityNotFoundError;
 use crate::game::state::formation::{DefensiveFormation, Formation};
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{Player, PlayerId, TeamId};
-use crate::game::state::progression::{Phase, PrecombatPhaseStep};
+use crate::game::state::progression::{Phase, PrecombatPhaseStep, Team};
 use crate::game::state::stack::Stack;
 use crate::game::state::State;
 use crate::game::state::unordered_cards::UnorderedCards;
@@ -230,7 +230,7 @@ impl State {
             Phase::PrecombatPhase(PrecombatPhaseStep::Draft) => {
                 self.players_in_region_combine_packs_with_hand(region_id)
             }
-            Phase::PrecombatPhase(PrecombatPhaseStep::ITMana) => {
+            Phase::PrecombatPhase(PrecombatPhaseStep::Mana(Team::IT)) => {
                 self = self.each_player_sends_pack_clockwise()
             }
             _ => {}

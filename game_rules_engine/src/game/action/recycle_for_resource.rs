@@ -8,7 +8,7 @@ use crate::game::state::mutation::move_card::{MoveCardMutation, Placement, To};
 use crate::game::state::mutation::StateMutation;
 use crate::game::state::mutation::StaticStateMutation::{CreateCard, MoveCard};
 use crate::game::state::player::Player;
-use crate::game::state::progression::{Phase, PrecombatPhaseStep};
+use crate::game::state::progression::{Phase, PrecombatPhaseStep, Team};
 use crate::game::state::resource::ResourceType;
 use crate::game::state::State;
 
@@ -60,15 +60,13 @@ impl ActionTrait for RecycleForResourceAction {
         for region in &state.regions {
             let player = region.sole_player();
             if player.team_id == state.initiative_team() {
-                if let Phase::PrecombatPhase(PrecombatPhaseStep::ITMana) = region.step {}
+                if let Phase::PrecombatPhase(PrecombatPhaseStep::Mana(Team::IT)) = region.step {}
                 else {
                     continue
                 }
-            } else {
-                if let Phase::PrecombatPhase(PrecombatPhaseStep::NITMana) = region.step {}
-                else {
-                    continue
-                }
+            } else if let Phase::PrecombatPhase(PrecombatPhaseStep::Mana(Team::NIT)) = region.step {}
+            else {
+                continue
             }
 
 

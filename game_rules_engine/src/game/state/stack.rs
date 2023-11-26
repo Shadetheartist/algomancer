@@ -19,19 +19,13 @@ pub struct Effect {
 
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(Default)]
 pub struct Stack {
     priority: Vec<PlayerId>,
     stack: Vec<Effect>
 }
 
-impl Default for Stack {
-    fn default() -> Self {
-        Self {
-            priority: Vec::new(),
-            stack: Vec::new(),
-        }
-    }
-}
+
 
 impl Stack {
     pub fn push_effect(&mut self, state: &State, effect: Effect){

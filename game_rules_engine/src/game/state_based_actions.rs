@@ -1,9 +1,9 @@
-use crate::game::state::mutation::player_mutations::{UpdatePlayerAliveMutation, UpdatePlayerHealthMutation};
+use crate::game::state::mutation::player_mutations::{UpdatePlayerAliveMutation};
 use crate::game::state::mutation::StateMutation;
 use crate::game::state::stack::Next;
 use crate::game::state::State;
-use crate::{sm_eval, sm_eval_vec, sm_static, sm_vec};
-use crate::game::state::progression::{CombatPhaseAStep, CombatPhaseBStep, Phase};
+use crate::{sm_static};
+use crate::game::state::progression::{CombatPhaseStep, Phase};
 
 impl State {
     pub fn generate_state_based_mutations(&self) -> Vec<StateMutation> {
@@ -57,7 +57,7 @@ fn add_sba_transition(state: &State, mut mutations: Vec<StateMutation>) -> Vec<S
     mutations
 }
 
-fn add_sba_player(state: &State, mut mutations: Vec<StateMutation>) -> Vec<StateMutation> {
+fn add_sba_player(state: &State, mutations: Vec<StateMutation>) -> Vec<StateMutation> {
     for r in &state.regions {
         for p in &r.players {
             if !p.is_alive {
@@ -82,10 +82,10 @@ fn add_sba_player(state: &State, mut mutations: Vec<StateMutation>) -> Vec<State
     mutations
 }
 
-fn add_sba_damage(state: &State, mut mutations: Vec<StateMutation>) -> Vec<StateMutation> {
+fn add_sba_damage(state: &State, mutations: Vec<StateMutation>) -> Vec<StateMutation> {
     for r in &state.regions {
         match r.step {
-            Phase::CombatPhaseA(CombatPhaseAStep::Damage) |  Phase::CombatPhaseB(CombatPhaseBStep::Damage) => {
+            Phase::CombatPhaseA(CombatPhaseStep::Damage) | Phase::CombatPhaseB(CombatPhaseStep::Damage) => {
                 eprintln!("Doing damage...");
             }
             _ => {}

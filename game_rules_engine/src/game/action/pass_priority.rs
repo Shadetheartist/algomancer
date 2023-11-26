@@ -88,15 +88,11 @@ impl ActionTrait for PassPriorityAction {
 
         for region in &state.regions {
             for player in &region.players {
-                match region.step {
-                    _ => {
-                        if state.player_can_act(player.id) {
-                            actions.push(Action {
-                                issuer_player_id: player.id,
-                                action: ActionType::PassPriority(PassPriorityAction {}),
-                            })
-                        }
-                    }
+                if state.player_can_act(player.id) {
+                    actions.push(Action {
+                        issuer_player_id: player.id,
+                        action: ActionType::PassPriority(PassPriorityAction {}),
+                    })
                 }
             }
         }

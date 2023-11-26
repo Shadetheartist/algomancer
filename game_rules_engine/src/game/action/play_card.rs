@@ -11,7 +11,7 @@ use crate::game::state::mutation::StateMutation;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::permanent::Permanent::SpellToken;
 use crate::game::state::player::{Player, PlayerId};
-use crate::game::state::progression::{MainPhaseStep, Phase, PrecombatPhaseStep};
+use crate::game::state::progression::{MainPhaseStep, Phase, PrecombatPhaseStep, Team};
 use crate::game::state::State;
 
 
@@ -89,15 +89,13 @@ impl PlayCardAction {
         for region in &state.regions {
             let player = region.sole_player();
             if player.team_id == state.initiative_team() {
-                if let Phase::PrecombatPhase(PrecombatPhaseStep::ITMana) = region.step {}
+                if let Phase::PrecombatPhase(PrecombatPhaseStep::Mana(Team::IT)) = region.step {}
                 else {
                     continue
                 }
-            } else {
-                if let Phase::PrecombatPhase(PrecombatPhaseStep::NITMana) = region.step {}
-                else {
-                    continue
-                }
+            } else if let Phase::PrecombatPhase(PrecombatPhaseStep::Mana(Team::NIT)) = region.step {}
+            else {
+                continue
             }
 
             // assume single player per region at in the mana step
@@ -126,7 +124,7 @@ impl PlayCardAction {
 
         for region in &state.regions {
 
-            if let Phase::PrecombatPhase(PrecombatPhaseStep::ITMana | PrecombatPhaseStep::NITMana) = region.step {} else {
+            if let Phase::PrecombatPhase(PrecombatPhaseStep::Mana(_)) = region.step {} else {
                 break
             }
 
@@ -207,8 +205,7 @@ impl Game {
             match &region.step {
                 Phase::PrecombatPhase(step) => {
                     match step {
-                        PrecombatPhaseStep::ITMana |
-                        PrecombatPhaseStep::NITMana => {
+                        PrecombatPhaseStep::Mana(_)  => {
                             match proto.card_type {
 
                                 // up to two resource cards are allowed during the mana step
@@ -265,8 +262,7 @@ impl Game {
                         MainPhaseStep::Regroup => {
                             return Err(MustBePlayedFromHand(card_id));
                         }
-                        MainPhaseStep::ITMain => {}
-                        MainPhaseStep::NITMain => {}
+                        MainPhaseStep::Main(_) => {}
                     }
                 }
             }

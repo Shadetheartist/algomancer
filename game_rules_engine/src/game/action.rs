@@ -85,7 +85,7 @@ impl Game {
     pub fn apply_action(&mut self, action: Action) -> Result<Vec<StaticStateMutation>, StateError> {
         eprintln!("[{}] Applying Action [{:?}]", self.state.depth, &action);
 
-        let mut mutations = action.generate_mutations(self)?;
+        let mutations = action.generate_mutations(self)?;
 
         let mut static_mutations = Vec::new();
 

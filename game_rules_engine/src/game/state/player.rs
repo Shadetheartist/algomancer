@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::game::state::card_collection::{CardCollectionId};
 use crate::game::state::error::{EntityNotFoundError, StateError};
-use crate::game::state::progression::{CombatPhaseAStep, CombatPhaseBStep, MainPhaseStep, Phase, PrecombatPhaseStep};
+use crate::game::state::progression::{CombatPhaseStep, MainPhaseStep, Phase, PrecombatPhaseStep, Team};
 use crate::game::state::{GameMode, State};
 use crate::game::state::deck::Deck;
 use crate::game::state::stack::Next;
@@ -57,14 +57,14 @@ impl Player {
                 } else {
                     panic!("player is supposed to draw from the common deck in live-draft, but it doesn't exist");
                 }
-            },
+            }
             GameMode::PreDraft { .. } | GameMode::Constructed { .. } => {
                 if let Some(own_deck) = &self.own_deck {
                     own_deck
                 } else {
                     panic!("player is supposed to draw from their own deck in pre-draft & constructed, but it doesn't exist");
                 }
-            },
+            }
             GameMode::TeamDraft { .. } => {
                 // weird, this needs a common deck per team i guess
                 todo!("need to implement team draft, which deck the player is drawing from")
@@ -75,9 +75,8 @@ impl Player {
 
 
 impl State {
-
     /// create an iterator over all the players in the game
-    pub fn players(&self) -> impl Iterator<Item = &Player> {
+    pub fn players(&self) -> impl Iterator<Item=&Player> {
         self.regions.iter().flat_map(|r| &r.players)
     }
 
@@ -124,7 +123,7 @@ impl State {
             _ => false
         };
 
-        let has_initiative_in_region = match region.step {
+        match region.step {
             Phase::PrecombatPhase(step) => {
                 match step {
                     // these are async
@@ -138,45 +137,47 @@ impl State {
                     // players instead wait for the last player to reach this step, then all regions
                     // transition to the next step automatically
                     PrecombatPhaseStep::PassPack => false,
-                    PrecombatPhaseStep::ITMana => player_is_on_initiative_team && active_on_stack,
-                    PrecombatPhaseStep::NITMana => !player_is_on_initiative_team && active_on_stack
+                    PrecombatPhaseStep::Mana(Team::IT) => player_is_on_initiative_team && active_on_stack,
+                    PrecombatPhaseStep::Mana(Team::NIT) => !player_is_on_initiative_team && active_on_stack
                 }
             }
             Phase::CombatPhaseA(step) => {
                 match step {
-                    CombatPhaseAStep::ITAttack => player_is_on_initiative_team && active_on_stack,
-                    CombatPhaseAStep::AfterITAttackPriorityWindow => active_on_stack,
-                    CombatPhaseAStep::NITBlock => !player_is_on_initiative_team && active_on_stack,
-                    CombatPhaseAStep::AfterNITBlockPriorityWindow => active_on_stack,
+                    CombatPhaseStep::Attack(Team::IT) => player_is_on_initiative_team && active_on_stack,
+                    CombatPhaseStep::AfterAttackPriorityWindow => active_on_stack,
+                    CombatPhaseStep::Block(Team::NIT) => !player_is_on_initiative_team && active_on_stack,
+                    CombatPhaseStep::AfterBlockPriorityWindow => active_on_stack,
 
                     // this step happens, but is really just a step where mutations are applied,
                     // players don't take any actions
-                    CombatPhaseAStep::Damage => false,
-
-                    CombatPhaseAStep::AfterCombatPriorityWindow => active_on_stack,
+                    CombatPhaseStep::Damage => false,
+                    CombatPhaseStep::AfterCombatPriorityWindow => active_on_stack,
+                    _ => { panic!("weird phase") }
                 }
             }
             Phase::CombatPhaseB(step) => {
                 match step {
-                    CombatPhaseBStep::NITAttack => !player_is_on_initiative_team && active_on_stack,
-                    CombatPhaseBStep::AfterNITAttackPriorityWindow => active_on_stack,
-                    CombatPhaseBStep::ITBlock => player_is_on_initiative_team && active_on_stack,
-                    CombatPhaseBStep::AfterITBlockPriorityWindow => active_on_stack,
-                    CombatPhaseBStep::Damage => false, // see above
-                    CombatPhaseBStep::AfterCombatPriorityWindow => active_on_stack,
+                    CombatPhaseStep::Attack(Team::NIT) => !player_is_on_initiative_team && active_on_stack,
+                    CombatPhaseStep::AfterAttackPriorityWindow => active_on_stack,
+                    CombatPhaseStep::Block(Team::IT) => player_is_on_initiative_team && active_on_stack,
+                    CombatPhaseStep::AfterBlockPriorityWindow => active_on_stack,
+
+                    // this step happens, but is really just a step where mutations are applied,
+                    // players don't take any actions
+                    CombatPhaseStep::Damage => false,
+                    CombatPhaseStep::AfterCombatPriorityWindow => active_on_stack,
+                    _ => { panic!("weird phase") }
                 }
             }
             Phase::MainPhase(step) => {
                 match step {
                     // just a cleanup step, no user interaction
                     MainPhaseStep::Regroup => false,
-                    MainPhaseStep::ITMain => player_is_on_initiative_team && active_on_stack,
-                    MainPhaseStep::NITMain => !player_is_on_initiative_team && active_on_stack,
+                    MainPhaseStep::Main(Team::IT) => player_is_on_initiative_team && active_on_stack,
+                    MainPhaseStep::Main(Team::NIT) => !player_is_on_initiative_team && active_on_stack,
                 }
             }
-        };
-
-        return has_initiative_in_region
+        }
     }
 
     pub fn initiative_team(&self) -> TeamId {
@@ -186,8 +187,6 @@ impl State {
     pub fn non_initiative_team(&self) -> TeamId {
         self.team_ids().into_iter().find(|&t| t != self.initiative_team()).expect("a non-initative team")
     }
-
-
 }
 
 
@@ -207,8 +206,7 @@ impl State {
     }
 
 
-    pub fn player_draw_n_cards(&mut self, player_id: PlayerId, n: usize){
-
+    pub fn player_draw_n_cards(&mut self, player_id: PlayerId, n: usize) {
         let deck = self.player_deck(player_id).expect("a deck");
         let mut cards = Vec::new();
         for _ in 0..n {
@@ -230,7 +228,7 @@ impl State {
                 } else {
                     panic!("player is supposed to draw from the common deck in live-draft, but it doesn't exist");
                 }
-            },
+            }
             GameMode::PreDraft { .. } | GameMode::Constructed { .. } => {
                 let player = self.find_player_mut(player_id).expect("player");
                 if let Some(player_deck) = player.own_deck.as_mut() {
@@ -238,7 +236,7 @@ impl State {
                 } else {
                     panic!("player is supposed to draw from their own deck in pre-draft & constructed, but it doesn't exist");
                 }
-            },
+            }
             GameMode::TeamDraft { .. } => {
                 // weird, this needs a common deck per team i guess
                 todo!("need to implement team draft, which deck the player is drawing from")

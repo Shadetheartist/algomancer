@@ -98,7 +98,7 @@ pub enum StaticStateMutation {
 
 
 impl State {
-    pub fn mutate(mut self, db: &CardPrototypeDatabase, state_mutation: &StaticStateMutation) -> Result<State, StateError> {
+    pub fn mutate(self, db: &CardPrototypeDatabase, state_mutation: &StaticStateMutation) -> Result<State, StateError> {
         match state_mutation {
             StaticStateMutation::StackClearPriority(m) => m.mutate_state(self, db),
             StaticStateMutation::StackAddPriority(m) => m.mutate_state(self, db),
@@ -144,7 +144,6 @@ macro_rules! sm_static {
     };
 }
 
-#[macro_use]
 #[macro_export]
 macro_rules! sm_vec {
     ($items:expr) => {
@@ -153,7 +152,6 @@ macro_rules! sm_vec {
 }
 
 
-#[macro_use]
 #[macro_export]
 macro_rules! sm_eval {
     ($func:expr) => {
@@ -161,7 +159,6 @@ macro_rules! sm_eval {
     };
 }
 
-#[macro_use]
 #[macro_export]
 macro_rules! sm_eval_vec {
     ($func:expr) => {
