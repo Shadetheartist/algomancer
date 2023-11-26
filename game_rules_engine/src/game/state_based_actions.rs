@@ -23,11 +23,10 @@ fn add_sba_transition(state: &State, mut mutations: Vec<StateMutation>) -> Vec<S
     // once all players on a team have passed priority
 
     for r in &state.regions {
-        let next  = r.stack.next();
+        let next = r.stack.next();
         match next {
             Next::TransitionStep => {
                 if r.step.is_team_sync_step() {
-
                     let active_team_id = r.active_team_id(state).expect("an active team in the region");
 
                     let all_players_on_team_passed_priority = state.players_on_team(active_team_id).expect("players on the team").into_iter().all(|p| {
@@ -44,14 +43,20 @@ fn add_sba_transition(state: &State, mut mutations: Vec<StateMutation>) -> Vec<S
                             mutations.push(state.generate_mutation_for_phase_transition(r.id));
                         }
                     }
-                } else {
+                }  else {
                     mutations.push(state.generate_mutation_for_phase_transition(r.id));
                 }
             }
             Next::PassPriority(_) => {
+                if r.step.is_priority_window() {
+                    // skip priority windows when there's no other player in the region
+                    if r.players.len() < 2 {
+                        eprintln!("skipping prio window - not enough players in region");
+                        mutations.push(state.generate_mutation_for_phase_transition(r.id));
+                    }
+                }
             }
-            Next::ResolveEffect(_) => {
-            }
+            Next::ResolveEffect(_) => {}
         }
     }
 

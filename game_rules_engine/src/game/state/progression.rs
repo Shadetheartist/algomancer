@@ -6,6 +6,7 @@ use crate::game::state::{GameMode};
 
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+#[serde(tag = "phase")]
 pub enum Phase {
     PrecombatPhase(PrecombatPhaseStep),
     CombatPhaseA(CombatPhaseStep),
@@ -14,6 +15,7 @@ pub enum Phase {
 }
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+#[serde(tag = "step")]
 pub enum PrecombatPhaseStep {
     Untap,
     Draw,
@@ -23,6 +25,7 @@ pub enum PrecombatPhaseStep {
 }
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+#[serde(tag = "step")]
 pub enum CombatPhaseStep {
     Attack(Team),
     AfterAttackPriorityWindow,
@@ -34,12 +37,14 @@ pub enum CombatPhaseStep {
 
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+#[serde(tag = "step")]
 pub enum MainPhaseStep {
     Regroup,
     Main(Team),
 }
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+#[serde(tag = "team")]
 pub enum Team {
     IT,
     NIT,
@@ -76,18 +81,18 @@ impl Phase {
                     CombatPhaseStep::AfterBlockPriorityWindow => Phase::CombatPhaseA(CombatPhaseStep::Damage),
                     CombatPhaseStep::Damage => Phase::CombatPhaseA(CombatPhaseStep::AfterCombatPriorityWindow),
                     CombatPhaseStep::AfterCombatPriorityWindow => Phase::CombatPhaseB(CombatPhaseStep::Attack(Team::NIT)),
-                    _ => { panic!("weird phase/step") }
+                    _ => { panic!("mismatched phase/step") }
                 }
             }
             Phase::CombatPhaseB(step) => {
                 match step {
-                    CombatPhaseStep::Attack(Team::NIT) => Phase::CombatPhaseA(CombatPhaseStep::AfterAttackPriorityWindow),
-                    CombatPhaseStep::AfterAttackPriorityWindow => Phase::CombatPhaseA(CombatPhaseStep::Block(Team::IT)),
-                    CombatPhaseStep::Block(Team::IT) => Phase::CombatPhaseA(CombatPhaseStep::AfterBlockPriorityWindow),
-                    CombatPhaseStep::AfterBlockPriorityWindow => Phase::CombatPhaseA(CombatPhaseStep::Damage),
-                    CombatPhaseStep::Damage => Phase::CombatPhaseA(CombatPhaseStep::AfterCombatPriorityWindow),
+                    CombatPhaseStep::Attack(Team::NIT) => Phase::CombatPhaseB(CombatPhaseStep::AfterAttackPriorityWindow),
+                    CombatPhaseStep::AfterAttackPriorityWindow => Phase::CombatPhaseB(CombatPhaseStep::Block(Team::IT)),
+                    CombatPhaseStep::Block(Team::IT) => Phase::CombatPhaseB(CombatPhaseStep::AfterBlockPriorityWindow),
+                    CombatPhaseStep::AfterBlockPriorityWindow => Phase::CombatPhaseB(CombatPhaseStep::Damage),
+                    CombatPhaseStep::Damage => Phase::CombatPhaseB(CombatPhaseStep::AfterCombatPriorityWindow),
                     CombatPhaseStep::AfterCombatPriorityWindow => Phase::MainPhase(MainPhaseStep::Regroup),
-                    _ => { panic!("weird phase/step") }
+                    _ => { panic!("mismatched phase/step") }
                 }
             }
             Phase::MainPhase(step) => {
