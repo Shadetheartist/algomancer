@@ -1,9 +1,9 @@
-use crate::game::state::mutation::player_mutations::{UpdatePlayerAliveMutation};
-use crate::game::state::mutation::StateMutation;
+use crate::game::state::mutation::player_mutations::{UpdatePlayerAliveMutation, UpdatePlayerResourcesPlayedMutation};
+use crate::game::state::mutation::{StateMutation};
 use crate::game::state::stack::Next;
 use crate::game::state::State;
 use crate::{sm_static};
-use crate::game::state::progression::{CombatPhaseStep, MainPhaseStep, Phase};
+use crate::game::state::progression::{CombatPhaseStep, MainPhaseStep, Phase, PrecombatPhaseStep};
 
 impl State {
     pub fn generate_state_based_mutations(&self) -> Vec<StateMutation> {
@@ -11,6 +11,7 @@ impl State {
 
         mutations = add_sba_player(self, mutations);
         mutations = add_sba_damage(self, mutations);
+        mutations = add_sba_untap(self, mutations);
         mutations = add_sba_regroup(self, mutations);
         mutations = add_sba_transition(self, mutations);
 
@@ -44,7 +45,7 @@ fn add_sba_transition(state: &State, mut mutations: Vec<StateMutation>) -> Vec<S
                             mutations.push(state.generate_mutation_for_phase_transition(r.id));
                         }
                     }
-                }  else {
+                } else {
                     mutations.push(state.generate_mutation_for_phase_transition(r.id));
                 }
             }
@@ -106,6 +107,27 @@ fn add_sba_regroup(state: &State, mut mutations: Vec<StateMutation>) -> Vec<Stat
         match r.step {
             Phase::MainPhase(MainPhaseStep::Regroup) => {
                 mutations.push(state.generate_mutation_for_phase_transition(r.id));
+            }
+            _ => {}
+        }
+    }
+
+    mutations
+}
+
+fn add_sba_untap(state: &State, mut mutations: Vec<StateMutation>) -> Vec<StateMutation> {
+    for r in &state.regions {
+        match r.step {
+            Phase::PrecombatPhase(PrecombatPhaseStep::Untap) => {
+                for p in &r.players {
+                    if p.resources_played_this_turn != 0 {
+                        mutations.push(
+                            sm_static!(UpdatePlayerResourcesPlayed, UpdatePlayerResourcesPlayedMutation {
+                            player_id: p.id,
+                            new_value: 0,
+                        }))
+                    }
+                }
             }
             _ => {}
         }

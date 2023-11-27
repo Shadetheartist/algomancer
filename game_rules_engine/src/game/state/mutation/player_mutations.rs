@@ -33,3 +33,16 @@ impl StateMutator for UpdatePlayerAliveMutation {
         Ok(state)
     }
 }
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct UpdatePlayerResourcesPlayedMutation {
+    pub player_id: PlayerId,
+    pub new_value: u8,
+}
+
+impl StateMutator for UpdatePlayerResourcesPlayedMutation {
+    fn mutate_state(&self, mut state: State, _db: &CardPrototypeDatabase) -> Result<State, StateError> {
+        state.find_player_mut(self.player_id)?.resources_played_this_turn = self.new_value;
+        Ok(state)
+    }
+}

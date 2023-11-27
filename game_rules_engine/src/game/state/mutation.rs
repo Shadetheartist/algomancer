@@ -17,7 +17,7 @@ use crate::game::state::mutation::create_card::CreateCardMutation;
 use crate::game::state::mutation::create_pack::CreatePackMutation;
 use crate::game::state::mutation::move_card::MoveCardMutation;
 use crate::game::state::mutation::phase_transition::PhaseTransitionMutation;
-use crate::game::state::mutation::player_mutations::{UpdatePlayerAliveMutation, UpdatePlayerHealthMutation};
+use crate::game::state::mutation::player_mutations::{UpdatePlayerAliveMutation, UpdatePlayerHealthMutation, UpdatePlayerResourcesPlayedMutation};
 use crate::game::state::mutation::stack_add_priority::StackAddPriorityMutation;
 use crate::game::state::mutation::stack_clear_priority::StackClearPriorityMutation;
 use crate::game::state::mutation::stack_pass_priority::StackPassPriorityMutation;
@@ -94,6 +94,7 @@ pub enum StaticStateMutation {
     CreateCard(CreateCardMutation),
     UpdatePlayerHealth(UpdatePlayerHealthMutation),
     UpdatePlayerAlive(UpdatePlayerAliveMutation),
+    UpdatePlayerResourcesPlayed(UpdatePlayerResourcesPlayedMutation),
 }
 
 
@@ -110,6 +111,7 @@ impl State {
             StaticStateMutation::CreateCard(m) => m.mutate_state(self, db),
             StaticStateMutation::UpdatePlayerHealth(m) => m.mutate_state(self, db),
             StaticStateMutation::UpdatePlayerAlive(m) => m.mutate_state(self, db),
+            StaticStateMutation::UpdatePlayerResourcesPlayed(m) => m.mutate_state(self, db),
         }
     }
 }

@@ -7,7 +7,8 @@ use crate::game::state::card::{Card, CardId, CardType, FindCardResult, Timing};
 use crate::game::state::card::CardType::{Resource, Unit};
 use crate::game::state::error::{CardNotPlayableError,StateError};
 use crate::game::state::error::CardNotPlayableError::{CannotCastANonSpellTokenPermanentFromPlay, CannotPlayMoreResources, CardDoesNotExist, CardLacksCorrectTiming, MustBePlayedFromHand, NotInPlayableStep, NotInPlayableZone};
-use crate::game::state::mutation::StateMutation;
+use crate::game::state::mutation::{StateMutation, StaticStateMutation};
+use crate::game::state::mutation::player_mutations::UpdatePlayerResourcesPlayedMutation;
 use crate::game::state::permanent::Permanent;
 use crate::game::state::permanent::Permanent::SpellToken;
 use crate::game::state::player::{Player, PlayerId};
@@ -25,11 +26,31 @@ impl PlayCardAction {
 }
 
 impl ActionTrait for PlayCardAction {
-    fn generate_mutations(&self, state: &State, _db: &CardPrototypeDatabase, issuer: &Player) -> Result<Vec<StateMutation>, StateError> {
+    fn generate_mutations(&self, state: &State, db: &CardPrototypeDatabase, issuer: &Player) -> Result<Vec<StateMutation>, StateError> {
         match state.find_card(self.card_id)? {
-            FindCardResult::InPlayerHand(player, _, _card) => {
+            FindCardResult::InPlayerHand(player, _, card) => {
                 if player.id != issuer.id {
                     return Err(CardNotPlayableError::NotUnderPlayersControl(self.card_id).into())
+                }
+
+                let proto = &db.prototypes.get(&card.prototype_id).expect("a card prototype");
+                match proto.card_type {
+                    Resource(_) => {
+                        let mut mutations = Vec::new();
+
+                        let mutation = StateMutation::Static(StaticStateMutation::UpdatePlayerResourcesPlayed(UpdatePlayerResourcesPlayedMutation{
+                            player_id: issuer.id,
+                            new_value: issuer.resources_played_this_turn + 1
+                        }));
+
+                        mutations.push(mutation);
+
+                        Ok(mutations)
+                    }
+                    CardType::UnitToken => { todo!("not yet supported"); }
+                    CardType::SpellToken => { todo!("not yet supported"); }
+                    Unit(_) => { todo!("not yet supported"); }
+                    CardType::Spell(_) => { todo!("not yet supported"); }
                 }
             }
 
@@ -48,6 +69,8 @@ impl ActionTrait for PlayCardAction {
                     if common.controller_player_id != issuer.id {
                         return Err(CardNotPlayableError::NotUnderPlayersControl(common.permanent_id).into())
                     }
+
+                    todo!("not implemented yet")
                 } else {
                     let id = match permanent {
                         Permanent::Unit { common, .. } => { common.permanent_id }
@@ -65,15 +88,13 @@ impl ActionTrait for PlayCardAction {
             FindCardResult::AsPermanentInFormation(_, _, _) => {
                 return Err(CardNotPlayableError::NotInPlayableZone(self.card_id).into())
             }
-        };
-
-        Ok(Vec::new())
+        }
     }
 
     fn get_valid(state: &State, db: &CardPrototypeDatabase) -> Vec<Action> {
         let mut actions = Vec::new();
 
-        // actions.extend(Self::valid_play_resource(state, db));
+        actions.extend(Self::valid_play_resource(state, db));
         // actions.extend(Self::valid_play_haste(state, db));
 
         actions
