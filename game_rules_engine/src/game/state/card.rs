@@ -17,6 +17,7 @@ use crate::game::state::resource::{ResourceType};
 use crate::game::state::unordered_cards::UnorderedCards;
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
+#[serde(tag="timing")]
 pub enum Timing {
     Default,
     Haste,
@@ -65,8 +66,6 @@ pub enum FindCardResult<'a> {
     InPlayerDeck(&'a Player, &'a Deck, &'a Card),
     InPlayerPack(&'a Player, &'a UnorderedCards, &'a Card),
     InCommonDeck(&'a Deck, &'a Card),
-    AsPermanentInRegion(&'a Region, &'a Permanent),
-    AsPermanentInFormation(&'a Region, &'a Formation<Permanent>, &'a Permanent),
 }
 
 impl Card {
@@ -104,28 +103,6 @@ impl State {
             let card = player.discard.iter().find(|c| c.card_id == card_id);
             if let Some(card) = card {
                 return Ok(FindCardResult::InPlayerDiscard(player, &player.discard, card))
-            }
-        }
-
-        // look for the card on the battlefield
-        for region in self.regions.iter() {
-            for permanent in region.unformed_permanents.iter() {
-                if let Permanent::Unit { card, .. } = permanent {
-                    if card.card_id == card_id {
-                        return Ok(FindCardResult::AsPermanentInRegion(region, permanent))
-                    }
-                }
-            }
-
-            // the card could be in a formation
-            for formation in region.formations().iter() {
-                for permanent in formation.cells_iter() {
-                    if let Permanent::Unit { card, .. } = permanent {
-                        if card.card_id == card_id {
-                            return Ok(FindCardResult::AsPermanentInFormation(region, formation, permanent))
-                        }
-                    }
-                }
             }
         }
 

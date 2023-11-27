@@ -7,6 +7,8 @@ pub mod stack_pass_priority;
 pub mod stack_add_priority;
 pub mod stack_clear_priority;
 pub mod player_mutations;
+pub mod remove_card;
+pub mod create_permanent;
 
 use std::fmt::{Debug};
 use serde::{Deserialize, Serialize};
@@ -15,9 +17,11 @@ use crate::game::db::{CardPrototypeDatabase};
 use crate::game::state::error::StateError;
 use crate::game::state::mutation::create_card::CreateCardMutation;
 use crate::game::state::mutation::create_pack::CreatePackMutation;
+use crate::game::state::mutation::create_permanent::CreatePermanentMutation;
 use crate::game::state::mutation::move_card::MoveCardMutation;
 use crate::game::state::mutation::phase_transition::PhaseTransitionMutation;
 use crate::game::state::mutation::player_mutations::{UpdatePlayerAliveMutation, UpdatePlayerHealthMutation, UpdatePlayerResourcesPlayedMutation};
+use crate::game::state::mutation::remove_card::RemoveCardMutation;
 use crate::game::state::mutation::stack_add_priority::StackAddPriorityMutation;
 use crate::game::state::mutation::stack_clear_priority::StackClearPriorityMutation;
 use crate::game::state::mutation::stack_pass_priority::StackPassPriorityMutation;
@@ -92,9 +96,11 @@ pub enum StaticStateMutation {
     MoveCard(MoveCardMutation),
     CreatePackForPlayer(CreatePackMutation),
     CreateCard(CreateCardMutation),
+    RemoveCard(RemoveCardMutation),
     UpdatePlayerHealth(UpdatePlayerHealthMutation),
     UpdatePlayerAlive(UpdatePlayerAliveMutation),
     UpdatePlayerResourcesPlayed(UpdatePlayerResourcesPlayedMutation),
+    CreatePermanent(CreatePermanentMutation),
 }
 
 
@@ -109,9 +115,11 @@ impl State {
             StaticStateMutation::MoveCard(m) => m.mutate_state(self, db),
             StaticStateMutation::CreatePackForPlayer(m) => m.mutate_state(self, db),
             StaticStateMutation::CreateCard(m) => m.mutate_state(self, db),
+            StaticStateMutation::RemoveCard(m) => m.mutate_state(self, db),
             StaticStateMutation::UpdatePlayerHealth(m) => m.mutate_state(self, db),
             StaticStateMutation::UpdatePlayerAlive(m) => m.mutate_state(self, db),
             StaticStateMutation::UpdatePlayerResourcesPlayed(m) => m.mutate_state(self, db),
+            StaticStateMutation::CreatePermanent(m) => m.mutate_state(self, db),
         }
     }
 }

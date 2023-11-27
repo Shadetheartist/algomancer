@@ -220,6 +220,7 @@ impl Game {
                         stack: Stack::default(),
                     };
 
+                    region.step = Phase::PrecombatPhase(PrecombatPhaseStep::Draw);
                     region.stack.push_priority(player_id);
 
                     game.state.regions.push(region);

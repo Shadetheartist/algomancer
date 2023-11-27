@@ -9,23 +9,25 @@ use crate::game::state::State;
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct CreateCardMutation {
     pub card_collection_id: CardCollectionId,
-    pub card_prototype_id: CardPrototypeId
+    pub card: Card
 }
 
 impl StateMutator for CreateCardMutation {
     fn mutate_state(&self, mut state: State, db: &CardPrototypeDatabase) -> Result<State, StateError> {
-        let card = Card::from_prototype_id(db, &mut state, self.card_prototype_id);
+
+        state.next_card_id += 1;
+
         let cc = state.find_card_collection_mut(self.card_collection_id)?;
 
         match cc {
             FindCardCollectionMutResult::CommonDeck(cc) |
             FindCardCollectionMutResult::PlayerDeck(_, cc) => {
-                cc.add_to_top(card)
+                cc.add_to_top(self.card.clone())
             }
             FindCardCollectionMutResult::PlayerHand(_, cc) |
             FindCardCollectionMutResult::PlayerDiscard(_, cc) |
             FindCardCollectionMutResult::PlayerPack(_, cc) => {
-                cc.add(card)
+                cc.add(self.card.clone())
             }
         }
 

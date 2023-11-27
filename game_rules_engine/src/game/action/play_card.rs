@@ -8,12 +8,16 @@ use crate::game::state::card::CardType::{Resource, Unit};
 use crate::game::state::error::{CardNotPlayableError,StateError};
 use crate::game::state::error::CardNotPlayableError::{CannotCastANonSpellTokenPermanentFromPlay, CannotPlayMoreResources, CardDoesNotExist, CardLacksCorrectTiming, MustBePlayedFromHand, NotInPlayableStep, NotInPlayableZone};
 use crate::game::state::mutation::{StateMutation, StaticStateMutation};
+use crate::game::state::mutation::create_card::CreateCardMutation;
+use crate::game::state::mutation::create_permanent::CreatePermanentMutation;
 use crate::game::state::mutation::player_mutations::UpdatePlayerResourcesPlayedMutation;
-use crate::game::state::permanent::Permanent;
+use crate::game::state::mutation::remove_card::RemoveCardMutation;
+use crate::game::state::permanent::{Permanent, PermanentCommon, PermanentId};
 use crate::game::state::permanent::Permanent::SpellToken;
 use crate::game::state::player::{Player, PlayerId};
 use crate::game::state::progression::{MainPhaseStep, Phase, PrecombatPhaseStep, Team};
 use crate::game::state::State;
+use crate::{sm_eval, sm_static};
 
 
 #[derive(Hash, Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
@@ -38,16 +42,41 @@ impl ActionTrait for PlayCardAction {
                     Resource(_) => {
                         let mut mutations = Vec::new();
 
-                        let mutation = StateMutation::Static(StaticStateMutation::UpdatePlayerResourcesPlayed(UpdatePlayerResourcesPlayedMutation{
+                        let mutation = sm_static!(RemoveCard, RemoveCardMutation{
+                            card_id: self.card_id
+                        });
+                        mutations.push(mutation);
+
+                        let player_id = player.id;
+                        let prototype_id = proto.prototype_id;
+                        let mutation = sm_eval!(move |next_state| {
+                            let region_id = next_state.find_region_id_containing_player(player_id);
+                            let permanent = Permanent::Resource {
+                                card_prototype_id: prototype_id,
+                                common: PermanentCommon {
+                                    permanent_id: PermanentId(next_state.next_permanent_id),
+                                    controller_player_id: player_id
+                                }
+                            };
+
+                            let mutation = sm_static!(CreatePermanent, CreatePermanentMutation{
+                                region_id: region_id,
+                                permanent: permanent
+                            });
+
+                            Ok(Some(mutation))
+                        });
+                        mutations.push(mutation);
+
+                        let mutation = sm_static!(UpdatePlayerResourcesPlayed, UpdatePlayerResourcesPlayedMutation{
                             player_id: issuer.id,
                             new_value: issuer.resources_played_this_turn + 1
-                        }));
-
+                        });
                         mutations.push(mutation);
 
                         Ok(mutations)
                     }
-                    CardType::UnitToken => { todo!("not yet supported"); }
+                    CardType::UnitToken => { panic!("can't cast a unit token"); }
                     CardType::SpellToken => { todo!("not yet supported"); }
                     Unit(_) => { todo!("not yet supported"); }
                     CardType::Spell(_) => { todo!("not yet supported"); }
@@ -63,29 +92,9 @@ impl ActionTrait for PlayCardAction {
                 todo!("card must be either grafting or augmenting")
             }
 
-            // must be casting a spell token
-            FindCardResult::AsPermanentInRegion(_, permanent) => {
-                if let SpellToken {common, ..} = permanent {
-                    if common.controller_player_id != issuer.id {
-                        return Err(CardNotPlayableError::NotUnderPlayersControl(common.permanent_id).into())
-                    }
-
-                    todo!("not implemented yet")
-                } else {
-                    let id = match permanent {
-                        Permanent::Unit { common, .. } => { common.permanent_id }
-                        Permanent::Resource { common, .. } => { common.permanent_id }
-                        Permanent::UnitToken { common, .. } => { common.permanent_id }
-                        SpellToken { .. } => panic!("how did it come to this")
-                    };
-                    return Err(CardNotPlayableError::CannotCastANonSpellTokenPermanentFromPlay(id).into())
-                }
-            }
-
             FindCardResult::InPlayerDeck(_, _, _) |
             FindCardResult::InPlayerPack(_, _, _) |
-            FindCardResult::InCommonDeck(_, _) |
-            FindCardResult::AsPermanentInFormation(_, _, _) => {
+            FindCardResult::InCommonDeck(_, _) => {
                 return Err(CardNotPlayableError::NotInPlayableZone(self.card_id).into())
             }
         }
@@ -146,14 +155,22 @@ impl PlayCardAction {
         for region in &state.regions {
 
             if let Phase::PrecombatPhase(PrecombatPhaseStep::Mana(_)) = region.step {} else {
-                break
+                continue
             }
 
             // assume single player per region at in the mana step
             let player = region.sole_player();
 
+            // can't play more than two resources per round
             if player.resources_played_this_turn >= 2 {
-                break
+                continue
+            }
+
+            // player must be on the team with active initiative
+            if let Some(active_team_id) = region.active_team_id(state) {
+                if player.team_id != active_team_id {
+                    continue
+                }
             }
 
             for card in player.hand.iter() {
@@ -197,17 +214,6 @@ impl Game {
                 FindCardResult::InPlayerDiscard(player, _,  card) => {
                     (player.id, card.prototype_id, false, true, false)
                 }
-                FindCardResult::AsPermanentInRegion(_, permanent) => {
-                    match permanent {
-                        Permanent::SpellToken { common, card_prototype_id } => {
-                            (common.controller_player_id, *card_prototype_id, false, false, true)
-                        }
-                        _ => {
-                            return Err(CannotCastANonSpellTokenPermanentFromPlay(card_id));
-                        }
-                    }
-                }
-                FindCardResult::AsPermanentInFormation(_, _, _) |
                 FindCardResult::InCommonDeck(_, _) |
                 FindCardResult::InPlayerPack(_, _, _) |
                 FindCardResult::InPlayerDeck(_, _, _) => {

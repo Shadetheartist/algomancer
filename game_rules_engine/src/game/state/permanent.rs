@@ -4,8 +4,8 @@ use crate::game::db::{CardPrototype, CardPrototypeDatabase, CardPrototypeId};
 use crate::game::state::card::{Card, CardId, CardType};
 use crate::game::state::player::PlayerId;
 use crate::game::state::State;
-
-pub type PermanentId = CardId;
+#[derive(Hash, Clone, Eq, PartialEq, Serialize, Deserialize, Debug, Copy)]
+pub struct PermanentId(pub usize);
 
 impl PermanentId {
     pub fn next(state: &mut State) -> PermanentId {
@@ -22,6 +22,7 @@ pub struct PermanentCommon {
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
+#[serde(tag="type")]
 pub enum Permanent {
     Unit {
         common: PermanentCommon,
