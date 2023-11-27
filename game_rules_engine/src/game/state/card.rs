@@ -8,11 +8,11 @@ use crate::game::state::{GameMode, State};
 use crate::game::state::card::CardType::Resource;
 
 use crate::game::state::error::{EntityNotFoundError};
-use crate::game::state::formation::Formation;
+
 use crate::game::state::deck::Deck;
-use crate::game::state::permanent::Permanent;
+
 use crate::game::state::player::Player;
-use crate::game::state::region::Region;
+
 use crate::game::state::resource::{ResourceType};
 use crate::game::state::unordered_cards::UnorderedCards;
 

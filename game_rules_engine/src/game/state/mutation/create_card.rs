@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use crate::game::db::{CardPrototypeDatabase, CardPrototypeId};
+use crate::game::db::{CardPrototypeDatabase};
 use crate::game::state::card::Card;
 use crate::game::state::card_collection::{CardCollectionId, FindCardCollectionMutResult};
 use crate::game::state::error::StateError;
@@ -13,7 +13,7 @@ pub struct CreateCardMutation {
 }
 
 impl StateMutator for CreateCardMutation {
-    fn mutate_state(&self, mut state: State, db: &CardPrototypeDatabase) -> Result<State, StateError> {
+    fn mutate_state(&self, mut state: State, _db: &CardPrototypeDatabase) -> Result<State, StateError> {
 
         state.next_card_id += 1;
 

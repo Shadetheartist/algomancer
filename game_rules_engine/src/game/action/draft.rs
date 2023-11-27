@@ -48,7 +48,7 @@ impl DraftAction {
         }
 
         let cards_for_pack: Vec<&Card> = issuer.hand.iter().filter(|c| !self.cards_to_keep.contains(&c.card_id)).collect();
-        let cards_for_pack2: Vec<&CardPrototype> = cards_for_pack.iter().map(|c| &db.prototypes[&c.prototype_id]).collect();
+        let _cards_for_pack2: Vec<&CardPrototype> = cards_for_pack.iter().map(|c| &db.prototypes[&c.prototype_id]).collect();
 
         // enforce that each card left for the pack is not a resource
         for card in cards_for_pack {

@@ -22,10 +22,10 @@ pub struct AttackAction {
 
 impl ActionTrait for AttackAction {
     fn generate_mutations(&self, state: &State, _db: &CardPrototypeDatabase, _issuer: &Player) -> Result<Vec<StateMutation>, StateError> {
-        let mut mutations = Vec::new();
-
-        mutations.push(state.generate_mutation_for_phase_transition(self.home_region_id));
-        mutations.push(state.generate_mutation_for_phase_transition(self.under_attack_region_id));
+        let mutations: Vec<StateMutation> = vec![
+            state.generate_mutation_for_phase_transition(self.home_region_id),
+            state.generate_mutation_for_phase_transition(self.under_attack_region_id)
+        ];
 
         Ok(mutations)
     }

@@ -6,14 +6,14 @@ use crate::game::{Game};
 use crate::game::state::card::{Card, CardId, CardType, FindCardResult, Timing};
 use crate::game::state::card::CardType::{Resource, Unit};
 use crate::game::state::error::{CardNotPlayableError,StateError};
-use crate::game::state::error::CardNotPlayableError::{CannotCastANonSpellTokenPermanentFromPlay, CannotPlayMoreResources, CardDoesNotExist, CardLacksCorrectTiming, MustBePlayedFromHand, NotInPlayableStep, NotInPlayableZone};
-use crate::game::state::mutation::{StateMutation, StaticStateMutation};
-use crate::game::state::mutation::create_card::CreateCardMutation;
+use crate::game::state::error::CardNotPlayableError::{CannotPlayMoreResources, CardDoesNotExist, CardLacksCorrectTiming, MustBePlayedFromHand, NotInPlayableStep, NotInPlayableZone};
+use crate::game::state::mutation::{StateMutation};
+
 use crate::game::state::mutation::create_permanent::CreatePermanentMutation;
 use crate::game::state::mutation::player_mutations::UpdatePlayerResourcesPlayedMutation;
 use crate::game::state::mutation::remove_card::RemoveCardMutation;
 use crate::game::state::permanent::{Permanent, PermanentCommon, PermanentId};
-use crate::game::state::permanent::Permanent::SpellToken;
+
 use crate::game::state::player::{Player, PlayerId};
 use crate::game::state::progression::{MainPhaseStep, Phase, PrecombatPhaseStep, Team};
 use crate::game::state::State;
@@ -60,8 +60,8 @@ impl ActionTrait for PlayCardAction {
                             };
 
                             let mutation = sm_static!(CreatePermanent, CreatePermanentMutation{
-                                region_id: region_id,
-                                permanent: permanent
+                                region_id,
+                                permanent
                             });
 
                             Ok(Some(mutation))
@@ -95,7 +95,7 @@ impl ActionTrait for PlayCardAction {
             FindCardResult::InPlayerDeck(_, _, _) |
             FindCardResult::InPlayerPack(_, _, _) |
             FindCardResult::InCommonDeck(_, _) => {
-                return Err(CardNotPlayableError::NotInPlayableZone(self.card_id).into())
+                Err(CardNotPlayableError::NotInPlayableZone(self.card_id).into())
             }
         }
     }

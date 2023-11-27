@@ -33,11 +33,7 @@ fn add_sba_transition(state: &State, mut mutations: Vec<StateMutation>) -> Vec<S
 
                     let all_players_on_team_passed_priority = state.players_on_team(active_team_id).expect("players on the team").into_iter().all(|p| {
                         let p_region = state.find_region_containing_player(p.id).expect("a region");
-                        if let Next::TransitionStep = p_region.stack.next() {
-                            true
-                        } else {
-                            false
-                        }
+                        matches!(p_region.stack.next(), Next::TransitionStep)
                     });
 
                     if all_players_on_team_passed_priority {
@@ -91,11 +87,8 @@ fn add_sba_player(state: &State, mutations: Vec<StateMutation>) -> Vec<StateMuta
 
 fn add_sba_damage(state: &State, mut mutations: Vec<StateMutation>) -> Vec<StateMutation> {
     for r in &state.regions {
-        match r.step {
-            Phase::CombatPhaseA(CombatPhaseStep::Damage) | Phase::CombatPhaseB(CombatPhaseStep::Damage) => {
-                mutations.push(state.generate_mutation_for_phase_transition(r.id));
-            }
-            _ => {}
+        if let Phase::CombatPhaseA(CombatPhaseStep::Damage) | Phase::CombatPhaseB(CombatPhaseStep::Damage) = r.step {
+            mutations.push(state.generate_mutation_for_phase_transition(r.id));
         }
     }
 
@@ -104,11 +97,8 @@ fn add_sba_damage(state: &State, mut mutations: Vec<StateMutation>) -> Vec<State
 
 fn add_sba_regroup(state: &State, mut mutations: Vec<StateMutation>) -> Vec<StateMutation> {
     for r in &state.regions {
-        match r.step {
-            Phase::MainPhase(MainPhaseStep::Regroup) => {
-                mutations.push(state.generate_mutation_for_phase_transition(r.id));
-            }
-            _ => {}
+        if let Phase::MainPhase(MainPhaseStep::Regroup) = r.step {
+            mutations.push(state.generate_mutation_for_phase_transition(r.id));
         }
     }
 
@@ -117,19 +107,16 @@ fn add_sba_regroup(state: &State, mut mutations: Vec<StateMutation>) -> Vec<Stat
 
 fn add_sba_untap(state: &State, mut mutations: Vec<StateMutation>) -> Vec<StateMutation> {
     for r in &state.regions {
-        match r.step {
-            Phase::PrecombatPhase(PrecombatPhaseStep::Untap) => {
-                for p in &r.players {
-                    if p.resources_played_this_turn != 0 {
-                        mutations.push(
-                            sm_static!(UpdatePlayerResourcesPlayed, UpdatePlayerResourcesPlayedMutation {
+        if let Phase::PrecombatPhase(PrecombatPhaseStep::Untap) = r.step {
+            for p in &r.players {
+                if p.resources_played_this_turn != 0 {
+                    mutations.push(
+                        sm_static!(UpdatePlayerResourcesPlayed, UpdatePlayerResourcesPlayedMutation {
                             player_id: p.id,
                             new_value: 0,
                         }))
-                    }
                 }
             }
-            _ => {}
         }
     }
 

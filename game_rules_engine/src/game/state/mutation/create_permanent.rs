@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
-use crate::game::db::{CardPrototypeDatabase, CardPrototypeId};
-use crate::game::state::card::Card;
-use crate::game::state::card_collection::{CardCollectionId, FindCardCollectionMutResult};
+use crate::game::db::{CardPrototypeDatabase};
+
+
 use crate::game::state::error::StateError;
 use crate::game::state::mutation::StateMutator;
 use crate::game::state::permanent::Permanent;
@@ -15,7 +15,7 @@ pub struct CreatePermanentMutation {
 }
 
 impl StateMutator for CreatePermanentMutation {
-    fn mutate_state(&self, mut state: State, db: &CardPrototypeDatabase) -> Result<State, StateError> {
+    fn mutate_state(&self, mut state: State, _db: &CardPrototypeDatabase) -> Result<State, StateError> {
 
         state.next_permanent_id += 1;
 

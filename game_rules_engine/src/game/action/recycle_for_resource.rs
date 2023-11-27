@@ -6,7 +6,7 @@ use crate::game::state::error::{InvalidActionError, StateError};
 use crate::game::state::mutation::create_card::CreateCardMutation;
 use crate::game::state::mutation::move_card::{MoveCardMutation, Placement, To};
 use crate::game::state::mutation::StateMutation;
-use crate::game::state::mutation::StaticStateMutation::{CreateCard, MoveCard};
+use crate::game::state::mutation::StaticStateMutation::{MoveCard};
 use crate::game::state::player::Player;
 use crate::game::state::progression::{Phase, PrecombatPhaseStep, Team};
 use crate::game::state::resource::ResourceType;
@@ -39,7 +39,7 @@ impl ActionTrait for RecycleForResourceAction {
                         card_collection_id: player_hand_id,
                         card: Card {
                             card_id: CardId(next_state.next_card_id),
-                            prototype_id: prototype_id
+                            prototype_id
                         }
                     });
                     Ok(Some(mutation))
