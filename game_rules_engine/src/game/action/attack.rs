@@ -66,8 +66,8 @@ impl ActionTrait for AttackAction {
             });
         }
 
-
-        actions
+        Vec::new()
+        // actions
     }
 }
 

@@ -50,7 +50,7 @@ pub enum CardCollectionError {
 pub enum DraftError {
     IncorrectNumberOfCardsDrafted,
     CardNotInHand(CardId),
-    InvalidPackCard(CardId),
+    InvalidPackCard(CardId, &'static str),
 }
 
 

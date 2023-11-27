@@ -73,8 +73,8 @@ impl ActionTrait for PlayCardAction {
     fn get_valid(state: &State, db: &CardPrototypeDatabase) -> Vec<Action> {
         let mut actions = Vec::new();
 
-        actions.extend(Self::valid_play_resource(state, db));
-        actions.extend(Self::valid_play_haste(state, db));
+        // actions.extend(Self::valid_play_resource(state, db));
+        // actions.extend(Self::valid_play_haste(state, db));
 
         actions
     }

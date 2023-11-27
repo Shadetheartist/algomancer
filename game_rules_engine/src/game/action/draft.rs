@@ -6,7 +6,7 @@ use rand::RngCore;
 use serde::{Deserialize, Serialize};
 
 use crate::game::action::{Action, ActionTrait, ActionType};
-use crate::game::db::CardPrototypeDatabase;
+use crate::game::db::{CardPrototype, CardPrototypeDatabase};
 
 use crate::game::state::card::{Card, CardId};
 use crate::game::state::card::CardType::Resource;
@@ -47,13 +47,14 @@ impl DraftAction {
             }
         }
 
-        let cards_for_pack = issuer.hand.iter().filter(|c| !self.cards_to_keep.contains(&c.card_id));
+        let cards_for_pack: Vec<&Card> = issuer.hand.iter().filter(|c| !self.cards_to_keep.contains(&c.card_id)).collect();
+        let cards_for_pack2: Vec<&CardPrototype> = cards_for_pack.iter().map(|c| &db.prototypes[&c.prototype_id]).collect();
 
         // enforce that each card left for the pack is not a resource
         for card in cards_for_pack {
             let proto = &db.prototypes[&card.prototype_id];
             if let Resource(_) = proto.card_type {
-                return Err(InvalidDraft(InvalidPackCard(card.card_id)).into());
+                return Err(InvalidDraft(InvalidPackCard(card.card_id, "cannot put a resource into a pack")).into());
             }
 
         }
@@ -122,30 +123,32 @@ impl ActionTrait for DraftAction {
 
     fn get_valid(state: &State, db: &CardPrototypeDatabase) -> Vec<Action> {
         let mut actions = Vec::new();
+        let pack_size = 10;
+
+        let must_keep = |card: &&Card| {
+            let proto = &db.prototypes[&card.prototype_id];
+            matches!(proto.card_type, Resource(_))
+        };
 
         for region in &state.regions {
             if let Phase::PrecombatPhase(PrecombatPhaseStep::Draft) = region.step {
                 let player = region.sole_player();
-                let card_ids: Vec<CardId> = player.hand.iter()
-                    .filter(|card| {
-                        let proto = &db.prototypes[&card.prototype_id];
-                        if let Resource(_) = proto.card_type {
-                            return false;
-                        }
-                        true
-                    })
+
+                let must_keep_card_ids: Vec<CardId> = player.hand
+                    .iter()
+                    .filter(must_keep)
+                    .map(|c| c.card_id)
+                    .collect();
+
+                let valid_card_ids: Vec<CardId> = player.hand
+                    .iter()
+                    .filter(|card| { !must_keep(card) })
                     .map(|card| card.card_id)
                     .collect();
 
-
-                let num_cards_to_draft = {
-                    if player.hand.len() >= 10 {
-                        player.hand.len() - 10
-                    } else {
-                        0
-                    }
-                };
-
+                let num_cards_destined_for_hand = player.hand.len() - pack_size;
+                let num_cards_which_cant_be_swapped = must_keep_card_ids.len();
+                let num_draftable_options = num_cards_destined_for_hand - num_cards_which_cant_be_swapped;
 
                 let performance_mode = true;
                 let combinations = {
@@ -153,18 +156,21 @@ impl ActionTrait for DraftAction {
                         // this generates a random unique set of size `num_options` of combinations of cards
                         let num_options = 3;
                         let mut rng_clone = state.rand.clone();
-                        random_unique_combinations(&mut rng_clone, &card_ids, num_cards_to_draft, num_options)
+                        random_unique_combinations(&mut rng_clone, &valid_card_ids, num_draftable_options, num_options)
                     } else {
                         // this generates an exhaustive list of combinations
-                        combinations(card_ids.as_slice(), num_cards_to_draft)
+                        combinations(valid_card_ids.as_slice(), num_draftable_options)
                     }
                 };
 
                 for combination in combinations {
+                    let mut combined = must_keep_card_ids.clone();
+                    combined.extend(combination);
+
                     actions.push(Action {
                         issuer_player_id: player.id,
                         action: ActionType::Draft(DraftAction {
-                            cards_to_keep: combination,
+                            cards_to_keep: combined,
                         }),
                     })
                 }

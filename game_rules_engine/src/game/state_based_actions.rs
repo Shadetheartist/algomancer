@@ -3,15 +3,16 @@ use crate::game::state::mutation::StateMutation;
 use crate::game::state::stack::Next;
 use crate::game::state::State;
 use crate::{sm_static};
-use crate::game::state::progression::{CombatPhaseStep, Phase};
+use crate::game::state::progression::{CombatPhaseStep, MainPhaseStep, Phase};
 
 impl State {
     pub fn generate_state_based_mutations(&self) -> Vec<StateMutation> {
         let mut mutations = Vec::new();
 
-        mutations = add_sba_transition(self, mutations);
         mutations = add_sba_player(self, mutations);
         mutations = add_sba_damage(self, mutations);
+        mutations = add_sba_regroup(self, mutations);
+        mutations = add_sba_transition(self, mutations);
 
         mutations
     }
@@ -51,7 +52,6 @@ fn add_sba_transition(state: &State, mut mutations: Vec<StateMutation>) -> Vec<S
                 if r.step.is_priority_window() {
                     // skip priority windows when there's no other player in the region
                     if r.players.len() < 2 {
-                        eprintln!("skipping prio window - not enough players in region");
                         mutations.push(state.generate_mutation_for_phase_transition(r.id));
                     }
                 }
@@ -92,6 +92,19 @@ fn add_sba_damage(state: &State, mut mutations: Vec<StateMutation>) -> Vec<State
     for r in &state.regions {
         match r.step {
             Phase::CombatPhaseA(CombatPhaseStep::Damage) | Phase::CombatPhaseB(CombatPhaseStep::Damage) => {
+                mutations.push(state.generate_mutation_for_phase_transition(r.id));
+            }
+            _ => {}
+        }
+    }
+
+    mutations
+}
+
+fn add_sba_regroup(state: &State, mut mutations: Vec<StateMutation>) -> Vec<StateMutation> {
+    for r in &state.regions {
+        match r.step {
+            Phase::MainPhase(MainPhaseStep::Regroup) => {
                 mutations.push(state.generate_mutation_for_phase_transition(r.id));
             }
             _ => {}
