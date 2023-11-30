@@ -117,11 +117,21 @@ impl CardPrototypeDatabase {
             CardType::Unit(timing(card_attributes))
         }
 
-        fn remove_extension(filename: &str) -> &str {
-            match filename.rfind('.') {
-                Some(index) => &filename[..index],
-                None => filename, // Return the original string if no dot is found
+
+
+        fn map_std_name(filename: &str) -> Box<str> {
+            fn remove_extension(filename: &str) -> &str {
+                match filename.rfind('.') {
+                    Some(index) => &filename[..index],
+                    None => filename, // Return the original string if no dot is found
+                }
             }
+
+            let std_name = filename.trim();
+            let std_name = remove_extension(std_name);
+            let std_name = std_name.replace('-', "_");
+
+            std_name.into_boxed_str()
         }
 
         let mapped: Vec<CardPrototype> = data.into_iter().map(|d| {
@@ -131,7 +141,7 @@ impl CardPrototypeDatabase {
                 text: d.text,
                 costs: map_cost(&d.cost, &d.affinity),
                 card_type: map_type(&d.card_type, &d.attributes),
-                std_name: remove_extension(&d.image_name).to_string(),
+                std_name: map_std_name(&d.image_name).to_string(),
             }
         }).collect();
 
