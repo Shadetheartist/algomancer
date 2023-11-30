@@ -1,16 +1,21 @@
 use serde::{Deserialize, Serialize};
-use crate::game::state::faction::FactionAffinity;
+use crate::game::state::faction::{Faction};
 
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct Cost {
-    pub faction_affinities: Vec<FactionAffinity>,
-    pub additional_cost: u8,
+pub enum Cost {
+    Standard {
+        faction_affinities: Vec<(Faction, u32)>,
+        additional_cost: u32,
+    },
+    X {
+        faction_affinities: Vec<(Faction, u32)>,
+    }
 }
 
 impl Cost {
     pub fn free() -> Cost {
-        Cost {
+        Cost::Standard {
             faction_affinities: Vec::new(),
             additional_cost: 0
         }

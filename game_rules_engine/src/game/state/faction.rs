@@ -30,13 +30,9 @@ impl Faction {
             ResourceType::Metal => Some(Faction::Metal),
             ResourceType::Wood => Some(Faction::Wood),
             ResourceType::ManaConverter |
+            ResourceType::Prismite |
             ResourceType::Shard => None
         }
     }
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct FactionAffinity {
-    pub faction: Faction,
-    pub amount: u8
-}

@@ -10,6 +10,7 @@ pub enum ResourceType {
     Wood,
     ManaConverter,
     Shard,
+    Prismite,
 }
 
 impl ResourceType {

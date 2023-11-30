@@ -1,25 +1,25 @@
-use std::collections::HashMap;
+
 use std::error::Error;
 use std::fmt;
 
 use rand::prelude::SliceRandom;
 
 use crate::game::{Game, GameOptions};
-use crate::game::db::{CardPrototype, CardPrototypeDatabase, CardPrototypeId};
+use crate::game::db::{CardPrototypeDatabase, CardPrototypeId};
 use crate::game::game_builder::NewGameError::NotSupportedYet;
 use crate::game::state::{GameMode, State};
 use crate::game::state::card::{Card, CardId,  CardType};
-use crate::game::state::card::Timing::{Combat, Default, Haste, Virus};
+
 use crate::game::state::card_collection::CardCollectionId;
-use crate::game::state::cost::Cost;
+
 use crate::game::state::deck::Deck;
-use crate::game::state::faction::Faction;
+
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{Player, PlayerId, TeamId};
 use crate::game::state::progression::{Phase, PrecombatPhaseStep};
 use crate::game::state::region::{Region, RegionId};
-use crate::game::state::resource::{ ResourceType};
-use crate::game::state::resource::ResourceType::{ManaConverter, Shard};
+
+
 use crate::game::state::rng::AlgomancerRng;
 use crate::game::state::stack::Stack;
 use crate::game::state::team_configuration::TeamConfiguration;
@@ -38,6 +38,8 @@ impl fmt::Display for NewGameError {
     }
 }
 
+const CORE_DB_JSON: &str = include_str!("../../../resources/core_cards.json");
+
 impl Game {
     pub fn new(options: &GameOptions) -> Result<Game, NewGameError> {
         match &options.game_mode {
@@ -51,83 +53,12 @@ impl Game {
     }
 
     fn build_live_draft(options: &GameOptions) -> Result<Game, NewGameError> {
-
-
-
         if let GameMode::LiveDraft { team_configuration, .. } = &options.game_mode {
             let mut algomancer_rng = AlgomancerRng::new(options.seed);
 
-            let mut card_prototypes = HashMap::new();
-            let mut id_num = 0;
+            let cards_db = CardPrototypeDatabase::load_from_raw_json(CORE_DB_JSON);
+            let card_prototypes = &cards_db.prototypes;
 
-            fn random_read_card_type(rng: &mut AlgomancerRng)-> CardType {
-                let r = rng.gen_range(0..8);
-
-                match r {
-                    0 => CardType::Spell(Default),
-                    1 => CardType::Spell(Combat),
-                    2 => CardType::Spell(Virus),
-                    3 => CardType::Unit(Haste),
-                    4 => CardType::Unit(Virus),
-                    _ => CardType::Unit(Default),
-                }
-            }
-
-            for i in 0..((10 + 54) * 3) {
-                id_num = i + 1;
-                let card_prototype_id = CardPrototypeId(id_num);
-                card_prototypes.insert(card_prototype_id, CardPrototype {
-                    prototype_id: card_prototype_id,
-                    name: format!("Card #{}", id_num),
-                    text: format!("Text for card #{}.", id_num),
-                    costs: Cost::free(),
-                    card_type: random_read_card_type(&mut algomancer_rng),
-                });
-            }
-
-            // add the prototypes for the resource types, mana converters, shards, and, tokens
-            id_num += 1;
-            let card_prototype_id = CardPrototypeId(id_num);
-            let mana_converter_prototype_id = card_prototype_id;
-            card_prototypes.insert(card_prototype_id, CardPrototype {
-                prototype_id: card_prototype_id,
-                name: "Mana Converter".to_string(),
-                text: "At the beginning of the mana step, you may exchange this for another resource.".to_string(),
-                costs: Cost::free(),
-                card_type: CardType::Resource(ManaConverter),
-            });
-
-            id_num += 1;
-            let card_prototype_id = CardPrototypeId(id_num);
-            card_prototypes.insert(card_prototype_id, CardPrototype {
-                prototype_id: card_prototype_id,
-                name: "Shard".to_string(),
-                text: "(Shards add no affinity, but all resources including this can be expended for [1]).".to_string(),
-                costs: Cost::free(),
-                card_type: CardType::Resource(Shard),
-            });
-
-            for f in Faction::all() {
-                id_num += 1;
-                let card_prototype_id = CardPrototypeId(id_num);
-                card_prototypes.insert(card_prototype_id, CardPrototype {
-                    prototype_id: card_prototype_id,
-                    name: format!("{:?}", f),
-                    text: format!("When I enter play, if you have [{:?} {:?} {:?}], take a shard.", f, f, f),
-                    costs: Cost::free(),
-                    card_type: CardType::Resource(ResourceType::from_faction(f)),
-                });
-            }
-
-            id_num += 1;
-            let card_prototype_id = CardPrototypeId(id_num);
-            card_prototypes.insert(card_prototype_id, CardPrototype {
-                prototype_id: card_prototype_id,
-                name: "Token Unit".to_string(),
-                text: "Why, hello there".to_string(),
-                costs: Cost::free(),
-                card_type: CardType::UnitToken,
-            });
 
             // takes all the non-token, non-resource card prototypes and maps them to card instances
             let mut card_id_counter = 0;
@@ -147,9 +78,6 @@ impl Game {
                 })
                 .collect();
 
-            let cards_db = CardPrototypeDatabase {
-                prototypes: card_prototypes,
-            };
 
             cards_for_deck.shuffle(&mut algomancer_rng);
 
@@ -175,6 +103,9 @@ impl Game {
                 action_history: Vec::new(),
                 state,
             };
+
+
+            let mana_converter_prototype_id = CardPrototypeId(1311);
 
             match &team_configuration {
                 TeamConfiguration::Ffa { num_players } => {
