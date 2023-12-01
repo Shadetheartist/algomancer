@@ -2,6 +2,16 @@
 
 ## Design Considerations
 
+Server (long running process)
+
+CLI (stateless)
+
+State separate from Cards DB & Action History
+- strictly speaking, the cards db will be completely immutable throughout the lifetime of a game, so it doesn't need 
+constant re-evaluation & re-serialization in a game server context.
+- And action history is supplementary data as well. When operating, it will be much more efficient to only send the state.
+
+
 Action Classes?
 - classify actions into groups so that it can be reported that a class of actions is possible, without enumerating every single one. 
   - ex: the 'Draft' action class could be valid for a player id, but not enumerating every single valid draft.
