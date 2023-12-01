@@ -12,7 +12,7 @@ pub struct NewArgs {
     #[arg(short, long, default_value="all")]
     pub include: Include,
 
-    #[arg(short='f', long="out_file")]
+    #[arg(short='o', long="out_file")]
     pub output_file: Option<String>,
 
     /// A game mode to initialize the game with
