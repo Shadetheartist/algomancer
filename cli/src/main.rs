@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use std::{fs, io};
 
 use algomancer_gre::game::{Game, GameOptions};
 use algomancer_gre::game::action::{Action};
@@ -12,9 +13,10 @@ use serde::{Serialize};
 use algomancer_gre::game::db::CardPrototypeDatabase;
 use algomancer_gre::game::state::mutation::StaticStateMutation;
 
-use crate::parser::{Cli, Commands, Output};
+use crate::parser::{Cli, Commands, Include};
 use crate::parser::actions::{ActionsCommand, ApplyActionArgs, ListActionsArgs};
 use crate::parser::new::{FactionArg, GameModeCommand, LiveDraftArgs, Mode, NewArgs};
+use thiserror::Error;
 
 mod parser;
 mod json_value_parser;
@@ -24,8 +26,16 @@ fn main() -> Result<(), CLIError> {
 
     match args.command {
         Commands::New(args) => {
-            print_new_game(&args)?;
-            Ok(())
+            match args.output_file {
+                None => {
+                    print_new_game(&args)?;
+                    Ok(())
+                }
+                Some(_) => {
+                    write_new_game_to_file(&args)?;
+                    Ok(())
+                }
+            }
         }
         Commands::Action(args) => {
             match args.command {
@@ -42,18 +52,29 @@ fn main() -> Result<(), CLIError> {
     }
 }
 
-
-#[derive(Debug)]
-enum CLIError {
+#[derive(Error, Debug)]
+pub enum CLIError {
+    #[error("Failed to serialize game data: {0}")]
     FailedToSerializeGame(serde_json::Error),
+
+    #[error("Failed to initialize new game: {0}")]
     FailedToInitializeGame(NewGameError),
 
+    #[error("Failed to serialize actions: {0}")]
     FailedToSerializeActions(serde_json::Error),
 
+    #[error("Invalid action {0:?} for the current game state: {1}")]
     InvalidAction(Action, StateError),
+
+    #[error("I/O error: {0}")]
+    IoError(io::Error),
+
+    #[error("Invalid arguments: {0}")]
+    InvalidArgs(&'static str),
+
+    #[error("Feature not implemented")]
     NotImplemented,
 }
-
 
 
 /// creates a new game instance, serializes it, and prints it to stdout
@@ -63,9 +84,29 @@ fn print_new_game(args: &NewArgs) -> Result<(), CLIError> {
 
     match game {
         Ok(game) => {
-            let game_json = serialize_game(&game, &args.output, None)?;
+            let game_json = serialize_game(&game, &args.include, None)?;
             println!("{}", game_json);
             Ok(())
+        }
+        Err(err) => {
+            Err(CLIError::FailedToInitializeGame(err))
+        }
+    }
+}
+
+/// creates a new game instance, serializes it, and prints it to stdout
+fn write_new_game_to_file(args: &NewArgs) -> Result<(), CLIError> {
+    let options = game_options_from_new_args(args)?;
+    let game = Game::new(&options);
+
+    match game {
+        Ok(game) => {
+            let game_json = serialize_game(&game, &args.include, None)?;
+            let out_file = args.output_file.as_ref().expect("an output file");
+            match fs::write(out_file, game_json) {
+                Ok(_) => Ok(()),
+                Err(err) => Err(CLIError::IoError(err))
+            }
         }
         Err(err) => {
             Err(CLIError::FailedToInitializeGame(err))
@@ -115,12 +156,12 @@ fn game_options_from_new_args(args: &NewArgs) -> Result<GameOptions, CLIError> {
     }
 }
 
-fn serialize_game(game: &Game, output: &Output, mutations: Option<Vec<StaticStateMutation>>) -> Result<String, CLIError> {
+fn serialize_game(game: &Game, output: &Include, mutations: Option<Vec<StaticStateMutation>>) -> Result<String, CLIError> {
 
     let game_serialized: Result<String, serde_json::Error>;
 
     match output {
-        Output::Full => {
+        Include::All => {
             match mutations {
                 None => game_serialized = serde_json::to_string(game),
                 Some(mutations) => game_serialized = serde_json::to_string(&GameAndMutations {
@@ -129,7 +170,7 @@ fn serialize_game(game: &Game, output: &Output, mutations: Option<Vec<StaticStat
                 }),
             }
         }
-        Output::State => {
+        Include::State => {
             match mutations {
                 None => game_serialized = serde_json::to_string(game),
                 Some(mutations) => game_serialized = serde_json::to_string(&StateAndMutations {
@@ -138,7 +179,7 @@ fn serialize_game(game: &Game, output: &Output, mutations: Option<Vec<StaticStat
                 }),
             }
         }
-        Output::Database => {
+        Include::Database => {
             match mutations {
                 None => game_serialized = serde_json::to_string(game),
                 Some(mutations) => game_serialized = serde_json::to_string(&DBAndMutations {
@@ -147,7 +188,7 @@ fn serialize_game(game: &Game, output: &Output, mutations: Option<Vec<StaticStat
                 }),
             }
         }
-        Output::History => {
+        Include::History => {
             match mutations {
                 None => game_serialized = serde_json::to_string(game),
                 Some(mutations) => game_serialized = serde_json::to_string(&HistoryAndMutations {
@@ -173,28 +214,88 @@ fn serialize_actions(actions: &HashSet<Action>) -> Result<String, CLIError> {
 }
 
 fn list_actions(args: &ListActionsArgs) -> Result<(), CLIError> {
-    let actions = args.state.valid_actions();
-    let actions_json = serialize_actions(&actions)?;
-    println!("{}", actions_json);
-    Ok(())
-}
-
-fn apply_action(mut args: ApplyActionArgs, output: &Output) -> Result<(), CLIError> {
-    let result = args.state.apply_action(args.action.clone());
-    match result {
-        Ok(mutations) => {
-            if args.mutations {
-                let game_serialized = serialize_game(&args.state, output, Some(mutations))?;
-                println!("{}", game_serialized);
-            } else {
-                let game_serialized = serialize_game(&args.state, output, None)?;
-                println!("{}", game_serialized);
-            }
-
+   match &args.state {
+        None => {
+            let state = read_state_file(&args.state_file)?;
+            let actions = state.valid_actions();
+            let actions_json = serialize_actions(&actions)?;
+            println!("{}", actions_json);
             Ok(())
         }
-        Err(err) => Err(CLIError::InvalidAction(args.action, err)),
+        Some(state) => {
+            let actions = state.valid_actions();
+            let actions_json = serialize_actions(&actions)?;
+            println!("{}", actions_json);
+            Ok(())
+        }
     }
+}
+
+fn read_state_file(path: &Option<String>) -> Result<Game, CLIError> {
+    // this is required to be set if state is not
+    let state_file_path = match path.as_ref() {
+        Some(path) => path,
+        None => {
+            return Err(CLIError::InvalidArgs("if state is not passed in through stdin, it must \
+            be passed in by file."));
+        },
+    };
+
+    let file_contents = match fs::read_to_string(state_file_path){
+        Ok(contents) => contents,
+        Err(err) => {
+            return Err(CLIError::IoError(err));
+        },
+    };
+
+    let game: Game = serde_json::from_str(&file_contents).unwrap();
+
+    Ok(game)
+}
+
+fn apply_action(args: ApplyActionArgs, output: &Include) -> Result<(), CLIError> {
+
+    match args.state {
+        None => {
+            let mut state = read_state_file(&args.state_file)?;
+            let result = state.apply_action(args.action.clone());
+            match result {
+                Ok(mutations) => {
+                    let mutations = if args.mutations {
+                        Some(mutations)
+                    } else {
+                        None
+                    };
+
+                    let game_serialized = serialize_game(&state, output, mutations)?;
+                    println!("{}", game_serialized);
+
+                    Ok(())
+                }
+                Err(err) => Err(CLIError::InvalidAction(args.action, err)),
+            }
+        }
+        Some(mut state) => {
+            let result = state.apply_action(args.action.clone());
+            match result {
+                Ok(mutations) => {
+                    let mutations = if args.mutations {
+                        Some(mutations)
+                    } else {
+                        None
+                    };
+
+                    let game_serialized = serialize_game(&state, output, mutations)?;
+                    println!("{}", game_serialized);
+
+                    Ok(())
+                }
+                Err(err) => Err(CLIError::InvalidAction(args.action, err)),
+            }
+        }
+    }
+
+
 }
 
 /// get the unique elements of the faction args by converting to hash set and then back to vec

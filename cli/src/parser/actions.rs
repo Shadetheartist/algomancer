@@ -1,13 +1,13 @@
 use clap::{Args, Subcommand};
 use algomancer_gre::game::action::{Action};
 use algomancer_gre::game::Game;
-use crate::parser::Output;
+use crate::parser::Include;
 
 #[derive(Debug, Args)]
 #[command(rename_all = "snake_case")]
 pub struct ActionsArgs {
-    #[arg(short, long, default_value="full")]
-    pub output: Output,
+    #[arg(short, long, default_value="all")]
+    pub output: Include,
 
     #[command(subcommand)]
     pub command: ActionsCommand,
@@ -29,8 +29,12 @@ pub enum ActionsCommand {
 #[derive(Debug, Args)]
 #[command(rename_all = "snake_case")]
 pub struct ListActionsArgs {
-    #[arg(value_parser = crate::json_value_parser::json_value_parser::<Game>)]
-    pub state: Game,
+
+    #[arg(short='f', long, required_unless_present = "state")]
+    pub state_file: Option<String>,
+
+    #[arg(required_unless_present = "state_file", value_parser = crate::json_value_parser::json_value_parser::<Game>)]
+    pub state: Option<Game>,
 }
 
 #[derive(Debug, Args)]
@@ -39,8 +43,11 @@ pub struct ApplyActionArgs {
     #[arg(short, long)]
     pub mutations: bool,
 
-    #[arg(value_parser = crate::json_value_parser::json_value_parser::<Game>)]
-    pub state: Game,
+    #[arg(short='f', long, required_unless_present = "state")]
+    pub state_file: Option<String>,
+
+    #[arg(required_unless_present = "state_file", value_parser = crate::json_value_parser::json_value_parser::<Game>)]
+    pub state: Option<Game>,
 
     #[arg(value_parser = crate::json_value_parser::json_value_parser::<Action>)]
     pub action: Action,

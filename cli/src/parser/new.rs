@@ -1,6 +1,6 @@
 use algomancer_gre::game::state::faction::Faction;
 use clap::{Args, Subcommand, ValueEnum};
-use crate::parser::Output;
+use crate::parser::Include;
 
 #[derive(Debug, Args)]
 #[command(rename_all = "snake_case")]
@@ -9,8 +9,11 @@ pub struct NewArgs {
     #[arg(short, long, default_value = "0")]
     pub seed: u128,
 
-    #[arg(short, long, default_value="full")]
-    pub output: Output,
+    #[arg(short, long, default_value="all")]
+    pub include: Include,
+
+    #[arg(short='f', long="out_file")]
+    pub output_file: Option<String>,
 
     /// A game mode to initialize the game with
     #[command(subcommand)]

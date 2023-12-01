@@ -28,8 +28,8 @@ pub enum Commands {
 }
 
 #[derive(Debug, ValueEnum, Clone)]
-pub enum Output {
-    Full,
+pub enum Include {
+    All,
     State,
     Database,
     History,
