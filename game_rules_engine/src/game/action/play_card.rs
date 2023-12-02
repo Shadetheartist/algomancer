@@ -76,10 +76,11 @@ impl ActionTrait for PlayCardAction {
 
                         Ok(mutations)
                     }
-                    CardType::UnitToken => { panic!("can't cast a unit token"); }
-                    CardType::SpellToken => { todo!("not yet supported"); }
                     Unit(_) => { todo!("not yet supported"); }
                     CardType::Spell(_) => { todo!("not yet supported"); }
+
+                    CardType::UnitToken => { panic!("can't cast a unit token"); }
+                    CardType::SpellToken => { todo!("not yet supported"); }
                 }
             }
 
@@ -104,7 +105,7 @@ impl ActionTrait for PlayCardAction {
         let mut actions = Vec::new();
 
         actions.extend(Self::valid_play_resource(state, db));
-        // actions.extend(Self::valid_play_haste(state, db));
+        actions.extend(Self::valid_play_haste(state, db));
 
         actions
     }

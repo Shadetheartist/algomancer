@@ -235,6 +235,7 @@ impl State {
             region.step.get_next_phase(&self.game_mode)
         };
 
+        // todo -- put these in state based actions
         match next_step {
             Phase::PrecombatPhase(PrecombatPhaseStep::Draw) => {
                 self.each_player_in_region_takes_draw_step_cards(region_id)

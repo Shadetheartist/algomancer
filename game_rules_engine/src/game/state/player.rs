@@ -130,15 +130,18 @@ impl State {
                     PrecombatPhaseStep::Untap => true,
                     PrecombatPhaseStep::Draw => true,
 
-                    // during the draft step, players implicitly pass priority be selecting a draft
+                    // during the draft step, players implicitly pass priority by selecting a draft
                     PrecombatPhaseStep::Draft => false,
 
                     // the pass pack is a global sync step, you can't pass priority here
                     // players instead wait for the last player to reach this step, then all regions
                     // transition to the next step automatically
                     PrecombatPhaseStep::PassPack => false,
+
                     PrecombatPhaseStep::Mana(Team::IT) => player_is_on_initiative_team && active_on_stack,
-                    PrecombatPhaseStep::Mana(Team::NIT) => !player_is_on_initiative_team && active_on_stack
+                    PrecombatPhaseStep::Mana(Team::NIT) => !player_is_on_initiative_team && active_on_stack,
+                    PrecombatPhaseStep::Haste(Team::IT) => player_is_on_initiative_team && active_on_stack,
+                    PrecombatPhaseStep::Haste(Team::NIT) => !player_is_on_initiative_team && active_on_stack,
                 }
             }
             Phase::CombatPhaseA(step) => {

@@ -22,6 +22,7 @@ pub enum PrecombatPhaseStep {
     Draft,
     PassPack,
     Mana(Team),
+    Haste(Team),
 }
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
@@ -70,7 +71,9 @@ impl Phase {
                     PrecombatPhaseStep::Draft => Phase::PrecombatPhase(PrecombatPhaseStep::PassPack),
                     PrecombatPhaseStep::PassPack =>  Phase::PrecombatPhase(PrecombatPhaseStep::Mana(Team::IT)),
                     PrecombatPhaseStep::Mana(Team::IT) => Phase::PrecombatPhase(PrecombatPhaseStep::Mana(Team::NIT)),
-                    PrecombatPhaseStep::Mana(Team::NIT) => Phase::CombatPhaseA(CombatPhaseStep::Attack(Team::IT)),
+                    PrecombatPhaseStep::Mana(Team::NIT) => Phase::PrecombatPhase(PrecombatPhaseStep::Haste(Team::IT)),
+                    PrecombatPhaseStep::Haste(Team::IT) => Phase::PrecombatPhase(PrecombatPhaseStep::Haste(Team::NIT)),
+                    PrecombatPhaseStep::Haste(Team::NIT) => Phase::CombatPhaseA(CombatPhaseStep::Attack(Team::IT)),
                 }
             }
             Phase::CombatPhaseA(step) => {
@@ -137,9 +140,9 @@ impl Phase {
     }
     pub fn active_team(&self) -> Option<Team> {
         match self {
-            Phase::PrecombatPhase(PrecombatPhaseStep::Mana(team)) => Some(*team),
+            Phase::PrecombatPhase(PrecombatPhaseStep::Mana(team) | PrecombatPhaseStep::Haste(team)) |
             Phase::CombatPhaseA(CombatPhaseStep::Attack(team) | CombatPhaseStep::Block(team)) |
-            Phase::CombatPhaseB(CombatPhaseStep::Attack(team) | CombatPhaseStep::Block(team)) => Some(*team),
+            Phase::CombatPhaseB(CombatPhaseStep::Attack(team) | CombatPhaseStep::Block(team)) |
             Phase::MainPhase(MainPhaseStep::Main(team)) => Some(*team),
             _ => None
         }
@@ -149,7 +152,8 @@ impl Phase {
         match self {
             Phase::PrecombatPhase(step) => {
                 matches!(step,
-                    PrecombatPhaseStep::Mana(_)
+                    PrecombatPhaseStep::Mana(_) |
+                    PrecombatPhaseStep::Haste(_)
                 )
             }
             Phase::CombatPhaseA(step) | Phase::CombatPhaseB(step) => {
