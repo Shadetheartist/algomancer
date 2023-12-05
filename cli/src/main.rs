@@ -5,19 +5,15 @@ use algomancer_gre::game::{Game, GameOptions};
 use algomancer_gre::game::action::{Action};
 use algomancer_gre::game::game_builder::NewGameError;
 use algomancer_gre::game::state::error::StateError;
-use algomancer_gre::game::state::{GameMode, State};
+use algomancer_gre::game::state::{GameMode};
 use algomancer_gre::game::state::faction::Faction;
 use algomancer_gre::game::state::team_configuration::TeamConfiguration;
 use clap::Parser;
-use serde::{Serialize};
-use serde_json::Error;
-use algomancer_gre::game::db::CardPrototypeDatabase;
 use algomancer_gre::game::state::mutation::StaticStateMutation;
-
+use thiserror::Error;
 use crate::parser::{Cli, Commands, Include};
 use crate::parser::actions::{ActionsCommand, ApplyActionArgs, ListActionsArgs};
 use crate::parser::new::{FactionArg, GameModeCommand, LiveDraftArgs, Mode, NewArgs};
-use thiserror::Error;
 
 mod parser;
 mod json_value_parser;
@@ -99,7 +95,7 @@ fn print_new_game(args: &NewArgs) -> Result<(), CLIError> {
 }
 
 fn write_mutations_to_file(mutations: &Vec<StaticStateMutation>, path: &String) -> Result<(), CLIError> {
-    let game_json = serialize_mutations(&mutations)?;
+    let game_json = serialize_mutations(mutations)?;
     match fs::write(path, game_json) {
         Ok(_) => Ok(()),
         Err(err) => Err(CLIError::IoError(err))
@@ -107,7 +103,7 @@ fn write_mutations_to_file(mutations: &Vec<StaticStateMutation>, path: &String) 
 }
 
 fn write_game_to_file(game: &Game, path: &String, include: &Include) -> Result<(), CLIError> {
-    let game_json = serialize_game(&game, &include)?;
+    let game_json = serialize_game(game, include)?;
     match fs::write(path, game_json) {
         Ok(_) => Ok(()),
         Err(err) => Err(CLIError::IoError(err))
@@ -171,7 +167,7 @@ fn game_options_from_new_args(args: &NewArgs) -> Result<GameOptions, CLIError> {
     }
 }
 
-fn serialize_game(game: &Game, output: &Include) -> Result<String, CLIError> {
+fn serialize_game(game: &Game, _output: &Include) -> Result<String, CLIError> {
     let game_serialized = serde_json::to_string(game);
     match game_serialized {
         Ok(game_serialized) => Ok(game_serialized),
