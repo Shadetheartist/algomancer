@@ -3,7 +3,7 @@ use crate::game::state::mutation::{StateMutation};
 use crate::game::state::stack::Next;
 use crate::game::state::State;
 use crate::{sm_static};
-use crate::game::state::progression::{CombatPhaseStep, MainPhaseStep, Phase, PrecombatPhaseStep};
+use crate::game::state::progression::{BattlePhaseStep, DeploymentPhaseStep, Phase, PlanningPhaseStep};
 
 impl State {
     pub fn generate_state_based_mutations(&self) -> Vec<StateMutation> {
@@ -87,7 +87,7 @@ fn add_sba_player(state: &State, mutations: Vec<StateMutation>) -> Vec<StateMuta
 
 fn add_sba_damage(state: &State, mut mutations: Vec<StateMutation>) -> Vec<StateMutation> {
     for r in &state.regions {
-        if let Phase::CombatPhaseA(CombatPhaseStep::Damage) | Phase::CombatPhaseB(CombatPhaseStep::Damage) = r.step {
+        if let Phase::BattlePhaseA(BattlePhaseStep::Damage) | Phase::BattlePhaseB(BattlePhaseStep::Damage) = r.step {
             mutations.push(state.generate_mutation_for_phase_transition(r.id));
         }
     }
@@ -97,7 +97,7 @@ fn add_sba_damage(state: &State, mut mutations: Vec<StateMutation>) -> Vec<State
 
 fn add_sba_regroup(state: &State, mut mutations: Vec<StateMutation>) -> Vec<StateMutation> {
     for r in &state.regions {
-        if let Phase::MainPhase(MainPhaseStep::Regroup) = r.step {
+        if let Phase::DeploymentPhase(DeploymentPhaseStep::Regroup) = r.step {
             mutations.push(state.generate_mutation_for_phase_transition(r.id));
         }
     }
@@ -107,7 +107,7 @@ fn add_sba_regroup(state: &State, mut mutations: Vec<StateMutation>) -> Vec<Stat
 
 fn add_sba_untap(state: &State, mut mutations: Vec<StateMutation>) -> Vec<StateMutation> {
     for r in &state.regions {
-        if let Phase::PrecombatPhase(PrecombatPhaseStep::Untap) = r.step {
+        if let Phase::PlanningPhase(PlanningPhaseStep::Refresh) = r.step {
             for p in &r.players {
                 if p.resources_played_this_turn != 0 {
                     mutations.push(

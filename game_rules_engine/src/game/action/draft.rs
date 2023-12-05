@@ -20,8 +20,8 @@ use crate::game::state::mutation::move_card::{MoveCardMutation, To};
 use crate::game::state::mutation::phase_transition::PhaseTransitionMutation;
 use crate::game::state::mutation::StaticStateMutation::{CreatePackForPlayer, MoveCard, PhaseTransition};
 use crate::game::state::player::Player;
-use crate::game::state::progression::Phase::PrecombatPhase;
-use crate::game::state::progression::{Phase, PrecombatPhaseStep};
+use crate::game::state::progression::Phase::PlanningPhase;
+use crate::game::state::progression::{Phase, PlanningPhaseStep};
 
 use crate::game::state::State;
 
@@ -106,7 +106,7 @@ impl ActionTrait for DraftAction {
         // if all the other regions are in the pass pack step, and we just transitioned to it as
         // well, then all players are ready to receive their packs
         let all_other_regions_in_pass_pack_step = state.regions.iter().filter(|r| r.id !=  region.id).all(|r| {
-            r.step == PrecombatPhase(PrecombatPhaseStep::PassPack)
+            r.step == PlanningPhase(PlanningPhaseStep::PassPack)
         });
 
         // therefore all regions should move the the next step
@@ -131,7 +131,7 @@ impl ActionTrait for DraftAction {
         };
 
         for region in &state.regions {
-            if let Phase::PrecombatPhase(PrecombatPhaseStep::Draft) = region.step {
+            if let Phase::PlanningPhase(PlanningPhaseStep::Draft) = region.step {
                 let player = region.sole_player();
 
                 let must_keep_card_ids: Vec<CardId> = player.hand

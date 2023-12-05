@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::game::state::card_collection::{CardCollectionId};
 use crate::game::state::error::{EntityNotFoundError, StateError};
-use crate::game::state::progression::{CombatPhaseStep, MainPhaseStep, Phase, PrecombatPhaseStep, Team};
+use crate::game::state::progression::{BattlePhaseStep, DeploymentPhaseStep, Phase, PlanningPhaseStep, Team};
 use crate::game::state::{GameMode, State};
 use crate::game::state::deck::Deck;
 use crate::game::state::stack::Next;
@@ -124,60 +124,60 @@ impl State {
         };
 
         match region.step {
-            Phase::PrecombatPhase(step) => {
+            Phase::PlanningPhase(step) => {
                 match step {
                     // these are async
-                    PrecombatPhaseStep::Untap => true,
-                    PrecombatPhaseStep::Draw => true,
+                    PlanningPhaseStep::Refresh => true,
+                    PlanningPhaseStep::Draw => true,
 
                     // during the draft step, players implicitly pass priority by selecting a draft
-                    PrecombatPhaseStep::Draft => false,
+                    PlanningPhaseStep::Draft => false,
 
                     // the pass pack is a global sync step, you can't pass priority here
                     // players instead wait for the last player to reach this step, then all regions
                     // transition to the next step automatically
-                    PrecombatPhaseStep::PassPack => false,
+                    PlanningPhaseStep::PassPack => false,
 
-                    PrecombatPhaseStep::Mana(Team::IT) => player_is_on_initiative_team && active_on_stack,
-                    PrecombatPhaseStep::Mana(Team::NIT) => !player_is_on_initiative_team && active_on_stack,
-                    PrecombatPhaseStep::Haste(Team::IT) => player_is_on_initiative_team && active_on_stack,
-                    PrecombatPhaseStep::Haste(Team::NIT) => !player_is_on_initiative_team && active_on_stack,
+                    PlanningPhaseStep::Mana(Team::IT) => player_is_on_initiative_team && active_on_stack,
+                    PlanningPhaseStep::Mana(Team::NIT) => !player_is_on_initiative_team && active_on_stack,
+                    PlanningPhaseStep::Haste(Team::IT) => player_is_on_initiative_team && active_on_stack,
+                    PlanningPhaseStep::Haste(Team::NIT) => !player_is_on_initiative_team && active_on_stack,
                 }
             }
-            Phase::CombatPhaseA(step) => {
+            Phase::BattlePhaseA(step) => {
                 match step {
-                    CombatPhaseStep::Attack(Team::IT) => player_is_on_initiative_team && active_on_stack,
-                    CombatPhaseStep::AfterAttackPriorityWindow => active_on_stack,
-                    CombatPhaseStep::Block(Team::NIT) => !player_is_on_initiative_team && active_on_stack,
-                    CombatPhaseStep::AfterBlockPriorityWindow => active_on_stack,
+                    BattlePhaseStep::Attack(Team::IT) => player_is_on_initiative_team && active_on_stack,
+                    BattlePhaseStep::AfterAttackPriorityWindow => active_on_stack,
+                    BattlePhaseStep::Block(Team::NIT) => !player_is_on_initiative_team && active_on_stack,
+                    BattlePhaseStep::AfterBlockPriorityWindow => active_on_stack,
 
                     // this step happens, but is really just a step where mutations are applied,
                     // players don't take any actions
-                    CombatPhaseStep::Damage => false,
-                    CombatPhaseStep::AfterCombatPriorityWindow => active_on_stack,
+                    BattlePhaseStep::Damage => false,
+                    BattlePhaseStep::AfterCombatPriorityWindow => active_on_stack,
                     _ => { panic!("weird phase") }
                 }
             }
-            Phase::CombatPhaseB(step) => {
+            Phase::BattlePhaseB(step) => {
                 match step {
-                    CombatPhaseStep::Attack(Team::NIT) => !player_is_on_initiative_team && active_on_stack,
-                    CombatPhaseStep::AfterAttackPriorityWindow => active_on_stack,
-                    CombatPhaseStep::Block(Team::IT) => player_is_on_initiative_team && active_on_stack,
-                    CombatPhaseStep::AfterBlockPriorityWindow => active_on_stack,
+                    BattlePhaseStep::Attack(Team::NIT) => !player_is_on_initiative_team && active_on_stack,
+                    BattlePhaseStep::AfterAttackPriorityWindow => active_on_stack,
+                    BattlePhaseStep::Block(Team::IT) => player_is_on_initiative_team && active_on_stack,
+                    BattlePhaseStep::AfterBlockPriorityWindow => active_on_stack,
 
                     // this step happens, but is really just a step where mutations are applied,
                     // players don't take any actions
-                    CombatPhaseStep::Damage => false,
-                    CombatPhaseStep::AfterCombatPriorityWindow => active_on_stack,
+                    BattlePhaseStep::Damage => false,
+                    BattlePhaseStep::AfterCombatPriorityWindow => active_on_stack,
                     _ => { panic!("weird phase") }
                 }
             }
-            Phase::MainPhase(step) => {
+            Phase::DeploymentPhase(step) => {
                 match step {
                     // just a cleanup step, no user interaction
-                    MainPhaseStep::Regroup => false,
-                    MainPhaseStep::Main(Team::IT) => player_is_on_initiative_team && active_on_stack,
-                    MainPhaseStep::Main(Team::NIT) => !player_is_on_initiative_team && active_on_stack,
+                    DeploymentPhaseStep::Regroup => false,
+                    DeploymentPhaseStep::Deployment(Team::IT) => player_is_on_initiative_team && active_on_stack,
+                    DeploymentPhaseStep::Deployment(Team::NIT) => !player_is_on_initiative_team && active_on_stack,
                 }
             }
         }

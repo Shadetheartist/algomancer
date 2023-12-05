@@ -8,16 +8,16 @@ use crate::game::state::{GameMode};
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 #[serde(tag = "phase")]
 pub enum Phase {
-    PrecombatPhase(PrecombatPhaseStep),
-    CombatPhaseA(CombatPhaseStep),
-    CombatPhaseB(CombatPhaseStep),
-    MainPhase(MainPhaseStep),
+    PlanningPhase(PlanningPhaseStep),
+    BattlePhaseA(BattlePhaseStep),
+    BattlePhaseB(BattlePhaseStep),
+    DeploymentPhase(DeploymentPhaseStep),
 }
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 #[serde(tag = "step")]
-pub enum PrecombatPhaseStep {
-    Untap,
+pub enum PlanningPhaseStep {
+    Refresh,
     Draw,
     Draft,
     PassPack,
@@ -27,7 +27,7 @@ pub enum PrecombatPhaseStep {
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 #[serde(tag = "step")]
-pub enum CombatPhaseStep {
+pub enum BattlePhaseStep {
     Attack(Team),
     AfterAttackPriorityWindow,
     Block(Team),
@@ -39,9 +39,9 @@ pub enum CombatPhaseStep {
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 #[serde(tag = "step")]
-pub enum MainPhaseStep {
+pub enum DeploymentPhaseStep {
     Regroup,
-    Main(Team),
+    Deployment(Team),
 }
 
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
@@ -56,53 +56,53 @@ impl Phase {
     /// This method returns the next phase for a game running with a given game mode.
     pub fn get_next_phase(&self, game_mode: &GameMode) -> Phase {
         match self {
-            Phase::PrecombatPhase(step) => {
+            Phase::PlanningPhase(step) => {
                 match step {
-                    PrecombatPhaseStep::Untap => {
-                        Phase::PrecombatPhase(PrecombatPhaseStep::Draw)
+                    PlanningPhaseStep::Refresh => {
+                        Phase::PlanningPhase(PlanningPhaseStep::Draw)
                     }
-                    PrecombatPhaseStep::Draw => {
+                    PlanningPhaseStep::Draw => {
                         match &game_mode {
                             // skip the draft step in constructed
-                            GameMode::Constructed { .. } => Phase::PrecombatPhase(PrecombatPhaseStep::Mana(Team::IT)),
-                            _ => Phase::PrecombatPhase(PrecombatPhaseStep::Draft),
+                            GameMode::Constructed { .. } => Phase::PlanningPhase(PlanningPhaseStep::Mana(Team::IT)),
+                            _ => Phase::PlanningPhase(PlanningPhaseStep::Draft),
                         }
                     }
-                    PrecombatPhaseStep::Draft => Phase::PrecombatPhase(PrecombatPhaseStep::PassPack),
-                    PrecombatPhaseStep::PassPack =>  Phase::PrecombatPhase(PrecombatPhaseStep::Mana(Team::IT)),
-                    PrecombatPhaseStep::Mana(Team::IT) => Phase::PrecombatPhase(PrecombatPhaseStep::Mana(Team::NIT)),
-                    PrecombatPhaseStep::Mana(Team::NIT) => Phase::PrecombatPhase(PrecombatPhaseStep::Haste(Team::IT)),
-                    PrecombatPhaseStep::Haste(Team::IT) => Phase::PrecombatPhase(PrecombatPhaseStep::Haste(Team::NIT)),
-                    PrecombatPhaseStep::Haste(Team::NIT) => Phase::CombatPhaseA(CombatPhaseStep::Attack(Team::IT)),
+                    PlanningPhaseStep::Draft => Phase::PlanningPhase(PlanningPhaseStep::PassPack),
+                    PlanningPhaseStep::PassPack =>  Phase::PlanningPhase(PlanningPhaseStep::Mana(Team::IT)),
+                    PlanningPhaseStep::Mana(Team::IT) => Phase::PlanningPhase(PlanningPhaseStep::Mana(Team::NIT)),
+                    PlanningPhaseStep::Mana(Team::NIT) => Phase::PlanningPhase(PlanningPhaseStep::Haste(Team::IT)),
+                    PlanningPhaseStep::Haste(Team::IT) => Phase::PlanningPhase(PlanningPhaseStep::Haste(Team::NIT)),
+                    PlanningPhaseStep::Haste(Team::NIT) => Phase::BattlePhaseA(BattlePhaseStep::Attack(Team::IT)),
                 }
             }
-            Phase::CombatPhaseA(step) => {
+            Phase::BattlePhaseA(step) => {
                 match step {
-                    CombatPhaseStep::Attack(Team::IT) => Phase::CombatPhaseA(CombatPhaseStep::AfterAttackPriorityWindow),
-                    CombatPhaseStep::AfterAttackPriorityWindow => Phase::CombatPhaseA(CombatPhaseStep::Block(Team::NIT)),
-                    CombatPhaseStep::Block(Team::NIT) => Phase::CombatPhaseA(CombatPhaseStep::AfterBlockPriorityWindow),
-                    CombatPhaseStep::AfterBlockPriorityWindow => Phase::CombatPhaseA(CombatPhaseStep::Damage),
-                    CombatPhaseStep::Damage => Phase::CombatPhaseA(CombatPhaseStep::AfterCombatPriorityWindow),
-                    CombatPhaseStep::AfterCombatPriorityWindow => Phase::CombatPhaseB(CombatPhaseStep::Attack(Team::NIT)),
+                    BattlePhaseStep::Attack(Team::IT) => Phase::BattlePhaseA(BattlePhaseStep::AfterAttackPriorityWindow),
+                    BattlePhaseStep::AfterAttackPriorityWindow => Phase::BattlePhaseA(BattlePhaseStep::Block(Team::NIT)),
+                    BattlePhaseStep::Block(Team::NIT) => Phase::BattlePhaseA(BattlePhaseStep::AfterBlockPriorityWindow),
+                    BattlePhaseStep::AfterBlockPriorityWindow => Phase::BattlePhaseA(BattlePhaseStep::Damage),
+                    BattlePhaseStep::Damage => Phase::BattlePhaseA(BattlePhaseStep::AfterCombatPriorityWindow),
+                    BattlePhaseStep::AfterCombatPriorityWindow => Phase::BattlePhaseB(BattlePhaseStep::Attack(Team::NIT)),
                     _ => { panic!("mismatched phase/step") }
                 }
             }
-            Phase::CombatPhaseB(step) => {
+            Phase::BattlePhaseB(step) => {
                 match step {
-                    CombatPhaseStep::Attack(Team::NIT) => Phase::CombatPhaseB(CombatPhaseStep::AfterAttackPriorityWindow),
-                    CombatPhaseStep::AfterAttackPriorityWindow => Phase::CombatPhaseB(CombatPhaseStep::Block(Team::IT)),
-                    CombatPhaseStep::Block(Team::IT) => Phase::CombatPhaseB(CombatPhaseStep::AfterBlockPriorityWindow),
-                    CombatPhaseStep::AfterBlockPriorityWindow => Phase::CombatPhaseB(CombatPhaseStep::Damage),
-                    CombatPhaseStep::Damage => Phase::CombatPhaseB(CombatPhaseStep::AfterCombatPriorityWindow),
-                    CombatPhaseStep::AfterCombatPriorityWindow => Phase::MainPhase(MainPhaseStep::Regroup),
+                    BattlePhaseStep::Attack(Team::NIT) => Phase::BattlePhaseB(BattlePhaseStep::AfterAttackPriorityWindow),
+                    BattlePhaseStep::AfterAttackPriorityWindow => Phase::BattlePhaseB(BattlePhaseStep::Block(Team::IT)),
+                    BattlePhaseStep::Block(Team::IT) => Phase::BattlePhaseB(BattlePhaseStep::AfterBlockPriorityWindow),
+                    BattlePhaseStep::AfterBlockPriorityWindow => Phase::BattlePhaseB(BattlePhaseStep::Damage),
+                    BattlePhaseStep::Damage => Phase::BattlePhaseB(BattlePhaseStep::AfterCombatPriorityWindow),
+                    BattlePhaseStep::AfterCombatPriorityWindow => Phase::DeploymentPhase(DeploymentPhaseStep::Regroup),
                     _ => { panic!("mismatched phase/step") }
                 }
             }
-            Phase::MainPhase(step) => {
+            Phase::DeploymentPhase(step) => {
                 match step {
-                    MainPhaseStep::Regroup => Phase::MainPhase(MainPhaseStep::Main(Team::IT)),
-                    MainPhaseStep::Main(Team::IT) => Phase::MainPhase(MainPhaseStep::Main(Team::NIT)),
-                    MainPhaseStep::Main(Team::NIT) => Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
+                    DeploymentPhaseStep::Regroup => Phase::DeploymentPhase(DeploymentPhaseStep::Deployment(Team::IT)),
+                    DeploymentPhaseStep::Deployment(Team::IT) => Phase::DeploymentPhase(DeploymentPhaseStep::Deployment(Team::NIT)),
+                    DeploymentPhaseStep::Deployment(Team::NIT) => Phase::PlanningPhase(PlanningPhaseStep::Refresh),
                 }
             }
         }
@@ -110,8 +110,8 @@ impl Phase {
 
     pub fn is_attack(&self) -> bool {
         match self {
-            Phase::CombatPhaseA(step) | Phase::CombatPhaseB(step) => {
-                matches!(step, CombatPhaseStep::Attack(_))
+            Phase::BattlePhaseA(step) | Phase::BattlePhaseB(step) => {
+                matches!(step, BattlePhaseStep::Attack(_))
             }
             _ => false,
         }
@@ -119,11 +119,11 @@ impl Phase {
 
     pub fn is_priority_window(&self) -> bool {
         match self {
-            Phase::CombatPhaseA(step) | Phase::CombatPhaseB(step) => {
+            Phase::BattlePhaseA(step) | Phase::BattlePhaseB(step) => {
                 matches!(step,
-                    CombatPhaseStep::AfterAttackPriorityWindow |
-                    CombatPhaseStep::AfterBlockPriorityWindow |
-                    CombatPhaseStep::AfterCombatPriorityWindow
+                    BattlePhaseStep::AfterAttackPriorityWindow |
+                    BattlePhaseStep::AfterBlockPriorityWindow |
+                    BattlePhaseStep::AfterCombatPriorityWindow
                 )
             }
             _ => false,
@@ -132,39 +132,39 @@ impl Phase {
 
     pub fn is_global_sync_step(&self) -> bool {
         match self {
-            Phase::PrecombatPhase(step) => {
-                matches!(step, PrecombatPhaseStep::PassPack)
+            Phase::PlanningPhase(step) => {
+                matches!(step, PlanningPhaseStep::PassPack)
             }
             _ => false,
         }
     }
     pub fn active_team(&self) -> Option<Team> {
         match self {
-            Phase::PrecombatPhase(PrecombatPhaseStep::Mana(team) | PrecombatPhaseStep::Haste(team)) |
-            Phase::CombatPhaseA(CombatPhaseStep::Attack(team) | CombatPhaseStep::Block(team)) |
-            Phase::CombatPhaseB(CombatPhaseStep::Attack(team) | CombatPhaseStep::Block(team)) |
-            Phase::MainPhase(MainPhaseStep::Main(team)) => Some(*team),
+            Phase::PlanningPhase(PlanningPhaseStep::Mana(team) | PlanningPhaseStep::Haste(team)) |
+            Phase::BattlePhaseA(BattlePhaseStep::Attack(team) | BattlePhaseStep::Block(team)) |
+            Phase::BattlePhaseB(BattlePhaseStep::Attack(team) | BattlePhaseStep::Block(team)) |
+            Phase::DeploymentPhase(DeploymentPhaseStep::Deployment(team)) => Some(*team),
             _ => None
         }
     }
 
     pub fn is_team_sync_step(&self) -> bool {
         match self {
-            Phase::PrecombatPhase(step) => {
+            Phase::PlanningPhase(step) => {
                 matches!(step,
-                    PrecombatPhaseStep::Mana(_) |
-                    PrecombatPhaseStep::Haste(_)
+                    PlanningPhaseStep::Mana(_) |
+                    PlanningPhaseStep::Haste(_)
                 )
             }
-            Phase::CombatPhaseA(step) | Phase::CombatPhaseB(step) => {
+            Phase::BattlePhaseA(step) | Phase::BattlePhaseB(step) => {
                 matches!(step,
-                    CombatPhaseStep::Attack(_) |
-                    CombatPhaseStep::Block(_)
+                    BattlePhaseStep::Attack(_) |
+                    BattlePhaseStep::Block(_)
                 )
             }
-            Phase::MainPhase(step) => {
+            Phase::DeploymentPhase(step) => {
                 matches!(step,
-                    MainPhaseStep::Main(_)
+                    DeploymentPhaseStep::Deployment(_)
                 )
             }
         }

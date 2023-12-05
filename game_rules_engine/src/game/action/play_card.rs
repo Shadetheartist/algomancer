@@ -15,7 +15,7 @@ use crate::game::state::mutation::remove_card::RemoveCardMutation;
 use crate::game::state::permanent::{Permanent, PermanentCommon, PermanentId};
 
 use crate::game::state::player::{Player, PlayerId};
-use crate::game::state::progression::{MainPhaseStep, Phase, PrecombatPhaseStep, Team};
+use crate::game::state::progression::{DeploymentPhaseStep, Phase, PlanningPhaseStep, Team};
 use crate::game::state::State;
 use crate::{sm_eval, sm_static};
 
@@ -120,11 +120,11 @@ impl PlayCardAction {
         for region in &state.regions {
             let player = region.sole_player();
             if player.team_id == state.initiative_team() {
-                if let Phase::PrecombatPhase(PrecombatPhaseStep::Mana(Team::IT)) = region.step {}
+                if let Phase::PlanningPhase(PlanningPhaseStep::Mana(Team::IT)) = region.step {}
                 else {
                     continue
                 }
-            } else if let Phase::PrecombatPhase(PrecombatPhaseStep::Mana(Team::NIT)) = region.step {}
+            } else if let Phase::PlanningPhase(PlanningPhaseStep::Mana(Team::NIT)) = region.step {}
             else {
                 continue
             }
@@ -155,7 +155,7 @@ impl PlayCardAction {
 
         for region in &state.regions {
 
-            if let Phase::PrecombatPhase(PrecombatPhaseStep::Mana(_)) = region.step {} else {
+            if let Phase::PlanningPhase(PlanningPhaseStep::Mana(_)) = region.step {} else {
                 continue
             }
 
@@ -231,9 +231,9 @@ impl Game {
             let region = state.find_region(region_id).expect("a region");
 
             match &region.step {
-                Phase::PrecombatPhase(step) => {
+                Phase::PlanningPhase(step) => {
                     match step {
-                        PrecombatPhaseStep::Mana(_)  => {
+                        PlanningPhaseStep::Mana(_)  => {
                             match proto.card_type {
 
                                 // up to two resource cards are allowed during the mana step
@@ -258,8 +258,8 @@ impl Game {
                         }
                     }
                 }
-                phase @ Phase::CombatPhaseA(_) |
-                phase @ Phase::CombatPhaseB(_) => {
+                phase @ Phase::BattlePhaseA(_) |
+                phase @ Phase::BattlePhaseB(_) => {
                     if !phase.is_priority_window() {
                         return Err(NotInPlayableStep(card_id));
                     }
@@ -285,12 +285,12 @@ impl Game {
                     }
                 }
 
-                Phase::MainPhase(step) => {
+                Phase::DeploymentPhase(step) => {
                     match step {
-                        MainPhaseStep::Regroup => {
+                        DeploymentPhaseStep::Regroup => {
                             return Err(MustBePlayedFromHand(card_id));
                         }
-                        MainPhaseStep::Main(_) => {}
+                        DeploymentPhaseStep::Deployment(_) => {}
                     }
                 }
             }

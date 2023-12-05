@@ -16,7 +16,7 @@ use crate::game::state::deck::Deck;
 
 use crate::game::state::permanent::Permanent;
 use crate::game::state::player::{Player, PlayerId, TeamId};
-use crate::game::state::progression::{Phase, PrecombatPhaseStep};
+use crate::game::state::progression::{Phase, PlanningPhaseStep};
 use crate::game::state::region::{Region, RegionId};
 
 
@@ -147,11 +147,11 @@ impl Game {
                         unformed_permanents: permanents,
                         attacking_formation: None,
                         defending_formation: None,
-                        step: Phase::PrecombatPhase(PrecombatPhaseStep::Untap),
+                        step: Phase::PlanningPhase(PlanningPhaseStep::Refresh),
                         stack: Stack::default(),
                     };
 
-                    region.step = Phase::PrecombatPhase(PrecombatPhaseStep::Draw);
+                    region.step = Phase::PlanningPhase(PlanningPhaseStep::Draw);
                     region.stack.push_priority(player_id);
 
                     game.state.regions.push(region);
