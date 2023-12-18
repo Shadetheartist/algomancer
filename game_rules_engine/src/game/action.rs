@@ -7,7 +7,7 @@ use crate::game::action::draft::DraftAction;
 use crate::game::action::pass_priority::PassPriorityAction;
 use crate::game::action::play_card::PlayCardAction;
 use crate::game::action::recycle_for_resource::RecycleForResourceAction;
-use crate::game::db::CardPrototypeDatabase;
+use database::CardPrototypeDatabase;
 use crate::game::Game;
 use crate::game::state::error::{StateError};
 use crate::game::state::mutation::{StateMutation, StaticStateMutation};

@@ -2,13 +2,12 @@ use serde::{Deserialize, Serialize};
 use state::rng::AlgomancerRngSeed;
 
 use crate::game::action::{Action};
-use crate::game::db::CardPrototypeDatabase;
+use database::CardPrototypeDatabase;
 use crate::game::state::GameMode;
 
 pub mod state;
 pub mod action;
 pub mod game_builder;
-pub mod db;
 pub mod state_based_actions;
 
 #[derive(Debug)]

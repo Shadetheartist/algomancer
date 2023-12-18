@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use crate::game::action::{Action, ActionTrait, ActionType};
-use crate::game::db::CardPrototypeDatabase;
+use database::CardPrototypeDatabase;
 use crate::game::state::card::{Card, CardId, FindCardResult};
 use crate::game::state::error::{InvalidActionError, StateError};
 use crate::game::state::mutation::create_card::CreateCardMutation;
@@ -9,7 +9,7 @@ use crate::game::state::mutation::StateMutation;
 use crate::game::state::mutation::StaticStateMutation::{MoveCard};
 use crate::game::state::player::Player;
 use crate::game::state::progression::{Phase, PlanningPhaseStep, Team};
-use crate::game::state::resource::ResourceType;
+use algocore::ResourceType;
 use crate::game::state::State;
 use crate::{sm_eval, sm_static};
 

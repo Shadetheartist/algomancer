@@ -5,10 +5,11 @@ use std::fmt;
 use rand::prelude::SliceRandom;
 
 use crate::game::{Game, GameOptions};
-use crate::game::db::{CardPrototypeDatabase, CardPrototypeId};
+use database::{CardPrototypeDatabase, CardPrototypeId};
 use crate::game::game_builder::NewGameError::NotSupportedYet;
 use crate::game::state::{GameMode, State};
-use crate::game::state::card::{Card, CardId,  CardType};
+use crate::game::state::card::{Card, CardId};
+use algocore::CardType;
 
 use crate::game::state::card_collection::CardCollectionId;
 
@@ -28,6 +29,7 @@ use crate::game::state::team_configuration::TeamConfiguration;
 pub enum NewGameError {
     //InvalidConfiguration(&'static str),
     NotSupportedYet(String),
+    FailedToLoadResource,
 }
 
 impl Error for NewGameError {}
@@ -56,16 +58,23 @@ impl Game {
         if let GameMode::LiveDraft { team_configuration, .. } = &options.game_mode {
             let mut algomancer_rng = AlgomancerRng::new(options.seed);
 
-            let cards_db = CardPrototypeDatabase::load_from_raw_json(CORE_DB_JSON);
-            let card_prototypes = &cards_db.prototypes;
+            let cards_db = {
+                match CardPrototypeDatabase::load_from_raw_json(CORE_DB_JSON) {
+                    Ok(card_prototypes) => card_prototypes,
+                    Err(_) => {
+                        return Err(NewGameError::FailedToLoadResource)
+                    }
+                }
+            };
 
+            let card_prototypes = &cards_db.prototypes;
 
             // takes all the non-token, non-resource card prototypes and maps them to card instances
             let mut card_id_counter = 0;
             let mut cards_for_deck: Vec<Card> = card_prototypes.iter()
                 .filter(|(_, c)| {
                     match c.card_type {
-                        CardType::Resource(_) | CardType::UnitToken | CardType::SpellToken => false,
+                        CardType::Resource(_) | CardType::UnitToken | CardType::SpellToken | CardType::Meta(_) => false,
                         CardType::Unit(_) | CardType::Spell(_) => true,
                     }
                 })

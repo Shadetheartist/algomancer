@@ -1,9 +1,12 @@
 
 use serde::{Deserialize, Serialize};
 use crate::game::action::{Action, ActionTrait, ActionType};
-use crate::game::db::{CardPrototypeDatabase};
+use database::{CardPrototypeDatabase};
 use crate::game::{Game};
-use crate::game::state::card::{Card, CardId, CardType, FindCardResult, Timing};
+use crate::game::state::card::{Card, CardId, FindCardResult };
+use algocore::CardType;
+use algocore::Timing;
+
 use crate::game::state::error::{CardNotPlayableError,StateError};
 use crate::game::state::error::CardNotPlayableError::{CannotPlayMoreResources, CardDoesNotExist, CardLacksCorrectTiming, MustBePlayedFromHand, NotInPlayableStep, NotInPlayableZone};
 use crate::game::state::mutation::{StateMutation};
@@ -115,6 +118,7 @@ impl ActionTrait for PlayCardAction {
                     CardType::Spell(_) => { todo!("not yet supported"); }
                     CardType::UnitToken => { panic!("can't cast a unit token"); }
                     CardType::SpellToken => { todo!("not yet supported"); }
+                    CardType::Meta(_) => { todo!("this is a meta card"); }
                 }
             }
 
@@ -307,7 +311,7 @@ impl Game {
                         CardType::Spell(timing) |
                         CardType::Unit(timing) => {
                             match timing {
-                                Timing::Combat => {}
+                                Timing::Battle => {}
                                 Timing::Virus => {
                                     if !in_hand {
                                         return Err(MustBePlayedFromHand(card_id));
@@ -407,6 +411,9 @@ impl Game {
                 todo!("does this even make sense?")
             }
 
+            CardType::Meta(_) => {
+                todo!("this is a meta card type");
+            }
         }
 
 

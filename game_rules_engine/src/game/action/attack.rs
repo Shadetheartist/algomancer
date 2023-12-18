@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use crate::game::action::{Action, ActionTrait, ActionType};
 use crate::game::action::pass_priority::PassPriorityAction;
-use crate::game::db::CardPrototypeDatabase;
+use database::CardPrototypeDatabase;
 
 use crate::game::state::error::{StateError};
 use crate::game::state::formation::{Formation, FormationId, FormationPos};

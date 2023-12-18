@@ -314,7 +314,7 @@ fn print_row<T>(row: &Vec<Option<T>>) {
 
 #[cfg(test)]
 mod tests {
-    use crate::game::db::CardPrototypeId;
+    use database::CardPrototypeId;
     use crate::game::state::formation::{DefensiveFormation, Formation, FormationId, FormationPos};
     use crate::game::state::permanent::{Permanent, PermanentCommon, PermanentId};
     use crate::game::state::player::PlayerId;

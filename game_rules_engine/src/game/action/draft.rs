@@ -6,10 +6,10 @@ use rand::RngCore;
 use serde::{Deserialize, Serialize};
 
 use crate::game::action::{Action, ActionTrait, ActionType};
-use crate::game::db::{CardPrototype, CardPrototypeDatabase};
+use database::{CardPrototype, CardPrototypeDatabase};
 
 use crate::game::state::card::{Card, CardId};
-use crate::game::state::card::CardType::Resource;
+use algocore::CardType::Resource;
 use crate::game::state::error::{InvalidActionError, StateError};
 use crate::game::state::error::DraftError::{CardNotInHand, IncorrectNumberOfCardsDrafted, InvalidPackCard};
 use crate::game::state::error::InvalidActionError::InvalidDraft;

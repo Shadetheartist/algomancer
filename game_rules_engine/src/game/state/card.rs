@@ -2,10 +2,10 @@ use std::fmt::{Display, Formatter};
 use std::hash::{Hash};
 
 use serde::{Deserialize, Serialize};
-use crate::game::db::{CardPrototypeDatabase, CardPrototypeId};
+use database::{CardPrototypeDatabase, CardPrototypeId};
 
 use crate::game::state::{GameMode, State};
-use crate::game::state::card::CardType::Resource;
+use algocore::CardType::Resource;
 
 use crate::game::state::error::{EntityNotFoundError};
 
@@ -13,35 +13,8 @@ use crate::game::state::deck::Deck;
 
 use crate::game::state::player::Player;
 
-use crate::game::state::resource::{ResourceType};
+use algocore::ResourceType;
 use crate::game::state::unordered_cards::UnorderedCards;
-
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
-#[serde(tag="timing")]
-pub enum Timing {
-    Default,
-    Haste,
-    Combat,
-    Virus
-}
-
-#[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
-pub enum CardType {
-    Resource(ResourceType),
-    UnitToken,
-    SpellToken,
-    Unit(Timing),
-    Spell(Timing),
-}
-
-impl CardType {
-    /// is not a resource or token - i.e. 'real'
-    pub fn is_real(&self) -> bool {
-        matches!(self, CardType::Unit(_) | CardType::Spell(_))
-    }
-}
-
-
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy, Ord, PartialOrd)]
 pub struct CardId(pub usize);

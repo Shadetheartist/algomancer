@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use crate::game::db::{CardPrototypeDatabase};
+use database::{CardPrototypeDatabase};
 use crate::game::state::card::{CardId, FindCardResult};
 
 use crate::game::state::error::StateError;

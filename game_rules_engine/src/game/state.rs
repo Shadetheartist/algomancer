@@ -11,7 +11,6 @@ use crate::game::state::team_configuration::TeamConfiguration;
 pub mod card;
 pub mod player;
 pub mod progression;
-pub mod resource;
 pub mod rng;
 pub mod region;
 pub mod permanent;

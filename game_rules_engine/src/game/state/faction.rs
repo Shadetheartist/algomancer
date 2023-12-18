@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use crate::game::state::resource::ResourceType;
+use algocore::ResourceType;
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum Faction {
@@ -31,7 +31,8 @@ impl Faction {
             ResourceType::Wood => Some(Faction::Wood),
             ResourceType::ManaConverter |
             ResourceType::Prismite |
-            ResourceType::Shard => None
+            ResourceType::Dormant |
+            ResourceType::Shard => None,
         }
     }
 }

@@ -14,6 +14,7 @@ serde_json = { version = "1.0", features = [] }
 thiserror = { version = "1.0.50", features = [] }
 algomacros = { path = "../algomacros" }
 algocore = { path = "../algocore" }
+database = { path = "../database" }
 
 [build-dependencies]
 database = { path = "../database" }

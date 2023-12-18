@@ -13,7 +13,7 @@ pub mod create_permanent;
 use std::fmt::{Debug};
 use serde::{Deserialize, Serialize};
 use crate::{phase_transition, stack_add_priority, stack_clear_priority};
-use crate::game::db::{CardPrototypeDatabase};
+use database::{CardPrototypeDatabase};
 use crate::game::state::error::StateError;
 use crate::game::state::mutation::create_card::CreateCardMutation;
 use crate::game::state::mutation::create_pack::CreatePackMutation;

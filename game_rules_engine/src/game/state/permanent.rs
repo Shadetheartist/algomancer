@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
-use crate::game::db::{CardPrototype, CardPrototypeDatabase, CardPrototypeId};
+use database::{CardPrototype, CardPrototypeDatabase, CardPrototypeId};
 
-use crate::game::state::card::{Card, CardType};
+use crate::game::state::card::{Card};
+use algocore::{CardType};
 use crate::game::state::player::PlayerId;
 use crate::game::state::State;
 #[derive(Hash, Clone, Eq, PartialEq, Serialize, Deserialize, Debug, Copy)]

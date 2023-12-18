@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use crate::game::action::{Action, ActionTrait, ActionType};
-use crate::game::db::CardPrototypeDatabase;
+use database::CardPrototypeDatabase;
 
 use crate::game::state::error::StateError;
 use crate::game::state::mutation::{StateMutation};
