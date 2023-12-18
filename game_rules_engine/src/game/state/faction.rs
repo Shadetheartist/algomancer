@@ -29,7 +29,6 @@ impl Faction {
             ResourceType::Water => Some(Faction::Water),
             ResourceType::Metal => Some(Faction::Metal),
             ResourceType::Wood => Some(Faction::Wood),
-            ResourceType::ManaConverter |
             ResourceType::Prismite |
             ResourceType::Dormant |
             ResourceType::Shard => None,

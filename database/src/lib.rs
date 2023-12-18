@@ -54,7 +54,7 @@ impl CardPrototypeDatabase {
     pub fn resource(&self, resource_type: ResourceType) -> &CardPrototype {
         self.prototypes.iter().find(|(_, c)| {
             c.card_type == CardType::Resource(resource_type)
-        }).expect("a prototype for this resource").1
+        }).expect(format!("a prototype for this resource type {:?}", resource_type).as_str()).1
     }
 
 
@@ -129,8 +129,6 @@ impl CardPrototypeDatabase {
                     ResourceType::Metal
                 } else if card_type.contains("Shard") {
                     ResourceType::Shard
-                } else if card_type.contains("Mana Converter") {
-                    ResourceType::ManaConverter
                 } else if card_type.contains("Prismite") {
                     ResourceType::Prismite
                 } else if card_type.contains("Dormant") {

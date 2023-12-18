@@ -69,6 +69,10 @@ impl Game {
 
             let card_prototypes = &cards_db.prototypes;
 
+            let mana_converter_prototype_id = {
+                card_prototypes.values().find(|c| c.name == "Dormant Resource").expect("a dormant resource in the db").prototype_id
+            };
+
             // takes all the non-token, non-resource card prototypes and maps them to card instances
             let mut card_id_counter = 0;
             let mut cards_for_deck: Vec<Card> = card_prototypes.iter()
@@ -114,7 +118,7 @@ impl Game {
             };
 
 
-            let mana_converter_prototype_id = CardPrototypeId(1311);
+
 
             match &team_configuration {
                 TeamConfiguration::Ffa { num_players } => {

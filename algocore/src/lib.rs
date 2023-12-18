@@ -23,7 +23,6 @@ pub enum ResourceType {
     Water,
     Metal,
     Wood,
-    ManaConverter,
     Shard,
     Prismite,
     Dormant,
@@ -37,7 +36,6 @@ impl ResourceType {
             ResourceType::Water,
             ResourceType::Metal,
             ResourceType::Wood,
-            ResourceType::ManaConverter,
             ResourceType::Shard,
         ]
     }
