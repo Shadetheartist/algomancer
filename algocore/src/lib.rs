@@ -1,11 +1,5 @@
-use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub enum DbError {
-    IO(std::io::Error),
-    Serde(serde_json::Error),
-}
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum Faction {
@@ -15,6 +9,33 @@ pub enum Faction {
     Metal,
     Wood,
 }
+
+impl Faction {
+    pub fn all() -> Vec<Faction> {
+        vec![
+            Faction::Fire,
+            Faction::Earth,
+            Faction::Water,
+            Faction::Metal,
+            Faction::Wood,
+        ]
+    }
+
+    #[allow(dead_code)]
+    pub fn from_resource_type(resource_type: ResourceType) -> Option<Faction> {
+        match resource_type {
+            ResourceType::Fire => Some(Faction::Fire),
+            ResourceType::Earth => Some(Faction::Earth),
+            ResourceType::Water => Some(Faction::Water),
+            ResourceType::Metal => Some(Faction::Metal),
+            ResourceType::Wood => Some(Faction::Wood),
+            ResourceType::Prismite |
+            ResourceType::Dormant |
+            ResourceType::Shard => None,
+        }
+    }
+}
+
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub enum ResourceType {
@@ -62,6 +83,7 @@ pub enum CardType {
     Meta(MetaCardType)
 }
 
+
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum MetaCardType {
     Trigger,
@@ -76,7 +98,6 @@ impl CardType {
 }
 
 
-
 #[derive(Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 #[serde(tag="timing")]
 pub enum Timing {
@@ -85,6 +106,7 @@ pub enum Timing {
     Battle,
     Virus
 }
+
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum Cost {
@@ -97,22 +119,13 @@ pub enum Cost {
     }
 }
 
-
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug, Copy, Ord, PartialOrd)]
-pub struct CardPrototypeId(pub usize);
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct CardPrototype {
-    pub prototype_id: CardPrototypeId,
-    pub name: String,
-    pub text: String,
-    pub costs: Cost,
-    pub card_type: CardType,
-
-    pub std_name: String,
+impl Cost {
+    pub fn free() -> Cost {
+        Cost::Standard {
+            faction_affinities: Vec::new(),
+            additional_cost: 0
+        }
+    }
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct CardPrototypeDatabase {
-    pub prototypes: HashMap<CardPrototypeId, CardPrototype>,
-}
+

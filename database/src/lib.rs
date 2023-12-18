@@ -4,6 +4,12 @@ use serde::{Deserialize, Serialize};
 
 use algocore::{*};
 
+#[derive(Debug)]
+pub enum DbError {
+    IO(std::io::Error),
+    Serde(serde_json::Error),
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 struct CardDataRaw {
     name: String,

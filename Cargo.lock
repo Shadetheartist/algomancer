@@ -23,6 +23,7 @@ dependencies = [
 name = "algomancer_cli"
 version = "0.1.0"
 dependencies = [
+ "algocore",
  "algomancer_gre",
  "clap",
  "serde",

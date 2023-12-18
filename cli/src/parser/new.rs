@@ -1,4 +1,4 @@
-use algomancer_gre::game::state::faction::Faction;
+use algocore::Faction;
 use clap::{Args, Subcommand, ValueEnum};
 use crate::parser::Include;
 
