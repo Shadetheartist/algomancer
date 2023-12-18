@@ -2,6 +2,8 @@
 resolver = "2"
 members = [
     "algomacros",
+    "algocore",
     "cli",
     "game_rules_engine",
+    "database",
 ]

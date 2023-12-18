@@ -3,6 +3,14 @@
 version = 3
 
 [[package]]
+name = "algocore"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "algomacros"
 version = "0.1.0"
 dependencies = [
@@ -26,7 +34,9 @@ dependencies = [
 name = "algomancer_gre"
 version = "0.1.0"
 dependencies = [
+ "algocore",
  "algomacros",
+ "database",
  "rand",
  "rand_pcg",
  "serde",
@@ -133,6 +143,15 @@ name = "colorchoice"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "acbf1af155f9b9ef647e42cdc158db4b64a1b61f743629225fde6f3e0be2a7c7"
+
+[[package]]
+name = "database"
+version = "0.1.0"
+dependencies = [
+ "algocore",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "getrandom"

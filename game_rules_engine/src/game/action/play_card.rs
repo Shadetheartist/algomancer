@@ -1,10 +1,9 @@
 
 use serde::{Deserialize, Serialize};
 use crate::game::action::{Action, ActionTrait, ActionType};
-use crate::game::db::CardPrototypeDatabase;
+use crate::game::db::{CardPrototypeDatabase};
 use crate::game::{Game};
 use crate::game::state::card::{Card, CardId, CardType, FindCardResult, Timing};
-use crate::game::state::card::CardType::{Resource, Unit};
 use crate::game::state::error::{CardNotPlayableError,StateError};
 use crate::game::state::error::CardNotPlayableError::{CannotPlayMoreResources, CardDoesNotExist, CardLacksCorrectTiming, MustBePlayedFromHand, NotInPlayableStep, NotInPlayableZone};
 use crate::game::state::mutation::{StateMutation};
@@ -15,7 +14,7 @@ use crate::game::state::mutation::remove_card::RemoveCardMutation;
 use crate::game::state::permanent::{Permanent, PermanentCommon, PermanentId};
 
 use crate::game::state::player::{Player, PlayerId};
-use crate::game::state::progression::{DeploymentPhaseStep, Phase, PlanningPhaseStep, Team};
+use crate::game::state::progression::{DeploymentPhaseStep, Phase, PlanningPhaseStep};
 use crate::game::state::State;
 use crate::{sm_eval, sm_static};
 
@@ -29,7 +28,18 @@ impl PlayCardAction {
 
 }
 
+fn remove_card_mutation(card_id: CardId) -> StateMutation {
+    sm_static!(RemoveCard, RemoveCardMutation{
+        card_id
+    })
+}
+
+
+
 impl ActionTrait for PlayCardAction {
+
+
+
     fn generate_mutations(&self, state: &State, db: &CardPrototypeDatabase, issuer: &Player) -> Result<Vec<StateMutation>, StateError> {
         match state.find_card(self.card_id)? {
             FindCardResult::InPlayerHand(player, _, card) => {
@@ -37,16 +47,14 @@ impl ActionTrait for PlayCardAction {
                     return Err(CardNotPlayableError::NotUnderPlayersControl(self.card_id).into())
                 }
 
-                let proto = &db.prototypes.get(&card.prototype_id).expect("a card prototype");
-                match proto.card_type {
-                    Resource(_) => {
-                        let mut mutations = Vec::new();
+                let mut mutations = Vec::new();
 
-                        let mutation = sm_static!(RemoveCard, RemoveCardMutation{
-                            card_id: self.card_id
-                        });
-                        mutations.push(mutation);
+                let proto = db.prototypes.get(&card.prototype_id).expect("a card prototype");
+                match &proto.card_type {
+                    CardType::Resource(_) => {
+                        mutations.push(remove_card_mutation(self.card_id));
 
+                        // create the permanent
                         let player_id = player.id;
                         let prototype_id = proto.prototype_id;
                         let mutation = sm_eval!(move |next_state| {
@@ -76,9 +84,35 @@ impl ActionTrait for PlayCardAction {
 
                         Ok(mutations)
                     }
-                    Unit(_) => { todo!("not yet supported"); }
-                    CardType::Spell(_) => { todo!("not yet supported"); }
 
+                    CardType::Unit(_) => {
+                        mutations.push(remove_card_mutation(self.card_id));
+
+                        // create the permanent
+                        let player_id = player.id;
+                        let prototype_id = proto.prototype_id;
+                        let mutation = sm_eval!(move |next_state| {
+                            let region_id = next_state.find_region_id_containing_player(player_id);
+                            let permanent = Permanent::Resource {
+                                card_prototype_id: prototype_id,
+                                common: PermanentCommon {
+                                    permanent_id: PermanentId(next_state.next_permanent_id),
+                                    controller_player_id: player_id
+                                }
+                            };
+
+                            let mutation = sm_static!(CreatePermanent, CreatePermanentMutation{
+                                region_id,
+                                permanent
+                            });
+
+                            Ok(Some(mutation))
+                        });
+
+                        mutations.push(mutation);
+                        Ok(mutations)
+                    }
+                    CardType::Spell(_) => { todo!("not yet supported"); }
                     CardType::UnitToken => { panic!("can't cast a unit token"); }
                     CardType::SpellToken => { todo!("not yet supported"); }
                 }
@@ -118,29 +152,34 @@ impl PlayCardAction {
         let mut actions : Vec<Action> = Vec::new();
 
         for region in &state.regions {
-            let player = region.sole_player();
-            if player.team_id == state.initiative_team() {
-                if let Phase::PlanningPhase(PlanningPhaseStep::Mana(Team::IT)) = region.step {}
-                else {
-                    continue
-                }
-            } else if let Phase::PlanningPhase(PlanningPhaseStep::Mana(Team::NIT)) = region.step {}
-            else {
+
+            if let Phase::PlanningPhase(PlanningPhaseStep::Haste(_)) = region.step {} else {
                 continue
             }
 
-            // assume single player per region at in the mana step
+            // assume single player per region at in the haste step
             let player = region.sole_player();
+
+            // player must be on the team with active initiative
+            if let Some(active_team_id) = region.active_team_id(state) {
+                if player.team_id != active_team_id {
+                    continue
+                }
+            }
 
             for card in player.hand.iter() {
                 let proto = db.prototypes.get(&card.prototype_id).expect("a card prototype");
-                if let Unit(Timing::Haste) = proto.card_type {
-                    actions.push(Action {
-                        issuer_player_id: player.id,
-                        action: ActionType::PlayCard(PlayCardAction {
-                            card_id: card.card_id,
+                match proto.card_type {
+                    CardType::Unit(Timing::Haste) |
+                    CardType::Spell(Timing::Haste) => {
+                        actions.push(Action {
+                            issuer_player_id: player.id,
+                            action: ActionType::PlayCard(PlayCardAction {
+                                card_id: card.card_id,
+                            })
                         })
-                    })
+                    }
+                    _ => {}
                 }
             }
         }
@@ -176,7 +215,7 @@ impl PlayCardAction {
 
             for card in player.hand.iter() {
                 let proto = db.prototypes.get(&card.prototype_id).expect("a card prototype");
-                if let Resource(_) = proto.card_type {
+                if let CardType::Resource(_) = proto.card_type {
                     actions.push(Action {
                         issuer_player_id: player.id,
                         action: ActionType::PlayCard(PlayCardAction {

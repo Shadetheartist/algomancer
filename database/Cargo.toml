@@ -1,19 +1,11 @@
 [package]
-name = "algomancer_gre"
+name = "database"
 version = "0.1.0"
 edition = "2021"
-authors = ["Derek Hemingson"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rand = "0.8.5"
-rand_pcg = { version = "0.3.1", features = ["serde1"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0", features = [] }
-thiserror = { version = "1.0.50", features = [] }
-algomacros = { path = "../algomacros" }
 algocore = { path = "../algocore" }
-
-[build-dependencies]
-database = { path = "../database" }
