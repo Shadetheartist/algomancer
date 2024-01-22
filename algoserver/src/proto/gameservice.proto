@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package GameService;
+
+service Game {
+    rpc GetState(GetStateRequest) returns (GetStateResponse);
+    rpc ApplyAction(ApplyActicaonRequest) returns (ApplyActionResponse);
+}
+
+message GetStateRequest {
+
+}
+
+message GetStateResponse {
+    // big fucking response
+}
+
+message ApplyActionRequest {
+}
+
+message ApplyActionResponse {
+}
