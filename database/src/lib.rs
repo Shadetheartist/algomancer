@@ -177,11 +177,11 @@ impl CardPrototypeDatabase {
 
             CardPrototype {
                 prototype_id: CardPrototypeId(c),
-                name: d.name,
+                name: d.name.clone(),
                 text: d.text,
                 costs: map_cost(&d.cost, &d.affinity),
                 card_type: map_type(&d.card_type),
-                std_name: map_std_name(&d.image_name).to_string(),
+                std_name: map_std_name(&d.name).to_string(),
             }
 
         }).collect();
@@ -216,7 +216,6 @@ impl CardPrototypeDatabase {
                 Err(DbError::IO(err))
             }
         }
-
     }
 }
 

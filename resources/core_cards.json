@@ -7,35 +7,15 @@
       "cost": "e",
       "total_cost": "2",
       "type": "{Haste} Rock Pile Unit",
-      "text": "When I die, [Switch] Rockfall 4 {i}(For each player, I deal 4 damage to one of their units of their choice.)",
-      "image": "images_out/Stable/prk3.png",
-      "revision_date_time": "2023-12-14 14:03:04.711233",
+      "text": "When I die, [Switch] Rockfall 4 {i}(Each player chooses one of their units. I deal 4 damage to each of the chosen units.)",
+      "image": "images_out/Stable/prk3f.png",
+      "revision_date_time": "2024-02-26 17:21:14.249786",
       "details": "",
       "factions": [
         "earth"
       ],
       "rulings": [],
       "complexity": "Simple"
-    }
-  ],
-  "A Pile of Alien Flora": [
-    {
-      "name": "A Pile of Alien Flora",
-      "power": "2",
-      "toughness": "2",
-      "cost": "gm",
-      "total_cost": "2",
-      "type": "Alien Fungus Pile {Virus} Unit",
-      "text": "[Augment] When I die, target opponent distributes my counters among your units.",
-      "image": "images_out/Stable/paf5.png",
-      "revision_date_time": "2023-12-14 14:03:04.712231",
-      "details": "",
-      "factions": [
-        "wood",
-        "metal"
-      ],
-      "rulings": [],
-      "complexity": "Complex"
     }
   ],
   "A Pile of Rubbish": [
@@ -48,7 +28,7 @@
       "type": "Scrap Pile Unit",
       "text": "[Augment] When I die, draw a card.",
       "image": "images_out/Stable/pr4.png",
-      "revision_date_time": "2023-12-14 14:03:04.712231",
+      "revision_date_time": "2024-02-26 17:21:14.249786",
       "details": "",
       "factions": [
         "metal"
@@ -64,17 +44,17 @@
       "toughness": "3",
       "cost": "be",
       "total_cost": "3",
-      "type": "Mystic Rock Pile Unit",
-      "text": "[Augment] As I despawn, you may play one of my mods. {i}(You still pay its cost).",
+      "type": "Mystic Primordial Pile Unit",
+      "text": "[Augment] When I despawn, create a Crystal X, where X is my defense.",
       "image": "images_out/Stable/mod4.png",
-      "revision_date_time": "2023-12-14 14:03:04.712231",
+      "revision_date_time": "2024-02-26 17:21:14.249786",
       "details": "",
       "factions": [
         "water",
         "earth"
       ],
       "rulings": [],
-      "complexity": "Simple"
+      "complexity": "Complex"
     }
   ],
   "Abduct": [
@@ -84,10 +64,10 @@
       "toughness": "2",
       "cost": "gm",
       "total_cost": "X",
-      "type": "{Battle} Alien Fungus Spell",
+      "type": "{Battle} Alien Spell",
       "text": "Gain control of target unit with cost [x] or less unless its controller pays  [x].",
       "image": "images_out/Stable/grev7.png",
-      "revision_date_time": "2023-12-14 14:03:04.712231",
+      "revision_date_time": "2024-02-26 17:21:14.250783",
       "details": "",
       "factions": [
         "wood",
@@ -95,25 +75,6 @@
       ],
       "rulings": [],
       "complexity": "Complex"
-    }
-  ],
-  "Aberrant Ascendance": [
-    {
-      "name": "Aberrant Ascendance",
-      "power": "0",
-      "toughness": "7",
-      "cost": "bb",
-      "total_cost": "2",
-      "type": "{Battle} Occult Spell",
-      "text": "For each player, recall target unit that {/n}player controls. {i}(Return it to their hand.)",
-      "image": "images_out/Stable/ams3.png",
-      "revision_date_time": "2023-12-14 14:03:04.712231",
-      "details": "",
-      "factions": [
-        "water"
-      ],
-      "rulings": [],
-      "complexity": "Simple"
     }
   ],
   "Aberrant Populace": [
@@ -124,9 +85,9 @@
       "cost": "rr",
       "total_cost": "2",
       "type": "Spirit Horror Unit",
-      "text": "When I attack, block or die,  [Switch1] Create two Wisps. {i}(They aren't in formation.)",
+      "text": "When I attack, block, or die, [Switch1] Create two Wisps. {i}(They aren't in formation.)",
       "image": "images_out/Stable/ap2.png",
-      "revision_date_time": "2023-12-14 14:03:04.712231",
+      "revision_date_time": "2024-02-26 17:21:14.250783",
       "details": "",
       "factions": [
         "fire"
@@ -145,7 +106,7 @@
       "type": "{Virus} {Unstable} Luminary Unit",
       "text": "[Augment] Your units are base 3/3.",
       "image": "images_out/Stable/rshap.png",
-      "revision_date_time": "2023-12-14 14:03:04.712231",
+      "revision_date_time": "2024-02-26 17:21:14.250783",
       "details": "",
       "factions": [
         "metal"
@@ -163,8 +124,8 @@
       "total_cost": "2",
       "type": "{Haste} Flower Spell",
       "text": "[Switch1] Create two 1/1 units.",
-      "image": "images_out/Stable/flowry.png",
-      "revision_date_time": "2023-12-14 14:03:04.712231",
+      "image": "images_out/Stable/flowry2.png",
+      "revision_date_time": "2024-02-26 17:21:14.250783",
       "details": "",
       "factions": [
         "wood"
@@ -183,7 +144,7 @@
       "type": "{Battle} Mystic Elemental Spell",
       "text": "Put a +1/+1 counter on target unit for each of your  [e].",
       "image": "images_out//Stable/pcons2.png",
-      "revision_date_time": "2023-12-14 14:03:04.712231",
+      "revision_date_time": "2024-02-26 17:21:14.250783",
       "details": "",
       "factions": [
         "earth"
@@ -202,7 +163,7 @@
       "type": "{Sluggish} Jellyfish Unit",
       "text": "[Augment] Whenever a player loses life, put that many +1/+1 counters on me. {i}(Damage causes life loss.)",
       "image": "images_out/Stable/fthin.png",
-      "revision_date_time": "2023-12-14 14:03:04.712231",
+      "revision_date_time": "2024-02-26 17:21:14.250783",
       "details": "",
       "factions": [
         "water",
@@ -219,10 +180,10 @@
       "toughness": "3",
       "cost": "eg",
       "total_cost": "2",
-      "type": "Plant Rock Unit",
+      "type": "Plant Primordial Unit",
       "text": "[Augment] Whenever another nontoken ally spawns, create a Crystal 1.",
       "image": "images_out/Stable/gdor3.png",
-      "revision_date_time": "2023-12-14 14:03:04.712231",
+      "revision_date_time": "2024-02-26 17:21:14.250783",
       "details": "",
       "factions": [
         "earth",
@@ -230,6 +191,26 @@
       ],
       "rulings": [],
       "complexity": "Simple"
+    }
+  ],
+  "Aethercap Siphoner": [
+    {
+      "name": "Aethercap Siphoner",
+      "power": "4",
+      "toughness": "4",
+      "cost": "gb",
+      "total_cost": "3",
+      "type": "Cosmic Fungus Blight Unit",
+      "text": "I spawn with three -1/-1 counters on me. {/n}[Augment] Whenever you play a nontoken spell, you may move a counter from me onto another target unit.",
+      "image": "images_out/Stable/loobs3.png",
+      "revision_date_time": "2024-02-26 17:21:14.250783",
+      "details": "",
+      "factions": [
+        "wood",
+        "water"
+      ],
+      "rulings": [],
+      "complexity": "Complex"
     }
   ],
   "Aetherflux Golem": [
@@ -242,7 +223,7 @@
       "type": "Golem Sprite {Virus} Unit",
       "text": "[Augment] I gain +2/+2.",
       "image": "images_out/Stable/ssut.png",
-      "revision_date_time": "2023-12-14 14:03:04.713228",
+      "revision_date_time": "2024-02-26 17:21:14.250783",
       "details": "",
       "factions": [
         "earth"
@@ -260,7 +241,7 @@
       "type": "{Battle} Elemental  Spell",
       "text": "I deal damage to any target equal to your [r].",
       "image": "images_out/Stable/ablaz.png",
-      "revision_date_time": "2023-12-14 14:03:04.713228",
+      "revision_date_time": "2024-02-26 17:21:14.250783",
       "details": "",
       "factions": [
         "fire"
@@ -277,10 +258,10 @@
       "toughness": "2",
       "cost": "gg",
       "total_cost": "4",
-      "type": "Fungus Spell",
+      "type": "Ancient Blight Spell",
       "text": "Create a Poison 1 for each of your units.",
       "image": "images_out/Stable/ablight2.png",
-      "revision_date_time": "2023-12-14 14:03:04.713228",
+      "revision_date_time": "2024-02-26 17:21:14.250783",
       "details": "",
       "factions": [
         "wood"
@@ -299,7 +280,7 @@
       "type": "[Augment] {Sluggish} Rock Beast {Virus} Unit",
       "text": "",
       "image": "images_out/Stable/cancient.png",
-      "revision_date_time": "2023-12-14 14:03:04.713228",
+      "revision_date_time": "2024-02-26 17:21:14.251781",
       "details": "",
       "factions": [
         "earth"
@@ -313,12 +294,12 @@
       "name": "Amphivore",
       "power": "2",
       "toughness": "5",
-      "cost": "bb",
+      "cost": "b",
       "total_cost": "4",
-      "type": "{Haste} Frog Unit",
-      "text": "When my column deals combat damage to an opponent,  [Switch1][Switch1][Switch1] {i}(Trigger three instances of this graft ability).",
+      "type": "Frog Beast Unit",
+      "text": "When my column deals combat damage to an opponent,  [Switch1][Switch1][Switch1] {i}(Trigger three copies of this graft ability as one single trigger).",
       "image": "images_out/Stable/amph3.png",
-      "revision_date_time": "2023-12-14 14:03:04.713228",
+      "revision_date_time": "2024-02-26 17:21:14.251781",
       "details": "",
       "factions": [
         "water"
@@ -336,7 +317,7 @@
       "type": "Ancient Mimic Unit",
       "text": "[Augment] I have all abilities of adjacent allies. {i}(Abilities include everything below the type line.)",
       "image": "images_out/Stable/a1.png",
-      "revision_date_time": "2023-12-14 14:03:04.713228",
+      "revision_date_time": "2024-02-26 17:21:14.251781",
       "details": "",
       "factions": [
         "metal"
@@ -357,10 +338,10 @@
       "power": "0",
       "toughness": "1",
       "cost": "r",
-      "type": "Elemental Unit",
+      "type": "Anima Unit",
       "text": "[Augment] Your units gain +1/+0 for each non- {/n}token spell you've played in this battle.",
       "image": "images_out/Stable/erec10.png",
-      "revision_date_time": "2023-12-14 14:03:04.713228",
+      "revision_date_time": "2024-02-26 17:21:14.251781",
       "details": "",
       "factions": [
         "fire"
@@ -380,7 +361,7 @@
       "type": "{Battle} {Electric} Elemental Spell",
       "text": "I deal 6 damage to any target.",
       "image": "images_out/Stable/al7.png",
-      "revision_date_time": "2023-12-14 14:03:04.713228",
+      "revision_date_time": "2024-02-26 17:21:14.251781",
       "details": "",
       "factions": [
         "fire"
@@ -396,10 +377,10 @@
       "toughness": "2",
       "cost": "bb",
       "total_cost": "3",
-      "type": "Arcane Unit",
+      "type": "Arcane Alien Unit",
       "text": "[Augment][once] When you play a nontoken spell, cre- {/n}ate an X/X unit, where X is the spell's cost.",
       "image": "images_out/Stable/torty.png",
-      "revision_date_time": "2023-12-14 14:03:04.713228",
+      "revision_date_time": "2024-02-26 17:21:14.251781",
       "details": "",
       "factions": [
         "water"
@@ -415,33 +396,13 @@
       "toughness": "1",
       "cost": "m",
       "total_cost": "2",
-      "type": "{Battle} Cosmic Mimic Spell",
+      "type": "{Battle} Arcane Mimic Spell",
       "text": "[Switch1] Create a copy of target token.",
       "image": "images_out/Stable/replicatey3.png",
-      "revision_date_time": "2023-12-14 14:03:04.713228",
+      "revision_date_time": "2024-02-26 17:21:14.251781",
       "details": "",
       "factions": [
         "metal"
-      ],
-      "rulings": [],
-      "complexity": "Complex"
-    }
-  ],
-  "Ascendant Mycoid": [
-    {
-      "name": "Ascendant Mycoid",
-      "power": "4",
-      "toughness": "4",
-      "cost": "bg",
-      "total_cost": "1",
-      "type": "Fungus Horror Unit",
-      "text": "[Augment] At the start of deployment, recall all your other units.",
-      "image": "images_out/Stable/owamush.png",
-      "revision_date_time": "2023-12-14 14:03:04.713228",
-      "details": "",
-      "factions": [
-        "water",
-        "wood"
       ],
       "rulings": [],
       "complexity": "Complex"
@@ -451,13 +412,13 @@
     {
       "name": "Astral Painseeker",
       "power": "3",
-      "toughness": "4",
+      "toughness": "3",
       "cost": "rb",
       "total_cost": "5",
       "type": "Cosmic Elemental Unit",
-      "text": "When a player loses life from a non-combat damage source,  [Switch1] Draw a card.",
+      "text": "When a player loses life during battle, {/n}[Switch1] Draw a card. {i}(Damage causes life loss.)",
       "image": "images_out/Stable/oflam3.png",
-      "revision_date_time": "2023-12-14 14:03:04.714225",
+      "revision_date_time": "2024-02-26 17:21:14.251781",
       "details": "",
       "factions": [
         "fire",
@@ -466,7 +427,7 @@
       "rulings": [
         "On the first trigger, this makes a Fireball 0 even if you have no spells."
       ],
-      "complexity": "Complex"
+      "complexity": "Simple"
     }
   ],
   "Astral Tidewraith": [
@@ -477,9 +438,9 @@
       "cost": "bb",
       "total_cost": "3",
       "type": "Spirit Jellyfish Unit",
-      "text": "When I attack or block, [Switch1] Deal damage to each player equal to the number of cards in their hand.",
+      "text": "When I attack or block, [Switch1] I deal damage to each player equal to the number of cards in their hand.",
       "image": "images_out/Stable/grad.png",
-      "revision_date_time": "2023-12-14 14:03:04.714225",
+      "revision_date_time": "2024-02-26 17:21:14.251781",
       "details": "",
       "factions": [
         "water"
@@ -495,16 +456,16 @@
       "toughness": "3",
       "cost": "m",
       "total_cost": "1",
-      "type": "Polyform Robot Unit",
+      "type": "Polyform Scrap Unit",
       "text": "[Augment]  [three]: Put a +1/+1 counter on target unit.",
       "image": "images_out/Stable/nboo.png",
-      "revision_date_time": "2023-12-14 14:03:04.714225",
+      "revision_date_time": "2024-02-26 17:21:14.251781",
       "details": "",
       "factions": [
         "metal"
       ],
       "rulings": [],
-      "complexity": "Complex"
+      "complexity": "Simple"
     }
   ],
   "Auric Ascendant": [
@@ -514,10 +475,10 @@
       "toughness": "1",
       "cost": "bm",
       "total_cost": "2",
-      "type": "Mystic Elemental Avatar Unit",
-      "text": "[once]  [one], Recall another ally: I gain flying and +2/+0 until regroup.",
+      "type": "Mystic Avatar Unit",
+      "text": "[once]  [one], Recall another ally: I gain {g}flying and +2/+0 until regroup. {i}(Only flying units can block flying units.)",
       "image": "images_out/Stable/go2.png",
-      "revision_date_time": "2023-12-14 14:03:04.714225",
+      "revision_date_time": "2024-02-26 17:21:14.251781",
       "details": "",
       "factions": [
         "water",
@@ -534,10 +495,10 @@
       "toughness": "6",
       "cost": "mm",
       "total_cost": "5",
-      "type": "Construct Technology Unit",
+      "type": "Automaton Construct Unit",
       "text": "[Augment] If you would create one or more unit tokens, instead create those tokens plus an additional copy of each unique token you created.",
       "image": "images_out/Stable/gd2.png",
-      "revision_date_time": "2023-12-14 14:03:04.714225",
+      "revision_date_time": "2024-02-26 17:21:14.252778",
       "details": "",
       "factions": [
         "metal"
@@ -554,9 +515,9 @@
       "cost": "ee",
       "total_cost": "3",
       "type": "{Haste} Rock Structure Unit",
-      "text": "[Augment][once] When I am dealt damage, create an X/X unit, where X is the amount I am dealt.",
+      "text": "[Augment][once] When I am dealt damage, create an X/X unit, where X is the damage I am dealt.",
       "image": "images_out/Stable/atomb.png",
-      "revision_date_time": "2023-12-14 14:03:04.714225",
+      "revision_date_time": "2024-02-26 17:21:14.252778",
       "details": "",
       "factions": [
         "earth"
@@ -571,30 +532,11 @@
       "power": "4",
       "toughness": "1",
       "cost": "ee",
-      "total_cost": "3",
+      "total_cost": "4",
       "type": "{Battle} Bedlam Spell",
       "text": "Two target units fight. {i}(They deal damage {/n}to each other equal to their power.)",
       "image": "images_out/Stable/battlew2.png",
-      "revision_date_time": "2023-12-14 14:03:04.714225",
-      "details": "",
-      "factions": [
-        "earth"
-      ],
-      "rulings": [],
-      "complexity": "Simple"
-    }
-  ],
-  "Bearer of Destiny": [
-    {
-      "name": "Bearer of Destiny",
-      "power": "6",
-      "toughness": "8",
-      "cost": "ee",
-      "total_cost": "6",
-      "type": "Elemental Avatar Unit",
-      "text": "[Augment] Whenever I am dealt damage, you may pay  [one]. If you do, I fight another target unit.",
-      "image": "images_out/Stable/bdest3.png",
-      "revision_date_time": "2023-12-14 14:03:04.714225",
+      "revision_date_time": "2024-02-26 17:21:14.252778",
       "details": "",
       "factions": [
         "earth"
@@ -610,10 +552,10 @@
       "toughness": "4",
       "cost": "e",
       "total_cost": "4",
-      "type": "Rock Spirit Unit",
-      "text": "When I attack or block,  [Switch] I deal 1 damage to each unit.",
-      "image": "images_out/Stable/amblr.png",
-      "revision_date_time": "2023-12-14 14:03:04.714225",
+      "type": "Beast Rock Structure Unit",
+      "text": "When I attack or block, [Switch] I deal 1 damage to each unit.",
+      "image": "images_out/Stable/amblr2.png",
+      "revision_date_time": "2024-02-26 17:21:14.252778",
       "details": "",
       "factions": [
         "earth"
@@ -632,7 +574,7 @@
       "type": "Alien Robot Unit",
       "text": "[Augment] Whenever a nontoken unit dies, you may pay  [two] to erase it and put two +1/+1 counters on me.",
       "image": "images_out/Stable/rbyc.png",
-      "revision_date_time": "2023-12-14 14:03:04.714225",
+      "revision_date_time": "2024-02-26 17:21:14.252778",
       "details": "",
       "factions": [
         "metal"
@@ -649,9 +591,9 @@
       "cost": "ggg",
       "total_cost": "4",
       "type": "{Battle} Fungus Spell",
-      "text": "Target player reveals their hand. You choose a card from it and put it into your hand.",
+      "text": "Target player reveals their hand. You choose {/n}a card from it and put it into your hand.",
       "image": "images_out/Stable/sbar6.png",
-      "revision_date_time": "2023-12-14 14:03:04.715222",
+      "revision_date_time": "2024-02-26 17:21:14.252778",
       "details": "",
       "factions": [
         "wood"
@@ -667,10 +609,10 @@
       "toughness": "5",
       "cost": "g",
       "total_cost": "2",
-      "type": "Fungus Spell",
+      "type": "Arcane Blight Spell",
       "text": "[Switch1] Create three Poison 1.",
-      "image": "images_out/Stable/ablight.png",
-      "revision_date_time": "2023-12-14 14:03:04.715222",
+      "image": "images_out/Stable/btx.png",
+      "revision_date_time": "2024-02-26 17:21:14.252778",
       "details": "",
       "factions": [
         "wood"
@@ -687,12 +629,31 @@
       "cost": "b",
       "total_cost": "1",
       "type": "Cloud Manatee Unit",
-      "text": "When I despawn,  [Switch] I deal 3 damage to each opponent.",
+      "text": "When I despawn, [Switch] Each opponent loses 3 life.",
       "image": "images_out/Stable/brpyc.png",
-      "revision_date_time": "2023-12-14 14:03:04.715222",
+      "revision_date_time": "2024-02-26 17:21:14.252778",
       "details": "",
       "factions": [
         "water"
+      ],
+      "rulings": [],
+      "complexity": "Simple"
+    }
+  ],
+  "Bloodwind Revenant": [
+    {
+      "name": "Bloodwind Revenant",
+      "power": "1",
+      "toughness": "2",
+      "cost": "r",
+      "type": "{Flying} Occult Spirit Unit",
+      "text": "When my column deals combat damage to an opponent,  [Switch1] You may sacrifice a unit. If you do, draw a card.",
+      "image": "images_out//Stable/iwww.png",
+      "total_cost": "2",
+      "revision_date_time": "2024-02-26 17:21:14.252778",
+      "details": "",
+      "factions": [
+        "fire"
       ],
       "rulings": [],
       "complexity": "Simple"
@@ -708,7 +669,7 @@
       "type": "Druid Flower Unit",
       "text": "[Augment] Whenever you play a unit, create a 1/1 unit.",
       "image": "images_out/Stable/hfl3.png",
-      "revision_date_time": "2023-12-14 14:03:04.715222",
+      "revision_date_time": "2024-02-26 17:21:14.252778",
       "details": "",
       "factions": [
         "wood"
@@ -727,7 +688,7 @@
       "type": "{Battle} Arcane Spell",
       "text": "[Switch1] Exchange the base stats of two target units until regroup. {i}(Power and defense.)",
       "image": "images_out/Stable/bswap12.png",
-      "revision_date_time": "2023-12-14 14:03:04.715222",
+      "revision_date_time": "2024-02-26 17:21:14.253775",
       "details": "",
       "factions": [
         "metal"
@@ -741,12 +702,12 @@
       "name": "Boon of Protection",
       "power": "1",
       "toughness": "5",
-      "cost": "g",
+      "cost": "gg",
       "total_cost": "1",
-      "type": "{Battle} Arcane Spell",
+      "type": "{Battle} Druid Spell",
       "text": "Negate target effect that targets an allied effect, player or unit.",
       "image": "images_out/Stable/bpro.png",
-      "revision_date_time": "2023-12-14 14:03:04.715222",
+      "revision_date_time": "2024-02-26 17:21:14.253775",
       "details": "",
       "factions": [
         "wood"
@@ -763,9 +724,9 @@
       "cost": "b",
       "total_cost": "2",
       "type": "Oracle Beast Unit",
-      "text": "When an ally spawns during battle, [Switch1] I deal 2 damage to each opponent.",
+      "text": "When an ally spawns during battle, {/n}[Switch1] I deal 2 damage to each opponent.",
       "image": "images_out/Stable/tint4.png",
-      "revision_date_time": "2023-12-14 14:03:04.715222",
+      "revision_date_time": "2024-02-26 17:21:14.253775",
       "details": "",
       "factions": [
         "water"
@@ -784,7 +745,7 @@
       "type": "{Battle} Squid Mimic Spell Unit",
       "text": "Erase target unit. I become an exact copy of that unit. {i}(I copy all stat changes, counters, card text and mods).",
       "image": "images_out/Stable/cclon2.png",
-      "revision_date_time": "2023-12-14 14:03:04.715222",
+      "revision_date_time": "2024-02-26 17:21:14.253775",
       "details": "",
       "factions": [
         "metal"
@@ -800,16 +761,16 @@
       "toughness": "2",
       "cost": "bb",
       "total_cost": "3",
-      "type": "{Battle} {Feeble} Jellyfish Spell Unit",
+      "type": "{Battle} {Feeble} Jellyfish Cloud Spell Unit",
       "text": "[Switch1] Look at target player's hand. You may choose a card from it and recycle that card. If you do, that player draws a card.",
       "image": "images_out/Stable/brpy11.png",
-      "revision_date_time": "2023-12-14 14:03:04.715222",
+      "revision_date_time": "2024-02-26 17:21:14.253775",
       "details": "",
       "factions": [
         "water"
       ],
       "rulings": [],
-      "complexity": "Simple"
+      "complexity": "Complex"
     }
   ],
   "Bubb": [
@@ -822,7 +783,7 @@
       "type": "[Augment] {Unaware} Druid Rock Turtle Unit",
       "text": "",
       "image": "images_out/Stable/bubbersnow4.png",
-      "revision_date_time": "2023-12-14 14:03:04.715222",
+      "revision_date_time": "2024-02-26 17:21:14.253775",
       "details": "",
       "factions": [
         "earth"
@@ -841,7 +802,7 @@
       "type": "[Augment] {Piercing} Insect Crab Unit",
       "text": "",
       "image": "images_out/Stable/bc2.png",
-      "revision_date_time": "2023-12-14 14:03:04.716220",
+      "revision_date_time": "2024-02-26 17:21:14.253775",
       "details": "",
       "factions": [
         "earth"
@@ -860,7 +821,7 @@
       "type": "{Battle} Druid Spell",
       "text": "[Switch1] Double the /[power {i1}or defense] of target unit until regroup.",
       "image": "images_out/Stable/bbdon.png",
-      "revision_date_time": "2023-12-14 14:03:04.716220",
+      "revision_date_time": "2024-02-26 17:21:14.253775",
       "details": "",
       "factions": [
         "wood"
@@ -877,10 +838,10 @@
       "power": "6",
       "toughness": "2",
       "cost": "r",
-      "type": "{Battle} Occult Spell",
+      "type": "{Battle} Infernal Occult Spell",
       "text": "[Switch1] I deal damage to any target equal to the number of units that died in this battle.",
       "image": "images_out/Stable/bvenger2.png",
-      "revision_date_time": "2023-12-14 14:03:04.716220",
+      "revision_date_time": "2024-02-26 17:21:14.253775",
       "details": "",
       "factions": [
         "fire"
@@ -893,14 +854,14 @@
   "Carapace Devourer": [
     {
       "name": "Carapace Devourer",
-      "power": "4",
-      "toughness": "4",
+      "power": "3",
+      "toughness": "3",
       "cost": "e",
       "total_cost": "2",
       "type": "{Virus} Bedlam Beast Unit",
       "text": "[Augment] Whenever another unit spawns in battle, {/n}its controller sacrifices it unless they pay  [one].",
       "image": "images_out/Stable/dwe.png",
-      "revision_date_time": "2023-12-14 14:03:04.716220",
+      "revision_date_time": "2024-02-26 17:21:14.253775",
       "details": "",
       "factions": [
         "earth"
@@ -919,7 +880,7 @@
       "type": "Cosmic Spirit {Virus} Unit",
       "text": "When I spawn or become modified, put a +1/+1 counter on each of your units. {/n}[Augment] When I despawn, remove all counters from your units.",
       "image": "images_out/Stable/goob.png",
-      "revision_date_time": "2023-12-14 14:03:04.716220",
+      "revision_date_time": "2024-02-26 17:21:14.254772",
       "details": "",
       "factions": [
         "metal"
@@ -936,15 +897,15 @@
       "cost": "bb",
       "total_cost": "1",
       "type": "{Battle} Cosmic Spell",
-      "text": "Erase target unit. Its controller glimpses 3. {i}(Reveal the top three cards of their deck. They may play one of them now, ignoring threshold. Recycle the rest.)",
+      "text": "Erase target unit. Its controller glimpses 3. {i}(They reveal the top three cards of their deck and cache one. Until end of turn, they may play it as if it was in their hand, ignoring affinity. Recycle the rest.)",
       "image": "images_out/Stable/rrm4.png",
-      "revision_date_time": "2023-12-14 14:03:04.716220",
+      "revision_date_time": "2024-02-26 17:21:14.254772",
       "details": "",
       "factions": [
         "water"
       ],
       "rulings": [],
-      "complexity": "Simple"
+      "complexity": "Complex"
     }
   ],
   "Celestial Shifter": [
@@ -954,10 +915,10 @@
       "toughness": "2",
       "cost": "m",
       "total_cost": "2",
-      "type": "{Haste} Cosmic Unit",
+      "type": "{Haste} Cosmic Alien Unit",
       "text": "[Augment]  [x]: I become base X/X until regroup.",
       "image": "images_out/Stable/bopR.png",
-      "revision_date_time": "2023-12-14 14:03:04.716220",
+      "revision_date_time": "2024-02-26 17:21:14.254772",
       "details": "",
       "factions": [
         "metal"
@@ -976,7 +937,7 @@
       "type": "{Battle} Elemental Spell",
       "text": "I deal 2 damage to each of X target allies. For each ally damaged this way, distribute 2 damage among target opponent's units.",
       "image": "images_out/Stable/ls2.png",
-      "revision_date_time": "2023-12-14 14:03:04.716220",
+      "revision_date_time": "2024-02-26 17:21:14.254772",
       "details": "",
       "factions": [
         "earth",
@@ -993,10 +954,10 @@
       "toughness": "1",
       "cost": "bb",
       "total_cost": "2",
-      "type": "Polyform Elemental Unit",
+      "type": "Polyform Anima Unit",
       "text": "[Augment] [once] When you play a nontoken spell, put X +1/+1 counters on me, where X is that spell's cost.",
       "image": "images_out/Stable/bluu.png",
-      "revision_date_time": "2023-12-14 14:03:04.716220",
+      "revision_date_time": "2024-02-26 17:21:14.254772",
       "details": "",
       "factions": [
         "water"
@@ -1014,7 +975,7 @@
       "type": "{Battle} Elemental Spell",
       "text": "[Switch] /[Target unit gains +4/+4 or{i1} target unit and each of its adjacent allies gain +1/+1] until regroup.",
       "image": "images_out/Stable/cboo3.png",
-      "revision_date_time": "2023-12-14 14:03:04.716220",
+      "revision_date_time": "2024-02-26 17:21:14.254772",
       "details": "",
       "factions": [
         "fire"
@@ -1031,10 +992,10 @@
       "toughness": "0",
       "cost": "e",
       "total_cost": "1",
-      "type": "[Augment] {Balanced} Druid {Virus} Unit",
+      "type": "[Augment] {Balanced} Ancient Druid {Virus} Unit",
       "text": "",
       "image": "images_out/Stable/bgy.png",
-      "revision_date_time": "2023-12-14 14:03:04.716220",
+      "revision_date_time": "2024-02-26 17:21:14.254772",
       "details": "",
       "factions": [
         "earth"
@@ -1053,7 +1014,7 @@
       "type": "[Augment] {Powerful} Insect {Virus} Unit",
       "text": "",
       "image": "images_out/Stable/gbrow.png",
-      "revision_date_time": "2023-12-14 14:03:04.717217",
+      "revision_date_time": "2024-02-26 17:21:14.254772",
       "details": "",
       "factions": [
         "earth"
@@ -1062,17 +1023,36 @@
       "rulings": []
     }
   ],
+  "Cinder Scuttler": [
+    {
+      "name": "Cinder Scuttler",
+      "power": "2",
+      "toughness": "1",
+      "cost": "r",
+      "type": "{Haste} Infernal Insect Unit",
+      "text": "When you deal combat damage to an oppo- nent, if I am in your bin, recall me. {i}(Put me into your hand.)",
+      "image": "images_out/Stable/rspir2.png",
+      "revision_date_time": "2024-02-26 17:21:14.254772",
+      "details": "",
+      "factions": [
+        "fire"
+      ],
+      "total_cost": "1",
+      "rulings": [],
+      "complexity": "Simple"
+    }
+  ],
   "Collective Creation": [
     {
       "name": "Collective Creation",
-      "power": "3913",
-      "toughness": "3913",
-      "cost": "c",
+      "power": "4046",
+      "toughness": "4046",
+      "cost": "p",
       "total_cost": "10",
       "type": "Cosmic Glitch Unit",
-      "text": "{i}We are one.",
-      "image": "images_out/Stable/biggy.png",
-      "revision_date_time": "2023-12-14 14:03:04.717217",
+      "text": "",
+      "image": "images_out/Stable/biggy2.png",
+      "revision_date_time": "2024-02-26 17:21:14.254772",
       "details": "",
       "factions": [
         "colorless"
@@ -1088,10 +1068,10 @@
       "toughness": "1",
       "cost": "rr",
       "total_cost": "2",
-      "type": "Elemental Unit",
+      "type": "Infernal Elemental Unit",
       "text": "[Augment] If an allied source would deal noncombat damage, it deals that much damage plus 1 instead.",
       "image": "images_out/Stable/thun4.png",
-      "revision_date_time": "2023-12-14 14:03:04.717217",
+      "revision_date_time": "2024-02-26 17:21:14.254772",
       "details": "",
       "factions": [
         "fire"
@@ -1107,10 +1087,10 @@
       "toughness": "2",
       "cost": "m",
       "total_cost": "2",
-      "type": "Construct Unit",
-      "text": "After combat, [Switch1] Create a Robot 1.",
+      "type": "Robot Construct Unit",
+      "text": "After combat, [Switch] Create a Robot 1.",
       "image": "images_out/Stable/mgy.png",
-      "revision_date_time": "2023-12-14 14:03:04.717217",
+      "revision_date_time": "2024-02-26 17:21:14.255774",
       "details": "",
       "factions": [
         "metal"
@@ -1125,11 +1105,11 @@
       "power": "4",
       "toughness": "1",
       "cost": "mm",
-      "total_cost": "2",
-      "type": "{Battle} Technological Spell",
+      "total_cost": "3",
+      "type": "{Battle} Technology Spell",
       "text": "Negate all activated and triggered effects.",
       "image": "images_out/Stable/recalf.png",
-      "revision_date_time": "2023-12-14 14:03:04.717217",
+      "revision_date_time": "2024-02-26 17:21:14.255774",
       "details": "",
       "factions": [
         "metal"
@@ -1145,10 +1125,10 @@
       "toughness": "7",
       "cost": "eg",
       "total_cost": "1",
-      "type": "Fungus Crystal Spell",
+      "type": "Arcane Blight Crystal Spell",
       "text": "[Switch1] Create a Crystal 1 and a Poison 1.",
       "image": "images_out/Stable/ipos2.png",
-      "revision_date_time": "2023-12-14 14:03:04.717217",
+      "revision_date_time": "2024-02-26 17:21:14.255774",
       "details": "",
       "factions": [
         "earth",
@@ -1165,10 +1145,10 @@
       "toughness": "4",
       "cost": "g",
       "total_cost": "1",
-      "type": "Fungus Horror {Virus} Unit",
+      "type": "Blight Parasite {Virus} Unit",
       "text": "[Augment] After combat, a player of your choice who doesn't control me gains control of me.",
       "image": "images_out/Stable/cbll.png",
-      "revision_date_time": "2023-12-14 14:03:04.717217",
+      "revision_date_time": "2024-02-26 17:21:14.255774",
       "details": "",
       "factions": [
         "wood"
@@ -1181,13 +1161,13 @@
     {
       "name": "Cosmic Conspirator",
       "power": "3",
-      "toughness": "5",
+      "toughness": "3",
       "cost": "m",
-      "total_cost": "4",
+      "total_cost": "3",
       "type": "Luminary Unit",
-      "text": "[Augment] If you would create a token X, you may instead create a token X of any type. {i}(Token types include Robot, Fireball, Growth, Crystal, etc.)",
+      "text": "If you would create a Robot, Poison, Crystal or Fireball, you may instead create a token of any of these types. {i}(With the same X value.)",
       "image": "images_out/Stable/cc.png",
-      "revision_date_time": "2023-12-14 14:03:04.717217",
+      "revision_date_time": "2024-02-26 17:21:14.255774",
       "details": "",
       "factions": [
         "metal"
@@ -1206,7 +1186,7 @@
       "type": "{Battle} Cosmic Maelstrom Spell",
       "text": "Recall all other spell effects and spell units. {i}(Negate them and put them into their controller's hands.)",
       "image": "images_out/Stable/uprs6.png",
-      "revision_date_time": "2023-12-14 14:03:04.718215",
+      "revision_date_time": "2024-02-26 17:21:14.255774",
       "details": "",
       "factions": [
         "water"
@@ -1223,9 +1203,9 @@
       "cost": "ee",
       "total_cost": "2",
       "type": "Golem Beast Unit",
-      "text": "[Augment] Abilities cost  [one] more to activate or trigger during battle.",
+      "text": "[Augment] Abilities cost  [one] more to activate or trigger during battle. {i}(Choosing to not pay {/n}this prevents abilities from triggering.)",
       "image": "images_out/Stable/tto4.png",
-      "revision_date_time": "2023-12-14 14:03:04.718215",
+      "revision_date_time": "2024-02-26 17:21:14.255774",
       "details": "",
       "factions": [
         "earth"
@@ -1237,20 +1217,20 @@
   "Crumbling Ancient": [
     {
       "name": "Crumbling Ancient",
-      "power": "6",
+      "power": "3",
       "toughness": "8",
       "cost": "e",
       "total_cost": "2",
-      "type": "[Augment] {Weak} Rock {Virus} Unit",
+      "type": "[Augment] {Vulnerable} Ancient Rock {Virus} Unit",
       "text": "",
       "image": "images_out/Stable/canc.png",
-      "revision_date_time": "2023-12-14 14:03:04.718215",
+      "revision_date_time": "2024-02-26 17:21:14.255774",
       "details": "",
       "factions": [
         "earth"
       ],
       "rulings": [],
-      "complexity": "Simple"
+      "complexity": "Complex"
     }
   ],
   "Crystal": [
@@ -1262,7 +1242,7 @@
       "type": "{Battle} {Burst} Spell Token",
       "text": "Put X +1/+1 counters on target unit.",
       "image": "images_out/Stable/t.png",
-      "revision_date_time": "2023-12-14 14:03:04.718215",
+      "revision_date_time": "2024-02-26 17:21:14.255774",
       "details": "",
       "factions": [
         "earth"
@@ -1282,7 +1262,7 @@
       "type": "[Augment] {Evasive} Cosmic Sprite Unit",
       "text": "",
       "image": "images_out/Stable/blipp.png",
-      "revision_date_time": "2023-12-14 14:03:04.718215",
+      "revision_date_time": "2024-02-26 17:21:14.255774",
       "details": "",
       "factions": [
         "water"
@@ -1301,7 +1281,7 @@
       "type": "Elemental Spirit Unit",
       "text": "[Augment] Whenever you play a spell during battle, each player sacrifices a unit with cost less than or equal to the spell's cost.",
       "image": "images_out/Stable/dgrr5.png",
-      "revision_date_time": "2023-12-14 14:03:04.718215",
+      "revision_date_time": "2024-02-26 17:21:14.256769",
       "details": "",
       "factions": [
         "fire",
@@ -1311,6 +1291,25 @@
       "complexity": "Complex"
     }
   ],
+  "Deathglow Strider": [
+    {
+      "name": "Deathglow Strider",
+      "power": "2",
+      "toughness": "3",
+      "cost": "eee",
+      "total_cost": "3",
+      "type": "Alien Strider Unit",
+      "text": "[Augment] After combat, I deal damage equal to my defense to each opponent.",
+      "image": "images_out/Stable/rrp6.png",
+      "revision_date_time": "2024-02-26 17:21:14.256769",
+      "details": "",
+      "factions": [
+        "earth"
+      ],
+      "rulings": [],
+      "complexity": "Simple"
+    }
+  ],
   "Decay Distributor": [
     {
       "name": "Decay Distributor",
@@ -1318,10 +1317,10 @@
       "toughness": "7",
       "cost": "eg",
       "total_cost": "4",
-      "type": "{Haste} Rock Fungus Unit",
+      "type": "{Haste} Primordial Blight Unit",
       "text": "[Augment] Whenever I am dealt damage, put that many -1/-1 counters on target unit.",
       "image": "images_out/Stable/gbdud3.png",
-      "revision_date_time": "2023-12-14 14:03:04.718215",
+      "revision_date_time": "2024-02-26 17:21:14.256769",
       "details": "",
       "factions": [
         "earth",
@@ -1338,10 +1337,10 @@
       "toughness": "2",
       "cost": "m",
       "total_cost": "2",
-      "type": "Technology Spirit Unit",
+      "type": "Robot Spirit Unit",
       "text": "Sacrifice me and another ally: Delete all units with cost equal to the total number of counters on us.",
       "image": "images_out/Stable/fracm2.png",
-      "revision_date_time": "2023-12-14 14:03:04.718215",
+      "revision_date_time": "2024-02-26 17:21:14.256769",
       "details": "",
       "factions": [
         "metal"
@@ -1354,13 +1353,13 @@
     {
       "name": "Delver of Mysteries",
       "power": "2",
-      "toughness": "1",
-      "cost": "r",
-      "type": "{Feeble} Arcane Spell Unit",
-      "text": "Recall target spell in your bin.",
+      "toughness": "2",
+      "cost": "rr",
+      "type": "Arcane Elemental Spell Unit",
+      "text": "Recall target spell in your bin. {i}(Put it into your hand.)",
       "image": "images_out/Stable/redthing.png",
-      "total_cost": "3",
-      "revision_date_time": "2023-12-14 14:03:04.718215",
+      "total_cost": "4",
+      "revision_date_time": "2024-02-26 17:21:14.256769",
       "details": "",
       "factions": [
         "fire"
@@ -1376,17 +1375,17 @@
       "toughness": "1",
       "cost": "bm",
       "total_cost": "2",
-      "type": "{Battle} Astral Spell",
-      "text": "Negate target effect. Its controller Glimpses 3. {i}(Reveal the top three cards of their deck. They may play one of them now, ignoring threshold. Recycle the rest.)",
+      "type": "{Battle} Cosmic Technology Spell",
+      "text": "Negate target effect. Its controller Glimpses 3. {i}(They reveal the top three cards of their deck and cache one. Until end of turn, they may play it as if it was in their hand, ignoring affinity. Recycle the rest.)",
       "image": "images_out/Stable/rvrs2.png",
-      "revision_date_time": "2023-12-14 14:03:04.718215",
+      "revision_date_time": "2024-02-26 17:21:14.256769",
       "details": "",
       "factions": [
         "water",
         "metal"
       ],
       "rulings": [],
-      "complexity": "Simple"
+      "complexity": "Complex"
     }
   ],
   "Demon of the Depths": [
@@ -1399,14 +1398,14 @@
       "type": "Demon Spirit Unit",
       "text": "[Augment] Whenever one of your units despawns, {/n}I deal 1 damage to any target.",
       "image": "images_out/Stable/pns3.png",
-      "revision_date_time": "2023-12-14 14:03:04.719212",
+      "revision_date_time": "2024-02-26 17:21:14.256769",
       "details": "",
       "factions": [
         "water",
         "fire"
       ],
       "rulings": [],
-      "complexity": "Simple"
+      "complexity": "Complex"
     }
   ],
   "Discharge": [
@@ -1416,16 +1415,16 @@
       "toughness": "0",
       "cost": "m",
       "total_cost": "1",
-      "type": "{Battle} Technological Spell",
+      "type": "{Battle} Elemental Technology Spell",
       "text": "[Switch1] /[Remove X +1/+1 counters from allies]: I deal X damage to target unit.",
       "image": "images_out/Stable/dc.png",
-      "revision_date_time": "2023-12-14 14:03:04.719212",
+      "revision_date_time": "2024-02-26 17:21:14.256769",
       "details": "",
       "factions": [
         "metal"
       ],
       "rulings": [],
-      "complexity": "Simple"
+      "complexity": "Complex"
     }
   ],
   "Dispatch Courier": [
@@ -1438,7 +1437,7 @@
       "type": "Robot Horse Unit",
       "text": "[Augment] Each turn, you may play a unit during the mana step as if it had  [Haste].",
       "image": "images_out/Stable/ww8.png",
-      "revision_date_time": "2023-12-14 14:03:04.719212",
+      "revision_date_time": "2024-02-26 17:21:14.256769",
       "details": "",
       "factions": [
         "metal"
@@ -1457,7 +1456,7 @@
       "type": "Dormant Resource",
       "text": "{i}(To create a resource, recycle a card from your hand during the resource step. All resources spawn dormant. Dormant resources provide no affinity or mana. You may activate up to two resources each turn during the resource step, flipping them over permanently.)",
       "image": "images_out/Stable/dres2.png",
-      "revision_date_time": "2023-12-14 14:03:04.719212",
+      "revision_date_time": "2024-02-26 17:21:14.256769",
       "details": "",
       "factions": [
         "colorless"
@@ -1473,10 +1472,10 @@
       "toughness": "3",
       "cost": "mm",
       "total_cost": "1",
-      "type": "{Battle} Control Technology Spell",
+      "type": "{Battle} Technology Spell",
       "text": "Gain control of target token. You may choose new targets for spells controlled this way.",
       "image": "images_out/Stable/downld3.png",
-      "revision_date_time": "2023-12-14 14:03:04.719212",
+      "revision_date_time": "2024-02-26 17:21:14.257765",
       "details": "",
       "factions": [
         "metal"
@@ -1485,23 +1484,23 @@
       "complexity": "Simple"
     }
   ],
-  "Dreadspawn Lurker": [
+  "Dreadspawn Horror": [
     {
-      "name": "Dreadspawn Lurker",
-      "power": "3",
-      "toughness": "3",
-      "cost": "b",
-      "total_cost": "3",
-      "type": "[Augment] {Haste} {Repulsive} Horror Beast Unit",
-      "text": "",
+      "name": "Dreadspawn Horror",
+      "power": "7",
+      "toughness": "5",
+      "cost": "bb",
+      "total_cost": "1",
+      "type": "Alien Horror {Virus} Unit",
+      "text": "[Augment] I gain -1/-1 for each card in your hand.",
       "image": "images_out/Stable/alfr2.png",
-      "revision_date_time": "2023-12-14 14:03:04.719212",
+      "revision_date_time": "2024-02-26 17:21:14.257765",
       "details": "",
       "factions": [
         "water"
       ],
-      "complexity": "Complex",
-      "rulings": []
+      "rulings": [],
+      "complexity": "Complex"
     }
   ],
   "Dreadwave Devourer": [
@@ -1514,7 +1513,7 @@
       "type": "{Battle} Jellyfish Horror Spell Unit",
       "text": "Negate target spell effect.",
       "image": "images_out/Stable/brpy7.png",
-      "revision_date_time": "2023-12-14 14:03:04.719212",
+      "revision_date_time": "2024-02-26 17:21:14.257765",
       "details": "",
       "factions": [
         "water"
@@ -1530,16 +1529,16 @@
       "toughness": "2",
       "cost": "b",
       "total_cost": "2",
-      "type": "{Flying} Cloud Elemental Unit",
+      "type": "{Flying} Cloud Sprite Unit",
       "text": "[Augment] When I attack or block, you and target opponent each draw a card.",
       "image": "images_out/Stable/bbolt2.png",
-      "revision_date_time": "2023-12-14 14:03:04.719212",
+      "revision_date_time": "2024-02-26 17:21:14.257765",
       "details": "",
       "factions": [
         "water"
       ],
       "rulings": [],
-      "complexity": "Simple"
+      "complexity": "Complex"
     }
   ],
   "Dune Drifter": [
@@ -1549,35 +1548,16 @@
       "toughness": "1",
       "cost": "ee",
       "total_cost": "1",
-      "type": "[Augment] {Swift} Lizard Beast Unit",
+      "type": "[Augment] {Swift} Lizard Beast {Virus} Unit",
       "text": "",
       "image": "images_out/Stable/snok3.png",
-      "revision_date_time": "2023-12-14 14:03:04.719212",
+      "revision_date_time": "2024-02-26 17:21:14.257765",
       "details": "",
       "factions": [
         "earth"
       ],
       "complexity": "Simple",
       "rulings": []
-    }
-  ],
-  "Eager Mycolid": [
-    {
-      "name": "Eager Mycolid",
-      "power": "1",
-      "toughness": "2",
-      "cost": "g",
-      "total_cost": "2",
-      "type": "Fungus Unit",
-      "text": "When you put a counter on an enemy,  [Switch1] Draw a card.",
-      "image": "images_out/Stable/emy.png",
-      "revision_date_time": "2023-12-14 14:03:04.719212",
-      "details": "",
-      "factions": [
-        "wood"
-      ],
-      "rulings": [],
-      "complexity": "Simple"
     }
   ],
   "Earnest Defender": [
@@ -1588,9 +1568,9 @@
       "cost": "g",
       "total_cost": "3",
       "type": "{Haste} Flower Guardian Unit",
-      "text": "[Augment] Whenever an all becomes the target of a enemy spell, create a 1/1 unit.",
+      "text": "[Augment] Whenever an ally becomes the target of an enemy spell, create a 1/1 unit.",
       "image": "images_out/Stable/edef.png",
-      "revision_date_time": "2023-12-14 14:03:04.720209",
+      "revision_date_time": "2024-02-26 17:21:14.257765",
       "details": "",
       "factions": [
         "wood"
@@ -1607,9 +1587,9 @@
       "cost": "e",
       "total_cost": "1",
       "type": "[e] Resource \u2014 Earth",
-      "text": "When I activate, if you have at least [e][e][e], create a shard.",
+      "text": "When I activate, if you have at least [e][e][e], create a Shard.",
       "image": "images_out/Stable/ers4.png",
-      "revision_date_time": "2023-12-14 14:03:04.720209",
+      "revision_date_time": "2024-02-26 17:21:14.257765",
       "details": "",
       "factions": [
         "earth"
@@ -1625,10 +1605,10 @@
       "toughness": "3",
       "cost": "ge",
       "total_cost": "2",
-      "type": "Rock Elemental Unit",
+      "type": "Primordial Elemental Unit",
       "text": "[Augment] Whenever a player plays one or more spells targeting me, they copy those spells and may choose new targets for the copies.",
       "image": "images_out/Stable/et2.png",
-      "revision_date_time": "2023-12-14 14:03:04.720209",
+      "revision_date_time": "2024-02-26 17:21:14.257765",
       "details": "",
       "factions": [
         "wood",
@@ -1640,25 +1620,6 @@
       "complexity": "Complex"
     }
   ],
-  "Ebbing Nightmare": [
-    {
-      "name": "Ebbing Nightmare",
-      "power": "7",
-      "toughness": "5",
-      "cost": "bb",
-      "total_cost": "1",
-      "type": "Jellyfish Horror {Virus} Unit",
-      "text": "[Augment] I gain -1/-1 for each card in your hand.",
-      "image": "images_out/Stable/ht.png",
-      "revision_date_time": "2023-12-14 14:03:04.720209",
-      "details": "",
-      "factions": [
-        "water"
-      ],
-      "rulings": [],
-      "complexity": "Complex"
-    }
-  ],
   "Echo of Despair": [
     {
       "name": "Echo of Despair",
@@ -1667,9 +1628,9 @@
       "cost": "b",
       "total_cost": "4",
       "type": "Mimic Horror Unit",
-      "text": "After combat, if a player was dealt damage in this battle, create a copy of me.",
+      "text": "After combat, if a player lost life in this battle, create a copy of me.",
       "image": "images_out/Stable/tint2.png",
-      "revision_date_time": "2023-12-14 14:03:04.720209",
+      "revision_date_time": "2024-02-26 17:21:14.257765",
       "details": "",
       "factions": [
         "water"
@@ -1688,12 +1649,12 @@
       "type": "{Haste} {Evasive} Cosmic Alien Unit",
       "text": "[Augment] When my column deals conbat damage to an opponent, sacrifice me. If you do, look at that player's hand and discard a card from it.",
       "image": "images_out/Stable/mry3.png",
-      "revision_date_time": "2023-12-14 14:03:04.720209",
+      "revision_date_time": "2024-02-26 17:21:14.257765",
       "details": "",
       "factions": [
         "metal"
       ],
-      "complexity": "Simple",
+      "complexity": "Complex",
       "rulings": []
     }
   ],
@@ -1707,7 +1668,7 @@
       "type": "Fish Horror Spell Unit",
       "text": "Recall target unit in your bin. {i}(Put it into your hand.)",
       "image": "images_out/Stable/frec3.png",
-      "revision_date_time": "2023-12-14 14:03:04.720209",
+      "revision_date_time": "2024-02-26 17:21:14.258762",
       "details": "",
       "factions": [
         "water"
@@ -1724,9 +1685,9 @@
       "cost": "rr",
       "total_cost": "4",
       "type": "{Battle} Arcane Elemental Spell",
-      "text": "In this battle, you may play spells from your bin. If you do, they gain unstable until regroup. {i}(If they would enter a bin, erase them instead.)",
+      "text": "In this battle, you may play spells from your bin. If you do, they gain {p}unstable until regroup. {i}(If they would enter a bin, erase them instead.)",
       "image": "images_out/Stable/eld.png",
-      "revision_date_time": "2023-12-14 14:03:04.720209",
+      "revision_date_time": "2024-02-26 17:21:14.258762",
       "details": "",
       "factions": [
         "fire"
@@ -1745,7 +1706,7 @@
       "type": "Plant Elemental Unit",
       "text": "[Augment][once] When a spell effect you control deals damage, create that many 1/1 units.",
       "image": "images_out/Stable/emb3.png",
-      "revision_date_time": "2023-12-14 14:03:04.720209",
+      "revision_date_time": "2024-02-26 17:21:14.258762",
       "details": "",
       "factions": [
         "fire",
@@ -1763,9 +1724,9 @@
       "cost": "rrr",
       "total_cost": "4",
       "type": "Arcane Alpaca Unit",
-      "text": "[Augment] Your units and spells gain powerful. {i}(Powerful sources deal double damage).",
+      "text": "[Augment] Your units and spells gain {g}powerful. {i}(Powerful sources deal double damage).",
       "image": "images_out/Stable/sflam7.png",
-      "revision_date_time": "2023-12-14 14:03:04.720209",
+      "revision_date_time": "2024-02-26 17:21:14.258762",
       "details": "",
       "factions": [
         "fire"
@@ -1782,8 +1743,8 @@
       "cost": "rr",
       "type": "Elemental Beast Unit",
       "text": "[Augment] After combat, create an X/X unit, where X is the number of attacking units in my formation.",
-      "image": "images_out/Stable/agg1.png",
-      "revision_date_time": "2023-12-14 14:03:04.720209",
+      "image": "images_out/Stable/agg2.png",
+      "revision_date_time": "2024-02-26 17:21:14.258762",
       "details": "",
       "factions": [
         "fire"
@@ -1791,6 +1752,25 @@
       "total_cost": "2",
       "rulings": [],
       "complexity": "Simple"
+    }
+  ],
+  "Eminence of the Barrens": [
+    {
+      "name": "Eminence of the Barrens",
+      "power": "6",
+      "toughness": "8",
+      "cost": "ee",
+      "total_cost": "6",
+      "type": "Alien Avatar Unit",
+      "text": "[Augment] Whenever I am dealt damage, you may {/n}pay  [one]. If you do, I fight another target unit. {i}(We deal damage to each other equal to our power.)",
+      "image": "images_out/Stable/bdes7a.png",
+      "revision_date_time": "2024-02-26 17:21:14.258762",
+      "details": "",
+      "factions": [
+        "earth"
+      ],
+      "rulings": [],
+      "complexity": "Complex"
     }
   ],
   "Engorged Caudex": [
@@ -1801,9 +1781,9 @@
       "cost": "gg",
       "total_cost": "5",
       "type": "Plant Druid Unit",
-      "text": "When another nontoken ally spawns,  [Switch1] Draw a card.",
+      "text": "When another nontoken ally spawns, {/n}[Switch1] Draw a card.",
       "image": "images_out/Stable/bidoof.png",
-      "revision_date_time": "2023-12-14 14:03:04.721207",
+      "revision_date_time": "2024-02-26 17:21:14.258762",
       "details": "",
       "factions": [
         "wood"
@@ -1822,32 +1802,32 @@
       "type": "Spirit Guardian Unit",
       "text": "[Augment] [two]: Change a target of target effect to me.",
       "image": "images_out/Stable/bbg2.png",
-      "revision_date_time": "2023-12-14 14:03:04.721207",
+      "revision_date_time": "2024-02-26 17:21:14.258762",
       "details": "",
       "factions": [
         "earth"
       ],
       "rulings": [],
-      "complexity": "Simple"
+      "complexity": "Complex"
     }
   ],
   "Envoy of Lightning": [
     {
       "name": "Envoy of Lightning",
-      "power": "2",
-      "toughness": "1",
+      "power": "3",
+      "toughness": "2",
       "cost": "rr",
       "type": "Elemental Unit",
-      "text": "[Augment] Your spells gain \"Deal 1 damage to each opponent\". {i}(This is removed from the spells if I leave play.)",
+      "text": "[Augment] Your spell effects with a single target are {g}Electric. {i}(Excess damage from electric sources can {/n}be directed to an adjacent unit, recursively.)",
       "image": "images_out/Stable/shok.png",
-      "revision_date_time": "2023-12-14 14:03:04.721207",
+      "revision_date_time": "2024-02-26 17:21:14.258762",
       "details": "",
       "factions": [
         "fire"
       ],
       "total_cost": "2",
       "rulings": [],
-      "complexity": "Simple"
+      "complexity": "Complex"
     }
   ],
   "Ephemeral Skywalker": [
@@ -1860,7 +1840,7 @@
       "text": "",
       "image": "images_out/Stable/raky.png",
       "total_cost": "2",
-      "revision_date_time": "2023-12-14 14:03:04.721207",
+      "revision_date_time": "2024-02-26 17:21:14.258762",
       "details": "",
       "factions": [
         "fire"
@@ -1876,16 +1856,16 @@
       "toughness": "1",
       "cost": "m",
       "total_cost": "2",
-      "type": "Technology Horror {Virus} Unit",
+      "type": "Technology Strider {Virus} Unit",
       "text": "[Augment] Whenever I am modded or applied as a mod, put two +1/+1 counters on me.",
       "image": "images_out/Stable/cenc5.png",
-      "revision_date_time": "2023-12-14 14:03:04.721207",
+      "revision_date_time": "2024-02-26 17:21:14.258762",
       "details": "",
       "factions": [
         "metal"
       ],
       "rulings": [],
-      "complexity": "Simple"
+      "complexity": "Complex"
     }
   ],
   "Fertile Soil": [
@@ -1896,9 +1876,9 @@
       "cost": "g",
       "total_cost": "3",
       "type": "Plant Spell",
-      "text": "Create a number of 1/1 units equal to your  [g].",
+      "text": "Create a number of 1/1 units equal to your [g].",
       "image": "images_out/Stable/grs3.png",
-      "revision_date_time": "2023-12-14 14:03:04.721207",
+      "revision_date_time": "2024-02-26 17:21:14.259759",
       "details": "",
       "factions": [
         "wood"
@@ -1917,7 +1897,7 @@
       "type": "{Battle} Bedlam Spell",
       "text": "[Switch1] Target ally and another target unit fight. {i}(They deal damage to each other equal to their power.)",
       "image": "images_out/Stable/weirdfight.png",
-      "revision_date_time": "2023-12-14 14:03:04.721207",
+      "revision_date_time": "2024-02-26 17:21:14.259759",
       "details": "",
       "factions": [
         "earth"
@@ -1934,9 +1914,9 @@
       "cost": "r",
       "total_cost": "1",
       "type": "[r] Resource \u2014 Fire",
-      "text": "When I activate, if you have at least [r][r][r], create a shard.",
+      "text": "When I activate, if you have at least [r][r][r], create a Shard.",
       "image": "images_out/Stable/frss2.png",
-      "revision_date_time": "2023-12-14 14:03:04.721207",
+      "revision_date_time": "2024-02-26 17:21:14.259759",
       "details": "",
       "factions": [
         "fire"
@@ -1955,7 +1935,7 @@
       "type": "{Battle} {Burst} Spell Token",
       "text": "Deal X damage to any target.",
       "image": "images_out/Stable/fballr3.png",
-      "revision_date_time": "2023-12-14 14:03:04.721207",
+      "revision_date_time": "2024-02-26 17:21:14.259759",
       "details": "",
       "factions": [
         "fire"
@@ -1973,7 +1953,7 @@
       "type": "Elemental Spell",
       "text": "[Switch1] Create three Fireball 1.",
       "image": "images_out/Stable/fjugg.png",
-      "revision_date_time": "2023-12-14 14:03:04.722204",
+      "revision_date_time": "2024-02-26 17:21:14.259759",
       "details": "",
       "factions": [
         "fire"
@@ -1992,7 +1972,7 @@
       "type": "{Battle} {Reaping} Arcane Spell",
       "text": "I deal 1 damage to any target.",
       "image": "images_out/Stable/fohis.png",
-      "revision_date_time": "2023-12-14 14:03:04.722204",
+      "revision_date_time": "2024-02-26 17:21:14.259759",
       "details": "",
       "factions": [
         "fire"
@@ -2012,7 +1992,7 @@
       "type": "{Battle} Arcane Spell",
       "text": "Negate all other effects. For each nontoken spell negated this way, create a Fireball 1.",
       "image": "images_out/Stable/fshh.png",
-      "revision_date_time": "2023-12-14 14:03:04.722204",
+      "revision_date_time": "2024-02-26 17:21:14.259759",
       "details": "",
       "factions": [
         "fire"
@@ -2030,7 +2010,7 @@
       "type": "Axolot Lizard Unit",
       "text": "[Augment] When I attack or block, create a Fireball X+1, where X is the number of allies adja- cent to me.",
       "image": "images_out/Stable/flinit6.png",
-      "revision_date_time": "2023-12-14 14:03:04.722204",
+      "revision_date_time": "2024-02-26 17:21:14.259759",
       "details": "",
       "factions": [
         "fire"
@@ -2047,10 +2027,10 @@
       "toughness": "2",
       "cost": "ggm",
       "total_cost": "X",
-      "type": "Flower Spell",
+      "type": "Cosmic Flower Spell",
       "text": "/[Create X 1/1 units {i1}or your units become base X/X until regroup].",
       "image": "images_out/Stable/fsin7.png",
-      "revision_date_time": "2023-12-14 14:03:04.722204",
+      "revision_date_time": "2024-02-26 17:21:14.259759",
       "details": "",
       "factions": [
         "wood",
@@ -2070,7 +2050,7 @@
       "type": "Alien Plant Unit",
       "text": "[Augment] Whenever another ally spawns, put a +1/+1 counter on me.",
       "image": "images_out/Stable/gthing2.png",
-      "revision_date_time": "2023-12-14 14:03:04.722204",
+      "revision_date_time": "2024-02-26 17:21:14.260757",
       "details": "",
       "factions": [
         "wood"
@@ -2089,7 +2069,7 @@
       "type": "Flower Token Unit",
       "text": "{i}(You can tell it's a flower by the way that it is.)",
       "image": "images_out/Stable/flower4.png",
-      "revision_date_time": "2023-12-14 14:03:04.722204",
+      "revision_date_time": "2024-02-26 17:21:14.260757",
       "details": "",
       "factions": [
         "wood"
@@ -2105,10 +2085,10 @@
       "toughness": "3",
       "cost": "ee",
       "total_cost": "3",
-      "type": "{Swift} Luminary Rock Unit",
-      "text": "When my column deals combat damage,  [Switch1] Put a +1/+1 counter on each of your units.",
+      "type": "{Swift} Luminary Primordial Unit",
+      "text": "When my column deals combat damage,  {/n}[Switch1] Put a +1/+1 counter on each of your {/n}units.",
       "image": "images_out/Stable/farc.png",
-      "revision_date_time": "2023-12-14 14:03:04.722204",
+      "revision_date_time": "2024-02-26 17:21:14.260757",
       "details": "",
       "factions": [
         "earth"
@@ -2127,13 +2107,13 @@
       "type": "Alien Robot Unit",
       "text": "[Augment] Whenever a unit with +1/+1 counters on it dies, you may put those counters onto another target unit.",
       "image": "images_out/Stable/friendo4a.png",
-      "revision_date_time": "2023-12-14 14:03:04.722204",
+      "revision_date_time": "2024-02-26 17:21:14.260757",
       "details": "",
       "factions": [
         "metal"
       ],
       "rulings": [],
-      "complexity": "Simple"
+      "complexity": "Complex"
     }
   ],
   "Flux Resonator": [
@@ -2143,10 +2123,10 @@
       "toughness": "2",
       "cost": "mm",
       "total_cost": "2",
-      "type": "Technology Unit",
+      "type": "Technology Construct Unit",
       "text": "[Augment] If one or more counters would be put on a unit by an allied source, put that many counters plus one instead.",
       "image": "images_out/Stable/barp.png",
-      "revision_date_time": "2023-12-14 14:03:04.722204",
+      "revision_date_time": "2024-02-26 17:21:14.260757",
       "details": "",
       "factions": [
         "metal"
@@ -2163,15 +2143,15 @@
       "cost": "m",
       "total_cost": "1",
       "type": "{Battle} Cosmic Spell",
-      "text": "[Switch1] Glimpse 1 {i}(Reveal the top card of the deck. You may play it now, ignoring threshold. Oth- erwise, recycle it.)",
+      "text": "[Switch1] Glimpse 1 {i}(Reveal the top card of the deck {/n}and cache it. Until end of turn, you may play it {/n}as if it was in your hand, ignoring affinity.)",
       "image": "images_out/Stable/fort2.png",
-      "revision_date_time": "2023-12-14 14:03:04.722204",
+      "revision_date_time": "2024-02-26 17:21:14.260757",
       "details": "",
       "factions": [
         "metal"
       ],
       "rulings": [],
-      "complexity": "Complex"
+      "complexity": "Simple"
     }
   ],
   "Formless": [
@@ -2184,7 +2164,7 @@
       "type": "{Flying} Cloud Avatar Unit",
       "text": "When I attack or block,  [Switch] Target unit be- {/n}comes a base 4/4 and loses all attributes until regroup. {i}(This removes attributes from its column.)",
       "image": "images_out/Stable/fless3.png",
-      "revision_date_time": "2023-12-14 14:03:04.723201",
+      "revision_date_time": "2024-02-26 17:21:14.260757",
       "details": "",
       "factions": [
         "metal"
@@ -2203,7 +2183,7 @@
       "type": "{Battle} Ice Spell",
       "text": "The controller of target enemy effect may pay  [x]. If they do, you draw a card. Otherwise, negate that effect. X can't be zero.",
       "image": "images_out/Stable/waw3.png",
-      "revision_date_time": "2023-12-14 14:03:04.723201",
+      "revision_date_time": "2024-02-26 17:21:14.260757",
       "details": "",
       "factions": [
         "water"
@@ -2222,7 +2202,7 @@
       "type": "Fungus Druid Unit",
       "text": "Whenever a nontoken enemy dies, {/n}  [Switch] Create a 1/1 unit.",
       "image": "images_out/Stable/fgar2.png",
-      "revision_date_time": "2023-12-14 14:03:04.723201",
+      "revision_date_time": "2024-02-26 17:21:14.260757",
       "details": "",
       "factions": [
         "wood"
@@ -2241,7 +2221,7 @@
       "type": "Fungus Token Unit",
       "text": "{i}(Tokens are erased when they leave play.)",
       "image": "images_out/Stable/fungr.png",
-      "revision_date_time": "2023-12-14 14:03:04.723201",
+      "revision_date_time": "2024-02-26 17:21:14.260757",
       "details": "",
       "factions": [
         "wood"
@@ -2260,7 +2240,7 @@
       "type": "{Battle} Alien Fungus Spell",
       "text": "Create a 1/1 unit for each unit in target formation.",
       "image": "images_out//Stable/sgens2.png",
-      "revision_date_time": "2023-12-14 14:03:04.723201",
+      "revision_date_time": "2024-02-26 17:21:14.261754",
       "details": "",
       "factions": [
         "water",
@@ -2278,9 +2258,9 @@
       "cost": "bb",
       "total_cost": "3",
       "type": "Eel Unit",
-      "text": "Whenever one or more other cards enter your hand during battle,  [Switch] I gain +4/+4 and flying until regroup.",
+      "text": "Whenever one or more other cards enter your hand during battle,  [Switch] I gain +4/+4 and {g}flying until regroup. {i}(Only flying units can block flying units.)",
       "image": "images_out/Stable/esqd2.png",
-      "revision_date_time": "2023-12-14 14:03:04.723201",
+      "revision_date_time": "2024-02-26 17:21:14.261754",
       "details": "",
       "factions": [
         "water"
@@ -2299,7 +2279,7 @@
       "text": "After combat, [Switch1] Each player sacrifices a unit.",
       "image": "images_out/Stable/smof2.png",
       "total_cost": "2",
-      "revision_date_time": "2023-12-14 14:03:04.723201",
+      "revision_date_time": "2024-02-26 17:21:14.261754",
       "details": "",
       "factions": [
         "fire"
@@ -2315,10 +2295,10 @@
       "toughness": "4",
       "cost": "em",
       "total_cost": "3",
-      "type": "Robot Spell",
+      "type": "Primordial Technology Spell",
       "text": "[Switch1] Create a Robot X, where X is the greatest {/n}health among your units.",
       "image": "images_out/Stable/genrate.png",
-      "revision_date_time": "2023-12-14 14:03:04.723201",
+      "revision_date_time": "2024-02-26 17:21:14.261754",
       "details": "",
       "factions": [
         "earth",
@@ -2338,7 +2318,7 @@
       "type": "Token Unit",
       "text": "I gain the factions and types of the card that created me.",
       "image": "images_out/Stable/gencreature3.png",
-      "revision_date_time": "2023-12-14 14:03:04.723201",
+      "revision_date_time": "2024-02-26 17:21:14.261754",
       "details": "",
       "factions": [
         "colorless"
@@ -2355,9 +2335,9 @@
       "cost": "e",
       "total_cost": "1",
       "type": "Crystal Rock Unit",
-      "text": "When I spawn or die  [Switch] Create a Crystal 1.",
+      "text": "When I spawn or die, [Switch] Create a Crystal 1.",
       "image": "images_out/Stable/geo2.png",
-      "revision_date_time": "2023-12-14 14:03:04.723201",
+      "revision_date_time": "2024-02-26 17:21:14.261754",
       "details": "",
       "factions": [
         "earth"
@@ -2374,9 +2354,9 @@
       "cost": "rr",
       "total_cost": "3",
       "type": "Infernal Beast Unit",
-      "text": "When you sacrifice a unit, [Switch1] Each opponent sacrifices a nontoken unit.",
+      "text": "When you sacrifice a unit, [Switch1] Each oppo- nent sacrifices a nontoken unit.",
       "image": "images_out/Stable/grml2.png",
-      "revision_date_time": "2023-12-14 14:03:04.723201",
+      "revision_date_time": "2024-02-26 17:21:14.261754",
       "details": "",
       "factions": [
         "fire"
@@ -2395,7 +2375,7 @@
       "type": "Mystic Tree {Virus} Unit",
       "text": "[Augment] Your other units gain +1/+1.",
       "image": "images_out/Stable/lumlurk2.png",
-      "revision_date_time": "2023-12-14 14:03:04.724198",
+      "revision_date_time": "2024-02-26 17:21:14.261754",
       "details": "",
       "factions": [
         "wood"
@@ -2414,7 +2394,7 @@
       "type": "{Piercing} Whale Unit",
       "text": "[Battle] Ambush  [4bb] {i}(Play me with the effect \"Recall target ally, put me into their position in play.\"){/i}",
       "image": "images_out/Stable/gw.png",
-      "revision_date_time": "2023-12-14 14:03:04.724198",
+      "revision_date_time": "2024-02-26 17:21:14.261754",
       "details": "",
       "factions": [
         "water"
@@ -2435,7 +2415,7 @@
       "type": "Arcane Guardian {Virus} Unit",
       "text": "[Augment][once]  [one]: Negate target effect targeting me. That effect's controller draws a card.",
       "image": "images_out/Stable/grx8.png",
-      "revision_date_time": "2023-12-14 14:03:04.724198",
+      "revision_date_time": "2024-02-26 17:21:14.261754",
       "details": "",
       "factions": [
         "earth"
@@ -2454,7 +2434,7 @@
       "type": "{Haste} Occult Sprite Unit",
       "text": "When I die, [Switch] Each player sacrifices a unit.",
       "image": "images_out/Stable/grr2.png",
-      "revision_date_time": "2023-12-14 14:03:04.724198",
+      "revision_date_time": "2024-02-26 17:21:14.262755",
       "details": "",
       "factions": [
         "fire"
@@ -2470,10 +2450,10 @@
       "toughness": "1",
       "cost": "g",
       "total_cost": "2",
-      "type": "Alien Fungus Slime {Virus} Unit",
+      "type": "Alien Slime Parasite {Virus} Unit",
       "text": "When I spawn, draw a card. {/n}[Augment] When I despawn, each other player draws two cards.",
       "image": "images_out/Stable/gpl2.png",
-      "revision_date_time": "2023-12-14 14:03:04.724198",
+      "revision_date_time": "2024-02-26 17:21:14.262755",
       "details": "",
       "factions": [
         "wood"
@@ -2491,7 +2471,7 @@
       "type": "{Battle} {Burst} Spell Token",
       "text": "Target unit gains +X/+X until regroup.",
       "image": "images_out/InitialTesting/InitialTesting(396)_1.png",
-      "revision_date_time": "2023-12-14 14:03:04.724198",
+      "revision_date_time": "2024-02-26 17:21:14.262755",
       "details": "",
       "factions": [
         "wood"
@@ -2511,7 +2491,7 @@
       "type": "Flower Guardian Druid Unit",
       "text": "When I attack or block, [Switch] Your units gain +0/+1 until regroup.",
       "image": "images_out/Stable/bca3.png",
-      "revision_date_time": "2023-12-14 14:03:04.724198",
+      "revision_date_time": "2024-02-26 17:21:14.262755",
       "details": "",
       "factions": [
         "wood"
@@ -2530,7 +2510,7 @@
       "type": "{Battle} {Unaware} Sand Spell",
       "text": "I deal 1 damage to each unit.",
       "image": "images_out/Stable/hboo.png",
-      "revision_date_time": "2023-12-14 14:03:04.724198",
+      "revision_date_time": "2024-02-26 17:21:14.262755",
       "details": "",
       "factions": [
         "earth"
@@ -2545,10 +2525,10 @@
       "power": "2",
       "toughness": "4",
       "cost": "rr",
-      "type": "Elemental Unit",
+      "type": "Infernal Elemental Unit",
       "text": "At the end of turn, create a Fireball X, where X is one plus the number of spell tokens you control. {/n}[Augment] Your spell tokens stay through regroup.",
       "image": "images_out/Stable/rt2.png",
-      "revision_date_time": "2023-12-14 14:03:04.724198",
+      "revision_date_time": "2024-02-26 17:21:14.262755",
       "details": "",
       "factions": [
         "fire"
@@ -2558,28 +2538,9 @@
       "complexity": "Simple"
     }
   ],
-  "Hemlock Harvester": [
+  "Hexbane Shiitake": [
     {
-      "name": "Hemlock Harvester",
-      "power": "2",
-      "toughness": "1",
-      "cost": "g",
-      "total_cost": "1",
-      "type": "Insect Plant Unit",
-      "text": "[Augment]  [two], Sacrifice a token: Target unit or effect becomes deadly until regroup.",
-      "image": "images_out/Stable/rro5.png",
-      "revision_date_time": "2023-12-14 14:03:04.724198",
-      "details": "",
-      "factions": [
-        "wood"
-      ],
-      "rulings": [],
-      "complexity": "Simple"
-    }
-  ],
-  "Hexbane Shiitaki": [
-    {
-      "name": "Hexbane Shiitaki",
+      "name": "Hexbane Shiitake",
       "power": "3",
       "toughness": "3",
       "cost": "g",
@@ -2587,7 +2548,7 @@
       "type": "Arcane Fungus Unit",
       "text": "[Augment][once] Whenever another player plays a spell, you may exchange control of me for that spell. If you do, you may choose new targets for that spell.",
       "image": "images_out/Stable/ss.png",
-      "revision_date_time": "2023-12-14 14:03:04.724198",
+      "revision_date_time": "2024-02-26 17:21:14.262755",
       "details": "",
       "factions": [
         "wood"
@@ -2606,7 +2567,7 @@
       "type": "Hooba Robot Unit",
       "text": "[Augment] When I attack or block, create a Robot 2 in my formation.",
       "image": "images_out/Stable/hbb3.png",
-      "revision_date_time": "2023-12-14 14:03:04.725196",
+      "revision_date_time": "2024-02-26 17:21:14.262755",
       "details": "",
       "factions": [
         "metal"
@@ -2623,14 +2584,14 @@
       "cost": "eee",
       "total_cost": "3",
       "type": "Hooba Rock Unit",
-      "text": "[Augment] When I attack or block, create a shard.",
+      "text": "[Augment] When I attack or block, create a Shard.",
       "image": "images_out/Stable/hlan2.png",
-      "revision_date_time": "2023-12-14 14:03:04.725196",
+      "revision_date_time": "2024-02-26 17:21:14.262755",
       "details": "",
       "factions": [
         "earth"
       ],
-      "complexity": "Complex",
+      "complexity": "Simple",
       "rulings": []
     }
   ],
@@ -2644,7 +2605,7 @@
       "type": "{Haste} Hooba Cat Unit",
       "text": "[Augment] When I attack, create a 1/1 unit in my formation.",
       "image": "images_out/Stable/hlinn2.png",
-      "revision_date_time": "2023-12-14 14:03:04.725196",
+      "revision_date_time": "2024-02-26 17:21:14.262755",
       "details": "",
       "factions": [
         "fire"
@@ -2663,7 +2624,7 @@
       "type": "Hooba Banana Unit",
       "text": "[Augment] When I attack, if I am still in formation, create a 1/1 unit in all my adjacent slots.",
       "image": "images_out/Stable/hooban14.png",
-      "revision_date_time": "2023-12-14 14:03:04.725196",
+      "revision_date_time": "2024-02-26 17:21:14.262755",
       "details": "",
       "factions": [
         "wood"
@@ -2682,7 +2643,7 @@
       "type": "Hooba Bird Unit",
       "text": "[Augment] When I attack or block, you may play a unit from your hand into an open position in my formation. {i}(You still pay the cost.)",
       "image": "images_out/Stable/hbapo.png",
-      "revision_date_time": "2023-12-14 14:03:04.725196",
+      "revision_date_time": "2024-02-26 17:21:14.263749",
       "details": "",
       "factions": [
         "water"
@@ -2701,7 +2662,7 @@
       "type": "Hooba Token Unit",
       "text": "{i}(You can tell it's a Hooba by the way that it is.)",
       "image": "images_out/Stable/egg.png",
-      "revision_date_time": "2023-12-14 14:03:04.725196",
+      "revision_date_time": "2024-02-26 17:21:14.263749",
       "details": "",
       "factions": [
         "fire"
@@ -2720,7 +2681,7 @@
       "type": "Hooba Plant Token Unit",
       "text": "{i}(You can tell it's a Hooba by the way that it is.)",
       "image": "images_out/Stable/egg3.png",
-      "revision_date_time": "2023-12-14 14:03:04.725196",
+      "revision_date_time": "2024-02-26 17:21:14.263749",
       "details": "",
       "factions": [
         "wood"
@@ -2739,7 +2700,7 @@
       "type": "Hooba Token Unit",
       "text": "{i}(You can tell it's a Hooba by the way that it is.)",
       "image": "images_out/Stable/egg2.png",
-      "revision_date_time": "2023-12-14 14:03:04.725196",
+      "revision_date_time": "2024-02-26 17:21:14.263749",
       "details": "",
       "factions": [
         "earth"
@@ -2755,10 +2716,10 @@
       "toughness": "1",
       "cost": "gg",
       "total_cost": "2",
-      "type": "{Battle} Fungus Spell Unit",
+      "type": "{Battle} Arcane Fungus Spell Unit",
       "text": "Negate target effect. Its controller gains control of me.",
       "image": "images_out/Stable/shmush.png",
-      "revision_date_time": "2023-12-14 14:03:04.725196",
+      "revision_date_time": "2024-02-26 17:21:14.263749",
       "details": "",
       "factions": [
         "wood"
@@ -2774,10 +2735,10 @@
       "toughness": "3",
       "cost": "gg",
       "total_cost": "2",
-      "type": "Fungus Flower {Virus} Unit",
+      "type": "Flower Parasite {Virus} Unit",
       "text": "When I spawn, create two 1/1 units. {/n}[Augment] When I despawn, delete all token allies.",
       "image": "images_out/Stable/wflow2.png",
-      "revision_date_time": "2023-12-14 14:03:04.725196",
+      "revision_date_time": "2024-02-26 17:21:14.263749",
       "details": "",
       "factions": [
         "wood"
@@ -2792,10 +2753,10 @@
       "power": "1",
       "toughness": "1",
       "cost": "r",
-      "type": "Elemental Sprite Unit",
-      "text": "When I spawn or die,  [Switch] Create a Fireball 1.",
+      "type": "Infernal Sprite Unit",
+      "text": "When I spawn or die, [Switch] Create a Fireball 1.",
       "image": "images_out/Stable/fremb.png",
-      "revision_date_time": "2023-12-14 14:03:04.725196",
+      "revision_date_time": "2024-02-26 17:21:14.263749",
       "details": "",
       "factions": [
         "fire"
@@ -2815,7 +2776,7 @@
       "type": "{Battle} Occult Spell",
       "text": "[Switch1] /[Sacrifice a unit]: Draw a card.",
       "image": "images_out/Stable/edom4.png",
-      "revision_date_time": "2023-12-14 14:03:04.726193",
+      "revision_date_time": "2024-02-26 17:21:14.263749",
       "details": "",
       "factions": [
         "fire"
@@ -2831,10 +2792,10 @@
       "toughness": "1",
       "cost": "rg",
       "total_cost": "1",
-      "type": "{Battle} Elemental Fungus Spell",
+      "type": "{Battle} Infernal Blight Spell",
       "text": "[Switch1] /[Sacrifice X units]: I deal X damage to any target.",
       "image": "images_out/Stable/vtox.png",
-      "revision_date_time": "2023-12-14 14:03:04.726193",
+      "revision_date_time": "2024-02-26 17:21:14.263749",
       "details": "",
       "factions": [
         "fire",
@@ -2854,7 +2815,7 @@
       "type": "Infernal Demon Unit",
       "text": "[Augment] [once] Sacrifice X units: Create X Fireball 1.",
       "image": "images_out/Stable/sqlead3.png",
-      "revision_date_time": "2023-12-14 14:03:04.726193",
+      "revision_date_time": "2024-02-26 17:21:14.263749",
       "details": "",
       "factions": [
         "fire"
@@ -2866,14 +2827,14 @@
   "Infernal Grovekeeper": [
     {
       "name": "Infernal Grovekeeper",
-      "power": "5",
-      "toughness": "4",
+      "power": "3",
+      "toughness": "6",
       "cost": "rg",
       "total_cost": "4",
-      "type": "{Battle} Infernal Fungus Unit",
-      "text": "You may play me into an open slot in your formations. {/n}[Augment] At the start of deployment, you lose 1 life for each of your units.",
+      "type": "Infernal Fungus Unit",
+      "text": "[Augment] After battle, put a -1/-1 counter on each {/n}unit, then I deal 2 damage to each player.",
       "image": "images_out/Stable/shos2.png",
-      "revision_date_time": "2023-12-14 14:03:04.726193",
+      "revision_date_time": "2024-02-26 17:21:14.263749",
       "details": "",
       "factions": [
         "fire",
@@ -2893,7 +2854,7 @@
       "type": "Infernal Demon Unit",
       "text": "Your wisps gain +2/+1 and do not sacrifice themselves after combat. {/n}[Augment] At the end of turn, create a wisp.",
       "image": "images_out//Stable/mwwev4.png",
-      "revision_date_time": "2023-12-14 14:03:04.726193",
+      "revision_date_time": "2024-02-26 17:21:14.263749",
       "details": "",
       "factions": [
         "fire"
@@ -2910,9 +2871,9 @@
       "cost": "b",
       "total_cost": "1",
       "type": "{Battle} Bedlam Occult Spell",
-      "text": "Draw a card.  [Switch1] Starting with you, players may play a unit from hand. {i}(The unit's costs still need to be paid.).",
+      "text": "Draw a card. [Switch1] Starting with you, players may play a unit from hand as if it were [Battle]. {i}(The unit's costs still need to be paid.).",
       "image": "images_out/Stable/oh4.png",
-      "revision_date_time": "2023-12-14 14:03:04.726193",
+      "revision_date_time": "2024-02-26 17:21:14.264746",
       "details": "",
       "factions": [
         "water"
@@ -2928,10 +2889,10 @@
       "toughness": "2",
       "cost": "gg",
       "type": "Mystic Flower {Virus} Unit",
-      "text": "[Augment] Adjacent allies gain +2/+2.",
+      "text": "[Augment] Allies adjacent to me gain +2/+2.",
       "image": "images_out/Stable/inspir.png",
       "total_cost": "2",
-      "revision_date_time": "2023-12-14 14:03:04.726193",
+      "revision_date_time": "2024-02-26 17:21:14.264746",
       "details": "",
       "factions": [
         "wood"
@@ -2947,10 +2908,10 @@
       "toughness": "1",
       "cost": "mm",
       "total_cost": "2",
-      "type": "Spirit Technology Unit",
+      "type": "Spirit Construct Unit",
       "text": "[Augment]  [x], Sacrifice another nontoken unit: Create a Robot X. X can't be 0.",
       "image": "images_out/Stable/iress.png",
-      "revision_date_time": "2023-12-14 14:03:04.726193",
+      "revision_date_time": "2024-02-26 17:21:14.264746",
       "details": "",
       "factions": [
         "metal"
@@ -2969,7 +2930,7 @@
       "type": "{Battle}AI Cosmic Spell",
       "text": "Target opponent negates an effect they control.",
       "image": "images_out/Stable/warreal.png",
-      "revision_date_time": "2023-12-14 14:03:04.726193",
+      "revision_date_time": "2024-02-26 17:21:14.264746",
       "details": "",
       "factions": [
         "metal"
@@ -2988,13 +2949,33 @@
       "type": "{Battle} {Reaping} Occult Technology Spell",
       "text": "Switch the power and defense of target unit until regroup.",
       "image": "images_out/Stable/ires.png",
-      "revision_date_time": "2023-12-14 14:03:04.726193",
+      "revision_date_time": "2024-02-26 17:21:14.264746",
       "details": "",
       "factions": [
         "metal"
       ],
       "rulings": [],
       "complexity": "Simple"
+    }
+  ],
+  "Invasive Species": [
+    {
+      "name": "Invasive Species",
+      "power": "4",
+      "toughness": "4",
+      "cost": "bg",
+      "total_cost": "1",
+      "type": "Alien Parasite Unit",
+      "text": "[Augment] At the start of deployment, recall all your other units.",
+      "image": "images_out/Stable/amyb.png",
+      "revision_date_time": "2024-02-26 17:21:14.264746",
+      "details": "",
+      "factions": [
+        "water",
+        "wood"
+      ],
+      "rulings": [],
+      "complexity": "Complex"
     }
   ],
   "Invigorate": [
@@ -3007,7 +2988,7 @@
       "type": "{Battle} Mystic Druid Spell",
       "text": "Target unit gains +0/+1 until regroup. Draw a card.",
       "image": "images_out/Stable/igrt3.png",
-      "revision_date_time": "2023-12-14 14:03:04.727191",
+      "revision_date_time": "2024-02-26 17:21:14.264746",
       "details": "",
       "factions": [
         "wood"
@@ -3026,7 +3007,7 @@
       "type": "{Battle} Jellyfish Spell Unit",
       "text": "Target unit gains -2/-2 until regroup.",
       "image": "images_out/Stable/jl2b.png",
-      "revision_date_time": "2023-12-14 14:03:04.727191",
+      "revision_date_time": "2024-02-26 17:21:14.264746",
       "details": "",
       "factions": [
         "water"
@@ -3042,10 +3023,10 @@
       "toughness": "4",
       "cost": "gg",
       "total_cost": "3",
-      "type": "Insect Plant Unit",
+      "type": "Alien Insect Plant Unit",
       "text": "[Augment][once] When I am dealt damage, create that many 1/1 units.",
       "image": "images_out/Stable/fungg2.png",
-      "revision_date_time": "2023-12-14 14:03:04.727191",
+      "revision_date_time": "2024-02-26 17:21:14.264746",
       "details": "",
       "factions": [
         "wood"
@@ -3063,8 +3044,8 @@
       "total_cost": "5",
       "type": "{Battle} Beast Horror Spell Unit",
       "text": "[Switch1] Delete target unit.",
-      "image": "images_out/Stable/lillik.png",
-      "revision_date_time": "2023-12-14 14:03:04.727191",
+      "image": "images_out/Stable/lillik2.png",
+      "revision_date_time": "2024-02-26 17:21:14.264746",
       "details": "",
       "factions": [
         "water"
@@ -3083,7 +3064,7 @@
       "type": "{Battle} Technology Spell",
       "text": "[Switch1] /[Sacrifce a unit]: Each opponent sacrifices a unit.",
       "image": "images_out/Stable/ttransf3.png",
-      "revision_date_time": "2023-12-14 14:03:04.727191",
+      "revision_date_time": "2024-02-26 17:21:14.265743",
       "details": "",
       "factions": [
         "metal"
@@ -3102,7 +3083,7 @@
       "type": "Occult Rock {Virus} Unit",
       "text": "[Augment] Whenever I am dealt damage, I deal that much damage to you.",
       "image": "images_out/Stable/rk3.png",
-      "revision_date_time": "2023-12-14 14:03:04.727191",
+      "revision_date_time": "2024-02-26 17:21:14.265743",
       "details": "",
       "factions": [
         "earth"
@@ -3121,7 +3102,7 @@
       "type": "Robot Unit",
       "text": "[Augment]  [three]: Create a Robot 2.",
       "image": "images_out/Stable/lfor.png",
-      "revision_date_time": "2023-12-14 14:03:04.727191",
+      "revision_date_time": "2024-02-26 17:21:14.265743",
       "details": "",
       "factions": [
         "metal"
@@ -3140,33 +3121,13 @@
       "type": "Mystic Axolot Spell Unit",
       "text": "Draw a card.",
       "image": "images_out/Stable/drp2.png",
-      "revision_date_time": "2023-12-14 14:03:04.727191",
+      "revision_date_time": "2024-02-26 17:21:14.265743",
       "details": "",
       "factions": [
         "water"
       ],
       "rulings": [],
       "complexity": "Simple"
-    }
-  ],
-  "Loob": [
-    {
-      "name": "Loob",
-      "power": "3",
-      "toughness": "4",
-      "cost": "gb",
-      "total_cost": "3",
-      "type": "Cosmic Fungus Unit",
-      "text": "I spawn with three -1/-1 counters on me. {/n}[Augment] Whenever you play a nontoken spell, you may move a counter from me onto another target unit.",
-      "image": "images_out/Stable/looby6.png",
-      "revision_date_time": "2023-12-14 14:03:04.727191",
-      "details": "",
-      "factions": [
-        "wood",
-        "water"
-      ],
-      "rulings": [],
-      "complexity": "Complex"
     }
   ],
   "Lord of Buddies": [
@@ -3179,7 +3140,7 @@
       "type": "Glitch Buddy Lord Unit",
       "text": "[Augment] If another nontoken buddy would die in battle, recall it and create a 7/7 unit instead.",
       "image": "images_out/Stable/lbd.png",
-      "revision_date_time": "2023-12-14 14:03:04.727191",
+      "revision_date_time": "2024-02-26 17:21:14.265743",
       "details": "",
       "complexity": "Glitch",
       "factions": [
@@ -3192,19 +3153,19 @@
     {
       "name": "Lost Guardian",
       "power": "0",
-      "toughness": "3",
+      "toughness": "4",
       "cost": "e",
       "total_cost": "2",
       "type": "Cosmic Guardian Unit",
-      "text": "[Augment] You may augment cards on top of me.",
+      "text": "[Augment] At the start of deployment, you may recall {/n}one of my mods. {i}(Put it into your hand.)",
       "image": "images_out/Stable/bgar.png",
-      "revision_date_time": "2023-12-14 14:03:04.727191",
+      "revision_date_time": "2024-02-26 17:21:14.265743",
       "details": "",
       "factions": [
         "earth"
       ],
       "rulings": [],
-      "complexity": "Simple"
+      "complexity": "Complex"
     }
   ],
   "Lumengrove Lurker": [
@@ -3217,7 +3178,7 @@
       "type": "Mystic Fungus Unit",
       "text": "Afer combat, [Switch1] Recall up to one target unit with cost less than or equal to the number of units in my formation.",
       "image": "images_out/Stable/lrkk2.png",
-      "revision_date_time": "2023-12-14 14:03:04.728188",
+      "revision_date_time": "2024-02-26 17:21:14.265743",
       "details": "",
       "factions": [
         "water",
@@ -3236,8 +3197,8 @@
       "total_cost": "3",
       "type": "Plant Luminary Unit",
       "text": "When I attack in a formation of four or more units,  [Switch1] Draw a card.",
-      "image": "images_out/Stable/flok3b.png",
-      "revision_date_time": "2023-12-14 14:03:04.728188",
+      "image": "images_out/Stable/primp2.png",
+      "revision_date_time": "2024-02-26 17:21:14.265743",
       "details": "",
       "factions": [
         "wood"
@@ -3256,7 +3217,7 @@
       "type": "{Battle} Elemental Spell",
       "text": "I deal 6 damage to target unit.",
       "image": "images_out/Stable/jstr2.png",
-      "revision_date_time": "2023-12-14 14:03:04.728188",
+      "revision_date_time": "2024-02-26 17:21:14.265743",
       "details": "",
       "factions": [
         "fire"
@@ -3275,7 +3236,7 @@
       "type": "Slime Beast Unit",
       "text": "[Battle] Ambush  [three_blue] {i}(Play me with the effect \"Recall target ally, put me into their position in play.\"){/i}",
       "image": "images_out/Stable/slime2.png",
-      "revision_date_time": "2023-12-14 14:03:04.728188",
+      "revision_date_time": "2024-02-26 17:21:14.265743",
       "details": "",
       "factions": [
         "water"
@@ -3289,21 +3250,21 @@
   "Maelstrom Charger": [
     {
       "name": "Maelstrom Charger",
-      "power": "7",
+      "power": "4",
       "toughness": "2",
-      "cost": "rrm",
+      "cost": "rm",
       "total_cost": "3",
-      "type": "{Haste} Elemental Maelstrom Unit",
-      "text": "[Augment] Your units and spells are Electric. {i}(Excess damage by electric sources can be directed to an adjacent unit.)",
+      "type": "Elemental Maelstrom Unit",
+      "text": "As you play a nonunit spell, you may sacrifice me. If you do, copy that spell and you may choose new targets for the copy.",
       "image": "images_out/Stable/bthund4.png",
-      "revision_date_time": "2023-12-14 14:03:04.728188",
+      "revision_date_time": "2024-02-26 17:21:14.265743",
       "details": "",
       "factions": [
         "fire",
         "metal"
       ],
       "rulings": [],
-      "complexity": "Simple"
+      "complexity": "Complex"
     }
   ],
   "Malevolent Machinations": [
@@ -3316,7 +3277,7 @@
       "type": "{Battle} Occult Technology Spell",
       "text": "/[Sacrifice X units]: Negate up to X target effects.",
       "image": "images_out/Stable/opac.png",
-      "revision_date_time": "2023-12-14 14:03:04.728188",
+      "revision_date_time": "2024-02-26 17:21:14.266740",
       "details": "",
       "factions": [
         "fire",
@@ -3336,7 +3297,7 @@
       "type": "Elemental Horror {Virus} Unit",
       "text": "[Augment] I gain -7/-7.",
       "image": "images_out/Stable/mmoo3.png",
-      "revision_date_time": "2023-12-14 14:03:04.728188",
+      "revision_date_time": "2024-02-26 17:21:14.266740",
       "details": "",
       "factions": [
         "earth"
@@ -3355,7 +3316,7 @@
       "type": "Robot Insect Horror Unit",
       "text": "[Augment] Whenever one of your units dies, each opponent sacrifices a unit.",
       "image": "images_out/Stable/mhr.png",
-      "revision_date_time": "2023-12-14 14:03:04.728188",
+      "revision_date_time": "2024-02-26 17:21:14.266740",
       "details": "",
       "factions": [
         "metal",
@@ -3372,10 +3333,10 @@
       "toughness": "3",
       "cost": "mmm",
       "total_cost": "6",
-      "type": "Technology Spell",
+      "type": "Robot Spell",
       "text": "[Switch1] Create a Robot 3, a Robot 2 and a Robot 1.",
       "image": "images_out/Stable/manf3d.png",
-      "revision_date_time": "2023-12-14 14:03:04.728188",
+      "revision_date_time": "2024-02-26 17:21:14.266740",
       "details": "",
       "factions": [
         "metal"
@@ -3392,16 +3353,16 @@
       "cost": "rm",
       "total_cost": "4",
       "type": "{Battle} Bedlam Maelstrom Spell",
-      "text": "[Switch1] Each player sacrifices two units. If four or more units were sacrificed this way, repeat this.",
+      "text": "Each player sacrifices two units. If four or more units were sacrificed this way, repeat this.",
       "image": "images_out/Stable/cim8.png",
-      "revision_date_time": "2023-12-14 14:03:04.728188",
+      "revision_date_time": "2024-02-26 17:21:14.266740",
       "details": "",
       "factions": [
         "fire",
         "metal"
       ],
       "rulings": [],
-      "complexity": "Complex"
+      "complexity": "Simple"
     }
   ],
   "Megadeath": [
@@ -3411,10 +3372,10 @@
       "toughness": "3",
       "cost": "ggg",
       "total_cost": "4",
-      "type": "Fungus Beast Unit",
-      "text": "When I attack or die,  [Switch1] Create a Poison 5.",
+      "type": "Blight Beast Unit",
+      "text": "When I attack, [Switch1] Create a Poison 5.",
       "image": "images_out/Stable/pled_2.png",
-      "revision_date_time": "2023-12-14 14:03:04.728188",
+      "revision_date_time": "2024-02-26 17:21:14.266740",
       "details": "",
       "factions": [
         "wood"
@@ -3431,9 +3392,9 @@
       "cost": "m",
       "total_cost": "1",
       "type": "[m] Resource \u2014 Metal",
-      "text": "When I activate, if you have at least [m][m][m], create a shard.",
+      "text": "When I activate, if you have at least [m][m][m], create a Shard.",
       "image": "images_out/Stable/mrs7.png",
-      "revision_date_time": "2023-12-14 14:03:04.729185",
+      "revision_date_time": "2024-02-26 17:21:14.266740",
       "details": "",
       "factions": [
         "metal"
@@ -3450,9 +3411,9 @@
       "cost": "ee",
       "total_cost": "2",
       "type": "Mystic Luminary Unit",
-      "text": "When I attack or block,  [Switch] Create a Crystal 1.",
+      "text": "When I attack or block, [Switch] Create a Crystal 1.",
       "image": "images_out/Stable/sunbel.png",
-      "revision_date_time": "2023-12-14 14:03:04.729185",
+      "revision_date_time": "2024-02-26 17:21:14.266740",
       "details": "",
       "factions": [
         "earth"
@@ -3469,12 +3430,31 @@
       "cost": "e",
       "total_cost": "4",
       "type": "{Battle} Cosmic Rock Spell",
-      "text": "Rockfall 3 three times. {i}(For each player, I deal 3 damage to one of their units of their choice. Do this three times.)",
+      "text": "Rockfall 3 three times. {i}(To rockfall 3: Each player chooses one of their units. I deal 3 damage to each of the chosen units.)",
       "image": "images_out/Stable/aster.png",
-      "revision_date_time": "2023-12-14 14:03:04.729185",
+      "revision_date_time": "2024-02-26 17:21:14.266740",
       "details": "",
       "factions": [
         "earth"
+      ],
+      "rulings": [],
+      "complexity": "Simple"
+    }
+  ],
+  "Might of the Grove": [
+    {
+      "name": "Might of the Grove",
+      "power": "3",
+      "toughness": "4",
+      "cost": "g",
+      "total_cost": "2",
+      "type": "{Battle}Tree Tree Druid Spell",
+      "text": "[Switch1] Target unit gains +1/+1 for each of your units until regroup.",
+      "image": "images_out/Stable/symbb3.png",
+      "revision_date_time": "2024-02-26 17:21:14.266740",
+      "details": "",
+      "factions": [
+        "wood"
       ],
       "rulings": [],
       "complexity": "Simple"
@@ -3487,10 +3467,10 @@
       "toughness": "1",
       "cost": "g",
       "type": "Alien Fungus Unit",
-      "text": "After combat,  [Switch1] You may give an opponent control of target ally. If you do, draw a card.",
+      "text": "After combat, [Switch1] You may give an opponent control of target ally. If you do, draw a card.",
       "image": "images_out/Stable/dblot.png",
       "total_cost": "1",
-      "revision_date_time": "2023-12-14 14:03:04.729185",
+      "revision_date_time": "2024-02-26 17:21:14.266740",
       "details": "",
       "factions": [
         "wood"
@@ -3506,10 +3486,10 @@
       "toughness": "6",
       "cost": "bg",
       "total_cost": "3",
-      "type": "Alien Fungus Frog {Virus} Unit",
+      "type": "Alien Frog Parasite {Virus} Unit",
       "text": "[Augment] Whenever you are dealt combat damage, target opponent gains control of me.",
       "image": "images_out/Stable/msporf.png",
-      "revision_date_time": "2023-12-14 14:03:04.729185",
+      "revision_date_time": "2024-02-26 17:21:14.267740",
       "details": "",
       "factions": [
         "water",
@@ -3527,9 +3507,9 @@
       "cost": "bbb",
       "total_cost": "4",
       "type": "Kraken Unit",
-      "text": "When I attack or block, [Switch1] Recall up to one target unit with 5 or less defense.",
+      "text": "When I attack, [Switch1] Recall up to one target unit with 5 or less defense.",
       "image": "images_out/Stable/mkrk.png",
-      "revision_date_time": "2023-12-14 14:03:04.729185",
+      "revision_date_time": "2024-02-26 17:21:14.267740",
       "details": "",
       "factions": [
         "water"
@@ -3542,13 +3522,13 @@
     {
       "name": "Mirage Scuttler",
       "power": "0",
-      "toughness": "1",
+      "toughness": "2",
       "cost": "e",
       "total_cost": "1",
       "type": "Sand Crab Unit",
-      "text": "[Augment] When I become the target of an allied effect, put a +1/+1 counter on me.",
+      "text": "[Augment] Whenever I survive damage, put that many +1/+1 counters on me.",
       "image": "images_out/Stable/geop.png",
-      "revision_date_time": "2023-12-14 14:03:04.729185",
+      "revision_date_time": "2024-02-26 17:21:14.267740",
       "details": "",
       "factions": [
         "earth"
@@ -3567,7 +3547,7 @@
       "type": "Arcane Lizard Unit",
       "text": "[Battle] Ambush  [4bb] {i}(Play me with the effect \"Recall target ally, put me into their position in play.\"){/i} {/n}At the end of turn, if you took no actions during deployment,  [Switch1] Create a 3/3 unit.",
       "image": "images_out/Stable/horroth2.png",
-      "revision_date_time": "2023-12-14 14:03:04.729185",
+      "revision_date_time": "2024-02-26 17:21:14.267740",
       "details": "",
       "factions": [
         "water"
@@ -3584,9 +3564,9 @@
       "cost": "be",
       "total_cost": "2",
       "type": "Arcane Crab Unit",
-      "text": "[Battle] Ambush  [2be] {i}(Play me with the effect \"Recall target ally, put me into their position in play.\"){/i}  {/n}[once] When I am I dealt damage, I deal that much damage to any target.",
-      "image": "images_out/Stable/sdr3.png",
-      "revision_date_time": "2023-12-14 14:03:04.729185",
+      "text": "[Battle] Ambush  [2be] {i}(Play me with the effect \"Recall target ally, put me into their position in play.\"){/i}  {/n}[once] When I am dealt damage, I deal that much damage to any target.",
+      "image": "images_out/Stable/sdr3a.png",
+      "revision_date_time": "2024-02-26 17:21:14.267740",
       "details": "",
       "factions": [
         "water",
@@ -3606,7 +3586,7 @@
       "type": "Occult Demon Unit",
       "text": "When the second ally dies in this battle,  [Switch1] Draw a card.",
       "image": "images_out/Stable/fgrem.png",
-      "revision_date_time": "2023-12-14 14:03:04.729185",
+      "revision_date_time": "2024-02-26 17:21:14.267740",
       "details": "",
       "factions": [
         "fire"
@@ -3623,9 +3603,9 @@
       "cost": "e",
       "total_cost": "4",
       "type": "Cosmic Rock Unit",
-      "text": "When I become targeted  [Switch1] Create a Crystal 2.",
+      "text": "When I become targeted, [Switch1] Create a Crystal 2.",
       "image": "images_out/Stable/mru.png",
-      "revision_date_time": "2023-12-14 14:03:04.729185",
+      "revision_date_time": "2024-02-26 17:21:14.267740",
       "details": "",
       "factions": [
         "earth"
@@ -3644,7 +3624,7 @@
       "type": "Infernal Horror {Virus} Unit",
       "text": "When I spawn, create two Fireball 1. {/n}[Augment] When I despawn, negate all allied spells.",
       "image": "images_out/Stable/arkch5.png",
-      "revision_date_time": "2023-12-14 14:03:04.730183",
+      "revision_date_time": "2024-02-26 17:21:14.267740",
       "details": "",
       "factions": [
         "fire"
@@ -3662,10 +3642,10 @@
       "toughness": "6",
       "cost": "err",
       "total_cost": "7",
-      "type": "Rock Elemental Unit",
+      "type": "Infernal Rock Elemental Unit",
       "text": "[Augment] Whenever I survive damage, each oppo- nent sacrifices that many units.",
       "image": "images_out/Stable/avolc4.png",
-      "revision_date_time": "2023-12-14 14:03:04.730183",
+      "revision_date_time": "2024-02-26 17:21:14.267740",
       "details": "",
       "factions": [
         "earth",
@@ -3684,7 +3664,7 @@
       "type": "{Haste} Elemental Spell",
       "text": "[Switch1] Create a Fireball 3.",
       "image": "images_out/Stable/uphev2.png",
-      "revision_date_time": "2023-12-14 14:03:04.730183",
+      "revision_date_time": "2024-02-26 17:21:14.267740",
       "details": "",
       "factions": [
         "fire"
@@ -3701,10 +3681,10 @@
       "toughness": "1",
       "cost": "m",
       "total_cost": "1",
-      "type": "{Battle} Alien Monkey Unit",
+      "type": "{Battle} Bedlam Alien Monkey Unit",
       "text": "If I spawned this turn, other units in this battle lose all attributes and abilities.",
       "image": "images_out/Stable/mk5.png",
-      "revision_date_time": "2023-12-14 14:03:04.730183",
+      "revision_date_time": "2024-02-26 17:21:14.267740",
       "details": "",
       "factions": [
         "metal"
@@ -3725,7 +3705,7 @@
       "type": "Fungus Druid Unit",
       "text": "When an enemy dies, [Switch1] Create a 2/2 unit.",
       "image": "images_out/Stable/moosh2.png",
-      "revision_date_time": "2023-12-14 14:03:04.730183",
+      "revision_date_time": "2024-02-26 17:21:14.268735",
       "details": "",
       "factions": [
         "wood"
@@ -3744,7 +3724,7 @@
       "type": "Mystic Luminary Unit",
       "text": "Whenever you apply an augment during battle,  [Switch] I gain +2/+2 until regroup.",
       "image": "images_out/Stable/mgar.png",
-      "revision_date_time": "2023-12-14 14:03:04.730183",
+      "revision_date_time": "2024-02-26 17:21:14.268735",
       "details": "",
       "factions": [
         "earth"
@@ -3761,9 +3741,9 @@
       "cost": "g",
       "total_cost": "1",
       "type": "Fungus Unit",
-      "text": "When you create a token,  [Switch1] Target ally gains +3/+3 until regroup.",
+      "text": "When you create a token, [Switch1] Target ally gains +3/+3 until regroup.",
       "image": "images_out/Stable/mment.png",
-      "revision_date_time": "2023-12-14 14:03:04.730183",
+      "revision_date_time": "2024-02-26 17:21:14.268735",
       "details": "",
       "factions": [
         "wood"
@@ -3782,7 +3762,7 @@
       "type": "[Augment] {Flying} Alien Cloud Unit",
       "text": "",
       "image": "images_out/Stable/ndr3.png",
-      "revision_date_time": "2023-12-14 14:03:04.730183",
+      "revision_date_time": "2024-02-26 17:21:14.268735",
       "details": "",
       "factions": [
         "metal"
@@ -3799,9 +3779,9 @@
       "cost": "e",
       "total_cost": "3",
       "type": "Bird Insect Oracle Unit",
-      "text": "[Augment][once] When another ally with greater defense than power spawns, draw a card.",
+      "text": "[once] When another ally with greater defense than power spawns, draw a card.",
       "image": "images_out/Stable/ghora.png",
-      "revision_date_time": "2023-12-14 14:03:04.730183",
+      "revision_date_time": "2024-02-26 17:21:14.268735",
       "details": "",
       "factions": [
         "earth"
@@ -3817,10 +3797,10 @@
       "toughness": "1",
       "cost": "r",
       "total_cost": "2",
-      "type": "Eel Unit",
-      "text": "When you play one or more token spells, {/n}[Switch1] Target unit gains +2/+0 and flying until regroup.",
+      "type": "Cloud Eel Unit",
+      "text": "When you play a token spell, [Switch1] Target unit gains +2/+0 and {g}flying until regroup. {i}(Only flying units can block flying units.)",
       "image": "images_out/Stable/tfish.png",
-      "revision_date_time": "2023-12-14 14:03:04.730183",
+      "revision_date_time": "2024-02-26 17:21:14.268735",
       "details": "",
       "factions": [
         "fire"
@@ -3836,10 +3816,10 @@
       "toughness": "2",
       "cost": "gg",
       "total_cost": "3",
-      "type": "Fungus {Virus} Unit",
+      "type": "Blight Fungus {Virus} Unit",
       "text": "[Augment] When I die, put a -1/-1 counter on each unit.",
       "image": "images_out/Stable/grbs5.png",
-      "revision_date_time": "2023-12-14 14:03:04.730183",
+      "revision_date_time": "2024-02-26 17:21:14.268735",
       "details": "",
       "factions": [
         "wood"
@@ -3855,10 +3835,10 @@
       "toughness": "2",
       "cost": "gg",
       "total_cost": "1",
-      "type": "{Battle} {Reaping} Arcane Fungus Spell",
+      "type": "{Battle} {Reaping} Arcane Blight Spell",
       "text": "Put a -1/-1 counter on target unit.",
       "image": "images_out/Stable/ndem.png",
-      "revision_date_time": "2023-12-14 14:03:04.731180",
+      "revision_date_time": "2024-02-26 17:21:14.268735",
       "details": "",
       "factions": [
         "wood"
@@ -3874,16 +3854,35 @@
       "toughness": "2",
       "cost": "g",
       "total_cost": "2",
-      "type": "[Augment] {Poisonous} {Swift} Fungus Unit",
+      "type": "[Augment] {Poisonous} {Swift} Blight Fungus Unit",
       "text": "",
       "image": "images_out/Stable/sprm2.png",
-      "revision_date_time": "2023-12-14 14:03:04.731180",
+      "revision_date_time": "2024-02-26 17:21:14.268735",
       "details": "",
       "factions": [
         "wood"
       ],
       "complexity": "Simple",
       "rulings": []
+    }
+  ],
+  "Nucleus of the Miasma": [
+    {
+      "name": "Nucleus of the Miasma",
+      "power": "2",
+      "toughness": "2",
+      "cost": "g",
+      "total_cost": "4",
+      "type": "{Poisonous} Blight Cloud Unit",
+      "text": "When I die,  [Switch] Delete all units with -1/-1 counters on them.",
+      "image": "images_out/Stable/pbel5.png",
+      "revision_date_time": "2024-02-26 17:21:14.268735",
+      "details": "",
+      "factions": [
+        "wood"
+      ],
+      "rulings": [],
+      "complexity": "Complex"
     }
   ],
   "Null Drone": [
@@ -3893,16 +3892,36 @@
       "toughness": "1",
       "cost": "b",
       "total_cost": "2",
-      "type": "{Battle} Horror Spell Unit",
-      "text": "Negate target spell effect with cost less than or equal to the number of nontoken spell effects you control.",
+      "type": "{Battle} Sprite Horror Spell Unit",
+      "text": "Negate target spell effect with cost less than or equal to the greatest amount of life lost by a player in this battle.",
       "image": "images_out/Stable/ndron2.png",
-      "revision_date_time": "2023-12-14 14:03:04.731180",
+      "revision_date_time": "2024-02-26 17:21:14.268735",
       "details": "",
       "factions": [
         "water"
       ],
       "rulings": [],
       "complexity": "Simple"
+    }
+  ],
+  "Ominous Growth": [
+    {
+      "name": "Ominous Growth",
+      "power": "2",
+      "toughness": "2",
+      "cost": "gm",
+      "total_cost": "2",
+      "type": "Alien Fungus Unit",
+      "text": "[Augment] After combat, delete all tokens.",
+      "image": "images_out/Stable/poaf5.png",
+      "revision_date_time": "2024-02-26 17:21:14.269735",
+      "details": "",
+      "factions": [
+        "wood",
+        "metal"
+      ],
+      "rulings": [],
+      "complexity": "Complex"
     }
   ],
   "Omniwield Evoker": [
@@ -3915,7 +3934,7 @@
       "type": "Cosmic Robot Unit",
       "text": "[three]:   [Switch] Put a +1/+1 counter on me.",
       "image": "images_out/Stable/omnivoke.png",
-      "revision_date_time": "2023-12-14 14:03:04.731180",
+      "revision_date_time": "2024-02-26 17:21:14.269735",
       "details": "",
       "factions": [
         "metal"
@@ -3928,19 +3947,19 @@
     {
       "name": "Oorblak",
       "power": "2",
-      "toughness": "2",
-      "cost": "e",
-      "total_cost": "3",
-      "type": "Luminary Druid Unit",
-      "text": "[Augment] Other allies spawn with a +1/+1 counter on them.",
+      "toughness": "4",
+      "cost": "eee",
+      "total_cost": "4",
+      "type": "{Unstable} Luminary Strider {Virus} Unit",
+      "text": "[Augment] If combat damage would be dealt to you, that damage is dealt to me instead.",
       "image": "images_out/Stable/csca.png",
-      "revision_date_time": "2023-12-14 14:03:04.731180",
+      "revision_date_time": "2024-02-26 17:21:14.269735",
       "details": "",
       "factions": [
         "earth"
       ],
       "rulings": [],
-      "complexity": "Simple"
+      "complexity": "Complex"
     }
   ],
   "Oracle of Foretelling": [
@@ -3950,10 +3969,10 @@
       "toughness": "1",
       "cost": "b",
       "total_cost": "3",
-      "type": "Luminary Oracle Horror Spell Unit",
-      "text": "Glimpse 5 {i}(Reveal the top five cards of the deck. You may play one of them now, ignoring threshold. Recycle the rest.)",
-      "image": "images_out/Stable/oftell.png",
-      "revision_date_time": "2023-12-14 14:03:04.731180",
+      "type": "Polyform Oracle Spell Unit",
+      "text": "Glimpse 5 {i}(Reveal the top five cards of the deck and cache one. Until end of turn, you may play it as if it was in your hand, ignoring affinity. Recycle the rest.)",
+      "image": "images_out/Stable/rmm3.png",
+      "revision_date_time": "2024-02-26 17:21:14.269735",
       "details": "",
       "factions": [
         "water"
@@ -3969,10 +3988,10 @@
       "toughness": "1",
       "cost": "r",
       "type": "Infernal Oracle Unit",
-      "text": "Sacrifice me:  [Switch] Create a Fireball 1.",
+      "text": "Sacrifice me: [Switch] Create a Fireball 1.",
       "image": "images_out/Stable/wflamy4.png",
       "total_cost": "1",
-      "revision_date_time": "2023-12-14 14:03:04.731180",
+      "revision_date_time": "2024-02-26 17:21:14.269735",
       "details": "",
       "factions": [
         "fire"
@@ -3991,7 +4010,7 @@
       "type": "{Deadly} Spider Crab Unit",
       "text": "[Battle] Ambush  [3bb] {i}(Play me with the effect \"Recall target ally, put me into their position in play.\")",
       "image": "images_out/Stable/orblishho.png",
-      "revision_date_time": "2023-12-14 14:03:04.731180",
+      "revision_date_time": "2024-02-26 17:21:14.269735",
       "details": "",
       "factions": [
         "water"
@@ -4012,7 +4031,7 @@
       "type": "{Battle} Fungus Spell",
       "text": "Exchange control of two target units and swap their positions.",
       "image": "images_out/Stable/sbarg4.png",
-      "revision_date_time": "2023-12-14 14:03:04.731180",
+      "revision_date_time": "2024-02-26 17:21:14.269735",
       "details": "",
       "factions": [
         "wood"
@@ -4028,10 +4047,10 @@
       "toughness": "7",
       "cost": "be",
       "total_cost": "5",
-      "type": "Arcane Rock Beast Unit",
+      "type": "Arcane Primordial Beast Unit",
       "text": "[Augment] Whenever a player plays their first spell in this battle, negate it.",
       "image": "images_out/Stable/orgon3.png",
-      "revision_date_time": "2023-12-14 14:03:04.731180",
+      "revision_date_time": "2024-02-26 17:21:14.269735",
       "details": "",
       "factions": [
         "water",
@@ -4050,8 +4069,8 @@
       "total_cost": "2",
       "type": "Flower Spell",
       "text": "[Switch1] Target unit gains +7/+7 until regroup.",
-      "image": "images_out/Stable/obloo3.png",
-      "revision_date_time": "2023-12-14 14:03:04.731180",
+      "image": "images_out/Stable/obloo4.png",
+      "revision_date_time": "2024-02-26 17:21:14.269735",
       "details": "",
       "factions": [
         "wood"
@@ -4070,7 +4089,7 @@
       "type": "{Battle} Mystic Spell",
       "text": "[Switch1] Target unit gains -1/-1 until regroup for each card in your hand.",
       "image": "images_out/Stable/owhelm.png",
-      "revision_date_time": "2023-12-14 14:03:04.732177",
+      "revision_date_time": "2024-02-26 17:21:14.269735",
       "details": "",
       "factions": [
         "water"
@@ -4082,14 +4101,14 @@
   "Pack Leader": [
     {
       "name": "Pack Leader",
-      "power": "5",
-      "toughness": "5",
+      "power": "4",
+      "toughness": "4",
       "cost": "gg",
-      "total_cost": "5",
+      "total_cost": "6",
       "type": "Plant Unit",
       "text": "[Augment][two]: Create a 1/1 unit.",
       "image": "images_out/Stable/pled3.png",
-      "revision_date_time": "2023-12-14 14:03:04.732177",
+      "revision_date_time": "2024-02-26 17:21:14.269735",
       "details": "",
       "factions": [
         "wood"
@@ -4108,7 +4127,7 @@
       "type": "{Battle} Occult Spell",
       "text": "Each player sacrifices half of their units, rounded up.",
       "image": "images_out/Stable/perishy.png",
-      "revision_date_time": "2023-12-14 14:03:04.732177",
+      "revision_date_time": "2024-02-26 17:21:14.270730",
       "details": "",
       "factions": [
         "metal"
@@ -4125,9 +4144,9 @@
       "cost": "e",
       "total_cost": "1",
       "type": "Structure Unit",
-      "text": "Whenever an augment is applied to me, cre- {/n}ate a X/X unit, where X is the augment's cost.",
+      "text": "Whenever an augment is applied to me, cre- {/n}ate an X/X unit, where X is the augment's cost.",
       "image": "images_out/Stable/ert.png",
-      "revision_date_time": "2023-12-14 14:03:04.732177",
+      "revision_date_time": "2024-02-26 17:21:14.270730",
       "details": "",
       "factions": [
         "earth"
@@ -4136,16 +4155,16 @@
       "complexity": "Simple"
     }
   ],
-  "Pestilent Mycelon": [
+  "Pestilent Mycelion": [
     {
-      "name": "Pestilent Mycelon",
+      "name": "Pestilent Mycelion",
       "power": "1",
       "toughness": "4",
       "cost": "gg",
-      "type": "{Poisonous} Fungus Unit",
+      "type": "{Poisonous} Blight Unit",
       "text": "[Augment] Whenever one or more -1/-1 counters are put on a unit, each opponent loses 1 life.",
       "image": "images_out/Stable/gfung3.png",
-      "revision_date_time": "2023-12-14 14:03:04.732177",
+      "revision_date_time": "2024-02-26 17:21:14.270730",
       "details": "",
       "factions": [
         "wood"
@@ -4155,25 +4174,6 @@
         "If you place multiple counters on a single creature, this effect will only trigger once.",
         "If you place one or more counters on more than one unit, this effect will trigger once for each unit that had counters placed on it."
       ],
-      "complexity": "Simple"
-    }
-  ],
-  "Phantasmal Prawn": [
-    {
-      "name": "Phantasmal Prawn",
-      "power": "1",
-      "toughness": "2",
-      "cost": "r",
-      "type": "{Flying} Occult Spirit Unit",
-      "text": "When my column deals combat damage to an opponent,  [Switch1] You may sacrifice a unit. If you do, draw a card.",
-      "image": "images_out//Stable/iwww.png",
-      "total_cost": "2",
-      "revision_date_time": "2023-12-14 14:03:04.732177",
-      "details": "",
-      "factions": [
-        "fire"
-      ],
-      "rulings": [],
       "complexity": "Simple"
     }
   ],
@@ -4187,13 +4187,32 @@
       "type": "{Battle} Plant Spell",
       "text": "Until regroup, prevent all damage that would be dealt to target unit. Put a +1/+1 counter on it for each damage prevented this way.",
       "image": "images_out/Stable/ppro2.png",
-      "revision_date_time": "2023-12-14 14:03:04.732177",
+      "revision_date_time": "2024-02-26 17:21:14.270730",
       "details": "",
       "factions": [
         "wood"
       ],
       "rulings": [],
       "complexity": "Simple"
+    }
+  ],
+  "Plague Bellower": [
+    {
+      "name": "Plague Bellower",
+      "power": "2",
+      "toughness": "2",
+      "cost": "g",
+      "total_cost": "2",
+      "type": "Insect Plant Unit",
+      "text": "[Augment]  [three]: Each opponent chooses one of their units. Put a -1/-1 counter on each of the chosen units.",
+      "image": "images_out/Stable/glomps.png",
+      "revision_date_time": "2024-02-26 17:21:14.270730",
+      "details": "",
+      "factions": [
+        "wood"
+      ],
+      "rulings": [],
+      "complexity": "Complex"
     }
   ],
   "Plodding Pebbles": [
@@ -4206,7 +4225,7 @@
       "type": "{Sluggish} Rock Beast Unit",
       "text": "When I am dealt damage,  [Switch1] Put a +1/+1 counter on me.",
       "image": "images_out/Stable/ppeb.png",
-      "revision_date_time": "2023-12-14 14:03:04.732177",
+      "revision_date_time": "2024-02-26 17:21:14.270730",
       "details": "",
       "factions": [
         "earth"
@@ -4224,7 +4243,7 @@
       "type": "{Battle} {Burst} Spell Token",
       "text": "Put X -1/-1 counters on target unit.",
       "image": "images_out/Stable/ipos3.png",
-      "revision_date_time": "2023-12-14 14:03:04.732177",
+      "revision_date_time": "2024-02-26 17:21:14.270730",
       "details": "",
       "factions": [
         "wood"
@@ -4244,7 +4263,7 @@
       "type": "Robot Unit",
       "text": "I spawn with two +1/+1 counters. {/n} [Augment] When I die, you may move my counters onto target unit.",
       "image": "images_out/Stable/protectory.png",
-      "revision_date_time": "2023-12-14 14:03:04.732177",
+      "revision_date_time": "2024-02-26 17:21:14.270730",
       "details": "",
       "factions": [
         "metal"
@@ -4261,9 +4280,9 @@
       "cost": "b",
       "total_cost": "1",
       "type": "{Battle} Mystic Spell",
-      "text": "Glimpse X, where X is your [b].  {i}(Reveal the top X cards of the deck. You may play one of them now, ignoring threshold. Recycle the rest.)",
+      "text": "Glimpse X, where X is your [b].  {i}(Reveal the top X cards of the deck and cache one. Until end of turn, you may play it as if it was in your hand, ignoring affinity. Recycle the rest.)",
       "image": "images_out//Stable/premony2.png",
-      "revision_date_time": "2023-12-14 14:03:04.732177",
+      "revision_date_time": "2024-02-26 17:21:14.270730",
       "details": "",
       "factions": [
         "water"
@@ -4282,7 +4301,7 @@
       "text": "[Augment] I gain +1/+1 for each other ally.",
       "image": "images_out/Stable/bhr3.png",
       "total_cost": "1",
-      "revision_date_time": "2023-12-14 14:03:04.733174",
+      "revision_date_time": "2024-02-26 17:21:14.270730",
       "details": "",
       "factions": [
         "wood"
@@ -4301,7 +4320,7 @@
       "type": "Resource \u2014 Prismite",
       "text": "Erase me: Create a non-prismite resource, then activate it. Do this only during the mana step. {i}(This does not use one of your activations for turn.)",
       "image": "images_out/Stable/prism12.png",
-      "revision_date_time": "2023-12-14 14:03:04.733174",
+      "revision_date_time": "2024-02-26 17:21:14.270730",
       "details": "",
       "factions": [
         "colorless"
@@ -4318,9 +4337,9 @@
       "cost": "b",
       "total_cost": "1",
       "type": "{Battle} Druid Spell",
-      "text": "[Switch1] Target unit gains +1/+1 and piercing until regroup.",
+      "text": "[Switch1] Target unit gains +1/+1 and {g}piercing until regroup. {i}(Excess damage from piercing sources is dealt to the recipient's controller.)",
       "image": "images_out/Stable/enspike6a.png",
-      "revision_date_time": "2023-12-14 14:03:04.733174",
+      "revision_date_time": "2024-02-26 17:21:14.271727",
       "details": "",
       "factions": [
         "water"
@@ -4339,7 +4358,7 @@
       "type": "{Battle} Maelstrom Spell",
       "text": "Put target unit and all of its mods into your bin.",
       "image": "images_out/Stable/ddow2.png",
-      "revision_date_time": "2023-12-14 14:03:04.733174",
+      "revision_date_time": "2024-02-26 17:21:14.271727",
       "details": "",
       "factions": [
         "water"
@@ -4358,7 +4377,7 @@
       "type": "Apple Unit",
       "text": "[one]:   [Switch1] Give target opponent control of me. If you do, create three 1/1 units.",
       "image": "images_out/Stable/rapple2.png",
-      "revision_date_time": "2023-12-14 14:03:04.733174",
+      "revision_date_time": "2024-02-26 17:21:14.271727",
       "details": "",
       "factions": [
         "wood"
@@ -4375,9 +4394,9 @@
       "cost": "gg",
       "total_cost": "4",
       "type": "Flower Spell",
-      "text": "[Switch1] Allies gain +2/+2 and piercing until regroup. {i}(Excess damage from piercing sources is dealt to the recipient's controller.)",
+      "text": "[Switch1] Your units gain +2/+2 and {g}piercing until regroup. {i}(Excess damage from piercing sources is dealt to the recipient's controller.)",
       "image": "images_out/Stable/bloom.png",
-      "revision_date_time": "2023-12-14 14:03:04.733174",
+      "revision_date_time": "2024-02-26 17:21:14.271727",
       "details": "",
       "factions": [
         "wood"
@@ -4396,7 +4415,7 @@
       "type": "[Augment] {Tough} Rock Guardian {Virus} Unit",
       "text": "",
       "image": "images_out/Stable/rgar6.png",
-      "revision_date_time": "2023-12-14 14:03:04.733174",
+      "revision_date_time": "2024-02-26 17:21:14.271727",
       "details": "",
       "factions": [
         "earth"
@@ -4412,10 +4431,10 @@
       "toughness": "3",
       "cost": "rr",
       "type": "Jellyfish Mystic Unit",
-      "text": "Whenever you play a nontoken spell, [Switch] I gain +1/-1 until regroup.",
+      "text": "Whenever you play a nontoken spell, {/n}[Switch] I gain +1/-1 until regroup.",
       "image": "images_out/Stable/jred2.png",
       "total_cost": "4",
-      "revision_date_time": "2023-12-14 14:03:04.733174",
+      "revision_date_time": "2024-02-26 17:21:14.271727",
       "details": "",
       "factions": [
         "fire"
@@ -4431,10 +4450,10 @@
       "toughness": "3",
       "cost": "e",
       "total_cost": "2",
-      "type": "[Augment] {Inverted} Elemental {Virus} Unit",
+      "type": "[Augment] {Inverted} Ancient Anima {Virus} Unit",
       "text": "",
       "image": "images_out/Stable/rbb3.png",
-      "revision_date_time": "2023-12-14 14:03:04.733174",
+      "revision_date_time": "2024-02-26 17:21:14.271727",
       "details": "",
       "factions": [
         "earth"
@@ -4450,10 +4469,10 @@
       "toughness": "1",
       "cost": "g",
       "total_cost": "2",
-      "type": "{Battle} Arcane Spell",
+      "type": "{Battle} Arcane Fungus Spell",
       "text": "Each player gives an opponent control of one of their units.",
       "image": "images_out/Stable/equalize.png",
-      "revision_date_time": "2023-12-14 14:03:04.733174",
+      "revision_date_time": "2024-02-26 17:21:14.271727",
       "details": "",
       "factions": [
         "wood"
@@ -4472,7 +4491,7 @@
       "type": "{Battle} Maelstrom Spell",
       "text": "[Switch1] Each player recalls a unit and loses 2 life.",
       "image": "images_out/Stable/rc.png",
-      "revision_date_time": "2023-12-14 14:03:04.733174",
+      "revision_date_time": "2024-02-26 17:21:14.271727",
       "details": "",
       "factions": [
         "water"
@@ -4487,11 +4506,11 @@
       "power": "4",
       "toughness": "1",
       "cost": "rr",
-      "type": "Infernal Mystic Unit",
-      "text": "When I die, you may pay  [one] to recall target spell in your bin. {i}(Put it into your hand).",
+      "type": "Mystic Strider Unit",
+      "text": "When I die, you may pay [two] to recall target spell in your bin. {i}(Put it into your hand).",
       "image": "images_out/Stable/dmys2.png",
       "total_cost": "2",
-      "revision_date_time": "2023-12-14 14:03:04.734172",
+      "revision_date_time": "2024-02-26 17:21:14.271727",
       "details": "",
       "factions": [
         "fire"
@@ -4507,10 +4526,10 @@
       "toughness": "5",
       "cost": "be",
       "total_cost": "2",
-      "type": "{Virus} Rock Sprite Unit",
+      "type": "{Virus} Elemental Sprite Unit",
       "text": "[Augment] After combat, recall me.",
       "image": "images_out/Stable/augmen.png",
-      "revision_date_time": "2023-12-14 14:03:04.734172",
+      "revision_date_time": "2024-02-26 17:21:14.271727",
       "details": "",
       "factions": [
         "water",
@@ -4527,36 +4546,17 @@
       "toughness": "2",
       "cost": "em",
       "total_cost": "4",
-      "type": "{Battle} Nature Spell",
-      "text": "Augment target unit onto another target unit.",
+      "type": "{Battle} Primordial Technology Spell",
+      "text": "Augment target unit and all of its mods onto another target unit. {i}(The first target must have{/i}  [Augment] {i}to be able to be augmented.)",
       "image": "images_out/Stable/oblitt.png",
-      "revision_date_time": "2023-12-14 14:03:04.734172",
+      "revision_date_time": "2024-02-26 17:21:14.272725",
       "details": "",
       "factions": [
         "earth",
         "metal"
       ],
       "rulings": [],
-      "complexity": "Simple"
-    }
-  ],
-  "Recurrent Spirit": [
-    {
-      "name": "Recurrent Spirit",
-      "power": "2",
-      "toughness": "1",
-      "cost": "r",
-      "type": "{Haste} Insect Spirit Unit",
-      "text": "When you deal combat damage to an oppo- nent, if I am in your bin, recall me. {i}(Put me into your hand.)",
-      "image": "images_out/Stable/rspir2.png",
-      "revision_date_time": "2023-12-14 14:03:04.734172",
-      "details": "",
-      "factions": [
-        "fire"
-      ],
-      "total_cost": "1",
-      "rulings": [],
-      "complexity": "Simple"
+      "complexity": "Complex"
     }
   ],
   "Recyclable Sentinel": [
@@ -4566,10 +4566,10 @@
       "toughness": "1",
       "cost": "m",
       "total_cost": "1",
-      "type": "Scrap Unit",
+      "type": "Scrap Automaton Unit",
       "text": "When I spawn or die, [Switch1] Create a Robot 1.",
       "image": "images_out/Stable/recyc6.png",
-      "revision_date_time": "2023-12-14 14:03:04.734172",
+      "revision_date_time": "2024-02-26 17:21:14.272725",
       "details": "",
       "factions": [
         "metal"
@@ -4588,7 +4588,7 @@
       "type": "{Battle} Elemental Spell",
       "text": "Change the targets of target effect unless its controller pays  [x].",
       "image": "images_out/Stable/rdd.png",
-      "revision_date_time": "2023-12-14 14:03:04.734172",
+      "revision_date_time": "2024-02-26 17:21:14.272725",
       "details": "",
       "factions": [
         "fire"
@@ -4607,7 +4607,7 @@
       "type": "{Battle} Occult Technology Spell",
       "text": "Your units gain \"When I die, create a Robot 3\" until regroup.",
       "image": "images_out/Stable/rfda6.png",
-      "revision_date_time": "2023-12-14 14:03:04.734172",
+      "revision_date_time": "2024-02-26 17:21:14.272725",
       "details": "",
       "factions": [
         "metal"
@@ -4626,7 +4626,7 @@
       "type": "Occult Scrap Unit",
       "text": "[Augment] Whenever another unit dies, put a +1/+1 counter on me.",
       "image": "images_out/Stable/rrcc.png",
-      "revision_date_time": "2023-12-14 14:03:04.734172",
+      "revision_date_time": "2024-02-26 17:21:14.272725",
       "details": "",
       "factions": [
         "metal"
@@ -4642,10 +4642,10 @@
       "toughness": "4",
       "cost": "r",
       "total_cost": "4",
-      "type": "[Augment] {Resonant} Elemental Unit",
+      "type": "[Augment] {Resonant} Anima Unit",
       "text": "",
       "image": "images_out/Stable/rs3.png",
-      "revision_date_time": "2023-12-14 14:03:04.734172",
+      "revision_date_time": "2024-02-26 17:21:14.272725",
       "details": "",
       "factions": [
         "fire"
@@ -4664,7 +4664,7 @@
       "type": "Occult Avatar Unit",
       "text": "[Augment] Whenever I am I dealt damage, I deal that much damage to each opponent.",
       "image": "images_out/Stable/rtt.png",
-      "revision_date_time": "2023-12-14 14:03:04.734172",
+      "revision_date_time": "2024-02-26 17:21:14.272725",
       "details": "",
       "factions": [
         "earth"
@@ -4682,7 +4682,7 @@
       "type": "Occult Spell",
       "text": "[Switch1] Put target unit with cost 2 or less from your bin into play.",
       "image": "images_out/Stable/rrec2.png",
-      "revision_date_time": "2023-12-14 14:03:04.735169",
+      "revision_date_time": "2024-02-26 17:21:14.272725",
       "details": "",
       "factions": [
         "fire"
@@ -4702,7 +4702,7 @@
       "type": "{Battle} Druid Spell",
       "text": "Negate all effects. Erase all mods.",
       "image": "images_out/Stable/nature2.png",
-      "revision_date_time": "2023-12-14 14:03:04.735169",
+      "revision_date_time": "2024-02-26 17:21:14.272725",
       "details": "",
       "factions": [
         "earth"
@@ -4718,10 +4718,10 @@
       "toughness": "2",
       "cost": "b",
       "total_cost": "1",
-      "type": "Urchin Unit",
+      "type": "Fish Unit",
       "text": "[Augment] Whenever a card enters a player's hand during battle, I gain +2/+2 until regroup.",
-      "image": "images_out/Stable/beye2.png",
-      "revision_date_time": "2023-12-14 14:03:04.735169",
+      "image": "images_out/Stable/rtdd4.png",
+      "revision_date_time": "2024-02-26 17:21:14.272725",
       "details": "",
       "factions": [
         "water"
@@ -4737,10 +4737,10 @@
       "toughness": "2",
       "cost": "m",
       "total_cost": "2",
-      "type": "Cosmic Technology {Virus} Unit",
+      "type": "Cosmic Strider {Virus} Unit",
       "text": "[Augment][once]  [one]: Switch my position with another target ally in my formation.",
       "image": "images_out/Stable/riftwalker3.png",
-      "revision_date_time": "2023-12-14 14:03:04.735169",
+      "revision_date_time": "2024-02-26 17:21:14.272725",
       "details": "",
       "factions": [
         "metal"
@@ -4758,10 +4758,10 @@
       "toughness": "1",
       "cost": "b",
       "total_cost": "2",
-      "type": "{Evasive} Urchin Unit",
+      "type": "{Evasive} Alien Frog Unit",
       "text": "[Augment] Whenever my column deals combat damage to a player, put target card from that player's bin into your hand.",
-      "image": "images_out/Stable/cute2.png",
-      "revision_date_time": "2023-12-14 14:03:04.735169",
+      "image": "images_out/Stable/btop3.png",
+      "revision_date_time": "2024-02-26 17:21:14.273721",
       "details": "",
       "factions": [
         "water"
@@ -4780,32 +4780,13 @@
       "type": "Scrap Token Unit",
       "text": "I spawn with X +1/+1 counters on me. {i}(If the number of counters changes, so does the X value.)",
       "image": "images_out/Stable/rbtt.png",
-      "revision_date_time": "2023-12-14 14:03:04.735169",
+      "revision_date_time": "2024-02-26 17:21:14.273721",
       "details": "",
       "factions": [
         "metal"
       ],
       "complexity": "Simple",
       "rulings": []
-    }
-  ],
-  "Rockshell Reaper": [
-    {
-      "name": "Rockshell Reaper",
-      "power": "2",
-      "toughness": "3",
-      "cost": "eee",
-      "total_cost": "3",
-      "type": "Insect Unit",
-      "text": "[Augment] After combat, I deal damage to each opponent equal to my defense.",
-      "image": "images_out/Stable/burmim.png",
-      "revision_date_time": "2023-12-14 14:03:04.735169",
-      "details": "",
-      "factions": [
-        "earth"
-      ],
-      "rulings": [],
-      "complexity": "Simple"
     }
   ],
   "Rook": [
@@ -4815,10 +4796,10 @@
       "toughness": "4",
       "cost": "me",
       "total_cost": "4",
-      "type": "Rock Crab Unit",
+      "type": "Polyform Crab Unit",
       "text": "[Augment] You may augment cards from hand and bin during battle as if they were  [Virus].",
       "image": "images_out/Stable/rok.png",
-      "revision_date_time": "2023-12-14 14:03:04.735169",
+      "revision_date_time": "2024-02-26 17:21:14.273721",
       "details": "",
       "factions": [
         "metal",
@@ -4835,10 +4816,10 @@
       "toughness": "2",
       "cost": "gr",
       "total_cost": "2",
-      "type": "Fungus Spider Unit",
-      "text": "[Augment] Everything is deadly. {i}(Any damage from a deadly source will kill a unit.)",
+      "type": "Blight Spider Unit",
+      "text": "[Augment] Everything is {g}deadly. {i}(Any damage from a deadly source will kill a unit.)",
       "image": "images_out/Stable/hdet5.png",
-      "revision_date_time": "2023-12-14 14:03:04.735169",
+      "revision_date_time": "2024-02-26 17:21:14.273721",
       "details": "",
       "factions": [
         "wood",
@@ -4858,7 +4839,7 @@
       "type": "{Haste} Spirit Unit",
       "text": "When I attack, if I am still in formation, you may put target unit with cost 2 or less from your bin into the slot behind me.",
       "image": "images_out/Stable/rspr2.png",
-      "revision_date_time": "2023-12-14 14:03:04.735169",
+      "revision_date_time": "2024-02-26 17:21:14.273721",
       "details": "",
       "factions": [
         "fire"
@@ -4874,16 +4855,35 @@
       "toughness": "3",
       "cost": "e",
       "total_cost": "2",
-      "type": "Beast Unit",
-      "text": "[Augment] Whenever one of your columns blocks or becomes blocked, I deal 1 damage to each opponent.",
+      "type": "Porcupine Beast Unit",
+      "text": "[Augment] Whenever a column becomes blocked, I deal 1 damage to each opponent.",
       "image": "images_out/Stable/spikr3.png",
-      "revision_date_time": "2023-12-14 14:03:04.735169",
+      "revision_date_time": "2024-02-26 17:21:14.273721",
       "details": "",
       "factions": [
         "earth"
       ],
       "complexity": "Simple",
       "rulings": []
+    }
+  ],
+  "Ruinbringer": [
+    {
+      "name": "Ruinbringer",
+      "power": "8",
+      "toughness": "9",
+      "cost": "e",
+      "total_cost": "8",
+      "type": "{Piercing} Bedlam Primordial Unit",
+      "text": "[Augment] After combat, delete all units.",
+      "image": "images_out/Stable/colt4.png",
+      "revision_date_time": "2024-02-26 17:21:14.273721",
+      "details": "",
+      "factions": [
+        "earth"
+      ],
+      "rulings": [],
+      "complexity": "Complex"
     }
   ],
   "Rune Channeler": [
@@ -4893,10 +4893,10 @@
       "toughness": "3",
       "cost": "rr",
       "total_cost": "3",
-      "type": "Elemental Unit",
-      "text": "When you play a nontoken spell,  [Switch1] I deal 2 damage to any target.",
+      "type": "Arcane Unit",
+      "text": "When you play a nontoken spell, [Switch1] I deal 2 damage to any target.",
       "image": "images_out/Stable/goomer2.png",
-      "revision_date_time": "2023-12-14 14:03:04.735169",
+      "revision_date_time": "2024-02-26 17:21:14.273721",
       "details": "",
       "factions": [
         "fire"
@@ -4915,7 +4915,7 @@
       "text": "[Switch] /[Sacrifice a unit]: Deal 4 damage to any target.",
       "image": "images_out/Stable/stithey.png",
       "total_cost": "1",
-      "revision_date_time": "2023-12-14 14:03:04.736166",
+      "revision_date_time": "2024-02-26 17:21:14.273721",
       "details": "",
       "factions": [
         "fire"
@@ -4931,10 +4931,10 @@
       "toughness": "3",
       "cost": "e",
       "total_cost": "2",
-      "type": "Rock Anima Unit",
-      "text": "[Augment] Other allies gain +0/+2.",
+      "type": "Anima Guardian Unit",
+      "text": "[Augment] Your other units gain +0/+2.",
       "image": "images_out/Stable/t4.png",
-      "revision_date_time": "2023-12-14 14:03:04.736166",
+      "revision_date_time": "2024-02-26 17:21:14.273721",
       "details": "",
       "factions": [
         "earth"
@@ -4953,7 +4953,7 @@
       "type": "Fungus Oracle Unit",
       "text": "[Augment] Whenever a nontoken unit dies, create a 1/1 unit.",
       "image": "images_out/Stable/sorcle.png",
-      "revision_date_time": "2023-12-14 14:03:04.736166",
+      "revision_date_time": "2024-02-26 17:21:14.273721",
       "details": "",
       "factions": [
         "wood"
@@ -4972,7 +4972,7 @@
       "type": "Occult Scrap Unit",
       "text": "[Augment] Sacrifice another unit: Put a +1/+1 counter on me.",
       "image": "images_out/Stable/scasn.png",
-      "revision_date_time": "2023-12-14 14:03:04.736166",
+      "revision_date_time": "2024-02-26 17:21:14.274727",
       "details": "",
       "factions": [
         "metal"
@@ -4988,10 +4988,10 @@
       "toughness": "1",
       "cost": "m",
       "total_cost": "2",
-      "type": "{Battle} Technological Spell",
+      "type": "{Battle} Scrap Spell",
       "text": "[Switch] Move all counters from target unit onto another target unit.",
       "image": "images_out/Stable/sforpart.png",
-      "revision_date_time": "2023-12-14 14:03:04.736166",
+      "revision_date_time": "2024-02-26 17:21:14.274727",
       "details": "",
       "factions": [
         "metal"
@@ -5010,7 +5010,7 @@
       "type": "Robot Druid Unit",
       "text": "When you put one or more counters on an ally,  [Switch1] Draw a card.",
       "image": "images_out/Stable/wipr.png",
-      "revision_date_time": "2023-12-14 14:03:04.736166",
+      "revision_date_time": "2024-02-26 17:21:14.274727",
       "details": "",
       "factions": [
         "metal",
@@ -5030,7 +5030,7 @@
       "type": "Clam Horror Unit",
       "text": "When the second nontoken spell is played in {/n}this battle,  [Switch1] Each player recalls a unit.",
       "image": "images_out/Stable/mg3.png",
-      "revision_date_time": "2023-12-14 14:03:04.736166",
+      "revision_date_time": "2024-02-26 17:21:14.274727",
       "details": "",
       "factions": [
         "water"
@@ -5044,12 +5044,12 @@
       "name": "Seismomancy",
       "power": "2",
       "toughness": "4",
-      "cost": "e",
+      "cost": "ee",
       "total_cost": "3",
-      "type": "{Battle} {Reaping} Druid Spell",
+      "type": "{Battle} {Reaping} Primordial Spell",
       "text": "I deal 3 damage to any target.",
       "image": "images_out/Stable/smanc.png",
-      "revision_date_time": "2023-12-14 14:03:04.736166",
+      "revision_date_time": "2024-02-26 17:21:14.274727",
       "details": "",
       "factions": [
         "earth"
@@ -5068,7 +5068,7 @@
       "type": "Scrap Technology Spell",
       "text": "[Switch1] Create a Robot X, where X is equal to your  [m].",
       "image": "images_out/Stable/selfm.png",
-      "revision_date_time": "2023-12-14 14:03:04.736166",
+      "revision_date_time": "2024-02-26 17:21:14.274727",
       "details": "",
       "factions": [
         "metal"
@@ -5085,9 +5085,9 @@
       "cost": "p",
       "total_cost": "1",
       "type": "Resource \u2014 Shard",
-      "text": "{i}(Shards add no affinity, but all resources including this can be expended for{/i}  [one] {i})",
+      "text": "{i}(Shards add no affinity, but can be expended for{/i}  [one]. {i})",
       "image": "images_out/Stable/srdd3.png",
-      "revision_date_time": "2023-12-14 14:03:04.736166",
+      "revision_date_time": "2024-02-26 17:21:14.274727",
       "details": "",
       "factions": [
         "colorless"
@@ -5106,7 +5106,7 @@
       "type": "Crystal Horror Unit",
       "text": "When I attack or block in a formation of at least three units with different defense values,  [Switch1] Draw a card.",
       "image": "images_out/Stable/feethand.png",
-      "revision_date_time": "2023-12-14 14:03:04.737164",
+      "revision_date_time": "2024-02-26 17:21:14.274727",
       "details": "",
       "factions": [
         "earth"
@@ -5125,7 +5125,7 @@
       "type": "Spirit Unit",
       "text": "[Augment] After combat, you may recall target ally. {/n}If you do, each opponent loses 2 life.",
       "image": "images_out/Stable/jg2.png",
-      "revision_date_time": "2023-12-14 14:03:04.737164",
+      "revision_date_time": "2024-02-26 17:21:14.274727",
       "details": "",
       "factions": [
         "water"
@@ -5141,10 +5141,10 @@
       "toughness": "2",
       "cost": "ee",
       "total_cost": "2",
-      "type": "Arcane Horror {Virus} Unit",
+      "type": "Arcane Primordial {Virus} Unit",
       "text": "[Augment] Erase me: Negate all spell effects.",
       "image": "images_out/Stable/skybrk4.png",
-      "revision_date_time": "2023-12-14 14:03:04.737164",
+      "revision_date_time": "2024-02-26 17:21:14.274727",
       "details": "",
       "factions": [
         "earth"
@@ -5163,7 +5163,7 @@
       "type": " Slag Beast {Virus} Unit",
       "text": "[Augment][once]  [one], Erase one of my modifications: Deal 2 damage to any target.",
       "image": "images_out/Stable/ndix.png",
-      "revision_date_time": "2023-12-14 14:03:04.737164",
+      "revision_date_time": "2024-02-26 17:21:14.274727",
       "details": "",
       "factions": [
         "earth",
@@ -5183,7 +5183,7 @@
       "type": "[Augment] {Thieving} Frog {Virus} Unit",
       "text": "",
       "image": "images_out/Stable/slinky.png",
-      "revision_date_time": "2023-12-14 14:03:04.737164",
+      "revision_date_time": "2024-02-26 17:21:14.275720",
       "details": "",
       "factions": [
         "water"
@@ -5202,7 +5202,7 @@
       "text": "[Augment] After combat, sacrifice me.",
       "image": "images_out/Stable/flamy.png",
       "total_cost": "2",
-      "revision_date_time": "2023-12-14 14:03:04.737164",
+      "revision_date_time": "2024-02-26 17:21:14.275720",
       "details": "",
       "factions": [
         "fire"
@@ -5221,13 +5221,13 @@
       "type": "Demon Technology {Virus} Unit",
       "text": "[Augment]  [one], Remove X +1/+1 counters from me: Delete target unit with defense X or less.",
       "image": "images_out/Stable/doob2.png",
-      "revision_date_time": "2023-12-14 14:03:04.737164",
+      "revision_date_time": "2024-02-26 17:21:14.275720",
       "details": "",
       "factions": [
         "metal"
       ],
       "rulings": [],
-      "complexity": "Simple"
+      "complexity": "Complex"
     }
   ],
   "Soul Siphon": [
@@ -5236,11 +5236,11 @@
       "power": "2",
       "toughness": "2",
       "cost": "b",
-      "total_cost": "3",
+      "total_cost": "2",
       "type": "{Battle} Occult Spell",
-      "text": "[Switch1] Create an X/X unit, where X is the life target player lost in this battle.",
+      "text": "[Switch1] Create an X/X unit, where X is the life target player lost in this battle. {i}(Damage causes life loss.)",
       "image": "images_out/Stable/ssip2.png",
-      "revision_date_time": "2023-12-14 14:03:04.737164",
+      "revision_date_time": "2024-02-26 17:21:14.275720",
       "details": "",
       "factions": [
         "water"
@@ -5259,7 +5259,7 @@
       "type": "Occult Mystic Unit",
       "text": "[Augment] Sacrifice another unit: I gain +2/+2 until regroup.",
       "image": "images_out/Stable/sghost.png",
-      "revision_date_time": "2023-12-14 14:03:04.737164",
+      "revision_date_time": "2024-02-26 17:21:14.275720",
       "details": "",
       "factions": [
         "fire"
@@ -5277,7 +5277,7 @@
       "type": "{Battle} Arcane Spell",
       "text": "The controller of target effect may pay [one]. If they don't, negate that effect and draw a card.",
       "image": "images_out/Stable/flok3c.png",
-      "revision_date_time": "2023-12-14 14:03:04.737164",
+      "revision_date_time": "2024-02-26 17:21:14.275720",
       "details": "",
       "factions": [
         "fire"
@@ -5297,7 +5297,7 @@
       "type": "Demon Robot Unit",
       "text": "[Augment] Whenever one of your nontoken units dies, create a Fireball 1.",
       "image": "images_out/Stable/fmaky.png",
-      "revision_date_time": "2023-12-14 14:03:04.737164",
+      "revision_date_time": "2024-02-26 17:21:14.275720",
       "details": "",
       "factions": [
         "fire",
@@ -5313,10 +5313,10 @@
       "power": "0",
       "toughness": "1",
       "cost": "r",
-      "type": "Elemental Unit",
+      "type": "Sprite Anima Unit",
       "text": "[Augment] Whenever you play a spell, put a +1/+1 counter on me.",
       "image": "images_out/Stable/booba.png",
-      "revision_date_time": "2023-12-14 14:03:04.738161",
+      "revision_date_time": "2024-02-26 17:21:14.275720",
       "details": "",
       "factions": [
         "fire"
@@ -5333,10 +5333,10 @@
       "toughness": "2",
       "cost": "gg",
       "total_cost": "1",
-      "type": "Fungus Unit",
+      "type": "Blight Fungus Unit",
       "text": "[Augment] At the end of turn, you lose 1 life and create a Poison 1.",
       "image": "images_out/Stable/musho.png",
-      "revision_date_time": "2023-12-14 14:03:04.738161",
+      "revision_date_time": "2024-02-26 17:21:14.275720",
       "details": "",
       "factions": [
         "wood"
@@ -5355,7 +5355,7 @@
       "type": "{Battle} Alien Spell Unit",
       "text": "[Switch1] Create an 8/8 unit.",
       "image": "images_out/Stable/sbrky.png",
-      "revision_date_time": "2023-12-14 14:03:04.738161",
+      "revision_date_time": "2024-02-26 17:21:14.275720",
       "details": "",
       "factions": [
         "water"
@@ -5374,7 +5374,7 @@
       "type": "Occult Spell",
       "text": "[Switch1] Create three Wisps. {i}(They are 0/1 units that can't block with \"Sacrifice me after combat.\")",
       "image": "images_out//Stable/mbrt5.png",
-      "revision_date_time": "2023-12-14 14:03:04.738161",
+      "revision_date_time": "2024-02-26 17:21:14.275720",
       "details": "",
       "factions": [
         "fire"
@@ -5389,11 +5389,11 @@
       "power": "1",
       "toughness": "3",
       "cost": "bb",
-      "total_cost": "X",
+      "total_cost": "1",
       "type": "{Battle} Arcane Spell",
-      "text": "Play target spell with cost X or less from your bin for free. It gains unstable until regroup. {i}(If it would enter a bin, erase it instead.)",
+      "text": "You may play target spell from your bin until regroup. It gains {p}unstable until regroup. {i}(If it {/n}would enter a bin, erase it instead.)",
       "image": "images_out/Stable/spexca4.png",
-      "revision_date_time": "2023-12-14 14:03:04.738161",
+      "revision_date_time": "2024-02-26 17:21:14.276715",
       "details": "",
       "factions": [
         "water"
@@ -5412,7 +5412,7 @@
       "type": "Fungus Slime Unit",
       "text": "When I attack or block, [Switch] Create a Poison X, where X is my power.",
       "image": "images_out/Stable/spewy.png",
-      "revision_date_time": "2023-12-14 14:03:04.738161",
+      "revision_date_time": "2024-02-26 17:21:14.276715",
       "details": "",
       "factions": [
         "wood"
@@ -5431,14 +5431,14 @@
       "type": "Plant Crystal Unit",
       "text": "After combat, [Switch1] Create a /[Poison {i1}or Crystal] 2.",
       "image": "images_out/Stable/spnat2.png",
-      "revision_date_time": "2023-12-14 14:03:04.738161",
+      "revision_date_time": "2024-02-26 17:21:14.276715",
       "details": "",
       "factions": [
         "earth",
         "wood"
       ],
       "rulings": [],
-      "complexity": "Complex"
+      "complexity": "Simple"
     }
   ],
   "Spirit of Vengeance": [
@@ -5450,7 +5450,7 @@
       "type": "Occult Spirit Unit",
       "text": "[Augment] Whenever a unit dies, I deal 1 damage to each opponent.",
       "image": "images_out/Stable/sv2.png",
-      "revision_date_time": "2023-12-14 14:03:04.738161",
+      "revision_date_time": "2024-02-26 17:21:14.276715",
       "details": "",
       "factions": [
         "fire"
@@ -5458,25 +5458,6 @@
       "total_cost": "2",
       "rulings": [],
       "complexity": "Complex"
-    }
-  ],
-  "Sporecaster Mystic": [
-    {
-      "name": "Sporecaster Mystic",
-      "power": "2",
-      "toughness": "2",
-      "cost": "g",
-      "total_cost": "2",
-      "type": "Plant Mystic Unit",
-      "text": "[Augment]  [three]: For each player, put a -1/-1 counter on one of their units of their choice.",
-      "image": "images_out/Stable/primp2.png",
-      "revision_date_time": "2023-12-14 14:03:04.738161",
-      "details": "",
-      "factions": [
-        "wood"
-      ],
-      "rulings": [],
-      "complexity": "Simple"
     }
   ],
   "Sprouter": [
@@ -5489,7 +5470,7 @@
       "type": "Fungus Unit",
       "text": "Sacrifice me: [Switch] Create a Poison 1.",
       "image": "images_out/Stable/sprt.png",
-      "revision_date_time": "2023-12-14 14:03:04.738161",
+      "revision_date_time": "2024-02-26 17:21:14.276715",
       "details": "",
       "factions": [
         "wood"
@@ -5508,7 +5489,7 @@
       "type": "{Battle} Rock Spell",
       "text": "[Switch1] Target ally deals damage equal to its defense to another target unit.",
       "image": "images_out/Stable/squish4.png",
-      "revision_date_time": "2023-12-14 14:03:04.738161",
+      "revision_date_time": "2024-02-26 17:21:14.276715",
       "details": "",
       "factions": [
         "earth"
@@ -5527,7 +5508,7 @@
       "type": "Arcane Beast Unit",
       "text": "[Augment] Spells with base cost  [three] or less have a base cost of  [three] to play during battle.",
       "image": "images_out/Stable/irok.png",
-      "revision_date_time": "2023-12-14 14:03:04.739158",
+      "revision_date_time": "2024-02-26 17:21:14.276715",
       "details": "",
       "factions": [
         "water",
@@ -5547,7 +5528,7 @@
       "type": "Elemental Unit",
       "text": "[Augment] When I die, create a Fireball X, where X is my power.",
       "image": "images_out/Stable/cour.png",
-      "revision_date_time": "2023-12-14 14:03:04.739158",
+      "revision_date_time": "2024-02-26 17:21:14.276715",
       "details": "",
       "factions": [
         "fire"
@@ -5566,7 +5547,7 @@
       "type": "Cosmic Fungus Unit",
       "text": "After combat, gain control of target unit if it has a -1/-1 counter on it. {/n}[Augment] When I die, give each unit you control with {/n}a -1/-1 counter on it to target opponent.",
       "image": "images_out/Stable/gmusher.png",
-      "revision_date_time": "2023-12-14 14:03:04.739158",
+      "revision_date_time": "2024-02-26 17:21:14.276715",
       "details": "",
       "factions": [
         "wood"
@@ -5578,14 +5559,14 @@
   "Steward of the Plain": [
     {
       "name": "Steward of the Plain",
-      "power": "3",
+      "power": "2",
       "toughness": "2",
       "cost": "e",
       "total_cost": "2",
-      "type": "Rock Unit",
-      "text": "You may play one unit with no abilities from your bin each turn. {i}(Attributes are not abilities.)",
+      "type": "Primordial Unit",
+      "text": "You may play one unit with no abilities from your bin each deployment. {i}(Attributes are not abilities.)",
       "image": "images_out/Stable/tranquil.png",
-      "revision_date_time": "2023-12-14 14:03:04.739158",
+      "revision_date_time": "2024-02-26 17:21:14.276715",
       "details": "",
       "factions": [
         "earth"
@@ -5604,32 +5585,13 @@
       "type": "Stolen Card !Resource",
       "text": "{i}(In the constructed format, use this card to track the {/n}position of any card entering a hidden zone under a different owner's control. Place one copy inside the hidden zone and another card or dice with the same number on top of the card, outside the game).",
       "image": "images_out/Stable/sth4.png",
-      "revision_date_time": "2023-12-14 14:03:04.739158",
+      "revision_date_time": "2024-02-26 17:21:14.276715",
       "details": "",
       "factions": [
         "colorless"
       ],
       "complexity": "Simple",
       "rulings": []
-    }
-  ],
-  "Stone Sentinel": [
-    {
-      "name": "Stone Sentinel",
-      "power": "2",
-      "toughness": "4",
-      "cost": "e",
-      "total_cost": "3",
-      "type": "Rock Guardian Unit",
-      "text": "When an ally becomes targeted during battle,  [Switch1] I fight up to one target unit. {i}(We deal damage to each other as if in combat.)",
-      "image": "images_out/Stable/progrov.png",
-      "revision_date_time": "2023-12-14 14:03:04.739158",
-      "details": "",
-      "factions": [
-        "earth"
-      ],
-      "rulings": [],
-      "complexity": "Simple"
     }
   ],
   "Stoneborn Progenitor": [
@@ -5642,7 +5604,7 @@
       "type": "Mystic Rock Unit",
       "text": "When one of your units survives damage,  [Switch1] Create a 2/2 unit.",
       "image": "images_out/Stable/ccoo.png",
-      "revision_date_time": "2023-12-14 14:03:04.739158",
+      "revision_date_time": "2024-02-26 17:21:14.277712",
       "details": "",
       "factions": [
         "earth"
@@ -5661,7 +5623,7 @@
       "type": "Elemental Cloud Unit",
       "text": "[Augment] Whenever you play a nontoken spell, create a 1/1 unit.",
       "image": "images_out/Stable/ltree.png",
-      "revision_date_time": "2023-12-14 14:03:04.739158",
+      "revision_date_time": "2024-02-26 17:21:14.277712",
       "details": "",
       "factions": [
         "fire"
@@ -5677,10 +5639,10 @@
       "toughness": "6",
       "cost": "eer",
       "total_cost": "3",
-      "type": "{Battle} Elemental Spell",
+      "type": "{Battle} Elemental Structure Spell",
       "text": "[Switch1] /[Sacrifice a unit]: Each opponent sacri- {/n}fices units until their total defense is at least {/n}equal to the defense of your sacrificed unit.",
       "image": "images_out/Stable/cex.png",
-      "revision_date_time": "2023-12-14 14:03:04.739158",
+      "revision_date_time": "2024-02-26 17:21:14.277712",
       "details": "",
       "factions": [
         "earth",
@@ -5697,9 +5659,9 @@
       "toughness": "1",
       "cost": "g",
       "type": "{Battle} Flower Spell",
-      "text": "[Switch] Allies gain +1/+1 until regroup.",
+      "text": "[Switch] Your units gain +1/+1 until regroup.",
       "image": "images_out/Stable/sbloo2a.png",
-      "revision_date_time": "2023-12-14 14:03:04.739158",
+      "revision_date_time": "2024-02-26 17:21:14.277712",
       "details": "",
       "factions": [
         "wood"
@@ -5716,10 +5678,10 @@
       "toughness": "1",
       "cost": "m",
       "total_cost": "1",
-      "type": "{Battle} Technological Spell",
+      "type": "{Battle} Technology Spell",
       "text": "Target unit loses all attributes and abilities until regroup. Erase all of its mods and negate all of its effects.",
       "image": "images_out/Stable/enclo2.png",
-      "revision_date_time": "2023-12-14 14:03:04.739158",
+      "revision_date_time": "2024-02-26 17:21:14.277712",
       "details": "",
       "factions": [
         "metal"
@@ -5731,36 +5693,17 @@
   "Surly Stalker": [
     {
       "name": "Surly Stalker",
-      "power": "3",
-      "toughness": "3",
+      "power": "4",
+      "toughness": "4",
       "cost": "bb",
-      "total_cost": "3",
+      "total_cost": "4",
       "type": "{Battle} Manatee Unit",
-      "text": "When I attack or block alone,  [Switch1] Double my power and defense until regroup.",
+      "text": "When I attack or block alone, [Switch1] Double my power and defense until regroup.",
       "image": "images_out/Stable/fkrak.png",
-      "revision_date_time": "2023-12-14 14:03:04.740156",
+      "revision_date_time": "2024-02-26 17:21:14.277712",
       "details": "",
       "factions": [
         "water"
-      ],
-      "rulings": [],
-      "complexity": "Simple"
-    }
-  ],
-  "Symbiosis": [
-    {
-      "name": "Symbiosis",
-      "power": "3",
-      "toughness": "4",
-      "cost": "g",
-      "total_cost": "2",
-      "type": "{Battle}Plant Flower Spell",
-      "text": "[Switch1] Target unit gains +1/+1 for each of your units until regroup.",
-      "image": "images_out/Stable/grs1.png",
-      "revision_date_time": "2023-12-14 14:03:04.740156",
-      "details": "",
-      "factions": [
-        "wood"
       ],
       "rulings": [],
       "complexity": "Simple"
@@ -5773,10 +5716,10 @@
       "toughness": "1",
       "cost": "mm",
       "total_cost": "2",
-      "type": "Scrap Unit",
-      "text": "After combat,  [Switch1] Put a +1/+1 counter on each ally.",
+      "type": "Scrap Construct Unit",
+      "text": "After combat, [Switch1] Put a +1/+1 counter on each of your units.",
       "image": "images_out/Stable/sbrawl3.png",
-      "revision_date_time": "2023-12-14 14:03:04.740156",
+      "revision_date_time": "2024-02-26 17:21:14.277712",
       "details": "",
       "factions": [
         "metal"
@@ -5792,10 +5735,10 @@
       "toughness": "0",
       "cost": "m",
       "total_cost": "2",
-      "type": "{Battle} Technological Spell",
+      "type": "{Battle} Technology Spell",
       "text": "[Switch1] Duplicate each counter on target unit.",
       "image": "images_out/Stable/tsup.png",
-      "revision_date_time": "2023-12-14 14:03:04.740156",
+      "revision_date_time": "2024-02-26 17:21:14.277712",
       "details": "",
       "factions": [
         "metal"
@@ -5814,7 +5757,7 @@
       "type": "Luminary Elemental Unit",
       "text": "When I despawn, you may pay [one] to draw a card and lose 1 life.",
       "image": "images_out/Stable/embrev3.png",
-      "revision_date_time": "2023-12-14 14:03:04.740156",
+      "revision_date_time": "2024-02-26 17:21:14.277712",
       "details": "",
       "factions": [
         "water",
@@ -5834,7 +5777,7 @@
       "type": "[Augment] {Haste} {Alluring} Eel Unit",
       "text": "",
       "image": "images_out/Stable/alfr.png",
-      "revision_date_time": "2023-12-14 14:03:04.740156",
+      "revision_date_time": "2024-02-26 17:21:14.277712",
       "details": "",
       "factions": [
         "water"
@@ -5853,7 +5796,7 @@
       "type": "{Battle} Temporal Arcane Spell",
       "text": "End this battle. Erase this spell. {i}(Negate all effects, this battle is over.)",
       "image": "images_out/Stable/tst4.png",
-      "revision_date_time": "2023-12-14 14:03:04.740156",
+      "revision_date_time": "2024-02-26 17:21:14.277712",
       "details": "",
       "factions": [
         "water",
@@ -5873,7 +5816,7 @@
       "type": "Luminary Horror {Virus} Unit",
       "text": "[Augment] I gain -2/-2.",
       "image": "images_out/Stable/ooby3.png",
-      "revision_date_time": "2023-12-14 14:03:04.740156",
+      "revision_date_time": "2024-02-26 17:21:14.278708",
       "details": "",
       "factions": [
         "earth"
@@ -5890,9 +5833,9 @@
       "cost": "em",
       "total_cost": "3",
       "type": "Cosmic Arcane Unit",
-      "text": "[Augment] Teams may only play one spell that isn't targeting me in each battle. {i}(Spells targeting me and non-spells are unaffected by this.)",
+      "text": "[Augment] Teams may only play one spell that isn't targeting me in each battle. {i}(Spells targeting me are unaffected by this.)",
       "image": "images_out/Stable/tsl.png",
-      "revision_date_time": "2023-12-14 14:03:04.740156",
+      "revision_date_time": "2024-02-26 17:21:14.278708",
       "details": "",
       "factions": [
         "earth",
@@ -5912,14 +5855,14 @@
       "type": "Robot Fungus {Virus} Unit",
       "text": "[Augment] Whenever a unit token is created, put a -1/-1 counter on me. If you do, put +1/+1 counter on that token.",
       "image": "images_out/Stable/wshep2.png",
-      "revision_date_time": "2023-12-14 14:03:04.740156",
+      "revision_date_time": "2024-02-26 17:21:14.278708",
       "details": "",
       "factions": [
         "wood",
         "metal"
       ],
       "rulings": [],
-      "complexity": "Simple"
+      "complexity": "Complex"
     }
   ],
   "Throw off a Cliff": [
@@ -5930,9 +5873,9 @@
       "cost": "e",
       "total_cost": "1",
       "type": "{Battle} Rock Spell",
-      "text": "Delete target unit with 4 or greater defense.",
+      "text": "Delete target unit with 4 or more defense.",
       "image": "images_out/Stable/cliff3.png",
-      "revision_date_time": "2023-12-14 14:03:04.740156",
+      "revision_date_time": "2024-02-26 17:21:14.278708",
       "details": "",
       "factions": [
         "earth"
@@ -5951,10 +5894,48 @@
       "type": "Rock Unit",
       "text": "[Augment] Sacrifice me: I deal 3 damage to any target. Activate this ability only if I have an adjacent ally.",
       "image": "images_out/Stable/stoneb.png",
-      "revision_date_time": "2023-12-14 14:03:04.740156",
+      "revision_date_time": "2024-02-26 17:21:14.278708",
       "details": "",
       "factions": [
         "earth"
+      ],
+      "rulings": [],
+      "complexity": "Simple"
+    }
+  ],
+  "Tidal Menace": [
+    {
+      "name": "Tidal Menace",
+      "power": "7",
+      "toughness": "2",
+      "cost": "b",
+      "total_cost": "3",
+      "type": "{Haste} Lizard Fish Beast Unit",
+      "text": "",
+      "image": "images_out/Stable/aphor3.png",
+      "revision_date_time": "2024-02-26 17:21:14.278708",
+      "details": "",
+      "factions": [
+        "water"
+      ],
+      "complexity": "Simple",
+      "rulings": []
+    }
+  ],
+  "Tidal Reversion": [
+    {
+      "name": "Tidal Reversion",
+      "power": "0",
+      "toughness": "7",
+      "cost": "bb",
+      "total_cost": "2",
+      "type": "{Battle} Mystic Spell",
+      "text": "For each player, recall target unit that {/n}player controls. {i}(Return it to their hand.)",
+      "image": "images_out/Stable/trv2.png",
+      "revision_date_time": "2024-02-26 17:21:14.278708",
+      "details": "",
+      "factions": [
+        "water"
       ],
       "rulings": [],
       "complexity": "Simple"
@@ -5969,7 +5950,7 @@
       "type": "{Burst} Spell Token",
       "text": "[Switchblk] Return target unit with cost X or less to its controller's hand.",
       "image": "images_out/InitialTesting/InitialTesting(397)_0.png",
-      "revision_date_time": "2023-12-14 14:03:04.741153",
+      "revision_date_time": "2024-02-26 17:21:14.278708",
       "details": "",
       "factions": [
         "water"
@@ -5987,15 +5968,15 @@
       "cost": "bb",
       "total_cost": "3",
       "type": "Axolot Insect Unit",
-      "text": "When a player is dealt combat damage, [Switch1] Create a 2/2 unit.",
+      "text": "When a player is dealt combat damage, {/n}[Switch1] Create a 2/2 unit.",
       "image": "images_out/Stable/axl2.png",
-      "revision_date_time": "2023-12-14 14:03:04.741153",
+      "revision_date_time": "2024-02-26 17:21:14.278708",
       "details": "",
       "factions": [
         "water"
       ],
       "rulings": [],
-      "complexity": "Complex"
+      "complexity": "Simple"
     }
   ],
   "Tidepool Terror": [
@@ -6008,7 +5989,7 @@
       "type": "[Augment] {Deadly} Fish {Virus} Unit",
       "text": "",
       "image": "images_out/Stable/tt.png",
-      "revision_date_time": "2023-12-14 14:03:04.741153",
+      "revision_date_time": "2024-02-26 17:21:14.278708",
       "details": "",
       "factions": [
         "water"
@@ -6027,7 +6008,7 @@
       "type": "{Battle} Fish Unit",
       "text": "You may play me into an open spot in your formation.",
       "image": "images_out/Stable/ibol2.png",
-      "revision_date_time": "2023-12-14 14:03:04.741153",
+      "revision_date_time": "2024-02-26 17:21:14.278708",
       "details": "",
       "factions": [
         "water"
@@ -6046,7 +6027,7 @@
       "type": "{Battle} Cosmic Spell",
       "text": "Reveal the top eight cards of the deck. Choose up to two of them with total cost 8 or less. You may play them now, for free. Recycle the rest.",
       "image": "images_out/Stable/cfo.png",
-      "revision_date_time": "2023-12-14 14:03:04.741153",
+      "revision_date_time": "2024-02-26 17:21:14.279706",
       "details": "",
       "factions": [
         "water"
@@ -6065,7 +6046,7 @@
       "type": "{Battle} Elemental Spell",
       "text": "Recall X target nontoken allies. Then each player sacrifices a unit and you lose 1 life for each ally recalled this way.",
       "image": "images_out/Stable/bstuff.png",
-      "revision_date_time": "2023-12-14 14:03:04.741153",
+      "revision_date_time": "2024-02-26 17:21:14.279706",
       "details": "",
       "factions": [
         "water",
@@ -6082,10 +6063,10 @@
       "toughness": "15",
       "cost": "ee",
       "total_cost": "5",
-      "type": "Rock Beast {Virus} Unit",
+      "type": "Primordial Rock Beast {Virus} Unit",
       "text": "[Augment] Enemies gain +2/+2.",
       "image": "images_out/Stable/tcoly3.png",
-      "revision_date_time": "2023-12-14 14:03:04.741153",
+      "revision_date_time": "2024-02-26 17:21:14.279706",
       "details": "",
       "factions": [
         "earth"
@@ -6104,7 +6085,7 @@
       "type": "Mystic Structure Unit",
       "text": "[Augment] Spells cost  [one] more to play during battle.",
       "image": "images_out/Stable/t2.png",
-      "revision_date_time": "2023-12-14 14:03:04.741153",
+      "revision_date_time": "2024-02-26 17:21:14.279706",
       "details": "",
       "factions": [
         "earth"
@@ -6123,7 +6104,7 @@
       "type": "Alien {Virus} Unit",
       "text": "[Augment] Your other units gain +2/+2 and lose all attributes and abilities.",
       "image": "images_out/Stable/tgrf3.png",
-      "revision_date_time": "2023-12-14 14:03:04.741153",
+      "revision_date_time": "2024-02-26 17:21:14.279706",
       "details": "",
       "factions": [
         "metal"
@@ -6142,7 +6123,7 @@
       "type": "Jellyfish Oracle Unit",
       "text": "[Augment] Whenever another ally spawns during battle, double its /[power {i1}or defense] until regroup.",
       "image": "images_out/Stable/jfsh.png",
-      "revision_date_time": "2023-12-14 14:03:04.741153",
+      "revision_date_time": "2024-02-26 17:21:14.279706",
       "details": "",
       "factions": [
         "water",
@@ -6159,10 +6140,10 @@
       "toughness": "2",
       "cost": "m",
       "total_cost": "2",
-      "type": "[Augment] {Unaware} Robot {Virus} Unit",
+      "type": "[Augment] {Unaware} Scrap Robot {Virus} Unit",
       "text": "",
       "image": "images_out/Stable/blubb.png",
-      "revision_date_time": "2023-12-14 14:03:04.741153",
+      "revision_date_time": "2024-02-26 17:21:14.279706",
       "details": "",
       "factions": [
         "metal"
@@ -6181,7 +6162,7 @@
       "type": "Trigger !Resource",
       "text": "{i}(You may use this card to keep track of triggers on the stack).",
       "image": "images_out/Stable/trigger.png",
-      "revision_date_time": "2023-12-14 14:03:04.742150",
+      "revision_date_time": "2024-02-26 17:21:14.279706",
       "details": "",
       "factions": [
         "colorless"
@@ -6200,7 +6181,7 @@
       "type": "{Battle} Mystic Elemental Spell",
       "text": "[Switch1] I deal 2 damage to each of up to two target units.",
       "image": "images_out/Stable/tflame.png",
-      "revision_date_time": "2023-12-14 14:03:04.742150",
+      "revision_date_time": "2024-02-26 17:21:14.279706",
       "details": "",
       "factions": [
         "fire"
@@ -6216,10 +6197,10 @@
       "toughness": "1",
       "cost": "m",
       "total_cost": "2",
-      "type": "{Battle} Occult Spell",
+      "type": "{Battle} Occult Technology Spell",
       "text": "Delete target unit with base power 2 or less.",
       "image": "images_out/Stable/unmak3.png",
-      "revision_date_time": "2023-12-14 14:03:04.742150",
+      "revision_date_time": "2024-02-26 17:21:14.279706",
       "details": "",
       "factions": [
         "metal"
@@ -6238,7 +6219,7 @@
       "type": "Elemental Spirit Unit",
       "text": "[Augment][once] When you play a nontoken spell, cre- {/n}ate a Fireball X, where X is the spell's cost.",
       "image": "images_out/Stable/hflamr3.png",
-      "revision_date_time": "2023-12-14 14:03:04.742150",
+      "revision_date_time": "2024-02-26 17:21:14.279706",
       "details": "",
       "factions": [
         "fire"
@@ -6254,10 +6235,10 @@
       "toughness": "4",
       "cost": "er",
       "total_cost": "1",
-      "type": "Occult Rock {Virus} Unit",
+      "type": "Occult Anima {Virus} Unit",
       "text": "[Augment] After combat, sacrifice another unit.",
       "image": "images_out/Stable/mrit.png",
-      "revision_date_time": "2023-12-14 14:03:04.742150",
+      "revision_date_time": "2024-02-26 17:21:14.280707",
       "details": "",
       "factions": [
         "earth",
@@ -6274,10 +6255,10 @@
       "toughness": "2",
       "cost": "m",
       "total_cost": "2",
-      "type": "{Battle} Technology Spell",
+      "type": "{Battle} Cosmic Technology Spell",
       "text": "Target unit becomes a base 5/0 until regroup.",
       "image": "images_out/Stable/rshpy2.png",
-      "revision_date_time": "2023-12-14 14:03:04.742150",
+      "revision_date_time": "2024-02-26 17:21:14.280707",
       "details": "",
       "factions": [
         "metal"
@@ -6293,10 +6274,10 @@
       "toughness": "1",
       "cost": "m",
       "total_cost": "3",
-      "type": "Scrap Technology Unit",
+      "type": "Cosmic Anima Unit",
       "text": "When I die, [Switch1] Delete target unit.",
       "image": "images_out/Stable/cbomb.png",
-      "revision_date_time": "2023-12-14 14:03:04.742150",
+      "revision_date_time": "2024-02-26 17:21:14.280707",
       "details": "",
       "factions": [
         "metal"
@@ -6312,16 +6293,16 @@
       "toughness": "2",
       "cost": "b",
       "total_cost": "4",
-      "type": "{Battle} Elemental Spell",
-      "text": "Each player recalls two units. If four or more units were recalled this way, copy this.",
+      "type": "{Battle} Bedlam Maelstrom Spell",
+      "text": "Each player recalls two units. If four or more units were recalled this way, repeat this.",
       "image": "images_out/Stable/nup.png",
-      "revision_date_time": "2023-12-14 14:03:04.742150",
+      "revision_date_time": "2024-02-26 17:21:14.280707",
       "details": "",
       "factions": [
         "water"
       ],
       "rulings": [],
-      "complexity": "Simple"
+      "complexity": "Complex"
     }
   ],
   "Vaporweave Eidolon": [
@@ -6334,7 +6315,7 @@
       "type": "Cloud Spirit Unit",
       "text": "[zero]:   [Switch1] Recall me. {i}(Put me into your hand.)",
       "image": "images_out/Stable/eq3.png",
-      "revision_date_time": "2023-12-14 14:03:04.742150",
+      "revision_date_time": "2024-02-26 17:21:14.280707",
       "details": "",
       "factions": [
         "water"
@@ -6351,15 +6332,15 @@
       "cost": "gg",
       "total_cost": "3",
       "type": "Fungus Slime Unit",
-      "text": "When I spawn, create a Poison 6. {/n}[Augment] When I despawn, each opponent may pay {/n}[one] to put a unit from their bin into play.",
+      "text": "When I spawn, create a Poison 6. {/n}[Augment] When I despawn, each opponent may recall a unit from their bin.",
       "image": "images_out/Stable/nph2.png",
-      "revision_date_time": "2023-12-14 14:03:04.742150",
+      "revision_date_time": "2024-02-26 17:21:14.280707",
       "details": "",
       "factions": [
         "wood"
       ],
       "rulings": [],
-      "complexity": "Simple"
+      "complexity": "Complex"
     }
   ],
   "Verdant Vengeance": [
@@ -6370,9 +6351,9 @@
       "cost": "gg",
       "total_cost": "2",
       "type": "{Battle} Bedlam Plant Spell",
-      "text": "[Switch1] I deal damage to target unit equal to the number of allies.",
+      "text": "[Switch1] I deal damage to target unit equal to the number of units you control.",
       "image": "images_out/Stable/vvng2.png",
-      "revision_date_time": "2023-12-14 14:03:04.742150",
+      "revision_date_time": "2024-02-26 17:21:14.280707",
       "details": "",
       "factions": [
         "wood"
@@ -6388,10 +6369,10 @@
       "toughness": "1",
       "cost": "m",
       "total_cost": "2",
-      "type": "{Battle} Scrap Spell",
+      "type": "{Battle} Technology Spell",
       "text": "[Switch1] Each opponent discards a /[unit {i1}or spell] if able. Otherwise, they reveal their hand.",
       "image": "images_out/Stable/vm4.png",
-      "revision_date_time": "2023-12-14 14:03:04.743148",
+      "revision_date_time": "2024-02-26 17:21:14.280707",
       "details": "",
       "factions": [
         "metal"
@@ -6407,10 +6388,10 @@
       "toughness": "2",
       "cost": "rg",
       "total_cost": "2",
-      "type": "{Battle} Fungus Spell",
+      "type": "{Battle} Infernal Blight Spell",
       "text": "[Switch] /[Sacrifice a unit]: Create a Poison X and a Fireball X, where X is the defense of the sacrificed unit.",
       "image": "images_out/Stable/vtox2.png",
-      "revision_date_time": "2023-12-14 14:03:04.743148",
+      "revision_date_time": "2024-02-26 17:21:14.280707",
       "details": "",
       "factions": [
         "fire",
@@ -6430,10 +6411,29 @@
       "type": "Elemental Beast Unit",
       "text": "[Augment] Whenever you play a spell, I deal 1 damage to any target.",
       "image": "images_out/Stable/ntdin.png",
-      "revision_date_time": "2023-12-14 14:03:04.743148",
+      "revision_date_time": "2024-02-26 17:21:14.280707",
       "details": "",
       "factions": [
         "fire"
+      ],
+      "rulings": [],
+      "complexity": "Complex"
+    }
+  ],
+  "Wandering Blightshell": [
+    {
+      "name": "Wandering Blightshell",
+      "power": "1",
+      "toughness": "2",
+      "cost": "g",
+      "total_cost": "2",
+      "type": "Blight Turtle Unit",
+      "text": "When you put a counter on an enemy,  {/n}[Switch1] Draw a card.",
+      "image": "images_out/Stable/eamy6a.png",
+      "revision_date_time": "2024-02-26 17:21:14.280707",
+      "details": "",
+      "factions": [
+        "wood"
       ],
       "rulings": [],
       "complexity": "Simple"
@@ -6446,10 +6446,10 @@
       "toughness": "1",
       "cost": "g",
       "type": "Flower Unit",
-      "text": "When I attack or block,  [Switch] Your units gain +1/+0 until regroup.",
+      "text": "When I attack or block, [Switch] Your units gain +1/+0 until regroup.",
       "image": "images_out/Stable/wary.png",
       "total_cost": "1",
-      "revision_date_time": "2023-12-14 14:03:04.743148",
+      "revision_date_time": "2024-02-26 17:21:14.281700",
       "details": "",
       "factions": [
         "wood"
@@ -6466,9 +6466,9 @@
       "cost": "b",
       "total_cost": "1",
       "type": "[b] Resource \u2014 Water",
-      "text": "When I activate, if you have at least [b][b][b], create a shard.",
+      "text": "When I activate, if you have at least [b][b][b], create a Shard.",
       "image": "images_out/Stable/wars6.png",
-      "revision_date_time": "2023-12-14 14:03:04.743148",
+      "revision_date_time": "2024-02-26 17:21:14.281700",
       "details": "",
       "factions": [
         "water"
@@ -6487,7 +6487,7 @@
       "type": "[Augment] {Sneaky} Insect Sprite Unit",
       "text": "",
       "image": "images_out/Stable/bluu2.png",
-      "revision_date_time": "2023-12-14 14:03:04.743148",
+      "revision_date_time": "2024-02-26 17:21:14.281700",
       "details": "",
       "factions": [
         "water"
@@ -6503,10 +6503,10 @@
       "toughness": "5",
       "cost": "rr",
       "total_cost": "X",
-      "type": "{Battle} Elemental Spell",
+      "type": "{Battle} Infernal Spell",
       "text": "I deal X damage to any target.",
-      "image": "images_out/Stable/wfr3.png",
-      "revision_date_time": "2023-12-14 14:03:04.743148",
+      "image": "images_out/Stable/wf4.png",
+      "revision_date_time": "2024-02-26 17:21:14.281700",
       "details": "",
       "factions": [
         "fire"
@@ -6523,9 +6523,9 @@
       "cost": "rr",
       "total_cost": "0",
       "type": "{Feeble} Spirit Token Unit",
-      "text": "Sacrifice me after combat.",
+      "text": "After combat, sacrifice me.",
       "image": "images_out//Stable/wss3.png",
-      "revision_date_time": "2023-12-14 14:03:04.743148",
+      "revision_date_time": "2024-02-26 17:21:14.281700",
       "details": "",
       "factions": [
         "fire"
@@ -6544,7 +6544,7 @@
       "type": "{Battle} Arcane Druid Spell",
       "text": "[Switch1] /[Put a -1/-1 counter on each enemy or{i1} put a +1/+1 counter on each of your units.]",
       "image": "images_out/Stable/lnd5.png",
-      "revision_date_time": "2023-12-14 14:03:04.743148",
+      "revision_date_time": "2024-02-26 17:21:14.281700",
       "details": "",
       "factions": [
         "wood",
@@ -6562,9 +6562,9 @@
       "cost": "g",
       "total_cost": "1",
       "type": "[g] Resource \u2014 Wood",
-      "text": "When I activate, if you have at least  [g][g][g], create a shard.",
+      "text": "When I activate, if you have at least [g][g][g], create a Shard.",
       "image": "images_out/Stable/wrs3.png",
-      "revision_date_time": "2023-12-14 14:03:04.743148",
+      "revision_date_time": "2024-02-26 17:21:14.281700",
       "details": "",
       "factions": [
         "wood"
@@ -6583,7 +6583,7 @@
       "type": "{Battle} Druid Spell",
       "text": "Negate all enemy effects targeting allied effects, players or units.",
       "image": "images_out/Stable/blom4.png",
-      "revision_date_time": "2023-12-14 14:03:04.743148",
+      "revision_date_time": "2024-02-26 17:21:14.281700",
       "details": "",
       "factions": [
         "wood"
@@ -6600,9 +6600,9 @@
       "cost": "mm",
       "total_cost": "2",
       "type": "{Feeble} Cosmic Robot Unit",
-      "text": "Skip your draft step. When you do, draw a card.",
+      "text": "Skip your draft step. When you do, draw a card and you also lose 3 life if playing a constructed format.",
       "image": "images_out/Stable/wbend5.png",
-      "revision_date_time": "2023-12-14 14:03:04.744145",
+      "revision_date_time": "2024-02-26 17:21:14.281700",
       "details": "",
       "factions": [
         "metal"
@@ -6623,7 +6623,7 @@
       "type": "Axolot Frog Unit",
       "text": "[Augment] Whenever one or more other cards enter a player's hand during battle, you may pay  [one] to create a 2/2 unit.",
       "image": "images_out/Stable/gorg3.png",
-      "revision_date_time": "2023-12-14 14:03:04.744145",
+      "revision_date_time": "2024-02-26 17:21:14.281700",
       "details": "",
       "factions": [
         "water"
