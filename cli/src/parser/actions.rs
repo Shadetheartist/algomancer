@@ -45,7 +45,7 @@ pub struct ListActionsArgs {
 #[derive(Debug, Args)]
 #[command(rename_all = "snake_case")]
 pub struct ApplyActionArgs {
-    #[arg(short='m', long="out_file")]
+    #[arg(short='m', long="mut_out_file")]
     pub mutations_output_file: Option<String>,
 
     #[arg(short='o', long="out_file")]
