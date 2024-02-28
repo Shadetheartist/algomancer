@@ -59,7 +59,7 @@ impl Game {
             let mut algomancer_rng = AlgomancerRng::new(options.seed);
 
             let cards_db = {
-                match CardPrototypeDatabase::load_from_raw_json(CORE_DB_JSON) {
+                match CardPrototypeDatabase::from_json(CORE_DB_JSON) {
                     Ok(card_prototypes) => card_prototypes,
                     Err(_) => {
                         return Err(NewGameError::FailedToLoadResource)
