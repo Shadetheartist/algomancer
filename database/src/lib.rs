@@ -145,17 +145,26 @@ impl CardPrototypeDatabase {
             }
 
             if card_type.contains("Spell") {
-                return CardType::Spell(timing(card_type));
+                return if card_type.contains("Token") {
+                    CardType::SpellToken
+                } else {
+                    CardType::Spell(timing(card_type))
+                }
             } else if card_type.contains("!Resource") {
                 return CardType::Meta(meta_card_type(card_type));
             } else if card_type.contains("Resource") {
                 return CardType::Resource(resource_type(card_type));
             }
 
-            CardType::Unit(timing(card_type))
+            return if card_type.contains("Token") {
+                CardType::UnitToken
+            } else {
+                CardType::Unit(timing(card_type))
+            }
+
         }
 
-        fn map_std_name(filename: &str) -> Box<str> {
+        fn map_std_name(filename: &str) -> &str {
             fn remove_extension(filename: &str) -> &str {
                 match filename.rfind('.') {
                     Some(index) => &filename[..index],
@@ -165,9 +174,7 @@ impl CardPrototypeDatabase {
 
             let std_name = filename.trim();
             let std_name = remove_extension(std_name);
-            let std_name = std_name.replace('-', "_");
-
-            std_name.into_boxed_str()
+            std_name
         }
 
         let mut c = 0;
