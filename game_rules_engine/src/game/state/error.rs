@@ -32,6 +32,9 @@ pub enum EntityNotFoundError {
 
     #[error("card [{0}] not found in state")]
     Card(CardId),
+
+    #[error("permanent [{0}] not found in state")]
+    Permanent(PermanentId),
 }
 
 #[derive(Error, Debug)]

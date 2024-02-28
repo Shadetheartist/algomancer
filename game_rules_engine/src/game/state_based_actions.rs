@@ -3,6 +3,8 @@ use crate::game::state::mutation::{StateMutation};
 use crate::game::state::stack::Next;
 use crate::game::state::State;
 use crate::{sm_static};
+use crate::game::state::mutation::set_resource_tapped::SetResourceTappedMutation;
+use crate::game::state::permanent::Permanent;
 use crate::game::state::progression::{BattlePhaseStep, DeploymentPhaseStep, Phase, PlanningPhaseStep};
 
 impl State {
@@ -11,7 +13,7 @@ impl State {
 
         mutations = add_sba_player(self, mutations);
         mutations = add_sba_damage(self, mutations);
-        mutations = add_sba_untap(self, mutations);
+        mutations = add_sba_refresh(self, mutations);
         mutations = add_sba_regroup(self, mutations);
         mutations = add_sba_transition(self, mutations);
 
@@ -105,16 +107,31 @@ fn add_sba_regroup(state: &State, mut mutations: Vec<StateMutation>) -> Vec<Stat
     mutations
 }
 
-fn add_sba_untap(state: &State, mut mutations: Vec<StateMutation>) -> Vec<StateMutation> {
-    for r in &state.regions {
-        if let Phase::PlanningPhase(PlanningPhaseStep::Refresh) = r.step {
-            for p in &r.players {
-                if p.resources_played_this_turn != 0 {
+fn add_sba_refresh(state: &State, mut mutations: Vec<StateMutation>) -> Vec<StateMutation> {
+    for region in &state.regions {
+        if let Phase::PlanningPhase(PlanningPhaseStep::Refresh) = region.step {
+
+            // untap all tapped resources in each region
+            for resource in region.resources() {
+                if let Permanent::Resource { common,  tapped, ..} = resource {
+                    if *tapped {
+                        mutations.push(
+                            sm_static!(SetResourceTapped, SetResourceTappedMutation {
+                                tapped: false,
+                                resource_permanent_id: common.permanent_id
+                            }));
+                    }
+                }
+            }
+
+            // reset the number of resources played this turn for each player
+            for player in &region.players {
+                if player.resources_played_this_turn != 0 {
                     mutations.push(
                         sm_static!(UpdatePlayerResourcesPlayed, UpdatePlayerResourcesPlayedMutation {
-                            player_id: p.id,
+                            player_id: player.id,
                             new_value: 0,
-                        }))
+                        }));
                 }
             }
         }

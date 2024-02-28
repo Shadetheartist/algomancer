@@ -9,6 +9,7 @@ pub mod stack_clear_priority;
 pub mod player_mutations;
 pub mod remove_card;
 pub mod create_permanent;
+pub mod set_resource_tapped;
 
 use std::fmt::{Debug};
 use serde::{Deserialize, Serialize};
@@ -25,6 +26,7 @@ use crate::game::state::mutation::remove_card::RemoveCardMutation;
 use crate::game::state::mutation::stack_add_priority::StackAddPriorityMutation;
 use crate::game::state::mutation::stack_clear_priority::StackClearPriorityMutation;
 use crate::game::state::mutation::stack_pass_priority::StackPassPriorityMutation;
+use crate::game::state::mutation::set_resource_tapped::SetResourceTappedMutation;
 use crate::game::state::region::RegionId;
 use crate::game::state::State;
 
@@ -101,6 +103,7 @@ pub enum StaticStateMutation {
     UpdatePlayerAlive(UpdatePlayerAliveMutation),
     UpdatePlayerResourcesPlayed(UpdatePlayerResourcesPlayedMutation),
     CreatePermanent(CreatePermanentMutation),
+    SetResourceTapped(SetResourceTappedMutation),
 }
 
 
@@ -120,6 +123,7 @@ impl State {
             StaticStateMutation::UpdatePlayerAlive(m) => m.mutate_state(self, db),
             StaticStateMutation::UpdatePlayerResourcesPlayed(m) => m.mutate_state(self, db),
             StaticStateMutation::CreatePermanent(m) => m.mutate_state(self, db),
+            StaticStateMutation::SetResourceTapped(m) => m.mutate_state(self, db),
         }
     }
 }

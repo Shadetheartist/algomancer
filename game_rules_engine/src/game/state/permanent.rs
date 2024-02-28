@@ -1,12 +1,22 @@
+use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
 use database::{CardPrototype, CardPrototypeDatabase, CardPrototypeId};
 
 use crate::game::state::card::{Card};
 use algocore::{CardType};
-use crate::game::state::player::PlayerId;
+use crate::game::state::error::EntityNotFoundError;
+use crate::game::state::player::{PlayerId};
 use crate::game::state::State;
+
+
 #[derive(Hash, Clone, Eq, PartialEq, Serialize, Deserialize, Debug, Copy)]
 pub struct PermanentId(pub usize);
+
+impl Display for PermanentId {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Permanent #{}", self.0)
+    }
+}
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct PermanentCommon {
@@ -25,6 +35,7 @@ pub enum Permanent {
     Resource {
         common: PermanentCommon,
         card_prototype_id: CardPrototypeId,
+        tapped: bool,
     },
     SpellToken {
         common: PermanentCommon,
@@ -62,6 +73,7 @@ impl Permanent {
                         controller_player_id,
                     },
                     card_prototype_id: card_prototype.prototype_id,
+                    tapped: false,
                 }
             }
             CardType::UnitToken => {
@@ -85,6 +97,42 @@ impl Permanent {
             _ => {
                 panic!("you need to call this only when the card type is a token or resource")
             }
+        }
+    }
+}
+
+impl State {
+    pub fn find_permanent(&self, id: PermanentId) -> Result<&Permanent, EntityNotFoundError> {
+        let find_result = self.regions.iter().flat_map(|region| &region.unformed_permanents).find(|p| match p {
+            Permanent::Unit { common, .. } |
+            Permanent::Resource { common, .. } |
+            Permanent::SpellToken { common, .. } |
+            Permanent::UnitToken { common, .. } => {
+                common.permanent_id == id
+            }
+        });
+
+        if let Some(permanent) = find_result {
+            Ok(&permanent)
+        } else {
+            Err(EntityNotFoundError::Permanent(id))
+        }
+    }
+
+    pub fn find_permanent_mut(&mut self, id: PermanentId) -> Result<&mut Permanent, EntityNotFoundError> {
+        let find_result = self.regions.iter_mut().flat_map(|region| &mut region.unformed_permanents).find(|p| match p {
+            Permanent::Unit { common, .. } |
+            Permanent::Resource { common, .. } |
+            Permanent::SpellToken { common, .. } |
+            Permanent::UnitToken { common, .. } => {
+                common.permanent_id == id
+            }
+        });
+
+        if let Some(permanent) = find_result {
+            Ok(permanent)
+        } else {
+            Err(EntityNotFoundError::Permanent(id))
         }
     }
 }

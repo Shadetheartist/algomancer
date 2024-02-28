@@ -37,6 +37,18 @@ pub struct Region {
 
 impl Region {
 
+    pub fn resources(&self) -> Vec<&Permanent> {
+        let mut resources = Vec::new();
+
+        for permanent in &self.unformed_permanents {
+            if let Permanent::Resource { .. } = permanent {
+                resources.push(permanent);
+            }
+        }
+
+        resources
+    }
+
     pub fn formations(&self) -> Vec<&Formation<Permanent>> {
         let mut formations = Vec::new();
 

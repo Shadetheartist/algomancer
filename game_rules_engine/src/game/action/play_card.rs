@@ -40,9 +40,6 @@ fn remove_card_mutation(card_id: CardId) -> StateMutation {
 
 
 impl ActionTrait for PlayCardAction {
-
-
-
     fn generate_mutations(&self, state: &State, db: &CardPrototypeDatabase, issuer: &Player) -> Result<Vec<StateMutation>, StateError> {
         match state.find_card(self.card_id)? {
             FindCardResult::InPlayerHand(player, _, card) => {
@@ -64,6 +61,7 @@ impl ActionTrait for PlayCardAction {
                             let region_id = next_state.find_region_id_containing_player(player_id);
                             let permanent = Permanent::Resource {
                                 card_prototype_id: prototype_id,
+                                tapped: false,
                                 common: PermanentCommon {
                                     permanent_id: PermanentId(next_state.permanent_id_factory.peek()),
                                     controller_player_id: player_id
@@ -98,6 +96,7 @@ impl ActionTrait for PlayCardAction {
                             let region_id = next_state.find_region_id_containing_player(player_id);
                             let permanent = Permanent::Resource {
                                 card_prototype_id: prototype_id,
+                                tapped: false,
                                 common: PermanentCommon {
                                     permanent_id: PermanentId(next_state.permanent_id_factory.peek()),
                                     controller_player_id: player_id
