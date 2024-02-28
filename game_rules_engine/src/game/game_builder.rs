@@ -169,7 +169,7 @@ impl Game {
 
                     game.state.regions.push(region);
 
-                    game.state.player_draw_n_cards(player_id, 14);
+                    game.state.player_draw_n_cards(player_id, 16);
                 }
             }
 
