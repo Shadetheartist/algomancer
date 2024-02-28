@@ -51,7 +51,7 @@ impl ActionTrait for AttackAction {
 
             let clockwise_neighbour_id = state.region_clockwise_neighbour(region.id).expect("a neighbour").id;
 
-            let mut formation = Formation::new(FormationId(state.next_formation_id), player.id);
+            let mut formation = Formation::new(FormationId(state.formation_id_factory.peek()), player.id);
             let some_permanent = region.unformed_permanents.first().expect("some permanent to exist");
             if let Permanent::Resource { common, .. } = some_permanent {
                 formation.insert_at(FormationPos::FrontRow(0), common.permanent_id).expect("permanent inserted into formation");

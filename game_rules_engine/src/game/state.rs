@@ -46,6 +46,20 @@ impl GameMode {
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct IdFactory(pub usize);
+
+impl IdFactory {
+    pub fn peek(&self) -> usize {
+        self.0 + 1
+    }
+
+    pub fn proceed(&mut self) -> usize {
+        self.0 += 1;
+        self.0
+    }
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct State {
     pub depth: usize,
     pub game_mode: GameMode,
@@ -53,9 +67,9 @@ pub struct State {
     pub common_deck: Option<Deck>,
     pub regions: Vec<Region>,
     pub initiative_player: PlayerId,
-    pub next_permanent_id: usize,
-    pub next_card_id: usize,
-    pub next_formation_id: usize,
+    pub permanent_id_factory: IdFactory,
+    pub card_id_factory: IdFactory,
+    pub formation_id_factory: IdFactory,
 }
 
 impl Default for State {
@@ -67,9 +81,9 @@ impl Default for State {
             common_deck: Some(Deck::new(CardCollectionId::new_common_deck())),
             regions: Vec::new(),
             initiative_player: PlayerId(1),
-            next_permanent_id: 1,
-            next_card_id: 1,
-            next_formation_id: 1,
+            permanent_id_factory: IdFactory(0),
+            card_id_factory: IdFactory(0),
+            formation_id_factory: IdFactory(0),
         }
     }
 }

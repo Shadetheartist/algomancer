@@ -7,7 +7,7 @@ use rand::prelude::SliceRandom;
 use crate::game::{Game, GameOptions};
 use database::{CardPrototypeDatabase, CardPrototypeId};
 use crate::game::game_builder::NewGameError::NotSupportedYet;
-use crate::game::state::{GameMode, State};
+use crate::game::state::{GameMode, IdFactory, State};
 use crate::game::state::card::{Card, CardId};
 use algocore::CardType;
 
@@ -106,9 +106,9 @@ impl Game {
                 rand: algomancer_rng,
                 regions: Vec::new(),
                 initiative_player: PlayerId(1),
-                next_permanent_id: 1,
-                next_card_id: card_id_counter + 1,
-                next_formation_id: 1,
+                permanent_id_factory: IdFactory(1),
+                card_id_factory: IdFactory(card_id_counter + 1),
+                formation_id_factory: IdFactory(1),
             };
 
             let mut game = Game {

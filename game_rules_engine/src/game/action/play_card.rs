@@ -65,7 +65,7 @@ impl ActionTrait for PlayCardAction {
                             let permanent = Permanent::Resource {
                                 card_prototype_id: prototype_id,
                                 common: PermanentCommon {
-                                    permanent_id: PermanentId(next_state.next_permanent_id),
+                                    permanent_id: PermanentId(next_state.permanent_id_factory.peek()),
                                     controller_player_id: player_id
                                 }
                             };
@@ -99,7 +99,7 @@ impl ActionTrait for PlayCardAction {
                             let permanent = Permanent::Resource {
                                 card_prototype_id: prototype_id,
                                 common: PermanentCommon {
-                                    permanent_id: PermanentId(next_state.next_permanent_id),
+                                    permanent_id: PermanentId(next_state.permanent_id_factory.peek()),
                                     controller_player_id: player_id
                                 }
                             };

@@ -8,14 +8,6 @@ use crate::game::state::State;
 #[derive(Hash, Clone, Eq, PartialEq, Serialize, Deserialize, Debug, Copy)]
 pub struct PermanentId(pub usize);
 
-impl PermanentId {
-    pub fn next(state: &mut State) -> PermanentId {
-        let next = state.next_permanent_id;
-        state.next_permanent_id = next + 1;
-        Self(next)
-    }
-}
-
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct PermanentCommon {
     pub permanent_id: PermanentId,
@@ -51,7 +43,7 @@ impl Permanent {
         if let CardType::Unit(_) = &proto.card_type {
             Permanent::Unit {
                 common: PermanentCommon {
-                    permanent_id: PermanentId::next(state),
+                    permanent_id: PermanentId(state.permanent_id_factory.proceed()),
                     controller_player_id,
                 },
                 card
@@ -66,7 +58,7 @@ impl Permanent {
             CardType::Resource(_) => {
                 Permanent::Resource {
                     common: PermanentCommon {
-                        permanent_id: PermanentId::next(state),
+                        permanent_id: PermanentId(state.permanent_id_factory.proceed()),
                         controller_player_id,
                     },
                     card_prototype_id: card_prototype.prototype_id,
@@ -75,7 +67,7 @@ impl Permanent {
             CardType::UnitToken => {
                 Permanent::UnitToken {
                     common: PermanentCommon {
-                        permanent_id: PermanentId::next(state),
+                        permanent_id: PermanentId(state.permanent_id_factory.proceed()),
                         controller_player_id,
                     },
                     card_prototype_id: card_prototype.prototype_id,
@@ -84,7 +76,7 @@ impl Permanent {
             CardType::SpellToken => {
                 Permanent::SpellToken {
                     common: PermanentCommon {
-                        permanent_id: PermanentId::next(state),
+                        permanent_id: PermanentId(state.permanent_id_factory.proceed()),
                         controller_player_id,
                     },
                     card_prototype_id: card_prototype.prototype_id,

@@ -16,8 +16,7 @@ pub struct CreatePermanentMutation {
 
 impl StateMutator for CreatePermanentMutation {
     fn mutate_state(&self, mut state: State, _db: &CardPrototypeDatabase) -> Result<State, StateError> {
-
-        state.next_permanent_id += 1;
+        state.permanent_id_factory.proceed();
 
         let region = state.find_region_mut(self.region_id)?;
         region.unformed_permanents.push(self.permanent.clone());

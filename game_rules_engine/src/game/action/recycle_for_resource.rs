@@ -38,7 +38,7 @@ impl ActionTrait for RecycleForResourceAction {
                     let mutation = sm_static!(CreateCard, CreateCardMutation {
                         card_collection_id: player_hand_id,
                         card: Card {
-                            card_id: CardId(next_state.next_card_id),
+                            card_id: CardId(next_state.card_id_factory.peek()),
                             prototype_id
                         }
                     });

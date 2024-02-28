@@ -15,7 +15,7 @@ pub struct CreateCardMutation {
 impl StateMutator for CreateCardMutation {
     fn mutate_state(&self, mut state: State, _db: &CardPrototypeDatabase) -> Result<State, StateError> {
 
-        state.next_card_id += 1;
+        state.card_id_factory.proceed();
 
         let cc = state.find_card_collection_mut(self.card_collection_id)?;
 

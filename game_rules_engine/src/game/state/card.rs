@@ -52,11 +52,9 @@ impl Card {
     }
 
     pub fn from_prototype_id(db: &CardPrototypeDatabase, state: &mut State, card_prototype_id: CardPrototypeId) -> Card {
-        state.next_card_id += 1;
         let proto = db.prototypes.get(&card_prototype_id).expect("a card prototype in the db");
-
         Card {
-            card_id: CardId(state.next_card_id),
+            card_id: CardId(state.card_id_factory.proceed()),
             prototype_id: proto.prototype_id,
         }
     }
