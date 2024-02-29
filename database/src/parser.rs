@@ -97,7 +97,7 @@ fn map_cost(cost: &str, affinities: &str) -> Cost {
         let cost_num = cost.parse().unwrap();
         Cost::Standard {
             threshold: parse_affinity_string(affinities),
-            additional_cost: cost_num,
+            cost: cost_num,
         }
     }
 }

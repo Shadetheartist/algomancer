@@ -5,7 +5,7 @@ use crate::{Affinity};
 pub enum Cost {
     Standard {
         threshold: Vec<Affinity>,
-        additional_cost: u32,
+        cost: u32,
     },
     X {
         threshold: Vec<Affinity>,
@@ -16,7 +16,7 @@ impl Cost {
     pub fn free() -> Cost {
         Cost::Standard {
             threshold: Vec::new(),
-            additional_cost: 0
+            cost: 0
         }
     }
 }

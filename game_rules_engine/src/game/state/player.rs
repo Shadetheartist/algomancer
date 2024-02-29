@@ -1,11 +1,15 @@
+use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
+use algocore::{Affinity, CardType, Cost, Faction, ResourceType};
+use database::CardPrototypeDatabase;
 
 use crate::game::state::card_collection::{CardCollectionId};
 use crate::game::state::error::{EntityNotFoundError, StateError};
 use crate::game::state::progression::{BattlePhaseStep, DeploymentPhaseStep, Phase, PlanningPhaseStep, Team};
 use crate::game::state::{GameMode, State};
 use crate::game::state::deck::Deck;
+use crate::game::state::permanent::Permanent;
 use crate::game::state::stack::Next;
 use crate::game::state::unordered_cards::UnorderedCards;
 
@@ -190,6 +194,110 @@ impl State {
     pub fn non_initiative_team(&self) -> TeamId {
         self.team_ids().into_iter().find(|&t| t != self.initiative_team()).expect("a non-initative team")
     }
+
+    /// returns resources in the region the player is in that the player is currently controlling
+    pub fn player_resources(&self, player_id: PlayerId) -> Result<Vec<&Permanent>, EntityNotFoundError> {
+        let resources = self.find_region_containing_player(player_id)?.resources().into_iter().filter(|permanent| {
+            if let Permanent::Resource { common, .. } = permanent {
+                common.controller_player_id == player_id
+            } else {
+                false
+            }
+        }).collect();
+
+        Ok(resources)
+    }
+
+    /// gets the currently available mana for a player in the form of a vec of affinities and
+    /// a 'total available mana' count
+    pub fn player_available_mana(&self, db: &CardPrototypeDatabase, player_id: PlayerId) -> Result<(Vec<Affinity>, u32), EntityNotFoundError> {
+        let player_resources = self.player_resources(player_id)?;
+
+        let mut affinity_map: HashMap<Faction, u32> = HashMap::new();
+        let mut total_mana: u32 = 0;
+
+        for permanent in player_resources {
+            if let Permanent::Resource { tapped, card_prototype_id, .. } = permanent {
+                let card_type = &db.prototypes[card_prototype_id].card_type;
+                if let CardType::Resource(resource_type) = card_type {
+                    let faction = Faction::from_resource_type(*resource_type);
+
+                    // if the resource type maps to a faction, add it to the affinity map
+                    if let Some(faction) = faction {
+                        *affinity_map.entry(faction).or_insert(0) += 1;
+                    }
+
+                    // if the resource is tapped, it can't contribute to total available mana
+                    if !tapped {
+                        // if the resource is dormant, it can't be tapped
+                        if let ResourceType::Dormant = resource_type {} else {
+                            total_mana += 1;
+                        }
+                    }
+                } else {
+                    panic!("permanent card type is not a resource")
+                }
+            } else {
+                panic!("permanent is not a resource")
+            }
+        }
+
+        Ok((affinity_map.into_iter().map(|e| Affinity {
+            faction: e.0,
+            quantity: e.1,
+        }).collect(), total_mana))
+    }
+
+    /// checks if the player can currently afford some cost. Returns an enum describing if the
+    /// player can afford the cost, or why they can't.
+    pub fn player_check_affordability(&self, db: &CardPrototypeDatabase, player_id: PlayerId, cost: &Cost) -> Result<Affordability, EntityNotFoundError> {
+        let available_mana = self.player_available_mana(db, player_id)?;
+
+        // zero mana - can't cast shit
+        if available_mana.1 == 0 {
+            return Ok(Affordability::NotEnoughMana);
+        }
+
+        match cost {
+            Cost::Standard { threshold, cost } => {
+                // player straight-up does not have the mana to afford the cost
+                if *cost > available_mana.1 {
+                    return Ok(Affordability::NotEnoughMana);
+                }
+
+                for threshold_affinity in threshold {
+                    let available_affinity = available_mana.0.iter().find(|available_affinity| available_affinity.faction == threshold_affinity.faction);
+                    if let Some(available_affinity) = available_affinity {
+                        if available_affinity.quantity < threshold_affinity.quantity {
+                            return Ok(Affordability::DoesntMeetThreshold);
+                        }
+                    }
+                }
+            }
+            Cost::X { .. } => {
+                // not sure how to handle the X cost enum without a cost associated with it.
+                // probably have to resolve the X in the cost and then create a new std cost.
+            }
+        }
+
+        Ok(Affordability::Affordable)
+    }
+
+    /// returns true if the player can currently afford some cost.
+    pub fn player_can_afford(&self, db: &CardPrototypeDatabase, player_id: PlayerId, cost: &Cost) -> Result<bool, EntityNotFoundError> {
+        if let Affordability::Affordable = self.player_check_affordability(db, player_id, cost)? {
+            return Ok(true);
+        }
+
+        Ok(false)
+    }
+}
+
+
+pub enum Affordability {
+    Affordable,
+    NotEnoughMana,
+    DoesntMeetThreshold,
 }
 
 

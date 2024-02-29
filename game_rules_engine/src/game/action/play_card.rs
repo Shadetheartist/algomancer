@@ -27,17 +27,11 @@ pub struct PlayCardAction {
     pub card_id: CardId
 }
 
-impl PlayCardAction {
-
-}
-
 fn remove_card_mutation(card_id: CardId) -> StateMutation {
     sm_static!(RemoveCard, RemoveCardMutation{
         card_id
     })
 }
-
-
 
 impl ActionTrait for PlayCardAction {
     fn generate_mutations(&self, state: &State, db: &CardPrototypeDatabase, issuer: &Player) -> Result<Vec<StateMutation>, StateError> {
@@ -175,12 +169,14 @@ impl PlayCardAction {
                 match proto.card_type {
                     CardType::Unit(Timing::Haste) |
                     CardType::Spell(Timing::Haste) => {
-                        actions.push(Action {
-                            issuer_player_id: player.id,
-                            action: ActionType::PlayCard(PlayCardAction {
-                                card_id: card.card_id,
+                        if state.player_can_afford(db, player.id, &proto.costs).unwrap() {
+                            actions.push(Action {
+                                issuer_player_id: player.id,
+                                action: ActionType::PlayCard(PlayCardAction {
+                                    card_id: card.card_id,
+                                })
                             })
-                        })
+                        }
                     }
                     _ => {}
                 }
