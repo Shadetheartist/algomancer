@@ -26,6 +26,7 @@ dependencies = [
  "algocore",
  "algomancer_gre",
  "clap",
+ "rand",
  "serde",
  "serde_json",
  "thiserror",

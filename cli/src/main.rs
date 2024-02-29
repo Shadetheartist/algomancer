@@ -335,6 +335,8 @@ fn unique_factions(factions: &[FactionArg]) -> Vec<Faction> {
 #[cfg(test)]
 mod tests {
     use std::time::Instant;
+    use rand::prelude::SliceRandom;
+    use rand::thread_rng;
     use algomancer_gre::game::{Game, GameOptions};
     use algomancer_gre::game::action::{Action};
     use algomancer_gre::game::state::GameMode;
@@ -359,6 +361,7 @@ mod tests {
 
         let mut game = Game::new(&options).unwrap();
 
+        let mut rng = thread_rng();
 
         for _ in 0..500 {
             let start = Instant::now();
@@ -372,9 +375,8 @@ mod tests {
                 eprintln!("no more actions");
                 break;
             }
-            actions_vec.reverse();
 
-            let action = actions_vec.remove(0);
+            let action = actions_vec.choose(&mut rng).unwrap().clone();
             let start = Instant::now();
             let _mutations = game.apply_action(action).unwrap();
 
