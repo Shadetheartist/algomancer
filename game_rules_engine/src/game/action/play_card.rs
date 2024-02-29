@@ -83,14 +83,18 @@ impl ActionTrait for PlayCardAction {
                     CardType::Unit(_) => {
                         mutations.push(remove_card_mutation(self.card_id));
 
+
                         // create the permanent
                         let player_id = player.id;
                         let prototype_id = proto.prototype_id;
+                        let card_id = self.card_id;
                         let mutation = sm_eval!(move |next_state| {
                             let region_id = next_state.find_region_id_containing_player(player_id);
-                            let permanent = Permanent::Resource {
-                                card_prototype_id: prototype_id,
-                                tapped: false,
+                            let permanent = Permanent::Unit {
+                                card: Card {
+                                    card_id: card_id,
+                                    prototype_id: prototype_id
+                                },
                                 common: PermanentCommon {
                                     permanent_id: PermanentId(next_state.permanent_id_factory.peek()),
                                     controller_player_id: player_id
@@ -137,6 +141,7 @@ impl ActionTrait for PlayCardAction {
 
         actions.extend(Self::valid_play_resource(state, db));
         actions.extend(Self::valid_play_haste(state, db));
+        actions.extend(Self::valid_play_default(state, db));
 
         actions
     }
@@ -144,6 +149,52 @@ impl ActionTrait for PlayCardAction {
 }
 
 impl PlayCardAction {
+
+    fn valid_play_default(state: &State, db: &CardPrototypeDatabase) -> Vec<Action> {
+        let mut actions : Vec<Action> = Vec::new();
+
+        for region in &state.regions {
+
+            if let Phase::DeploymentPhase(DeploymentPhaseStep::Deployment(_)) = region.step {} else {
+                continue
+            }
+
+            // assume single player per region at in the deployment step
+            let player = region.sole_player();
+
+            // player must be on the team with active initiative
+            if let Some(active_team_id) = region.active_team_id(state) {
+                if player.team_id != active_team_id {
+                    continue
+                }
+            }
+
+            for card in player.hand.iter() {
+                let proto = db.prototypes.get(&card.prototype_id).expect("a card prototype");
+                match proto.card_type {
+                    // viruses can be cast during the main phase i think
+                    CardType::Unit(Timing::Virus) |
+                    // spells are not supported yet
+                    //CardType::Spell(Timing::Virus) |
+                    //CardType::Spell(Timing::Default) |
+                    CardType::Unit(Timing::Default)  => {
+                        if state.player_can_afford(db, player.id, &proto.costs).unwrap() {
+                            actions.push(Action {
+                                issuer_player_id: player.id,
+                                action: ActionType::PlayCard(PlayCardAction {
+                                    card_id: card.card_id,
+                                })
+                            })
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        actions
+    }
+
 
     fn valid_play_haste(state: &State, db: &CardPrototypeDatabase) -> Vec<Action> {
         let mut actions : Vec<Action> = Vec::new();

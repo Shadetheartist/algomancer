@@ -218,7 +218,8 @@ impl State {
 
         for permanent in player_resources {
             if let Permanent::Resource { tapped, card_prototype_id, .. } = permanent {
-                let card_type = &db.prototypes[card_prototype_id].card_type;
+                let prototype = &db.prototypes[card_prototype_id];
+                let card_type = &prototype.card_type;
                 if let CardType::Resource(resource_type) = card_type {
                     let faction = Faction::from_resource_type(*resource_type);
 
@@ -235,7 +236,7 @@ impl State {
                         }
                     }
                 } else {
-                    panic!("permanent card type is not a resource")
+                    panic!("permanent (proto: {:?}) type is not a resource", prototype)
                 }
             } else {
                 panic!("permanent is not a resource")
