@@ -24,7 +24,7 @@ pub struct Game {
 }
 
 impl Game {
-    // is_over returns true if there are are any living players on at least two teams
+    // is_over returns true if there are any living players on at least two teams
     pub fn is_over(&self) -> bool {
         let filtered = self.state.team_ids().into_iter().filter(|&t| !self.state.living_players_in_team(t).is_empty());
         let count = filtered.take(2).count();

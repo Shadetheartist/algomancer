@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package GameService;
+package game_service;
 
 service Game {
     rpc GetState(GetStateRequest) returns (GetStateResponse);
-    rpc ApplyAction(ApplyActicaonRequest) returns (ApplyActionResponse);
+    rpc ApplyAction(ApplyActionRequest) returns (ApplyActionResponse);
 }
 
 message GetStateRequest {
