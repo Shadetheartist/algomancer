@@ -6,8 +6,10 @@ service Coordinator {
     rpc Register(ConnectRequest) returns (ConnectResponse);
     rpc CreateLobby(CreateLobbyRequest) returns (CreateLobbyResponse);
     rpc JoinLobby(JoinLobbyRequest) returns (JoinLobbyResponse);
+    rpc LeaveLobby(LeaveLobbyRequest) returns (LeaveLobbyResponse);
     rpc LobbyListen(LobbyListenRequest) returns (stream LobbyEvent);
 }
+
 
 message ConnectRequest {
     string username = 1;
@@ -17,6 +19,7 @@ message ConnectResponse {
     uint64 agent_id = 1;
 }
 
+
 message CreateLobbyRequest {
     uint64 agent_id = 1;
 }
@@ -25,22 +28,34 @@ message CreateLobbyResponse {
     uint64 lobby_id = 1;
 }
 
+
 message JoinLobbyRequest {
     uint64 agent_id = 1;
     uint64 lobby_id = 2;
 }
+
+message JoinLobbyResponse {
+
+}
+
+
+message LeaveLobbyRequest {
+    uint64 agent_id = 1;
+}
+
+message LeaveLobbyResponse {
+
+}
+
 
 message LobbyListenRequest {
     uint64 agent_id = 1;
     uint64 lobby_id = 2;
 }
 
-
-message JoinLobbyResponse {
-
-}
-
 message LobbyEvent {
     string event_type = 1;
     string event_arg = 2;
 }
+
+

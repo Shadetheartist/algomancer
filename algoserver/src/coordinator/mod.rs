@@ -1,6 +1,6 @@
 pub mod service;
 
-use std::fmt::{Display, Formatter, Write};
+use std::fmt::{Display, Formatter};
 use std::sync::{Arc, Mutex};
 use tokio::sync::broadcast::Receiver;
 use algomancer_gre::game::{GameOptions};

@@ -1,12 +1,9 @@
-use std::fmt::format;
 use std::sync::{Arc};
-use tokio::sync::broadcast::error::RecvError;
 use tonic::{async_trait, Request, Response, Status};
 use tonic::codegen::tokio_stream::wrappers::ReceiverStream;
 use crate::algomancer;
 
-use crate::algomancer::{ConnectRequest, ConnectResponse, CreateLobbyRequest, CreateLobbyResponse, JoinLobbyRequest, JoinLobbyResponse};
-use crate::coordinator::LobbyEvent;
+use crate::algomancer::{ConnectRequest, ConnectResponse, CreateLobbyRequest, CreateLobbyResponse, JoinLobbyRequest, JoinLobbyResponse, LeaveLobbyRequest, LeaveLobbyResponse};
 
 #[derive(Debug)]
 pub struct CoordinatorService {
@@ -74,15 +71,31 @@ impl algomancer::coordinator_server::Coordinator for CoordinatorService {
         Ok(response)
     }
 
+    async fn leave_lobby(&self, request: Request<LeaveLobbyRequest>) -> Result<Response<LeaveLobbyResponse>, Status> {
+        let request = request.get_ref();
+
+        {
+            let mut coordinator = self.inner.write().await;
+            match coordinator.leave_current_lobby(request.agent_id.into()) {
+                Ok(_) => {},
+                Err(err) => return Err(Status::from_error(Box::new(err))),
+            }
+        }
+
+        let response = Response::new(LeaveLobbyResponse {});
+
+        Ok(response)
+    }
+
     type LobbyListenStream = ReceiverStream<Result<crate::algomancer::LobbyEvent, Status>>;
 
     async fn lobby_listen(&self, request: Request<algomancer::LobbyListenRequest>) -> Result<Response<Self::LobbyListenStream>, Status> {
         let request = request.get_ref();
 
-        let (mut tx, rx) = tokio::sync::mpsc::channel(4);
+        let (tx, rx) = tokio::sync::mpsc::channel(4);
 
         let mut lobby_events_rx = {
-            let mut coordinator = self.inner.write().await;
+            let coordinator = self.inner.write().await;
             match coordinator.lobby_listen(request.lobby_id.into()) {
                 Ok(rx) => rx,
                 Err(err) => return Err(Status::from_error(Box::new(err))),
@@ -99,7 +112,7 @@ impl algomancer::coordinator_server::Coordinator for CoordinatorService {
                             event_arg: event.event_arg,
                         };
 
-                        println!("sending {:?}", event);
+                        println!("received broadcast event, re-sending to listener. {:?}", event);
 
                         tx.send(Ok(event)).await.unwrap();
                     }
@@ -107,7 +120,6 @@ impl algomancer::coordinator_server::Coordinator for CoordinatorService {
                         return
                     }
                 }
-
             }
         });
 
