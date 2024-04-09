@@ -4,6 +4,9 @@ package algomancer;
 
 service Coordinator {
     rpc Register(ConnectRequest) returns (ConnectResponse);
+    rpc CreateLobby(CreateLobbyRequest) returns (CreateLobbyResponse);
+    rpc JoinLobby(JoinLobbyRequest) returns (JoinLobbyResponse);
+    rpc LobbyListen(JoinLobbyRequest) returns (stream LobbyMessage);
 }
 
 message ConnectRequest {
@@ -11,5 +14,26 @@ message ConnectRequest {
 }
 
 message ConnectResponse {
-    int64 agent_id = 1;
+    uint64 agent_id = 1;
+}
+
+message CreateLobbyRequest {
+    uint64 agent_id = 1;
+}
+
+message CreateLobbyResponse {
+    uint64 lobby_id = 1;
+}
+
+message JoinLobbyRequest {
+    uint64 agent_id = 1;
+    uint64 lobby_id = 2;
+}
+
+message JoinLobbyResponse {
+
+}
+
+message LobbyMessage {
+
 }

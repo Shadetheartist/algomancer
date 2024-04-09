@@ -1,5 +1,6 @@
 pub mod service;
 
+use std::fmt::{Display, Formatter, write, Write};
 use std::sync::{Arc, Mutex};
 use algomancer_gre::game::{GameOptions};
 use algomancer_gre::game::state::GameMode;
@@ -8,10 +9,37 @@ use crate::coordinator::Error::CannotRunError;
 use crate::runner::Runner;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
-pub struct AgentId(usize);
+pub struct AgentId(u64);
+
+impl Display for AgentId {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.0.to_string().as_str())
+    }
+}
+
+impl From<u64> for AgentId {
+    fn from(value: u64) -> Self {
+        Self(value)
+    }
+}
+
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
-pub struct LobbyId(usize);
+pub struct LobbyId(u64);
+
+impl Display for LobbyId {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.0.to_string().as_str())
+    }
+}
+
+
+impl From<u64> for LobbyId {
+    fn from(value: u64) -> Self {
+        Self(value)
+    }
+}
+
 
 #[derive(Debug)]
 pub enum Error {
@@ -19,6 +47,29 @@ pub enum Error {
     LobbyDoesNotExist(LobbyId),
     AgentNotInLobby(AgentId),
     CannotRunError(crate::runner::Error)
+}
+
+impl Display for Error {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Error::AgentDoesNotExist(agent_id) => {
+                write!(f, "agent {agent_id} does not exist")
+            }
+            Error::LobbyDoesNotExist(lobby_id) => {
+                write!(f, "lobby {lobby_id} does not exist")
+            }
+            Error::AgentNotInLobby(agent_id) => {
+                write!(f, "agent {agent_id} is not in a lobby")
+            }
+            CannotRunError(_) => {
+                write!(f, "cannot run the game")
+            }
+        }
+    }
+}
+
+impl std::error::Error for Error {
+
 }
 
 #[derive(Debug)]
