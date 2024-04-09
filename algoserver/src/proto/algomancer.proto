@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package algomancer;
+
+service Coordinator {
+    rpc Register(ConnectRequest) returns (ConnectResponse);
+}
+
+message ConnectRequest {
+    string username = 1;
+}
+
+message ConnectResponse {
+    int64 agent_id = 1;
+}

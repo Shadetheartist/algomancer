@@ -1,3 +1,5 @@
+pub mod service;
+
 use std::sync::{Arc, Mutex};
 use algomancer_gre::game::{GameOptions};
 use algomancer_gre::game::state::GameMode;
@@ -31,6 +33,7 @@ pub struct Lobby {
     agents: Vec<AgentId>,
 }
 
+#[derive(Debug)]
 pub struct Coordinator {
     last_agent_id: AgentId,
     last_lobby_id: LobbyId,
@@ -38,8 +41,10 @@ pub struct Coordinator {
     lobbies: Vec<Lobby>,
 }
 
+#[derive(Debug)]
 pub struct Agent {
-    id: AgentId
+    id: AgentId,
+    username: String
 }
 
 impl Coordinator {
@@ -52,10 +57,11 @@ impl Coordinator {
         }
     }
 
-    pub fn create_new_agent(&mut self) -> AgentId {
+    pub fn create_new_agent(&mut self, username: &str) -> AgentId {
         let id = self.next_agent_id();
         let agent = Agent {
             id: id,
+            username: username.to_string()
         };
 
         self.agents.push(agent);
@@ -223,13 +229,13 @@ mod tests {
     fn test_coordinator_join_leave() {
         let mut coordinator = Coordinator::new();
 
-        let agent_id = coordinator.create_new_agent();
+        let agent_id = coordinator.create_new_agent("Jim");
         println!("agent 1 {:?}", agent_id);
 
         let lobby_id = coordinator.create_lobby_with_host(agent_id).unwrap();
         println!("lobby_id {:?}", lobby_id);
 
-        let agent_2_id = coordinator.create_new_agent();
+        let agent_2_id = coordinator.create_new_agent("Pam");
         println!("agent 2 {:?}", agent_2_id);
 
         coordinator.join_lobby(agent_2_id, lobby_id).unwrap();
@@ -240,13 +246,13 @@ mod tests {
             println!("{:?}", l);
         }
 
-        let agent_id = coordinator.create_new_agent();
+        let agent_id = coordinator.create_new_agent("Dwight");
         coordinator.join_lobby(agent_id, lobby_id).unwrap();
 
-        let agent_id = coordinator.create_new_agent();
+        let agent_id = coordinator.create_new_agent("Larry");
         coordinator.join_lobby(agent_id, lobby_id).unwrap();
 
-        let agent_id = coordinator.create_new_agent();
+        let agent_id = coordinator.create_new_agent("Denis");
         coordinator.join_lobby(agent_id, lobby_id).unwrap();
 
         for l in coordinator.lobbies() {
@@ -266,13 +272,13 @@ mod tests {
     fn test_coordinator_2p_game() {
         let mut coordinator = Coordinator::new();
 
-        let agent_id = coordinator.create_new_agent();
+        let agent_id = coordinator.create_new_agent("Denis");
         println!("agent 1 {:?}", agent_id);
 
         let lobby_id = coordinator.create_lobby_with_host(agent_id).unwrap();
         println!("lobby_id {:?}", lobby_id);
 
-        let agent_2_id = coordinator.create_new_agent();
+        let agent_2_id = coordinator.create_new_agent("Greg");
         println!("agent 2 {:?}", agent_2_id);
 
         coordinator.join_lobby(agent_2_id, lobby_id).unwrap();
