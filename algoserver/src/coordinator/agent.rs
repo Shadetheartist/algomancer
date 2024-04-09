@@ -11,9 +11,9 @@ pub struct Agent {
 impl Agent {
     pub fn new(id: AgentId, username: String) -> Self {
         Self {
-            id: id,
+            id,
             key: AgentKey(rand::thread_rng().next_u64()),
-            username: username,
+            username,
         }
     }
 }

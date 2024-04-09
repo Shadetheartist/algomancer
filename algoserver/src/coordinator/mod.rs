@@ -104,7 +104,7 @@ impl Coordinator {
         let lobby = Lobby {
             id: lobby_id,
             runner: None,
-            options: options,
+            options,
             host_agent_id: agent.id,
             agents: vec![host_agent_id],
             broadcast: tx,
@@ -135,11 +135,11 @@ impl Coordinator {
                 .iter()
                 .enumerate()
                 .find(|(_, agent_id)| **agent_id == leaver_agent_id)
-                .expect(format!("a controller with an agent with id {:?}", leaver_agent_id).as_str()).0;
+                .unwrap_or_else(|| panic!("a controller with an agent with id {:?}", leaver_agent_id)).0;
 
             current_lobby.agents.remove(agent_idx);
 
-            if current_lobby.agents.len() == 0 {
+            if current_lobby.agents.is_empty() {
                 // if the lobby is empty, remove the lobby (after borrow is over)
                 remove_lobby = Some(current_lobby.id);
             } else {

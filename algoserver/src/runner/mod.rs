@@ -21,8 +21,8 @@ impl Runner {
         };
 
         let runner = Self {
-            lobby_id: lobby_id,
-            game: game,
+            lobby_id,
+            game,
         };
 
         Ok(runner)
