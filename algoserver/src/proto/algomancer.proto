@@ -17,11 +17,12 @@ message ConnectRequest {
 
 message ConnectResponse {
     uint64 agent_id = 1;
+    uint64 agent_key = 2;
 }
 
 
 message CreateLobbyRequest {
-    uint64 agent_id = 1;
+    uint64 agent_key = 1;
 }
 
 message CreateLobbyResponse {
@@ -30,7 +31,7 @@ message CreateLobbyResponse {
 
 
 message JoinLobbyRequest {
-    uint64 agent_id = 1;
+    uint64 agent_key = 1;
     uint64 lobby_id = 2;
 }
 
@@ -40,7 +41,7 @@ message JoinLobbyResponse {
 
 
 message LeaveLobbyRequest {
-    uint64 agent_id = 1;
+    uint64 agent_key = 1;
 }
 
 message LeaveLobbyResponse {
@@ -49,7 +50,7 @@ message LeaveLobbyResponse {
 
 
 message LobbyListenRequest {
-    uint64 agent_id = 1;
+    uint64 agent_key = 1;
     uint64 lobby_id = 2;
 }
 

@@ -25,13 +25,14 @@ impl algomancer::coordinator_server::Coordinator for CoordinatorService {
 
         let request = request.get_ref();
 
-        let agent_id = {
+        let (agent_id, agent_key) = {
             let mut coordinator = self.inner.write().await;
             coordinator.create_new_agent(request.username.as_str())
         };
 
         let response = Response::new(ConnectResponse {
-            agent_id: agent_id.0
+            agent_id: agent_id.0,
+            agent_key: agent_key.0,
         });
 
         Ok(response)
@@ -42,7 +43,7 @@ impl algomancer::coordinator_server::Coordinator for CoordinatorService {
 
         let lobby_id = {
             let mut coordinator = self.inner.write().await;
-            match coordinator.create_lobby_with_host(request.agent_id.into()) {
+            match coordinator.create_lobby_with_host(request.agent_key.into()) {
                 Ok(lobby_id) => lobby_id,
                 Err(err) => return Err(Status::from_error(Box::new(err))),
             }
@@ -60,7 +61,7 @@ impl algomancer::coordinator_server::Coordinator for CoordinatorService {
 
         {
             let mut coordinator = self.inner.write().await;
-            match coordinator.join_lobby(request.agent_id.into(), request.lobby_id.into()) {
+            match coordinator.join_lobby(request.agent_key.into(), request.lobby_id.into()) {
                 Ok(_) => {},
                 Err(err) => return Err(Status::from_error(Box::new(err))),
             }
@@ -76,7 +77,7 @@ impl algomancer::coordinator_server::Coordinator for CoordinatorService {
 
         {
             let mut coordinator = self.inner.write().await;
-            match coordinator.leave_current_lobby(request.agent_id.into()) {
+            match coordinator.leave_current_lobby(request.agent_key.into()) {
                 Ok(_) => {},
                 Err(err) => return Err(Status::from_error(Box::new(err))),
             }

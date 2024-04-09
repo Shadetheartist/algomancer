@@ -1,4 +1,6 @@
 pub mod service;
+pub mod agent;
+pub mod lobby;
 
 use std::fmt::{Display, Formatter};
 use std::sync::{Arc, Mutex};
@@ -6,48 +8,26 @@ use tokio::sync::broadcast::Receiver;
 use algomancer_gre::game::{GameOptions};
 use algomancer_gre::game::state::GameMode;
 use algomancer_gre::game::state::rng::AlgomancerRngSeed;
+use crate::coordinator::agent::{Agent, AgentId, AgentKey};
 use crate::coordinator::Error::CannotRunError;
+use crate::coordinator::lobby::{Lobby, LobbyEvent, LobbyEventType, LobbyId};
 use crate::runner::Runner;
 
-#[derive(Copy, Clone, PartialEq, Eq, Debug)]
-pub struct AgentId(pub u64);
-
-impl Display for AgentId {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.write_str(self.0.to_string().as_str())
-    }
+#[derive(Debug)]
+pub struct Coordinator {
+    last_agent_id: AgentId,
+    last_lobby_id: LobbyId,
+    agents: Vec<Agent>,
+    lobbies: Vec<Lobby>,
 }
-
-impl From<u64> for AgentId {
-    fn from(value: u64) -> Self {
-        Self(value)
-    }
-}
-
-
-#[derive(Copy, Clone, PartialEq, Eq, Debug)]
-pub struct LobbyId(u64);
-
-impl Display for LobbyId {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.write_str(self.0.to_string().as_str())
-    }
-}
-
-
-impl From<u64> for LobbyId {
-    fn from(value: u64) -> Self {
-        Self(value)
-    }
-}
-
 
 #[derive(Debug)]
 pub enum Error {
     AgentDoesNotExist(AgentId),
+    AgentDoesNotExistWithKey(AgentKey),
     LobbyDoesNotExist(LobbyId),
     AgentNotInLobby(AgentId),
-    CannotRunError(crate::runner::Error)
+    CannotRunError(crate::runner::Error),
 }
 
 impl Display for Error {
@@ -55,6 +35,9 @@ impl Display for Error {
         match self {
             Error::AgentDoesNotExist(agent_id) => {
                 write!(f, "agent {agent_id} does not exist")
+            }
+            Error::AgentDoesNotExistWithKey(agent_key) => {
+                write!(f, "agent does not exist with key {agent_key}")
             }
             Error::LobbyDoesNotExist(lobby_id) => {
                 write!(f, "lobby {lobby_id} does not exist")
@@ -69,50 +52,7 @@ impl Display for Error {
     }
 }
 
-impl std::error::Error for Error {
-
-}
-
-#[derive(Debug, Clone)]
-pub enum LobbyEventType {
-    AgentJoined,
-    AgentLeft,
-    AgentMessage
-}
-
-#[derive(Debug, Clone)]
-pub struct LobbyEvent {
-    pub event_type: LobbyEventType,
-    pub event_arg: String
-}
-
-#[derive(Debug)]
-pub struct Lobby {
-    id: LobbyId,
-
-    runner: Option<Arc<Mutex<Runner>>>,
-
-    options: GameOptions,
-
-    host_agent_id: AgentId,
-    agents: Vec<AgentId>,
-
-    broadcast: tokio::sync::broadcast::Sender<LobbyEvent>,
-}
-
-#[derive(Debug)]
-pub struct Coordinator {
-    last_agent_id: AgentId,
-    last_lobby_id: LobbyId,
-    agents: Vec<Agent>,
-    lobbies: Vec<Lobby>,
-}
-
-#[derive(Debug)]
-pub struct Agent {
-    id: AgentId,
-    username: String
-}
+impl std::error::Error for Error {}
 
 impl Coordinator {
     pub fn new() -> Self {
@@ -124,23 +64,27 @@ impl Coordinator {
         }
     }
 
-    pub fn create_new_agent(&mut self, username: &str) -> AgentId {
+    pub fn create_new_agent(&mut self, username: &str) -> (AgentId, AgentKey) {
         let id = self.next_agent_id();
-        let agent = Agent {
-            id: id,
-            username: username.to_string()
-        };
+
+        let agent = Agent::new(id, username.to_string());
+        let key = agent.key;
 
         self.agents.push(agent);
 
         self.last_agent_id = id;
 
-        id
+        (id, key)
     }
 
-    pub fn create_lobby_with_host(&mut self, host_agent_id: AgentId) -> Result<LobbyId, Error> {
+    pub fn create_lobby_with_host(&mut self, host_agent_key: AgentKey) -> Result<LobbyId, Error> {
 
-        let _ = self.leave_current_lobby(host_agent_id);
+        let _ = self.leave_current_lobby(host_agent_key);
+
+        let host_agent_id = match self.must_get_agent_id_by_key(host_agent_key) {
+            Ok(agent_id) => agent_id,
+            Err(e) => return Err(e)
+        };
 
         let agent = match self.must_get_agent(host_agent_id) {
             Ok(agent) => agent,
@@ -173,7 +117,12 @@ impl Coordinator {
         Ok(lobby_id)
     }
 
-    pub fn leave_current_lobby(&mut self, leaver_agent_id: AgentId) -> Result<(), Error> {
+    pub fn leave_current_lobby(&mut self, leaver_agent_key: AgentKey) -> Result<(), Error> {
+        let leaver_agent_id = match self.must_get_agent_id_by_key(leaver_agent_key) {
+            Ok(agent_id) => agent_id,
+            Err(e) => return Err(e)
+        };
+
         if self.get_agent(leaver_agent_id).is_none() {
             return Err(Error::AgentDoesNotExist(leaver_agent_id));
         }
@@ -212,13 +161,16 @@ impl Coordinator {
         Ok(())
     }
 
-    pub fn join_lobby(&mut self, agent_id: AgentId, lobby_id: LobbyId) -> Result<(), Error> {
-        match self.leave_current_lobby(agent_id) {
+    pub fn join_lobby(&mut self, agent_key: AgentKey, lobby_id: LobbyId) -> Result<(), Error> {
+        let agent_id = match self.must_get_agent_id_by_key(agent_key) {
+            Ok(agent_id) => agent_id,
+            Err(e) => return Err(e)
+        };
+
+        match self.leave_current_lobby(agent_key) {
             Ok(_) => {}
             Err(err) => {
-                if let Error::AgentDoesNotExist(_) = err {
-                    return Err(err);
-                }
+                return Err(err);
             }
         }
 
@@ -231,7 +183,7 @@ impl Coordinator {
 
         let event = LobbyEvent {
             event_type: LobbyEventType::AgentJoined,
-            event_arg: agent_id.to_string()
+            event_arg: agent_id.to_string(),
         };
 
         match lobby.broadcast.send(event.clone()) {
@@ -269,6 +221,14 @@ impl Coordinator {
             Ok(agent)
         } else {
             Err(Error::AgentDoesNotExist(agent_id))
+        }
+    }
+
+    pub fn must_get_agent_id_by_key(&self, agent_key: AgentKey) -> Result<AgentId, Error> {
+        if let Some(agent) = self.agents.iter().find(|a| a.key == agent_key) {
+            Ok(agent.id)
+        } else {
+            Err(Error::AgentDoesNotExistWithKey(agent_key))
         }
     }
 
@@ -313,7 +273,6 @@ impl Coordinator {
 
         Ok(arc)
     }
-
 }
 
 #[cfg(test)]

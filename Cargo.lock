@@ -75,6 +75,7 @@ version = "0.1.0"
 dependencies = [
  "algomancer_gre",
  "prost",
+ "rand",
  "tokio",
  "tonic",
  "tonic-build",

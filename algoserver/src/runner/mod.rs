@@ -1,6 +1,6 @@
 use algomancer_gre::game::{Game, GameOptions};
 use algomancer_gre::game::game_builder::NewGameError;
-use crate::coordinator::LobbyId;
+use crate::coordinator::lobby::LobbyId;
 
 #[derive(Debug)]
 pub enum Error {
