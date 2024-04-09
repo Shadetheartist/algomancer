@@ -1,7 +1,8 @@
 pub mod service;
 
-use std::fmt::{Display, Formatter, write, Write};
+use std::fmt::{Display, Formatter, Write};
 use std::sync::{Arc, Mutex};
+use tokio::sync::broadcast::Receiver;
 use algomancer_gre::game::{GameOptions};
 use algomancer_gre::game::state::GameMode;
 use algomancer_gre::game::state::rng::AlgomancerRngSeed;
@@ -9,7 +10,7 @@ use crate::coordinator::Error::CannotRunError;
 use crate::runner::Runner;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
-pub struct AgentId(u64);
+pub struct AgentId(pub u64);
 
 impl Display for AgentId {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
@@ -72,6 +73,19 @@ impl std::error::Error for Error {
 
 }
 
+#[derive(Debug, Clone)]
+pub enum LobbyEventType {
+    AgentJoined,
+    AgentLeft,
+    AgentMessage
+}
+
+#[derive(Debug, Clone)]
+pub struct LobbyEvent {
+    pub event_type: LobbyEventType,
+    pub event_arg: String
+}
+
 #[derive(Debug)]
 pub struct Lobby {
     id: LobbyId,
@@ -82,6 +96,8 @@ pub struct Lobby {
 
     host_agent_id: AgentId,
     agents: Vec<AgentId>,
+
+    broadcast: tokio::sync::broadcast::Sender<LobbyEvent>,
 }
 
 #[derive(Debug)]
@@ -139,15 +155,18 @@ impl Coordinator {
 
         let lobby_id = self.next_game_id();
 
-        let ongoing_game = Lobby {
+        let (tx, _) = tokio::sync::broadcast::channel::<LobbyEvent>(4);
+
+        let lobby = Lobby {
             id: lobby_id,
             runner: None,
             options: options,
             host_agent_id: agent.id,
             agents: vec![host_agent_id],
+            broadcast: tx,
         };
 
-        self.lobbies.push(ongoing_game);
+        self.lobbies.push(lobby);
 
         self.last_lobby_id = lobby_id;
 
@@ -210,6 +229,20 @@ impl Coordinator {
 
         lobby.agents.push(agent_id);
 
+        let event = LobbyEvent {
+            event_type: LobbyEventType::AgentJoined,
+            event_arg: agent_id.to_string()
+        };
+
+        match lobby.broadcast.send(event.clone()) {
+            Ok(_) => {
+                println!("broadcast {:?}", event);
+            }
+            Err(err) => {
+                eprintln!("err {} when broadcasting {:?}", err, event);
+            }
+        }
+
         Ok(())
     }
 
@@ -249,6 +282,17 @@ impl Coordinator {
 
     pub fn lobbies(&self) -> std::slice::Iter<'_, Lobby> {
         self.lobbies.iter()
+    }
+
+    pub fn lobby_listen(&self, lobby_id: LobbyId) -> Result<Receiver<LobbyEvent>, Error> {
+        let lobby = match self.get_lobby(lobby_id) {
+            Some(lobby) => lobby,
+            None => return Err(Error::LobbyDoesNotExist(lobby_id)),
+        };
+
+        let receiver = lobby.broadcast.subscribe();
+
+        Ok(receiver)
     }
 
     pub fn start_game(&mut self, lobby_id: LobbyId) -> Result<Arc<Mutex<Runner>>, Error> {

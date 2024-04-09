@@ -1,10 +1,12 @@
+use std::fmt::format;
 use std::sync::{Arc};
+use tokio::sync::broadcast::error::RecvError;
 use tonic::{async_trait, Request, Response, Status};
-use tonic::codegen::tokio_stream;
+use tonic::codegen::tokio_stream::wrappers::ReceiverStream;
 use crate::algomancer;
 
-use crate::algomancer::{ConnectRequest, ConnectResponse, CreateLobbyRequest, CreateLobbyResponse, JoinLobbyRequest, JoinLobbyResponse, LobbyMessage};
-use crate::coordinator::{Error, LobbyId};
+use crate::algomancer::{ConnectRequest, ConnectResponse, CreateLobbyRequest, CreateLobbyResponse, JoinLobbyRequest, JoinLobbyResponse};
+use crate::coordinator::LobbyEvent;
 
 #[derive(Debug)]
 pub struct CoordinatorService {
@@ -57,12 +59,58 @@ impl algomancer::coordinator_server::Coordinator for CoordinatorService {
     }
 
     async fn join_lobby(&self, request: Request<JoinLobbyRequest>) -> Result<Response<JoinLobbyResponse>, Status> {
-        todo!()
+        let request = request.get_ref();
+
+        {
+            let mut coordinator = self.inner.write().await;
+            match coordinator.join_lobby(request.agent_id.into(), request.lobby_id.into()) {
+                Ok(_) => {},
+                Err(err) => return Err(Status::from_error(Box::new(err))),
+            }
+        }
+
+        let response = Response::new(JoinLobbyResponse {});
+
+        Ok(response)
     }
 
-    type LobbyListenStream = tokio_stream::wrappers::ReceiverStream<Result<LobbyMessage, Status>>;
+    type LobbyListenStream = ReceiverStream<Result<crate::algomancer::LobbyEvent, Status>>;
 
-    async fn lobby_listen(&self, request: Request<JoinLobbyRequest>) -> Result<Response<Self::LobbyListenStream>, Status> {
-        todo!()
+    async fn lobby_listen(&self, request: Request<algomancer::LobbyListenRequest>) -> Result<Response<Self::LobbyListenStream>, Status> {
+        let request = request.get_ref();
+
+        let (mut tx, rx) = tokio::sync::mpsc::channel(4);
+
+        let mut lobby_events_rx = {
+            let mut coordinator = self.inner.write().await;
+            match coordinator.lobby_listen(request.lobby_id.into()) {
+                Ok(rx) => rx,
+                Err(err) => return Err(Status::from_error(Box::new(err))),
+            }
+        };
+
+        tokio::spawn(async move {
+            loop {
+                // coordinator needs to emit events to listen to, need event publishing / observer pattern
+                match lobby_events_rx.recv().await {
+                    Ok(event) => {
+                        let event = algomancer::LobbyEvent {
+                            event_type: format!("{:?}", event.event_type),
+                            event_arg: event.event_arg,
+                        };
+
+                        println!("sending {:?}", event);
+
+                        tx.send(Ok(event)).await.unwrap();
+                    }
+                    Err(_) => {
+                        return
+                    }
+                }
+
+            }
+        });
+
+        Ok(Response::new(ReceiverStream::new(rx)))
     }
 }

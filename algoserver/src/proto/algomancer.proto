@@ -6,7 +6,7 @@ service Coordinator {
     rpc Register(ConnectRequest) returns (ConnectResponse);
     rpc CreateLobby(CreateLobbyRequest) returns (CreateLobbyResponse);
     rpc JoinLobby(JoinLobbyRequest) returns (JoinLobbyResponse);
-    rpc LobbyListen(JoinLobbyRequest) returns (stream LobbyMessage);
+    rpc LobbyListen(LobbyListenRequest) returns (stream LobbyEvent);
 }
 
 message ConnectRequest {
@@ -30,10 +30,17 @@ message JoinLobbyRequest {
     uint64 lobby_id = 2;
 }
 
+message LobbyListenRequest {
+    uint64 agent_id = 1;
+    uint64 lobby_id = 2;
+}
+
+
 message JoinLobbyResponse {
 
 }
 
-message LobbyMessage {
-
+message LobbyEvent {
+    string event_type = 1;
+    string event_arg = 2;
 }
