@@ -1,4 +1,5 @@
 mod coordinator;
+mod runner;
 
 use std::net::SocketAddr;
 use game_service::game_server::{Game, GameServer};

@@ -1,8 +1,9 @@
-use algomancer_gre::game::{Game, GameOptions};
-use algomancer_gre::game::game_builder::NewGameError;
+use std::sync::{Arc, Mutex};
+use algomancer_gre::game::{GameOptions};
 use algomancer_gre::game::state::GameMode;
-use algomancer_gre::game::state::player::PlayerId;
 use algomancer_gre::game::state::rng::AlgomancerRngSeed;
+use crate::coordinator::Error::CannotRunError;
+use crate::runner::Runner;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub struct AgentId(usize);
@@ -14,25 +15,20 @@ pub struct LobbyId(usize);
 pub enum Error {
     AgentDoesNotExist(AgentId),
     LobbyDoesNotExist(LobbyId),
-    NewGameError(NewGameError),
     AgentNotInLobby(AgentId),
-}
-
-#[derive(Debug)]
-pub struct Controller {
-    agent_id: AgentId,
-    player_id: Option<PlayerId>,
+    CannotRunError(crate::runner::Error)
 }
 
 #[derive(Debug)]
 pub struct Lobby {
     id: LobbyId,
 
+    runner: Option<Arc<Mutex<Runner>>>,
+
     options: GameOptions,
-    game: Option<Game>,
 
     host_agent_id: AgentId,
-    controllers: Vec<Controller>,
+    agents: Vec<AgentId>,
 }
 
 pub struct Coordinator {
@@ -88,14 +84,10 @@ impl Coordinator {
 
         let ongoing_game = Lobby {
             id: lobby_id,
+            runner: None,
             options: options,
-            game: None,
             host_agent_id: agent.id,
-            controllers: vec![
-                Controller{
-                    agent_id: host_agent_id,
-                    player_id: None
-                }],
+            agents: vec![host_agent_id],
         };
 
         self.lobbies.push(ongoing_game);
@@ -113,23 +105,23 @@ impl Coordinator {
         // remove lobby if it's empty after the agent leaves, must be done after the mutable borrow is over
         let mut remove_lobby: Option<LobbyId> = None;
 
-        if let Some(mut current_lobby) = self.get_current_lobby_mut(leaver_agent_id) {
-            let controller_idx = current_lobby.controllers
+        if let Some(current_lobby) = self.get_current_lobby_mut(leaver_agent_id) {
+            let agent_idx = current_lobby.agents
                 .iter()
                 .enumerate()
-                .find(|(_, c)| c.agent_id == leaver_agent_id)
+                .find(|(_, agent_id)| **agent_id == leaver_agent_id)
                 .expect(format!("a controller with an agent with id {:?}", leaver_agent_id).as_str()).0;
 
-            current_lobby.controllers.remove(controller_idx);
+            current_lobby.agents.remove(agent_idx);
 
-            if current_lobby.controllers.len() == 0 {
+            if current_lobby.agents.len() == 0 {
                 // if the lobby is empty, remove the lobby (after borrow is over)
                 remove_lobby = Some(current_lobby.id);
             } else {
                 // if the leaver was the host - assign a new host
                 if current_lobby.host_agent_id == leaver_agent_id {
-                    let next_host_agent_id = current_lobby.controllers.first().expect("another player").agent_id;
-                    current_lobby.host_agent_id = next_host_agent_id;
+                    let next_host_agent_id = current_lobby.agents.first().expect("another player");
+                    current_lobby.host_agent_id = *next_host_agent_id;
                 }
             }
         } else {
@@ -159,7 +151,7 @@ impl Coordinator {
             None => return Err(Error::LobbyDoesNotExist(lobby_id)),
         };
 
-        lobby.controllers.push(Controller { agent_id, player_id: None });
+        lobby.agents.push(agent_id);
 
         Ok(())
     }
@@ -179,7 +171,7 @@ impl Coordinator {
     pub fn get_current_lobby_mut(&mut self, agent_id: AgentId) -> Option<&mut Lobby> {
         self.lobbies
             .iter_mut()
-            .find(|l| l.controllers.iter().any(|c| c.agent_id == agent_id))
+            .find(|l| l.agents.iter().any(|a| *a == agent_id))
     }
 
     pub fn must_get_agent(&self, agent_id: AgentId) -> Result<&Agent, Error> {
@@ -202,14 +194,33 @@ impl Coordinator {
         self.lobbies.iter()
     }
 
+    pub fn start_game(&mut self, lobby_id: LobbyId) -> Result<Arc<Mutex<Runner>>, Error> {
+        let lobby = match self.get_lobby_mut(lobby_id) {
+            Some(lobby) => lobby,
+            None => return Err(Error::LobbyDoesNotExist(lobby_id)),
+        };
+
+        let runner = match Runner::new(lobby_id, &lobby.options) {
+            Ok(runner) => runner,
+            Err(err) => return Err(CannotRunError(err))
+        };
+
+        let runner_mutex = Mutex::new(runner);
+        let arc = Arc::new(runner_mutex);
+
+        lobby.runner = Some(arc.clone());
+
+        Ok(arc)
+    }
+
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::coordinator::Coordinator;
+    use crate::coordinator::{AgentId, Coordinator};
 
     #[test]
-    fn test_coordinator() {
+    fn test_coordinator_join_leave() {
         let mut coordinator = Coordinator::new();
 
         let agent_id = coordinator.create_new_agent();
@@ -226,9 +237,48 @@ mod tests {
         coordinator.leave_current_lobby(agent_id).unwrap();
 
         for l in coordinator.lobbies() {
-            print!("{:?}", l);
+            println!("{:?}", l);
         }
 
+        let agent_id = coordinator.create_new_agent();
+        coordinator.join_lobby(agent_id, lobby_id).unwrap();
 
+        let agent_id = coordinator.create_new_agent();
+        coordinator.join_lobby(agent_id, lobby_id).unwrap();
+
+        let agent_id = coordinator.create_new_agent();
+        coordinator.join_lobby(agent_id, lobby_id).unwrap();
+
+        for l in coordinator.lobbies() {
+            println!("{:?}", l);
+        }
+
+        coordinator.leave_current_lobby(AgentId(2)).unwrap();
+        coordinator.leave_current_lobby(AgentId(3)).unwrap();
+        coordinator.leave_current_lobby(AgentId(4)).unwrap();
+        coordinator.leave_current_lobby(AgentId(5)).unwrap();
+
+        // lobby will self-delete when last player leaves
+        assert!(coordinator.join_lobby(agent_id, lobby_id).is_err());
+    }
+
+    #[test]
+    fn test_coordinator_2p_game() {
+        let mut coordinator = Coordinator::new();
+
+        let agent_id = coordinator.create_new_agent();
+        println!("agent 1 {:?}", agent_id);
+
+        let lobby_id = coordinator.create_lobby_with_host(agent_id).unwrap();
+        println!("lobby_id {:?}", lobby_id);
+
+        let agent_2_id = coordinator.create_new_agent();
+        println!("agent 2 {:?}", agent_2_id);
+
+        coordinator.join_lobby(agent_2_id, lobby_id).unwrap();
+
+        let _runner_arc_mutex = coordinator.start_game(lobby_id).unwrap();
+
+        print!("");
     }
 }
