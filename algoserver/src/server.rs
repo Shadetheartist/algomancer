@@ -1,5 +1,4 @@
-mod coordinator;
-mod runner;
+mod coordinator_service;
 
 use std::net::SocketAddr;
 use tonic::{transport::Server};
@@ -17,14 +16,7 @@ pub mod algomancer {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr: SocketAddr = "127.0.0.1:8000".parse()?;
 
-    let coordinator_service = coordinator::service::CoordinatorService::new();
-
-    let (_, agent_key) = coordinator_service.inner.write().await.create_new_agent("A");
-    coordinator_service.inner.write().await.create_lobby_with_host(agent_key).unwrap();
-    coordinator_service.inner.write().await.create_new_agent("B");
-    coordinator_service.inner.write().await.create_new_agent("C");
-    coordinator_service.inner.write().await.create_new_agent("D");
-
+    let coordinator_service = coordinator_service::CoordinatorService::new();
     let coordinator_service = algomancer::coordinator_server::CoordinatorServer::new(coordinator_service);
 
     let reflection_service = tonic_reflection::server::Builder::configure()
@@ -32,6 +24,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build()?;
 
     Server::builder()
+        .accept_http1(true)
         .add_service(reflection_service)
         .add_service(coordinator_service)
         .serve(addr)

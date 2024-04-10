@@ -7,4 +7,5 @@ members = [
     "game_rules_engine",
     "database",
     "algoserver",
+    "algomanserver",
 ]

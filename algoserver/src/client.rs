@@ -7,7 +7,7 @@ pub mod game_service {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut my_game_client = GameClient::connect("http://127.0.0.1:8000").await?;
+    let mut my_client = GameClient::connect("http://127.0.0.1:8000").await?;
 
     let request = tonic::Request::new(GetStateRequest{});
 

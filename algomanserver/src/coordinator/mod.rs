@@ -1,4 +1,3 @@
-pub mod service;
 pub mod agent;
 pub mod lobby;
 

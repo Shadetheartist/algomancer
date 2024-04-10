@@ -14,11 +14,12 @@ path = "src/client.rs"
 
 [dependencies]
 algomancer_gre = { path = "../game_rules_engine"}
+algomanserver = { path = "../algomanserver"}
 tonic = "0.11.0"
 tokio = { version = "1.35.1", features = ["full"] }
 prost = "0.12.3"
 tonic-reflection = "0.11.0"
-rand = "0.8.5"
+tonic-web = "0.11.0"
 
 [build-dependencies]
 tonic-build = "0.11.0"

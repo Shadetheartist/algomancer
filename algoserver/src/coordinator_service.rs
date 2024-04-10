@@ -7,13 +7,13 @@ use crate::algomancer::{AgentPublicInfo, ConnectRequest, ConnectResponse, Create
 
 #[derive(Debug)]
 pub struct CoordinatorService {
-    pub inner: Arc<tokio::sync::RwLock<crate::coordinator::Coordinator>>
+    pub inner: Arc<tokio::sync::RwLock<algomanserver::Coordinator>>
 }
 
 impl CoordinatorService {
     pub fn new() -> Self {
         Self {
-            inner: Arc::new(tokio::sync::RwLock::new(crate::coordinator::Coordinator::new())),
+            inner: Arc::new(tokio::sync::RwLock::new(algomanserver::Coordinator::new())),
         }
     }
 }
