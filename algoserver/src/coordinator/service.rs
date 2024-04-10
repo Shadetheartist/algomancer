@@ -3,7 +3,7 @@ use tonic::{async_trait, Request, Response, Status};
 use tonic::codegen::tokio_stream::wrappers::ReceiverStream;
 use crate::algomancer;
 
-use crate::algomancer::{ConnectRequest, ConnectResponse, CreateLobbyRequest, CreateLobbyResponse, JoinLobbyRequest, JoinLobbyResponse, LeaveLobbyRequest, LeaveLobbyResponse};
+use crate::algomancer::{AgentPublicInfo, ConnectRequest, ConnectResponse, CreateLobbyRequest, CreateLobbyResponse, JoinLobbyRequest, JoinLobbyResponse, LeaveLobbyRequest, LeaveLobbyResponse, ListLobbiesRequest};
 
 #[derive(Debug)]
 pub struct CoordinatorService {
@@ -121,6 +121,32 @@ impl algomancer::coordinator_server::Coordinator for CoordinatorService {
                         return
                     }
                 }
+            }
+        });
+
+        Ok(Response::new(ReceiverStream::new(rx)))
+    }
+
+    type ListLobbiesStream = ReceiverStream<Result<crate::algomancer::ListLobbiesResponse, Status>>;
+
+    async fn list_lobbies(&self, _: Request<ListLobbiesRequest>) -> Result<Response<Self::ListLobbiesStream>, Status> {
+        let (tx, rx) = tokio::sync::mpsc::channel(4);
+
+        let lobbies: Vec<algomancer::ListLobbiesResponse> = {
+            let coordinator = self.inner.write().await;
+            coordinator.lobbies().map(|l| algomancer::ListLobbiesResponse {
+                lobby_id: l.id.0,
+                lobby_name: "".to_string(),
+                agents: l.agents.iter().map(|a| AgentPublicInfo {
+                    agent_id: a.0,
+                    username: coordinator.get_agent(*a).unwrap().username.to_owned()
+                }).collect(),
+            }).collect()
+        };
+
+        tokio::spawn(async move {
+            for l in lobbies {
+                tx.send(Ok(l)).await.unwrap();
             }
         });
 

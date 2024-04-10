@@ -37,7 +37,6 @@ pub struct Lobby {
 pub enum LobbyEventType {
     AgentJoined,
     AgentLeft,
-    AgentMessage
 }
 
 #[derive(Debug, Clone)]

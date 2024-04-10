@@ -148,6 +148,11 @@ impl Coordinator {
                     let next_host_agent_id = current_lobby.agents.first().expect("another player");
                     current_lobby.host_agent_id = *next_host_agent_id;
                 }
+
+                Self::broadcast_lobby_event(current_lobby, LobbyEvent {
+                    event_type: LobbyEventType::AgentLeft,
+                    event_arg: leaver_agent_id.to_string(),
+                });
             }
         } else {
             return Err(Error::AgentNotInLobby(leaver_agent_id));
@@ -157,6 +162,9 @@ impl Coordinator {
             let lobby_idx = self.lobbies.iter().enumerate().find(|(_, l)| l.id == lobby_id).expect("this lobby").0;
             self.lobbies.remove(lobby_idx);
         }
+
+
+
 
         Ok(())
     }
@@ -170,7 +178,9 @@ impl Coordinator {
         match self.leave_current_lobby(agent_key) {
             Ok(_) => {}
             Err(err) => {
-                return Err(err);
+                if let Error::AgentNotInLobby(_) = err {} else {
+                    return Err(err);
+                }
             }
         }
 
@@ -181,21 +191,24 @@ impl Coordinator {
 
         lobby.agents.push(agent_id);
 
-        let event = LobbyEvent {
+        Self::broadcast_lobby_event(lobby, LobbyEvent {
             event_type: LobbyEventType::AgentJoined,
             event_arg: agent_id.to_string(),
-        };
-
-        match lobby.broadcast.send(event.clone()) {
-            Ok(_) => {
-                println!("broadcast {:?}", event);
-            }
-            Err(err) => {
-                eprintln!("err {} when broadcasting {:?}", err, event);
-            }
-        }
+        });
 
         Ok(())
+    }
+
+    fn broadcast_lobby_event(lobby: &Lobby, lobby_event: LobbyEvent){
+        match lobby.broadcast.send(lobby_event.clone()) {
+            Ok(_) => {
+                println!("broadcast {:?}", lobby_event);
+            }
+            Err(_) => {
+                // can only fail when there are no active receivers, which is actually totally fine
+                //eprintln!("err {} when broadcasting {:?}", err, lobby_event);
+            }
+        }
     }
 
     pub fn get_agent(&self, agent_id: AgentId) -> Option<&Agent> {
@@ -277,65 +290,70 @@ impl Coordinator {
 
 #[cfg(test)]
 mod tests {
-    use crate::coordinator::{AgentId, Coordinator};
+    use crate::coordinator::{Coordinator};
 
     #[test]
     fn test_coordinator_join_leave() {
         let mut coordinator = Coordinator::new();
 
-        let agent_id = coordinator.create_new_agent("Jim");
-        println!("agent 1 {:?}", agent_id);
+        let (_, agent_key) = coordinator.create_new_agent("Jim");
+        println!("agent 1 {:?}", agent_key);
 
-        let lobby_id = coordinator.create_lobby_with_host(agent_id).unwrap();
+        let lobby_id = coordinator.create_lobby_with_host(agent_key).unwrap();
         println!("lobby_id {:?}", lobby_id);
 
-        let agent_2_id = coordinator.create_new_agent("Pam");
-        println!("agent 2 {:?}", agent_2_id);
+        let (_, agent_2_key) = coordinator.create_new_agent("Pam");
+        println!("agent 2 {:?}", agent_2_key);
 
-        coordinator.join_lobby(agent_2_id, lobby_id).unwrap();
+        coordinator.join_lobby(agent_2_key, lobby_id).unwrap();
 
-        coordinator.leave_current_lobby(agent_id).unwrap();
-
-        for l in coordinator.lobbies() {
-            println!("{:?}", l);
-        }
-
-        let agent_id = coordinator.create_new_agent("Dwight");
-        coordinator.join_lobby(agent_id, lobby_id).unwrap();
-
-        let agent_id = coordinator.create_new_agent("Larry");
-        coordinator.join_lobby(agent_id, lobby_id).unwrap();
-
-        let agent_id = coordinator.create_new_agent("Denis");
-        coordinator.join_lobby(agent_id, lobby_id).unwrap();
+        coordinator.leave_current_lobby(agent_key).unwrap();
 
         for l in coordinator.lobbies() {
             println!("{:?}", l);
         }
 
-        coordinator.leave_current_lobby(AgentId(2)).unwrap();
-        coordinator.leave_current_lobby(AgentId(3)).unwrap();
-        coordinator.leave_current_lobby(AgentId(4)).unwrap();
-        coordinator.leave_current_lobby(AgentId(5)).unwrap();
+        let mut agent_keys = vec![];
+        agent_keys.push(agent_2_key);
+
+        let (_, agent_key) = coordinator.create_new_agent("Dwight");
+        coordinator.join_lobby(agent_key, lobby_id).unwrap();
+        agent_keys.push(agent_key);
+
+        let (_, agent_key) = coordinator.create_new_agent("Larry");
+        coordinator.join_lobby(agent_key, lobby_id).unwrap();
+        agent_keys.push(agent_key);
+
+        let (_, agent_key) = coordinator.create_new_agent("Denis");
+        coordinator.join_lobby(agent_key, lobby_id).unwrap();
+        agent_keys.push(agent_key);
+
+        for l in coordinator.lobbies() {
+            println!("{:?}", l);
+        }
+
+        for k in agent_keys {
+            coordinator.leave_current_lobby(k).unwrap();
+        }
 
         // lobby will self-delete when last player leaves
-        assert!(coordinator.join_lobby(agent_id, lobby_id).is_err());
+        assert!(coordinator.join_lobby(agent_key, lobby_id).is_err());
     }
 
     #[test]
     fn test_coordinator_2p_game() {
         let mut coordinator = Coordinator::new();
 
-        let agent_id = coordinator.create_new_agent("Denis");
-        println!("agent 1 {:?}", agent_id);
+        let (_, agent_key) = coordinator.create_new_agent("Denis");
+        println!("agent 1 {:?}", agent_key);
 
-        let lobby_id = coordinator.create_lobby_with_host(agent_id).unwrap();
+        let lobby_id = coordinator.create_lobby_with_host(agent_key).unwrap();
         println!("lobby_id {:?}", lobby_id);
 
-        let agent_2_id = coordinator.create_new_agent("Greg");
-        println!("agent 2 {:?}", agent_2_id);
+        let (_, agent_2_key) = coordinator.create_new_agent("Greg");
+        println!("agent 2 {:?}", agent_2_key);
 
-        coordinator.join_lobby(agent_2_id, lobby_id).unwrap();
+        coordinator.join_lobby(agent_2_key, lobby_id).unwrap();
 
         let _runner_arc_mutex = coordinator.start_game(lobby_id).unwrap();
 
