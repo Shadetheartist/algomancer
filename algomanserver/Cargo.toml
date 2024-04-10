@@ -9,4 +9,5 @@ authors = ["Derek Hemingson"]
 algomancer_gre = { path = "../game_rules_engine"}
 tokio = { version = "1.35.1", features = ["full"] }
 rand = "0.8.5"
-
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = [] }

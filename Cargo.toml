@@ -8,5 +8,5 @@ members = [
     "database",
     "grpc_server",
     "algomanserver",
-    "websocket_server",
+    "http_server",
 ]

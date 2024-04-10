@@ -10,7 +10,7 @@ pub mod action;
 pub mod game_builder;
 pub mod state_based_actions;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct GameOptions {
     pub seed: AlgomancerRngSeed,
     pub game_mode: GameMode,

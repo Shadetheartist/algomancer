@@ -1,7 +1,8 @@
 use std::fmt::{Display, Formatter};
 use rand::{RngCore};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Agent {
     pub id: AgentId,
     pub key: AgentKey,
@@ -18,7 +19,7 @@ impl Agent {
     }
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
 pub struct AgentId(pub u64);
 
 impl Display for AgentId {
@@ -34,7 +35,7 @@ impl From<u64> for AgentId {
 }
 
 
-#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
 pub struct AgentKey(pub u64);
 
 impl Display for AgentKey {

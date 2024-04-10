@@ -1,10 +1,11 @@
 use std::fmt::{Display, Formatter};
 use std::sync::{Arc, Mutex};
+use serde::{Deserialize, Serialize};
 use algomancer_gre::game::GameOptions;
 use crate::coordinator::agent::AgentId;
 use crate::runner::Runner;
 
-#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
 pub struct LobbyId(pub u64);
 
 impl Display for LobbyId {
@@ -30,16 +31,16 @@ pub struct Lobby {
     pub host_agent_id: AgentId,
     pub agents: Vec<AgentId>,
 
-    pub broadcast: tokio::sync::broadcast::Sender<LobbyEvent>,
+    pub broadcast: Option<tokio::sync::broadcast::Sender<LobbyEvent>>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum LobbyEventType {
     AgentJoined,
     AgentLeft,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LobbyEvent {
     pub event_type: LobbyEventType,
     pub event_arg: String

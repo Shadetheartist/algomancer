@@ -4,5 +4,6 @@ mod runner;
 pub use coordinator::{
     Coordinator,
     agent::{AgentId, AgentKey, Agent},
-    lobby::{LobbyId, LobbyEvent, LobbyEventType, Lobby}
+    lobby::{LobbyId, LobbyEvent, LobbyEventType, Lobby},
+    Error
 };

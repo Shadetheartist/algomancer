@@ -106,7 +106,7 @@ impl Coordinator {
             options,
             host_agent_id: agent.id,
             agents: vec![host_agent_id],
-            broadcast: tx,
+            broadcast: Some(tx),
         };
 
         self.lobbies.push(lobby);
@@ -199,15 +199,18 @@ impl Coordinator {
     }
 
     fn broadcast_lobby_event(lobby: &Lobby, lobby_event: LobbyEvent){
-        match lobby.broadcast.send(lobby_event.clone()) {
-            Ok(_) => {
-                println!("broadcast {:?}", lobby_event);
-            }
-            Err(_) => {
-                // can only fail when there are no active receivers, which is actually totally fine
-                //eprintln!("err {} when broadcasting {:?}", err, lobby_event);
+        if let Some(tx) = &lobby.broadcast {
+            match tx.send(lobby_event.clone()) {
+                Ok(_) => {
+                    println!("broadcast {:?}", lobby_event);
+                }
+                Err(_) => {
+                    // can only fail when there are no active receivers, which is actually totally fine
+                    //eprintln!("err {} when broadcasting {:?}", err, lobby_event);
+                }
             }
         }
+
     }
 
     pub fn get_agent(&self, agent_id: AgentId) -> Option<&Agent> {
@@ -262,9 +265,12 @@ impl Coordinator {
             None => return Err(Error::LobbyDoesNotExist(lobby_id)),
         };
 
-        let receiver = lobby.broadcast.subscribe();
-
-        Ok(receiver)
+        if let Some(tx) = &lobby.broadcast {
+            let receiver = tx.subscribe();
+            Ok(receiver)
+        } else {
+            panic!("tx is None")
+        }
     }
 
     pub fn start_game(&mut self, lobby_id: LobbyId) -> Result<Arc<Mutex<Runner>>, Error> {
