@@ -1,16 +1,12 @@
 [package]
-name = "algoserver"
+name = "grpc_server"
 version = "0.1.0"
 edition = "2021"
 authors = ["Derek Hemingson"]
 
 [[bin]]
-name = "algo-server"
+name = "grpc_server"
 path = "src/server.rs"
-
-[[bin]]
-name = "algo-client"
-path = "src/client.rs"
 
 [dependencies]
 algomancer_gre = { path = "../game_rules_engine"}

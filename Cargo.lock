@@ -79,20 +79,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "algoserver"
-version = "0.1.0"
-dependencies = [
- "algomancer_gre",
- "algomanserver",
- "prost",
- "tokio",
- "tonic",
- "tonic-build",
- "tonic-reflection",
- "tonic-web",
-]
-
-[[package]]
 name = "anstream"
 version = "0.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -434,6 +420,20 @@ name = "gimli"
 version = "0.28.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4271d37baee1b8c7e4b708028c57d816cf9d2434acb33a549475f78c181f6253"
+
+[[package]]
+name = "grpc_server"
+version = "0.1.0"
+dependencies = [
+ "algomancer_gre",
+ "algomanserver",
+ "prost",
+ "tokio",
+ "tonic",
+ "tonic-build",
+ "tonic-reflection",
+ "tonic-web",
+]
 
 [[package]]
 name = "h2"
