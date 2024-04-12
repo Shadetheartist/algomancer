@@ -6,11 +6,12 @@ extern crate rocket;
 use std::sync::Arc;
 use rocket::{Response, State};
 use tokio::sync::RwLock;
-use algomanserver::{Agent, AgentId, Coordinator, Lobby};
+use algomanserver::{Agent, AgentId, Coordinator, Lobby, LobbyId};
 use rand::{random, RngCore};
 use rocket::http::{ContentType, Status};
 use rocket::response::status;
 use rocket::serde::json::Json;
+use ws::WebSocket;
 use crate::models::RegistrationResponse;
 
 
@@ -108,7 +109,7 @@ async fn create_lobby(coordinator: &State<Arc<RwLock<Coordinator>>>, data: Json<
 
 
 #[post("/join_lobby", format="json", data = "<data>")]
-async fn join_lobby(coordinator: &State<Arc<RwLock<Coordinator>>>, data: Json<models::JoinLobbyRequest>) -> Result<String, Error> {
+async fn join_lobby(coordinator: &State<Arc<RwLock<Coordinator>>>, data: Json<models::AgentLobbyRequest>) -> Result<String, Error> {
     let mut coordinator = coordinator.write().await;
 
     match coordinator.join_lobby(data.agent_key, data.lobby_id) {
@@ -137,6 +138,20 @@ async fn leave_lobby(coordinator: &State<Arc<RwLock<Coordinator>>>, data: Json<m
 }
 
 
+#[get("/lobby/<lobby_id>/listen")]
+async fn lobby_listen(ws: WebSocket, coordinator: &State<Arc<RwLock<Coordinator>>>, lobby_id: u64) -> ws::Channel<'static> {
+    use rocket::futures::{SinkExt, StreamExt};
+
+    ws.channel(move |mut stream| Box::pin(async move {
+        while let Some(message) = stream.next().await {
+            let _ = stream.send(message?).await;
+        }
+
+        Ok(())
+    }))
+}
+
+
 #[launch]
 fn rocket() -> _ {
     let mut coordinator = Coordinator::new();
@@ -162,6 +177,7 @@ fn rocket() -> _ {
             create_lobby,
             join_lobby,
             leave_lobby,
+            lobby_listen,
             lobbies,
         ])
 }

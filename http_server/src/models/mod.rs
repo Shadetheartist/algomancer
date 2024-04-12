@@ -15,7 +15,7 @@ pub struct AgentKeyRequest {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct JoinLobbyRequest {
+pub struct AgentLobbyRequest {
     pub agent_key: AgentKey,
     pub lobby_id: LobbyId,
 }
