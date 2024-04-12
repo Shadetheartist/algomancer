@@ -3,15 +3,19 @@ mod models;
 #[macro_use]
 extern crate rocket;
 
+use std::borrow::Cow;
 use std::sync::Arc;
 use rocket::{Response, State};
 use tokio::sync::RwLock;
-use algomanserver::{Agent, AgentId, Coordinator, Lobby, LobbyId};
+use algomanserver::{Agent, AgentId, Coordinator, Lobby, LobbyEvent, LobbyId};
 use rand::{random, RngCore};
+use rocket::async_stream::stream;
 use rocket::http::{ContentType, Status};
 use rocket::response::status;
 use rocket::serde::json::Json;
-use ws::WebSocket;
+use tokio::sync::broadcast::Receiver;
+use ws::{Message, WebSocket};
+use ws::frame::{CloseCode, CloseFrame};
 use crate::models::RegistrationResponse;
 
 
@@ -142,9 +146,46 @@ async fn leave_lobby(coordinator: &State<Arc<RwLock<Coordinator>>>, data: Json<m
 async fn lobby_listen(ws: WebSocket, coordinator: &State<Arc<RwLock<Coordinator>>>, lobby_id: u64) -> ws::Channel<'static> {
     use rocket::futures::{SinkExt, StreamExt};
 
+    let mut coordinator = coordinator.write().await;
+
+    let mut lobby_events_rx = match coordinator.lobby_listen(lobby_id.into()) {
+        Ok(rx) => rx,
+        Err(_) => {
+            return ws.channel(move |mut stream| Box::pin(async move {
+                Ok(())
+            }));
+        }
+    };
+
     ws.channel(move |mut stream| Box::pin(async move {
-        while let Some(message) = stream.next().await {
-            let _ = stream.send(message?).await;
+
+        let (mut tx, mut rx) = stream.split();
+
+        let mut send_task = tokio::spawn(async move {
+            loop {
+                if let Ok(lobby_event) = lobby_events_rx.recv().await {
+                    let event_json = serde_json::to_string(&lobby_event).expect("serialized lobby event");
+                    let _ = tx.send(Message::Text(event_json)).await;
+                }
+            }
+        });
+
+        let mut recv_task = tokio::spawn(async move {
+            while let Some(message) = rx.next().await {
+                if let Ok(message) = message {
+                    println!("received message")
+                }
+            }
+        });
+
+        // If any one of the tasks exit, abort the other.
+        tokio::select! {
+            rv_a = (&mut send_task) => {
+                recv_task.abort();
+            },
+            rv_b = (&mut recv_task) => {
+                send_task.abort();
+            }
         }
 
         Ok(())
