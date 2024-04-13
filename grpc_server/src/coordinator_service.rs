@@ -105,7 +105,6 @@ impl algomancer::coordinator_server::Coordinator for CoordinatorService {
 
         tokio::spawn(async move {
             loop {
-                // coordinator needs to emit events to listen to, need event publishing / observer pattern
                 match lobby_events_rx.recv().await {
                     Ok(event) => {
                         let event = algomancer::LobbyEvent {

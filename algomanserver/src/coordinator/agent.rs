@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 pub struct Agent {
     pub id: AgentId,
     pub key: AgentKey,
-    pub username: String
+    pub username: String,
 }
 
 impl Agent {
@@ -19,7 +19,7 @@ impl Agent {
     }
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize, Hash)]
 pub struct AgentId(pub u64);
 
 impl Display for AgentId {
