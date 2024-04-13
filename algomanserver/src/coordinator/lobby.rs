@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use tokio::sync::mpsc::error::SendError;
 use algomancer_gre::game::GameOptions;
 use crate::coordinator::agent::AgentId;
+use crate::runner::MigrationInfo;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
 pub struct LobbyId(pub u64);
@@ -27,7 +28,7 @@ pub struct Lobby {
     pub options: GameOptions,
 
     pub host_agent_id: AgentId,
-    pub agents: Vec<AgentId>,
+    pub agent_ids: Vec<AgentId>,
 
     pub event_sender: HashMap<AgentId, tokio::sync::mpsc::Sender<LobbyEvent>>,
 }
@@ -38,7 +39,7 @@ pub enum LobbyEvent {
     AgentLeft(AgentId),
     NewHost(AgentId),
 
-    Migrate(AgentId),
+    Migrate(AgentId, MigrationInfo),
     Whisper(AgentId, AgentId, String)
 }
 
@@ -62,7 +63,7 @@ impl Lobby {
                 Ok(())
             }
 
-            LobbyEvent::Migrate(agent_id) |
+            LobbyEvent::Migrate(agent_id, _) |
             LobbyEvent::Whisper(_, agent_id, _) => {
                 let target_tx = self.event_sender.get(&agent_id).expect("agent to have a tx");
 

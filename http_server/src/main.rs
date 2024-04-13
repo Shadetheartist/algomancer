@@ -71,7 +71,7 @@ async fn lobbies(coordinator: &State<Arc<RwLock<Coordinator>>>) -> Json<Vec<mode
     let public_lobby_info: Vec<models::Lobby> = coordinator.lobbies().map(|l| models::Lobby {
         id: l.id,
         name: "".to_string(),
-        agents: l.agents.iter().filter(|a| coordinator.get_agent(**a).is_some()).map(|a| {
+        agents: l.agent_ids.iter().filter(|a| coordinator.get_agent(**a).is_some()).map(|a| {
             let agent = coordinator.get_agent(*a).expect("missing agents already should be filtered out");
 
             models::Agent {

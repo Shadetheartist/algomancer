@@ -1,7 +1,7 @@
 pub mod agent;
 pub mod lobby;
 
-use std::fmt::{Display, Formatter};
+use std::fmt::{Debug, Display, Formatter};
 use algomancer_gre::game::{GameOptions};
 use algomancer_gre::game::state::GameMode;
 use algomancer_gre::game::state::rng::AlgomancerRngSeed;
@@ -75,7 +75,6 @@ impl Coordinator {
     }
 
     pub async fn create_lobby_with_host(&mut self, host_agent_key: AgentKey) -> Result<LobbyId, Error> {
-
         let _ = self.leave_current_lobby(host_agent_key);
 
         let host_agent_id = match self.must_get_agent_id_by_key(host_agent_key) {
@@ -99,7 +98,7 @@ impl Coordinator {
             id: lobby_id,
             options,
             host_agent_id: agent.id,
-            agents: vec![host_agent_id],
+            agent_ids: vec![host_agent_id],
             event_sender: Default::default(),
         };
 
@@ -124,16 +123,16 @@ impl Coordinator {
         let mut remove_lobby: Option<LobbyId> = None;
 
         if let Some(current_lobby) = self.get_current_lobby_mut(leaver_agent_id) {
-            let agent_idx = current_lobby.agents
+            let agent_idx = current_lobby.agent_ids
                 .iter()
                 .enumerate()
                 .find(|(_, agent_id)| **agent_id == leaver_agent_id)
                 .unwrap_or_else(|| panic!("a controller with an agent with id {:?}", leaver_agent_id)).0;
 
-            current_lobby.agents.remove(agent_idx);
+            current_lobby.agent_ids.remove(agent_idx);
             current_lobby.event_sender.remove(&leaver_agent_id);
 
-            if current_lobby.agents.is_empty() {
+            if current_lobby.agent_ids.is_empty() {
                 // don't need to send any events here as the lobby only had the one player and the lobby is about to close
 
                 // if the lobby is empty, remove the lobby (after borrow is over)
@@ -143,7 +142,7 @@ impl Coordinator {
 
                 // if the leaver was the host - assign a new host
                 if current_lobby.host_agent_id == leaver_agent_id {
-                    let next_host_agent_id = current_lobby.agents.first().expect("another player");
+                    let next_host_agent_id = current_lobby.agent_ids.first().expect("another player");
                     current_lobby.host_agent_id = *next_host_agent_id;
                     current_lobby.send_event(LobbyEvent::NewHost(current_lobby.host_agent_id)).await.unwrap();
                 }
@@ -153,9 +152,36 @@ impl Coordinator {
         }
 
         if let Some(lobby_id) = remove_lobby {
-            let lobby_idx = self.lobbies.iter().enumerate().find(|(_, l)| l.id == lobby_id).expect("this lobby").0;
+            let lobby_idx = self.lobbies.iter().enumerate().find(|(_, l)| l.id == lobby_id).expect("a lobby").0;
             self.lobbies.remove(lobby_idx);
         }
+
+        Ok(())
+    }
+
+    fn get_agent_key(&self, agent_id: AgentId) -> Option<AgentKey> {
+        if let Some(agent) = self.agents.iter().find(|a| a.id == agent_id) {
+            Some(agent.key)
+        } else {
+            None
+        }
+    }
+
+    async fn remove_lobby(&mut self, lobby_id: LobbyId) -> Result<(), Error> {
+        let agent_keys_in_lobby: Vec<AgentKey> = {
+            let lobby = match self.get_lobby(lobby_id) {
+                Some(lobby) => lobby,
+                None => return Err(Error::LobbyDoesNotExist(lobby_id)),
+            };
+
+            lobby.agent_ids.iter().map(|a_id| self.get_agent_key(*a_id).expect("an agent")).collect()
+        };
+
+        for agent_key in agent_keys_in_lobby {
+            self.leave_current_lobby(agent_key).await.unwrap_or(());
+        }
+
+        // lobby will be removed when the last player leaves
 
         Ok(())
     }
@@ -180,13 +206,12 @@ impl Coordinator {
             None => return Err(Error::LobbyDoesNotExist(lobby_id)),
         };
 
-        lobby.agents.push(agent_id);
+        lobby.agent_ids.push(agent_id);
 
         lobby.send_event(LobbyEvent::AgentJoined(agent_id)).await.unwrap();
 
         Ok(())
     }
-
 
 
     pub fn get_agent(&self, agent_id: AgentId) -> Option<&Agent> {
@@ -204,7 +229,7 @@ impl Coordinator {
     pub fn get_current_lobby_mut(&mut self, agent_id: AgentId) -> Option<&mut Lobby> {
         self.lobbies
             .iter_mut()
-            .find(|l| l.agents.iter().any(|a| *a == agent_id))
+            .find(|l| l.agent_ids.iter().any(|a| *a == agent_id))
     }
 
     pub fn must_get_agent(&self, agent_id: AgentId) -> Result<&Agent, Error> {
@@ -236,7 +261,6 @@ impl Coordinator {
     }
 
     pub fn lobby_listen(&mut self, agent_key: AgentKey, lobby_id: LobbyId) -> Result<tokio::sync::mpsc::Receiver<LobbyEvent>, Error> {
-
         let agent_id = match self.must_get_agent_id_by_key(agent_key) {
             Ok(agent_id) => agent_id,
             Err(e) => return Err(e)
@@ -260,9 +284,9 @@ impl Coordinator {
             Err(e) => return Err(e)
         };
 
-        let lobby_id = match self.lobbies.iter().find(|l| l.agents.contains(&agent_id)) {
+        let lobby_id = match self.lobbies.iter().find(|l| l.agent_ids.contains(&agent_id)) {
             None => {
-                return Err(Error::AgentNotInLobby(agent_id))
+                return Err(Error::AgentNotInLobby(agent_id));
             }
             Some(l) => l.id
         };
@@ -276,16 +300,22 @@ impl Coordinator {
         Ok(())
     }
 
+    // starting the game sends each agent details on how to connect to the game server,
+    // then deletes the lobby
     pub async fn start_game(&mut self, lobby_id: LobbyId) -> Result<(), Error> {
-        let lobby = match self.get_lobby_mut(lobby_id) {
+        let lobby = match self.get_lobby(lobby_id) {
             Some(lobby) => lobby,
             None => return Err(Error::LobbyDoesNotExist(lobby_id)),
         };
 
-        let runner = match Runner::new(&lobby) {
+        let agent_keys = lobby.agent_ids.iter().map(|a_id| (*a_id, self.agents.iter().find(|a| a.id == *a_id).unwrap().key)).collect();
+
+        let runner = match Runner::new(&lobby, agent_keys) {
             Ok(runner) => runner,
             Err(err) => return Err(CannotRunError(err))
         };
+
+        self.remove_lobby(lobby_id).await?;
 
         Ok(())
     }
@@ -300,7 +330,7 @@ mod tests {
     use crate::coordinator::{Coordinator};
     use crate::LobbyEvent;
 
-    fn expect_events(mut rx: Receiver<LobbyEvent>, expected_events: Vec<LobbyEvent>) -> JoinHandle<()>{
+    fn expect_events(mut rx: Receiver<LobbyEvent>, expected_events: Vec<LobbyEvent>) -> JoinHandle<()> {
         tokio::spawn(async move {
             for expected_event in expected_events {
                 match rx.recv().await {
@@ -313,7 +343,6 @@ mod tests {
                         }
                     }
                 }
-
             }
         })
     }
@@ -409,7 +438,6 @@ mod tests {
         if let Err(err) = listener_handle.await {
             panic!("{:?}", err);
         }
-
     }
 
     #[tokio::test]
@@ -450,7 +478,7 @@ mod tests {
     }
 
     #[tokio::test]
-     async fn test_coordinator_2p_game() {
+    async fn test_coordinator_2p_game() {
         let mut coordinator = Coordinator::new();
 
         let (_, agent_key) = coordinator.create_new_agent("Denis").await;

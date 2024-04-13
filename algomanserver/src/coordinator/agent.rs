@@ -35,7 +35,7 @@ impl From<u64> for AgentId {
 }
 
 
-#[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize, Hash)]
 pub struct AgentKey(pub u64);
 
 impl Display for AgentKey {
