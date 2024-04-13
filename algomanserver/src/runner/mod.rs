@@ -1,6 +1,6 @@
 use algomancer_gre::game::{Game};
 use algomancer_gre::game::game_builder::NewGameError;
-use crate::{Lobby};
+use crate::{Lobby, LobbyEvent};
 
 #[derive(Debug)]
 pub enum Error {
@@ -14,6 +14,8 @@ pub struct Runner {
 
 impl Runner {
     pub fn new(lobby: &Lobby) -> Result<Self, Error> {
+
+
 
         // send out connection info to each client
         // wait for clients to connect
@@ -46,6 +48,12 @@ impl Runner {
 
     fn wait_for_clients() {}
 
-    fn send_client_info() {}
+    async fn send_each_client_info(lobby: &Lobby) {
+
+        for agent_id in &lobby.agents {
+            lobby.send_event(LobbyEvent::Migrate(agent_id.clone())).await.unwrap();
+        }
+
+    }
 
 }

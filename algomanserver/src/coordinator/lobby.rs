@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
+use tokio::sync::mpsc::error::SendError;
 use algomancer_gre::game::GameOptions;
 use crate::coordinator::agent::AgentId;
 
@@ -28,7 +29,7 @@ pub struct Lobby {
     pub host_agent_id: AgentId,
     pub agents: Vec<AgentId>,
 
-    pub target: HashMap<AgentId, tokio::sync::mpsc::Sender<LobbyEvent>>,
+    pub event_sender: HashMap<AgentId, tokio::sync::mpsc::Sender<LobbyEvent>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
@@ -39,4 +40,44 @@ pub enum LobbyEvent {
 
     Migrate(AgentId),
     Whisper(AgentId, AgentId, String)
+}
+
+
+impl Lobby {
+    pub async fn send_event(&self, lobby_event: LobbyEvent) -> Result<(), SendError<LobbyEvent>>{
+        match lobby_event {
+            LobbyEvent::AgentJoined(_) |
+            LobbyEvent::AgentLeft(_) |
+            LobbyEvent::NewHost(_) => {
+                println!("queuing broadcast of event to all lobby target channels: {:?}", lobby_event);
+                for (_, rx) in &self.event_sender {
+                    match rx.send(lobby_event.clone()).await {
+                        Ok(_) => {}
+                        Err(err) => {
+                            return Err(err);
+                        }
+                    }
+                }
+
+                Ok(())
+            }
+
+            LobbyEvent::Migrate(agent_id) |
+            LobbyEvent::Whisper(_, agent_id, _) => {
+                let target_tx = self.event_sender.get(&agent_id).expect("agent to have a tx");
+
+                match target_tx.send(lobby_event.clone()).await {
+                    Ok(_) => {
+                        println!("queued targeted message to channel: {:?}", lobby_event);
+                        Ok(())
+                    }
+                    Err(err) => {
+                        return Err(err);
+                    }
+                }
+
+
+            }
+        }
+    }
 }

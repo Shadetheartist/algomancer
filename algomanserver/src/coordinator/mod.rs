@@ -100,7 +100,7 @@ impl Coordinator {
             options,
             host_agent_id: agent.id,
             agents: vec![host_agent_id],
-            target: Default::default(),
+            event_sender: Default::default(),
         };
 
         self.lobbies.push(lobby);
@@ -131,7 +131,7 @@ impl Coordinator {
                 .unwrap_or_else(|| panic!("a controller with an agent with id {:?}", leaver_agent_id)).0;
 
             current_lobby.agents.remove(agent_idx);
-            current_lobby.target.remove(&leaver_agent_id);
+            current_lobby.event_sender.remove(&leaver_agent_id);
 
             if current_lobby.agents.is_empty() {
                 // don't need to send any events here as the lobby only had the one player and the lobby is about to close
@@ -139,13 +139,13 @@ impl Coordinator {
                 // if the lobby is empty, remove the lobby (after borrow is over)
                 remove_lobby = Some(current_lobby.id);
             } else {
-                Self::send_lobby_event(current_lobby, LobbyEvent::AgentLeft(leaver_agent_id)).await;
+                current_lobby.send_event(LobbyEvent::AgentLeft(leaver_agent_id)).await.unwrap();
 
                 // if the leaver was the host - assign a new host
                 if current_lobby.host_agent_id == leaver_agent_id {
                     let next_host_agent_id = current_lobby.agents.first().expect("another player");
                     current_lobby.host_agent_id = *next_host_agent_id;
-                    Self::send_lobby_event(current_lobby, LobbyEvent::NewHost(current_lobby.host_agent_id)).await;
+                    current_lobby.send_event(LobbyEvent::NewHost(current_lobby.host_agent_id)).await.unwrap();
                 }
             }
         } else {
@@ -182,40 +182,12 @@ impl Coordinator {
 
         lobby.agents.push(agent_id);
 
-        Self::send_lobby_event(lobby, LobbyEvent::AgentJoined(agent_id)).await;
+        lobby.send_event(LobbyEvent::AgentJoined(agent_id)).await.unwrap();
 
         Ok(())
     }
 
-    async fn send_lobby_event(lobby: &Lobby, lobby_event: LobbyEvent){
 
-        match lobby_event {
-            LobbyEvent::AgentJoined(_) |
-            LobbyEvent::AgentLeft(_) |
-            LobbyEvent::NewHost(_) => {
-                println!("queuing broadcast of event to all lobby target channels: {:?}", lobby_event);
-                for (_, rx) in &lobby.target {
-                    rx.send(lobby_event.clone()).await.unwrap();
-                }
-            }
-
-            LobbyEvent::Migrate(agent_id) |
-            LobbyEvent::Whisper(_, agent_id, _) => {
-                let target_tx = lobby.target.get(&agent_id).expect("agent to have a tx");
-
-                match target_tx.send(lobby_event.clone()).await {
-                    Ok(_) => {
-                        println!("queued targeted message to channel: {:?}", lobby_event);
-                    }
-                    Err(err) => {
-                        // can only fail when there are no active receivers, which is actually totally fine
-                        eprintln!("err {} when queueing targeted message to channel: {:?}", err, lobby_event);
-                    }
-                }
-            }
-        }
-
-    }
 
     pub fn get_agent(&self, agent_id: AgentId) -> Option<&Agent> {
         self.agents.iter().find(|a| a.id == agent_id)
@@ -277,7 +249,7 @@ impl Coordinator {
 
         let (a_tx, a_rx) = tokio::sync::mpsc::channel::<LobbyEvent>(4);
 
-        lobby.target.insert(agent_id, a_tx);
+        lobby.event_sender.insert(agent_id, a_tx);
 
         Ok(a_rx)
     }
@@ -299,7 +271,7 @@ impl Coordinator {
 
         let event = LobbyEvent::Whisper(agent_id, target_agent_id, content);
 
-        Self::send_lobby_event(lobby, event).await;
+        lobby.send_event(event).await.unwrap();
 
         Ok(())
     }
