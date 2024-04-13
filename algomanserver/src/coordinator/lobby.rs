@@ -1,9 +1,10 @@
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
-use tokio::sync::mpsc::error::SendError;
 use algomancer_gre::game::GameOptions;
 use crate::coordinator::agent::AgentId;
+use crate::Error;
+use crate::Error::{NotListening, SendEventError};
 use crate::runner::MigrationInfo;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
@@ -45,7 +46,7 @@ pub enum LobbyEvent {
 
 
 impl Lobby {
-    pub async fn send_event(&self, lobby_event: LobbyEvent) -> Result<(), SendError<LobbyEvent>>{
+    pub async fn send_event(&self, lobby_event: LobbyEvent) -> Result<(), Error>{
         match lobby_event {
             LobbyEvent::AgentJoined(_) |
             LobbyEvent::AgentLeft(_) |
@@ -55,7 +56,7 @@ impl Lobby {
                     match rx.send(lobby_event.clone()).await {
                         Ok(_) => {}
                         Err(err) => {
-                            return Err(err);
+                            return Err(SendEventError(err));
                         }
                     }
                 }
@@ -65,7 +66,12 @@ impl Lobby {
 
             LobbyEvent::Migrate(agent_id, _) |
             LobbyEvent::Whisper(_, agent_id, _) => {
-                let target_tx = self.event_sender.get(&agent_id).expect("agent to have a tx");
+                let target_tx = match self.event_sender.get(&agent_id) {
+                    None => {
+                        return Err(NotListening(agent_id));
+                    }
+                    Some(target_tx) => target_tx
+                };
 
                 match target_tx.send(lobby_event.clone()).await {
                     Ok(_) => {
@@ -73,7 +79,7 @@ impl Lobby {
                         Ok(())
                     }
                     Err(err) => {
-                        return Err(err);
+                        return Err(SendEventError(err));
                     }
                 }
 

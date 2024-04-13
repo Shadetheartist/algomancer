@@ -2,6 +2,7 @@ pub mod agent;
 pub mod lobby;
 
 use std::fmt::{Debug, Display, Formatter};
+use tokio::sync::mpsc::error::SendError;
 use algomancer_gre::game::{GameOptions};
 use algomancer_gre::game::state::GameMode;
 use algomancer_gre::game::state::rng::AlgomancerRngSeed;
@@ -25,6 +26,8 @@ pub enum Error {
     LobbyDoesNotExist(LobbyId),
     AgentNotInLobby(AgentId),
     CannotRunError(crate::runner::Error),
+    NotListening(AgentId),
+    SendEventError(SendError<LobbyEvent>),
 }
 
 impl Display for Error {
@@ -44,6 +47,12 @@ impl Display for Error {
             }
             CannotRunError(_) => {
                 write!(f, "cannot run the game")
+            }
+            Error::NotListening(agent_id) => {
+                write!(f, "agent {agent_id} is not listening")
+            }
+            Error::SendEventError(err) => {
+                write!(f, "send error for event: {:?}", err)
             }
         }
     }
@@ -301,7 +310,6 @@ impl Coordinator {
     }
 
     // starting the game sends each agent details on how to connect to the game server,
-    // then deletes the lobby
     pub async fn start_game(&mut self, lobby_id: LobbyId) -> Result<(), Error> {
         let lobby = match self.get_lobby(lobby_id) {
             Some(lobby) => lobby,
@@ -310,12 +318,12 @@ impl Coordinator {
 
         let agent_keys = lobby.agent_ids.iter().map(|a_id| (*a_id, self.agents.iter().find(|a| a.id == *a_id).unwrap().key)).collect();
 
-        let runner = match Runner::new(&lobby, agent_keys) {
+        let runner = match Runner::from_lobby(&lobby, agent_keys).await {
             Ok(runner) => runner,
             Err(err) => return Err(CannotRunError(err))
         };
 
-        self.remove_lobby(lobby_id).await?;
+        self.remove_lobby(lobby_id).await.unwrap();
 
         Ok(())
     }
@@ -345,6 +353,22 @@ mod tests {
                 }
             }
         })
+    }
+
+    #[tokio::test]
+    async fn test_no_listener() {
+        let mut coordinator = Coordinator::new();
+
+        let (_, agent_key) = coordinator.create_new_agent("Denis").await;
+        let lobby_id = coordinator.create_lobby_with_host(agent_key).await.unwrap();
+
+        let (_, agent_2_key) = coordinator.create_new_agent("Greg").await;
+
+        // these should work without filling up a queue, even though no one is listening
+        for _ in 0..100 {
+            coordinator.join_lobby(agent_2_key, lobby_id).await.unwrap();
+            coordinator.leave_current_lobby(agent_2_key).await.unwrap();
+        }
     }
 
     #[tokio::test]
@@ -435,9 +459,7 @@ mod tests {
         coordinator.leave_current_lobby(jim_agent_key).await.unwrap();
         coordinator.join_lobby(jim_agent_key, lobby_id).await.unwrap();
 
-        if let Err(err) = listener_handle.await {
-            panic!("{:?}", err);
-        }
+        listener_handle.await.unwrap();
     }
 
     #[tokio::test]
@@ -491,4 +513,6 @@ mod tests {
 
         coordinator.start_game(lobby_id).await.unwrap();
     }
+
+
 }

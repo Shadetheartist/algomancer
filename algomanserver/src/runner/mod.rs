@@ -7,10 +7,12 @@ use algomancer_gre::game::game_builder::NewGameError;
 use algomancer_gre::game::state::player::PlayerId;
 use crate::{AgentId, AgentKey, Lobby, LobbyEvent};
 use crate::runner::controller::ControllerKey;
+use crate::runner::Error::CouldNotMigrate;
 
 #[derive(Debug)]
 pub enum Error {
-    NewGameError(NewGameError)
+    NewGameError(NewGameError),
+    CouldNotMigrate(AgentId),
 }
 
 #[derive(Debug)]
@@ -25,11 +27,12 @@ pub struct MigrationState {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
 pub struct MigrationInfo {
-
+    agent_key: AgentKey,
+    controller_key: ControllerKey,
 }
 
 impl Runner {
-    pub fn new(lobby: &Lobby, lobby_agent_keys: Vec<(AgentId, AgentKey)>) -> Result<Self, Error> {
+    pub async fn from_lobby(lobby: &Lobby, lobby_agent_keys: Vec<(AgentId, AgentKey)>) -> Result<Self, Error> {
         // send out connection info to each client
         // wait for clients to connect
         // once all clients are connected, begin the game
@@ -50,6 +53,8 @@ impl Runner {
             game,
         };
 
+        runner.begin_migration(lobby, lobby_agent_keys).await;
+
         Ok(runner)
     }
 
@@ -59,29 +64,35 @@ impl Runner {
         });
     }
 
-    fn wait_for_clients() {}
+    async fn wait_for_clients() {}
 
-    async fn begin_migration(lobby: &Lobby, lobby_agent_keys: Vec<(AgentId, AgentKey)>) -> MigrationState {
+    async fn begin_migration(&self, lobby: &Lobby, lobby_agent_keys: Vec<(AgentId, AgentKey)>) -> Result<MigrationState, Error> {
 
         let migration_keys = lobby_agent_keys.iter().fold(HashMap::new(), |mut map, a| {
             map.insert(a.1, ControllerKey::random());
             map
         });
 
-        let mut migration_state = MigrationState {
+        for (agent_id, agent_key) in &lobby_agent_keys {
+            let info = MigrationInfo {
+                agent_key: *agent_key,
+                controller_key: *migration_keys.get(agent_key).expect("a migration ket for this agent")
+            };
+
+            match lobby.send_event(LobbyEvent::Migrate(agent_id.clone(), info)).await {
+                Ok(_) => {}
+                Err(_) => {
+                    return Err(CouldNotMigrate(agent_id.clone()));
+                }
+            }
+        }
+
+        let migration_state = MigrationState {
             migration_keys: migration_keys,
             controllers: Default::default()
         };
 
-        for agent_id in &lobby.agent_ids {
-            let info = MigrationInfo {
-
-            };
-
-            lobby.send_event(LobbyEvent::Migrate(agent_id.clone(), info)).await.unwrap();
-        }
-
-        migration_state
+        Ok(migration_state)
     }
 
 }
