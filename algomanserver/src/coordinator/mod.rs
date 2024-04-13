@@ -95,8 +95,6 @@ impl Coordinator {
 
         let lobby_id = self.next_game_id();
 
-        let (tx, _) = tokio::sync::broadcast::channel::<LobbyEvent>(4);
-
         let lobby = Lobby {
             id: lobby_id,
             options,
@@ -406,7 +404,7 @@ mod tests {
             },
             err = pam_listener_handle => {
                 match err {
-                    Ok(e) => {}
+                    Ok(_) => {}
                     Err(err) => {
                         panic!("pam's event list was wrong: {:?}", err)
                     }
