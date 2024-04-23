@@ -54,7 +54,7 @@ impl From<algomanserver::Error> for Error {
             algomanserver::Error::LobbyDoesNotExist(_) => {
                 Error::LobbyNotFound(value.to_string())
             }
-            algomanserver::Error::AgentNotInLobby(_) => {
+            algomanserver::Error::AgentNotInAnyLobby(_) => {
                 Error::AgentNotInLobby(value.to_string())
             }
             algomanserver::Error::CannotRunError(_) => {

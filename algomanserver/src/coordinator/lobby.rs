@@ -26,6 +26,8 @@ impl From<u64> for LobbyId {
 pub struct Lobby {
     pub id: LobbyId,
 
+    pub name: String,
+
     pub options: GameOptions,
 
     pub host_agent_id: AgentId,
@@ -48,10 +50,10 @@ pub enum LobbyEvent {
 impl Lobby {
     pub async fn send_event(&self, lobby_event: LobbyEvent) -> Result<(), Error>{
         match lobby_event {
+            // publicly broadcasted events
             LobbyEvent::AgentJoined(_) |
             LobbyEvent::AgentLeft(_) |
             LobbyEvent::NewHost(_) => {
-                println!("queuing broadcast of event to all lobby target channels: {:?}", lobby_event);
                 for (_, rx) in &self.event_sender {
                     match rx.send(lobby_event.clone()).await {
                         Ok(_) => {}
@@ -64,6 +66,7 @@ impl Lobby {
                 Ok(())
             }
 
+            // privately sent events
             LobbyEvent::Migrate(agent_id, _) |
             LobbyEvent::Whisper(_, agent_id, _) => {
                 let target_tx = match self.event_sender.get(&agent_id) {
@@ -75,15 +78,12 @@ impl Lobby {
 
                 match target_tx.send(lobby_event.clone()).await {
                     Ok(_) => {
-                        println!("queued targeted message to channel: {:?}", lobby_event);
                         Ok(())
                     }
                     Err(err) => {
                         return Err(SendEventError(err));
                     }
                 }
-
-
             }
         }
     }

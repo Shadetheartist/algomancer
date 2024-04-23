@@ -9,6 +9,7 @@ use algomancer_gre::game::state::rng::AlgomancerRngSeed;
 use crate::coordinator::agent::{Agent, AgentId, AgentKey};
 use crate::coordinator::Error::CannotRunError;
 use crate::coordinator::lobby::{Lobby, LobbyEvent, LobbyId};
+use crate::Error::AgentNotInCorrectLobby;
 use crate::runner::Runner;
 
 #[derive(Debug)]
@@ -24,7 +25,8 @@ pub enum Error {
     AgentDoesNotExist(AgentId),
     AgentDoesNotExistWithKey(AgentKey),
     LobbyDoesNotExist(LobbyId),
-    AgentNotInLobby(AgentId),
+    AgentNotInAnyLobby(AgentId),
+    AgentNotInCorrectLobby(AgentId),
     CannotRunError(crate::runner::Error),
     NotListening(AgentId),
     SendEventError(SendError<LobbyEvent>),
@@ -42,11 +44,14 @@ impl Display for Error {
             Error::LobbyDoesNotExist(lobby_id) => {
                 write!(f, "lobby {lobby_id} does not exist")
             }
-            Error::AgentNotInLobby(agent_id) => {
-                write!(f, "agent {agent_id} is not in a lobby")
+            Error::AgentNotInAnyLobby(agent_id) => {
+                write!(f, "agent {agent_id} is not in any lobby")
             }
-            CannotRunError(_) => {
-                write!(f, "cannot run the game")
+            Error::AgentNotInCorrectLobby(agent_id) => {
+                write!(f, "agent {agent_id} is not in the correct lobby")
+            }
+            CannotRunError(err) => {
+                write!(f, "cannot run the game: {:?}", err)
             }
             Error::NotListening(agent_id) => {
                 write!(f, "agent {agent_id} is not listening")
@@ -83,7 +88,7 @@ impl Coordinator {
         (id, key)
     }
 
-    pub async fn create_lobby_with_host(&mut self, host_agent_key: AgentKey) -> Result<LobbyId, Error> {
+    pub async fn create_lobby_with_host(&mut self, host_agent_key: AgentKey, name: String) -> Result<LobbyId, Error> {
         let _ = self.leave_current_lobby(host_agent_key);
 
         let host_agent_id = match self.must_get_agent_id_by_key(host_agent_key) {
@@ -105,6 +110,7 @@ impl Coordinator {
 
         let lobby = Lobby {
             id: lobby_id,
+            name: name,
             options,
             host_agent_id: agent.id,
             agent_ids: vec![host_agent_id],
@@ -157,7 +163,7 @@ impl Coordinator {
                 }
             }
         } else {
-            return Err(Error::AgentNotInLobby(leaver_agent_id));
+            return Err(Error::AgentNotInAnyLobby(leaver_agent_id));
         }
 
         if let Some(lobby_id) = remove_lobby {
@@ -204,7 +210,7 @@ impl Coordinator {
         match self.leave_current_lobby(agent_key).await {
             Ok(_) => {}
             Err(err) => {
-                if let Error::AgentNotInLobby(_) = err {} else {
+                if let Error::AgentNotInAnyLobby(_) = err {} else {
                     return Err(err);
                 }
             }
@@ -280,6 +286,10 @@ impl Coordinator {
             None => return Err(Error::LobbyDoesNotExist(lobby_id)),
         };
 
+        if lobby.agent_ids.contains(&agent_id) == false {
+            return Err(AgentNotInCorrectLobby(agent_id));
+        }
+
         let (a_tx, a_rx) = tokio::sync::mpsc::channel::<LobbyEvent>(4);
 
         lobby.event_sender.insert(agent_id, a_tx);
@@ -295,7 +305,7 @@ impl Coordinator {
 
         let lobby_id = match self.lobbies.iter().find(|l| l.agent_ids.contains(&agent_id)) {
             None => {
-                return Err(Error::AgentNotInLobby(agent_id));
+                return Err(Error::AgentNotInAnyLobby(agent_id));
             }
             Some(l) => l.id
         };
@@ -310,7 +320,7 @@ impl Coordinator {
     }
 
     // starting the game sends each agent details on how to connect to the game server,
-    pub async fn start_game(&mut self, lobby_id: LobbyId) -> Result<(), Error> {
+    pub async fn start_game(&mut self, lobby_id: LobbyId) -> Result<Runner, Error> {
         let lobby = match self.get_lobby(lobby_id) {
             Some(lobby) => lobby,
             None => return Err(Error::LobbyDoesNotExist(lobby_id)),
@@ -323,9 +333,7 @@ impl Coordinator {
             Err(err) => return Err(CannotRunError(err))
         };
 
-        self.remove_lobby(lobby_id).await.unwrap();
-
-        Ok(())
+        Ok(runner)
     }
 }
 
@@ -336,7 +344,8 @@ mod tests {
     use tokio::task::{JoinHandle};
     use tokio::time::sleep;
     use crate::coordinator::{Coordinator};
-    use crate::LobbyEvent;
+    use crate::{Error, LobbyEvent};
+    use crate::runner::Runner;
 
     fn expect_events(mut rx: Receiver<LobbyEvent>, expected_events: Vec<LobbyEvent>) -> JoinHandle<()> {
         tokio::spawn(async move {
@@ -344,9 +353,7 @@ mod tests {
                 match rx.recv().await {
                     None => {}
                     Some(event) => {
-                        if event == expected_event {
-                            println!("received expected event {:?}", event);
-                        } else {
+                        if event != expected_event {
                             panic!("received unexpected event\n{:?}\nExpected\n{:?}", event, expected_event)
                         }
                     }
@@ -360,7 +367,7 @@ mod tests {
         let mut coordinator = Coordinator::new();
 
         let (_, agent_key) = coordinator.create_new_agent("Denis").await;
-        let lobby_id = coordinator.create_lobby_with_host(agent_key).await.unwrap();
+        let lobby_id = coordinator.create_lobby_with_host(agent_key, "Lobby".to_string()).await.unwrap();
 
         let (_, agent_2_key) = coordinator.create_new_agent("Greg").await;
 
@@ -382,7 +389,7 @@ mod tests {
 
 
         // jim makes lobby
-        let lobby_id = coordinator.create_lobby_with_host(jim_agent_key).await.unwrap();
+        let lobby_id = coordinator.create_lobby_with_host(jim_agent_key, "Lobby".to_string()).await.unwrap();
 
         // jim listens to lobby
         let jim_rx = coordinator.lobby_listen(jim_agent_key, lobby_id).unwrap();
@@ -442,7 +449,7 @@ mod tests {
     async fn test_coordinator_broadcast() {
         let mut coordinator = Coordinator::new();
         let (jim_agent_id, jim_agent_key) = coordinator.create_new_agent("Jim").await;
-        let lobby_id = coordinator.create_lobby_with_host(jim_agent_key).await.unwrap();
+        let lobby_id = coordinator.create_lobby_with_host(jim_agent_key, "Lobby".to_string()).await.unwrap();
 
         let rx = coordinator.lobby_listen(jim_agent_key, lobby_id).unwrap();
 
@@ -468,7 +475,7 @@ mod tests {
 
         let (_, agent_key) = coordinator.create_new_agent("Jim").await;
 
-        let lobby_id = coordinator.create_lobby_with_host(agent_key).await.unwrap();
+        let lobby_id = coordinator.create_lobby_with_host(agent_key, "Lobby".to_string()).await.unwrap();
 
         let (_, agent_2_key) = coordinator.create_new_agent("Pam").await;
 
@@ -500,19 +507,57 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_coordinator_2p_game() {
+    async fn test_bad_listen() {
         let mut coordinator = Coordinator::new();
 
         let (_, agent_key) = coordinator.create_new_agent("Denis").await;
+        let lobby_id_1 = coordinator.create_lobby_with_host(agent_key, "Lobby".to_string()).await.unwrap();
 
-        let lobby_id = coordinator.create_lobby_with_host(agent_key).await.unwrap();
+        let (_, agent_2_key) = coordinator.create_new_agent("Greg").await;
+        let lobby_id_2 = coordinator.create_lobby_with_host(agent_key, "Lobby".to_string()).await.unwrap();
+
+        let (_, agent_3_key) = coordinator.create_new_agent("Evil").await;
+
+        // while not in a lobby, mr evil tries to listen to a lobby. which is not valid.
+        assert!(coordinator.lobby_listen(agent_3_key, lobby_id_1).is_err());
+        assert!(coordinator.lobby_listen(agent_3_key, lobby_id_2).is_err());
+
+        // of two lobbies, mr evil joins 1, then tries to listen to 2, which is not valid
+        coordinator.join_lobby(agent_3_key, lobby_id_1).await.unwrap();
+
+        // fail expected
+        assert!(coordinator.lobby_listen(agent_3_key, lobby_id_2).is_err());
+
+        // ok but listening to the lobby they're actually in is fine.
+        coordinator.lobby_listen(agent_3_key, lobby_id_1).unwrap();
+
+    }
+
+    #[tokio::test]
+    async fn test_coordinator_2p_game() {
+        let mut coordinator = Coordinator::new();
+
+        let (_, agent_1_key) = coordinator.create_new_agent("Denis").await;
+
+        let lobby_id = coordinator.create_lobby_with_host(agent_1_key, "Lobby".to_string()).await.unwrap();
 
         let (_, agent_2_key) = coordinator.create_new_agent("Greg").await;
 
         coordinator.join_lobby(agent_2_key, lobby_id).await.unwrap();
 
-        coordinator.start_game(lobby_id).await.unwrap();
+        // expect error since agents are not listening
+        assert!(coordinator.start_game(lobby_id).await.is_err());
+
+        let rx_1 = coordinator.lobby_listen(agent_1_key, lobby_id).unwrap();
+        let rx_2 = coordinator.lobby_listen(agent_2_key, lobby_id).unwrap();
+
+        let runner = match coordinator.start_game(lobby_id).await {
+            Ok(runner) => runner,
+            Err(err) => {
+                panic!("{}", err)
+            }
+        };
+
+        runner.run();
     }
-
-
 }
