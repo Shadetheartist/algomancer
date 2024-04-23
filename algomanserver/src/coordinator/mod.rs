@@ -9,7 +9,7 @@ use algomancer_gre::game::state::rng::AlgomancerRngSeed;
 use crate::coordinator::agent::{Agent, AgentId, AgentKey};
 use crate::coordinator::Error::CannotRunError;
 use crate::coordinator::lobby::{Lobby, LobbyEvent, LobbyId};
-use crate::Error::AgentNotInCorrectLobby;
+use crate::coordinator::Error::AgentNotInCorrectLobby;
 use crate::runner::Runner;
 
 #[derive(Debug)]

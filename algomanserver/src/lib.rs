@@ -8,12 +8,16 @@
 //! The `runner` acts as a game server, providing clients with synchronized game state and
 //! processing their actions.
 
-mod coordinator;
-mod runner;
+pub mod coordinator;
+pub mod runner;
 
 pub use coordinator::{
     Coordinator,
     agent::{AgentId, AgentKey, Agent},
     lobby::{LobbyId, LobbyEvent, Lobby},
-    Error
+};
+
+pub use runner::{
+    Runner,
+    RunnerId,
 };

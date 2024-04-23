@@ -3,8 +3,8 @@ use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
 use algomancer_gre::game::GameOptions;
 use crate::coordinator::agent::AgentId;
-use crate::Error;
-use crate::Error::{NotListening, SendEventError};
+use crate::coordinator::Error;
+use crate::coordinator::Error::{NotListening, SendEventError};
 use crate::runner::MigrationInfo;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
