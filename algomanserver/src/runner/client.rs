@@ -21,5 +21,4 @@ impl ClientKey {
     pub fn random() -> Self {
         Self(thread_rng().next_u64())
     }
-
 }

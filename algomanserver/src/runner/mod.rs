@@ -1,4 +1,4 @@
-mod controller;
+mod client;
 
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
@@ -8,7 +8,7 @@ use algomancer_gre::game::{Game};
 use algomancer_gre::game::game_builder::NewGameError;
 use algomancer_gre::game::state::player::PlayerId;
 use crate::{AgentId, AgentKey, Lobby, LobbyEvent};
-use crate::runner::controller::ClientKey;
+use crate::runner::client::ClientKey;
 
 #[derive(Debug)]
 pub enum Error {
@@ -35,7 +35,7 @@ impl From<u64> for  RunnerId {
 #[derive(Debug)]
 pub struct Runner {
     runner_id: RunnerId,
-    migration_state: MigrationState,
+    migration_state: Option<MigrationState>,
     game: Game
 }
 
@@ -53,17 +53,13 @@ pub struct MigrationInfo {
 }
 
 impl Runner {
+    /// creates a game runner instance from a coordinator lobby
+    /// this will send migration instructions to all agents in the lobby before returning.
+    /// if there is an error in the process of creating the runner or sending instructions, this
+    /// returns an error. The expectation is that after this, consumers will organize connecting
+    /// clients who reach out based on the instructions given to the runner.
+    /// once all agents connect, the runner can start. And the lobby can be cleaned up.
     pub async fn from_lobby(lobby: &Lobby, lobby_agent_keys: Vec<(AgentId, AgentKey)>) -> Result<Self, Error> {
-        // send out connection info to each client
-        // wait for clients to connect
-        // once all clients are connected, begin the game
-        // loop
-        //  wait for a valid action from a client
-        //  apply action and broadcast change to clients
-        //  if game ends then clean up
-        // if clients disconnect unexpectedly - wait to reconnect process
-        // if a clients disconnect on purpose, end remove the player and potentially end the game
-        // game ends - escape runner and clean up
 
         let game = match Game::new(&lobby.options) {
             Ok(game) => game,
@@ -72,12 +68,12 @@ impl Runner {
 
         let mut runner = Self {
             runner_id: RunnerId(rand::thread_rng().next_u64()),
-            migration_state: MigrationState { migration_keys: Default::default(), clients: Default::default() },
+            migration_state: None,
             game,
         };
 
         runner.migration_state = match runner.begin_migration(lobby, lobby_agent_keys).await {
-            Ok(migration_state) => migration_state,
+            Ok(migration_state) => Some(migration_state),
             Err(err) => {
                 return Err(err);
             }

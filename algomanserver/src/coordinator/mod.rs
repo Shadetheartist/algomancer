@@ -88,7 +88,7 @@ impl Coordinator {
         (id, key)
     }
 
-    pub async fn create_lobby_with_host(&mut self, host_agent_key: AgentKey, name: String) -> Result<LobbyId, Error> {
+    pub async fn create_lobby_with_host(&mut self, host_agent_key: AgentKey, name: &str) -> Result<LobbyId, Error> {
         let _ = self.leave_current_lobby(host_agent_key);
 
         let host_agent_id = match self.must_get_agent_id_by_key(host_agent_key) {
@@ -110,7 +110,7 @@ impl Coordinator {
 
         let lobby = Lobby {
             id: lobby_id,
-            name: name,
+            name: name.to_string(),
             options,
             host_agent_id: agent.id,
             agent_ids: vec![host_agent_id],
@@ -319,7 +319,7 @@ impl Coordinator {
         Ok(())
     }
 
-    // starting the game sends each agent details on how to connect to the game server,
+    /// starting the game sends each agent details on how to connect to the game server,
     pub async fn start_game(&mut self, lobby_id: LobbyId) -> Result<Runner, Error> {
         let lobby = match self.get_lobby(lobby_id) {
             Some(lobby) => lobby,
@@ -367,7 +367,7 @@ mod tests {
         let mut coordinator = Coordinator::new();
 
         let (_, agent_key) = coordinator.create_new_agent("Denis").await;
-        let lobby_id = coordinator.create_lobby_with_host(agent_key, "Lobby".to_string()).await.unwrap();
+        let lobby_id = coordinator.create_lobby_with_host(agent_key, "Lobby").await.unwrap();
 
         let (_, agent_2_key) = coordinator.create_new_agent("Greg").await;
 
@@ -389,7 +389,7 @@ mod tests {
 
 
         // jim makes lobby
-        let lobby_id = coordinator.create_lobby_with_host(jim_agent_key, "Lobby".to_string()).await.unwrap();
+        let lobby_id = coordinator.create_lobby_with_host(jim_agent_key, "Lobby").await.unwrap();
 
         // jim listens to lobby
         let jim_rx = coordinator.lobby_listen(jim_agent_key, lobby_id).unwrap();
@@ -449,7 +449,7 @@ mod tests {
     async fn test_coordinator_broadcast() {
         let mut coordinator = Coordinator::new();
         let (jim_agent_id, jim_agent_key) = coordinator.create_new_agent("Jim").await;
-        let lobby_id = coordinator.create_lobby_with_host(jim_agent_key, "Lobby".to_string()).await.unwrap();
+        let lobby_id = coordinator.create_lobby_with_host(jim_agent_key, "Lobby").await.unwrap();
 
         let rx = coordinator.lobby_listen(jim_agent_key, lobby_id).unwrap();
 
@@ -475,7 +475,7 @@ mod tests {
 
         let (_, agent_key) = coordinator.create_new_agent("Jim").await;
 
-        let lobby_id = coordinator.create_lobby_with_host(agent_key, "Lobby".to_string()).await.unwrap();
+        let lobby_id = coordinator.create_lobby_with_host(agent_key, "Lobby").await.unwrap();
 
         let (_, agent_2_key) = coordinator.create_new_agent("Pam").await;
 
@@ -511,10 +511,10 @@ mod tests {
         let mut coordinator = Coordinator::new();
 
         let (_, agent_key) = coordinator.create_new_agent("Denis").await;
-        let lobby_id_1 = coordinator.create_lobby_with_host(agent_key, "Lobby".to_string()).await.unwrap();
+        let lobby_id_1 = coordinator.create_lobby_with_host(agent_key, "Lobby").await.unwrap();
 
         let (_, agent_2_key) = coordinator.create_new_agent("Greg").await;
-        let lobby_id_2 = coordinator.create_lobby_with_host(agent_key, "Lobby".to_string()).await.unwrap();
+        let lobby_id_2 = coordinator.create_lobby_with_host(agent_key, "Lobby").await.unwrap();
 
         let (_, agent_3_key) = coordinator.create_new_agent("Evil").await;
 
@@ -539,7 +539,7 @@ mod tests {
 
         let (_, agent_1_key) = coordinator.create_new_agent("Denis").await;
 
-        let lobby_id = coordinator.create_lobby_with_host(agent_1_key, "Lobby".to_string()).await.unwrap();
+        let lobby_id = coordinator.create_lobby_with_host(agent_1_key, "Lobby").await.unwrap();
 
         let (_, agent_2_key) = coordinator.create_new_agent("Greg").await;
 
