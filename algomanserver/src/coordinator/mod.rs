@@ -268,8 +268,13 @@ impl Coordinator {
     }
 
     pub fn must_get_agent_id_by_key(&self, agent_key: AgentKey) -> Result<AgentId, Error> {
+        let agent = self.get_agent_by_key(agent_key)?;
+        Ok(agent.id)
+    }
+
+    pub fn get_agent_by_key(&self, agent_key: AgentKey) -> Result<&Agent, Error> {
         if let Some(agent) = self.agents.iter().find(|a| a.key == agent_key) {
-            Ok(agent.id)
+            Ok(agent)
         } else {
             Err(Error::AgentDoesNotExistWithKey(agent_key))
         }

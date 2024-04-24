@@ -1,9 +1,12 @@
-use std::sync::Arc;
+use std::borrow::Cow;
+use std::ops::DerefMut;
+use std::sync::{Arc};
 use rocket::futures::SinkExt;
 use rocket::futures::StreamExt;
 use rocket::futures::stream::{SplitSink, SplitStream};
 use serde::de::DeserializeOwned;
 use tokio::sync::RwLock;
+use ws::frame::CloseFrame;
 use ws::Message;
 use algomanserver::{AgentKey, Coordinator, LobbyId};
 
@@ -43,9 +46,20 @@ pub async fn ws_wait_for<T: DeserializeOwned>(what: &str, tx: &mut SplitSink<ws:
     None
 }
 
+
+pub async fn ws_close_normally(tx: &mut SplitSink<ws::stream::DuplexStream, Message>) {
+    tx.send(Message::Close(Some(CloseFrame{
+        code: ws::frame::CloseCode::Normal,
+        reason: Default::default()
+    }))).await.ok();
+}
+
 pub async fn ws_close_with_error(mut tx: SplitSink<ws::stream::DuplexStream, Message>, err_msg: String) {
     tx.send(Message::Text(err_msg.to_string())).await.ok();
-    tx.send(Message::Close(None)).await.ok();
+    tx.send(Message::Close(Some(CloseFrame{
+        code: ws::frame::CloseCode::Normal,
+        reason: Cow::from(err_msg)
+    }))).await.ok();
 }
 
 
@@ -67,22 +81,31 @@ pub async fn ws_lobby_listen(
         }
     };
 
-    let mut send_task = tokio::spawn(async move {
-        while let Some(lobby_event) = lobby_rx.recv().await {
-            let event_json = serde_json::to_string(&lobby_event).expect("serialized lobby event");
-            let _ = tx.send(Message::Text(event_json)).await;
-        }
-    });
+    let tx = Arc::new(tokio::sync::Mutex::new(tx));
+
+    let mut send_task = {
+        let tx = tx.clone();
+
+         tokio::spawn(async move {
+            while let Some(lobby_event) = lobby_rx.recv().await {
+                let event_json = serde_json::to_string(&lobby_event).expect("serialized lobby event");
+                tx.lock().await.send(Message::Text(event_json)).await.ok();
+            }
+        })
+    };
 
     let mut recv_task = tokio::spawn(async move {
         while let Some(message) = rx.next().await {
             if let Ok(message) = message {
                 match message {
-                    Message::Text(_) => {}
+                    Message::Text(_) => {
+                        tx.lock().await.send(Message::Text("EEE".to_string())).await.ok();
+                    }
                     Message::Binary(_) => {}
                     Message::Ping(_) => {}
                     Message::Pong(_) => {}
                     Message::Close(_) => {
+                        ws_close_normally(tx.lock().await.deref_mut()).await;
                         return;
                     }
                     Message::Frame(_) => {}
