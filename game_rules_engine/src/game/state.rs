@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use rng::{AlgomancerRng, AlgomancerRngSeed};
 use serde::{Deserialize, Serialize};
 use crate::game::state::card_collection::CardCollectionId;
@@ -33,6 +34,36 @@ pub enum GameMode {
     PreDraft { team_configuration: TeamConfiguration },
     TeamDraft { team_configuration: TeamConfiguration },
     Constructed { team_configuration: TeamConfiguration },
+}
+
+impl Display for GameMode {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            GameMode::LiveDraft { selected_deck_types, .. } => {
+                write!(f, "Live Draft (")?;
+
+                for (idx, faction) in selected_deck_types.iter().enumerate() {
+                    write!(f, "{}", faction.to_char())?;
+                    if idx < selected_deck_types.len() - 1 {
+                        write!(f, "/")?;
+                    }
+                }
+
+                write!(f, ")")?;
+
+                Ok(())
+            }
+            GameMode::PreDraft { .. } => {
+                write!(f, "Pre-Draft")
+            }
+            GameMode::TeamDraft { .. } => {
+                write!(f, "TeamD raft")
+            }
+            GameMode::Constructed { .. } => {
+                write!(f, "Constructed")
+            }
+        }
+    }
 }
 
 impl GameMode {

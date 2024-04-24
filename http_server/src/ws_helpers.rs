@@ -1,11 +1,18 @@
+use std::sync::Arc;
 use rocket::futures::SinkExt;
 use rocket::futures::StreamExt;
 use rocket::futures::stream::{SplitSink, SplitStream};
 use serde::de::DeserializeOwned;
+use tokio::sync::RwLock;
 use ws::Message;
+use algomanserver::{AgentKey, Coordinator, LobbyId};
+
+pub async fn ws_send_text(tx: &mut SplitSink<ws::stream::DuplexStream, Message>, msg: &str) -> Result<(), ws::result::Error> {
+    tx.send(Message::Text(msg.to_string())).await
+}
 
 pub async fn ws_wait_for<T: DeserializeOwned>(what: &str, tx: &mut SplitSink<ws::stream::DuplexStream, Message>, rx: &mut SplitStream<ws::stream::DuplexStream>) -> Option<T> {
-    if tx.send(Message::Text(format!("Waiting for {what}").to_string())).await.is_err() {
+    if ws_send_text(tx, format!("Waiting for {what}").as_str()).await.is_err() {
         return None;
     }
 
@@ -25,7 +32,6 @@ pub async fn ws_wait_for<T: DeserializeOwned>(what: &str, tx: &mut SplitSink<ws:
                                     return None;
                                 }
                             }
-
                         }
                     }
                 }
@@ -37,3 +43,62 @@ pub async fn ws_wait_for<T: DeserializeOwned>(what: &str, tx: &mut SplitSink<ws:
     None
 }
 
+pub async fn ws_close_with_error(mut tx: SplitSink<ws::stream::DuplexStream, Message>, err_msg: String) {
+    tx.send(Message::Text(err_msg.to_string())).await.ok();
+    tx.send(Message::Close(None)).await.ok();
+}
+
+
+pub async fn ws_lobby_listen(
+    coordinator: Arc<RwLock<Coordinator>>,
+    agent_key: AgentKey,
+    lobby_id: LobbyId,
+    mut tx: SplitSink<ws::stream::DuplexStream, Message>,
+    mut rx: SplitStream<ws::stream::DuplexStream>)
+{
+    let mut lobby_rx = {
+        let mut coordinator = coordinator.write().await;
+        match coordinator.lobby_listen(agent_key, lobby_id.into()) {
+            Ok(lobby_rx) => lobby_rx,
+            Err(err) => {
+                ws_close_with_error(tx, format!("{}", err)).await;
+                return;
+            }
+        }
+    };
+
+    let mut send_task = tokio::spawn(async move {
+        while let Some(lobby_event) = lobby_rx.recv().await {
+            let event_json = serde_json::to_string(&lobby_event).expect("serialized lobby event");
+            let _ = tx.send(Message::Text(event_json)).await;
+        }
+    });
+
+    let mut recv_task = tokio::spawn(async move {
+        while let Some(message) = rx.next().await {
+            if let Ok(message) = message {
+                match message {
+                    Message::Text(_) => {}
+                    Message::Binary(_) => {}
+                    Message::Ping(_) => {}
+                    Message::Pong(_) => {}
+                    Message::Close(_) => {
+                        return;
+                    }
+                    Message::Frame(_) => {}
+                }
+                println!("received message")
+            }
+        }
+    });
+
+    // If any one of the tasks exit, abort the other.
+    tokio::select! {
+        _ = (&mut send_task) => {
+            recv_task.abort();
+        },
+        _ = (&mut recv_task) => {
+            send_task.abort();
+        }
+    }
+}

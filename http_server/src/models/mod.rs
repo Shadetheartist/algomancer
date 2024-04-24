@@ -11,7 +11,7 @@ pub use registration::{RegistrationRequest, RegistrationResponse};
 
 #[derive(Serialize, Deserialize)]
 pub struct AgentKeyRequest {
-    pub agent_key: AgentKey,
+    pub agent_key: String,
 }
 
 #[derive(Serialize, Deserialize)]

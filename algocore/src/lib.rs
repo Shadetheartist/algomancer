@@ -11,6 +11,17 @@ pub enum Faction {
 }
 
 impl Faction {
+
+    pub fn to_char(&self) -> char {
+        match self {
+            Faction::Fire => 'F',
+            Faction::Earth => 'E',
+            Faction::Water => 'W',
+            Faction::Metal => 'M',
+            Faction::Wood => 'W',
+        }
+    }
+
     pub fn all() -> Vec<Faction> {
         vec![
             Faction::Fire,

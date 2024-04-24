@@ -9,5 +9,5 @@ pub struct RegistrationRequest {
 #[derive(Serialize, Deserialize)]
 pub struct RegistrationResponse {
     pub agent_id: AgentId,
-    pub agent_key: AgentKey,
+    pub agent_key: String,
 }

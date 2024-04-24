@@ -9,7 +9,6 @@ use algomancer_gre::game::state::rng::AlgomancerRngSeed;
 use crate::coordinator::agent::{Agent, AgentId, AgentKey};
 use crate::coordinator::Error::CannotRunError;
 use crate::coordinator::lobby::{Lobby, LobbyEvent, LobbyId};
-use crate::coordinator::Error::AgentNotInCorrectLobby;
 use crate::runner::Runner;
 
 #[derive(Debug)]
@@ -25,6 +24,7 @@ pub enum Error {
     AgentDoesNotExist(AgentId),
     AgentDoesNotExistWithKey(AgentKey),
     LobbyDoesNotExist(LobbyId),
+    AgentAlreadyInLobby(AgentId, LobbyId),
     AgentNotInAnyLobby(AgentId),
     AgentNotInCorrectLobby(AgentId),
     CannotRunError(crate::runner::Error),
@@ -49,6 +49,9 @@ impl Display for Error {
             }
             Error::AgentNotInCorrectLobby(agent_id) => {
                 write!(f, "agent {agent_id} is not in the correct lobby")
+            }
+            Error::AgentAlreadyInLobby(agent_id, lobby_id) => {
+                write!(f, "agent {agent_id} is already in lobby {lobby_id}")
             }
             CannotRunError(err) => {
                 write!(f, "cannot run the game: {:?}", err)
@@ -207,6 +210,18 @@ impl Coordinator {
             Err(e) => return Err(e)
         };
 
+        {
+            let lobby = match self.get_lobby_mut(lobby_id) {
+                Some(lobby) => lobby,
+                None => return Err(Error::LobbyDoesNotExist(lobby_id)),
+            };
+
+            // player is already in the lobby
+            if lobby.agent_ids.contains(&agent_id) {
+                return Err(Error::AgentAlreadyInLobby(agent_id, lobby_id));
+            }
+        }
+
         match self.leave_current_lobby(agent_key).await {
             Ok(_) => {}
             Err(err) => {
@@ -216,10 +231,7 @@ impl Coordinator {
             }
         }
 
-        let lobby = match self.get_lobby_mut(lobby_id) {
-            Some(lobby) => lobby,
-            None => return Err(Error::LobbyDoesNotExist(lobby_id)),
-        };
+        let lobby = self.get_lobby_mut(lobby_id).expect("a lobby");
 
         lobby.agent_ids.push(agent_id);
 
@@ -287,7 +299,7 @@ impl Coordinator {
         };
 
         if lobby.agent_ids.contains(&agent_id) == false {
-            return Err(AgentNotInCorrectLobby(agent_id));
+            return Err(Error::AgentNotInCorrectLobby(agent_id));
         }
 
         let (a_tx, a_rx) = tokio::sync::mpsc::channel::<LobbyEvent>(4);

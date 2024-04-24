@@ -8,5 +8,7 @@ use crate::models::Agent;
 pub struct Lobby {
     pub id: LobbyId,
     pub name: String,
+    pub capacity: u8,
+    pub mode: String,
     pub agents: Vec<Agent>
 }

@@ -33,6 +33,9 @@ enum Error {
     AgentNotInLobby(String),
 
     #[response(status = 400)]
+    AgentAlreadyInLobby(String),
+
+    #[response(status = 400)]
     AgentNotInCorrectLobby(String),
 
     #[response(status = 400)]
@@ -61,6 +64,9 @@ impl From<algomanserver::coordinator::Error> for Error {
             }
             algomanserver::coordinator::Error::AgentNotInAnyLobby(_) => {
                 Error::AgentNotInLobby(value.to_string())
+            }
+            algomanserver::coordinator::Error::AgentAlreadyInLobby(_, _) => {
+                Error::AgentAlreadyInLobby(value.to_string())
             }
             algomanserver::coordinator::Error::CannotRunError(_) => {
                 Error::CannotRunServer(value.to_string())
@@ -106,10 +112,8 @@ async fn rocket() -> _ {
         .manage(coordinator_arc)
         .mount("/coordinator/", routes![
             coordinator_routes::register,
-            coordinator_routes::create_lobby,
-            coordinator_routes::join_lobby,
-            coordinator_routes::leave_lobby,
-            coordinator_routes::lobby_listen,
+            coordinator_routes::lobby_create,
+            coordinator_routes::lobby_join, //ws
             coordinator_routes::lobbies,
         ])
 }
