@@ -1,7 +1,7 @@
 mod models;
-mod ws_helpers;
 mod coordinator_routes;
-mod runner_routes;
+mod messages;
+mod ws;
 
 #[macro_use]
 extern crate rocket;

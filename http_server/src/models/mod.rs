@@ -5,8 +5,8 @@ mod lobby;
 mod agent;
 mod registration;
 
-pub use lobby::Lobby;
-pub use agent::Agent;
+pub use lobby::LobbyModel;
+pub use agent::AgentModel;
 pub use registration::{RegistrationRequest, RegistrationResponse};
 
 #[derive(Serialize, Deserialize)]
