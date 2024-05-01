@@ -353,7 +353,7 @@ impl Coordinator {
     }
 
     /// starting the game sends each agent details on how to connect to the game server,
-    pub async fn start_game(&mut self, lobby_id: LobbyId) -> Result<Runner, Error> {
+    pub async fn start_game(&mut self, agent_key: AgentKey, lobby_id: LobbyId) -> Result<Runner, Error> {
         let lobby = match self.get_lobby(lobby_id) {
             Some(lobby) => lobby,
             None => return Err(Error::LobbyDoesNotExist(lobby_id)),
@@ -579,12 +579,12 @@ mod tests {
         coordinator.join_lobby(agent_2_key, lobby_id).await.unwrap();
 
         // expect error since agents are not listening
-        assert!(coordinator.start_game(lobby_id).await.is_err());
+        assert!(coordinator.start_game(agent_1_key, lobby_id).await.is_err());
 
         let rx_1 = coordinator.lobby_listen(agent_1_key, lobby_id).unwrap();
         let rx_2 = coordinator.lobby_listen(agent_2_key, lobby_id).unwrap();
 
-        let runner = match coordinator.start_game(lobby_id).await {
+        let runner = match coordinator.start_game(agent_1_key, lobby_id).await {
             Ok(runner) => runner,
             Err(err) => {
                 panic!("{}", err)

@@ -14,6 +14,10 @@ pub enum WsMessage {
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum WsRequest {
     AgentKeyRequest,
+    StartGameRequest {
+        agent_key: String,
+        lobby_id: String
+    },
 }
 
 
@@ -23,6 +27,12 @@ pub enum WsResponse {
     AgentKeyResponse {
         agent_key: String,
     },
+
+    LaunchGameResponse,
+
+    LobbyCreated {
+        lobby: LobbyModel
+    }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -31,5 +41,6 @@ pub enum WsEvent {
     AgentJoinedLobby {
         agent: AgentModel,
         lobby: LobbyModel
-    }
+    },
+
 }

@@ -11,7 +11,7 @@ use crate::models::{AgentModel, AgentKeyRequest, LobbyModel, RegistrationRespons
 use crate::ws::{SendJsonError, ws_close_with_error, ws_lobby_listen, ws_send_json, ws_send_text, ws_request_response, ws_request_agent_key, RequestResponseError};
 use rocket::futures::{SinkExt, StreamExt};
 use crate::messages::WsEvent::AgentJoinedLobby;
-use crate::messages::{WsMessage, WsRequest, WsResponse};
+use crate::messages::{WsEvent, WsMessage, WsRequest, WsResponse};
 use crate::messages::WsResponse::AgentKeyResponse;
 
 #[get("/lobbies")]
@@ -44,8 +44,9 @@ pub async fn register(coordinator: &State<Arc<RwLock<Coordinator>>>, data: Json<
 
 
 #[get("/lobby/create")]
-pub async fn lobby_create(ws: WebSocket, coordinator: &State<Arc<RwLock<Coordinator>>>) -> ws::Channel<'static> {
+pub async fn lobby_create(ws: WebSocket, coordinator: &State<Arc<RwLock<Coordinator>>>, runners: &State<Arc<RwLock<Vec<algomanserver::Runner>>>>) -> ws::Channel<'static> {
     let coordinator = coordinator.inner().clone();
+    let runners = runners.inner().clone();
 
     ws.channel(move |mut stream| {
         Box::pin(async move {
@@ -67,11 +68,20 @@ pub async fn lobby_create(ws: WebSocket, coordinator: &State<Arc<RwLock<Coordina
                 }
             };
 
-            if ws_send_text(&mut tx, "Created Lobby").await.is_err() {
-                return Ok(());
+            {
+                let mut coordinator = coordinator.write().await;
+                if let Some(lobby) = coordinator.get_lobby(lobby_id) {
+                    let lobby_model = LobbyModel::from_coordinator_lobby(coordinator.deref(), lobby);
+                    if let Err(err) = ws_send_json(&mut tx, &&WsMessage::Response {value: WsResponse::LobbyCreated { lobby: lobby_model }}).await {
+                        ws_close_with_error(tx, format!("failed to send json {}", err)).await;
+                        return Ok(());
+                    }
+                } else {
+                    panic!("lobby not found?")
+                }
             }
 
-            ws_lobby_listen(coordinator.clone(), agent_key, lobby_id, tx, rx).await;
+            ws_lobby_listen(runners.clone(), coordinator.clone(), agent_key, lobby_id, tx, rx).await;
 
             {
                 let mut coordinator = coordinator.write().await;
@@ -87,8 +97,10 @@ pub async fn lobby_create(ws: WebSocket, coordinator: &State<Arc<RwLock<Coordina
 }
 
 #[get("/lobby/<lobby_id>/join")]
-pub async fn lobby_join(ws: WebSocket, coordinator: &State<Arc<RwLock<Coordinator>>>, lobby_id: u64) -> ws::Channel<'static> {
+pub async fn lobby_join(ws: WebSocket, coordinator: &State<Arc<RwLock<Coordinator>>>, runners: &State<Arc<RwLock<Vec<algomanserver::Runner>>>>, lobby_id: u64) -> ws::Channel<'static> {
     let coordinator = coordinator.inner().clone();
+    let runners = runners.inner().clone();
+
     let lobby_id = LobbyId(lobby_id);
 
     ws.channel(move |mut stream| {
@@ -136,7 +148,7 @@ pub async fn lobby_join(ws: WebSocket, coordinator: &State<Arc<RwLock<Coordinato
             }
 
             // start listening to lobby events
-            ws_lobby_listen(coordinator.clone(), agent_key, lobby_id, tx, rx).await;
+            ws_lobby_listen(runners.clone(), coordinator.clone(), agent_key, lobby_id, tx, rx).await;
 
             // if the agent stops listening to the lobby, they must leave the lobby
             {

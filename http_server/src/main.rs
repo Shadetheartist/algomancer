@@ -2,6 +2,7 @@ mod models;
 mod coordinator_routes;
 mod messages;
 mod ws;
+mod runner_routes;
 
 #[macro_use]
 extern crate rocket;
@@ -98,8 +99,9 @@ impl From<algomanserver::coordinator::Error> for Error {
 #[launch]
 #[tokio::main]
 async fn rocket() -> _ {
-    let mut coordinator = Coordinator::new();
 
+
+    let mut coordinator = Coordinator::new();
     let coordinator_rwl = RwLock::new(coordinator);
     let coordinator_arc: Arc<RwLock<Coordinator>> = Arc::new(coordinator_rwl);
 
@@ -124,8 +126,13 @@ async fn rocket() -> _ {
         }
     });
 
+    let runners : Vec<algomanserver::Runner> = Vec::new();
+    let runners_rwl = RwLock::new(runners);
+    let runners_arc: Arc<RwLock<Vec<algomanserver::Runner>>> = Arc::new(runners_rwl);
+
     rocket::build()
         .manage(coordinator_arc)
+        .manage(runners_arc)
         .mount("/coordinator/", routes![
             coordinator_routes::register,
             coordinator_routes::lobby_create,
