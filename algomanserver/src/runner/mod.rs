@@ -61,7 +61,7 @@ impl Runner {
     /// once all agents connect, the runner can start. And the lobby can be cleaned up.
     pub async fn from_lobby(lobby: &Lobby, lobby_agent_keys: Vec<(AgentId, AgentKey)>) -> Result<Self, Error> {
 
-        let game = match Game::new(&lobby.options) {
+        let game = match Game::new(&lobby.game_options) {
             Ok(game) => game,
             Err(err) => return Err(Error::NewGameError(err))
         };

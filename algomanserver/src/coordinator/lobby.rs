@@ -25,12 +25,12 @@ impl From<u64> for LobbyId {
 #[derive(Debug)]
 pub struct Lobby {
     pub id: LobbyId,
-
+    pub capacity: u8,
+    pub host_agent_id: AgentId,
     pub name: String,
 
-    pub options: GameOptions,
+    pub game_options: GameOptions,
 
-    pub host_agent_id: AgentId,
     pub agent_ids: Vec<AgentId>,
 
     pub event_sender: HashMap<AgentId, tokio::sync::mpsc::Sender<LobbyEvent>>,

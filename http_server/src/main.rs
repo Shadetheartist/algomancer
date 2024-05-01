@@ -41,12 +41,17 @@ enum Error {
     #[response(status = 400)]
     AgentNotListeningToLobby(String),
 
+    #[response(status = 400)]
+    DuplicateUsername(String),
+
     #[response(status = 500)]
     SendEventError(String),
 
     #[response(status = 500)]
     CannotRunServer(String),
 
+    #[response(status = 400)]
+    LobbyIsFull(String),
 }
 
 
@@ -80,6 +85,12 @@ impl From<algomanserver::coordinator::Error> for Error {
             algomanserver::coordinator::Error::SendEventError(_) => {
                 Error::AgentNotInCorrectLobby(value.to_string())
             }
+            algomanserver::coordinator::Error::AgentAlreadyExistsWithUsername => {
+                Error::DuplicateUsername(value.to_string())
+            }
+            algomanserver::coordinator::Error::LobbyIsFull(_) => {
+                Error::LobbyIsFull(value.to_string())
+            }
         }
     }
 }
@@ -97,12 +108,17 @@ async fn rocket() -> _ {
         let mut coordinator = coordinator_arc_clone.write().await;
 
         // simulate some state to test
+        let mut a_id = 0;
         for i in 0..100 {
-            let (agent_id, agent_key) = coordinator.create_new_agent(format!("Agent {i}").as_str()).await;
+            let (agent_id, agent_key) = coordinator.create_new_agent(format!("Agent {a_id}").as_str()).await.unwrap();
+            a_id += 1;
+
             let lobby_id = coordinator.create_lobby_with_host(agent_key, format!("Lobby {i}").as_str()).await.unwrap();
 
-            for a in 1..(rand::random::<u64>() % 4) {
-                let (agent_id, agent_key) = coordinator.create_new_agent(format!("Agent {}", a + i).as_str()).await;
+            for a in 1..=(rand::random::<u64>() % 4) {
+                let (agent_id, agent_key) = coordinator.create_new_agent(format!("Agent {}", a_id).as_str()).await.unwrap();
+                a_id += 1;
+
                 coordinator.join_lobby(agent_key, lobby_id).await.unwrap()
             }
         }

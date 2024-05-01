@@ -7,7 +7,6 @@ use algomancer_gre::game::{GameOptions};
 use algomancer_gre::game::state::GameMode;
 use algomancer_gre::game::state::rng::AlgomancerRngSeed;
 use crate::coordinator::agent::{Agent, AgentId, AgentKey};
-use crate::coordinator::Error::CannotRunError;
 use crate::coordinator::lobby::{Lobby, LobbyEvent, LobbyId};
 use crate::runner::Runner;
 
@@ -21,9 +20,11 @@ pub struct Coordinator {
 
 #[derive(Debug)]
 pub enum Error {
+    AgentAlreadyExistsWithUsername,
     AgentDoesNotExist(AgentId),
     AgentDoesNotExistWithKey(AgentKey),
     LobbyDoesNotExist(LobbyId),
+    LobbyIsFull(LobbyId),
     AgentAlreadyInLobby(AgentId, LobbyId),
     AgentNotInAnyLobby(AgentId),
     AgentNotInCorrectLobby(AgentId),
@@ -53,7 +54,7 @@ impl Display for Error {
             Error::AgentAlreadyInLobby(agent_id, lobby_id) => {
                 write!(f, "agent {agent_id} is already in lobby {lobby_id}")
             }
-            CannotRunError(err) => {
+            Error::CannotRunError(err) => {
                 write!(f, "cannot run the game: {:?}", err)
             }
             Error::NotListening(agent_id) => {
@@ -61,6 +62,12 @@ impl Display for Error {
             }
             Error::SendEventError(err) => {
                 write!(f, "send error for event: {:?}", err)
+            }
+            Error::AgentAlreadyExistsWithUsername => {
+                write!(f, "an agent already exists with this username")
+            }
+            Error::LobbyIsFull(lobby_id) => {
+                write!(f, "the lobby {lobby_id} is full")
             }
         }
     }
@@ -78,8 +85,12 @@ impl Coordinator {
         }
     }
 
-    pub async fn create_new_agent(&mut self, username: &str) -> (AgentId, AgentKey) {
+    pub async fn create_new_agent(&mut self, username: &str) -> Result<(AgentId, AgentKey), Error> {
         let id = self.next_agent_id();
+
+        if self.agents.iter().find(|a| a.username == username).is_some() {
+            return Err(Error::AgentAlreadyExistsWithUsername);
+        }
 
         let agent = Agent::new(id, username.to_string());
         let key = agent.key;
@@ -88,7 +99,7 @@ impl Coordinator {
 
         self.last_agent_id = id;
 
-        (id, key)
+        Ok((id, key))
     }
 
     pub async fn create_lobby_with_host(&mut self, host_agent_key: AgentKey, name: &str) -> Result<LobbyId, Error> {
@@ -114,7 +125,8 @@ impl Coordinator {
         let lobby = Lobby {
             id: lobby_id,
             name: name.to_string(),
-            options,
+            game_options: options,
+            capacity: 4,
             host_agent_id: agent.id,
             agent_ids: vec![host_agent_id],
             event_sender: Default::default(),
@@ -215,6 +227,10 @@ impl Coordinator {
                 Some(lobby) => lobby,
                 None => return Err(Error::LobbyDoesNotExist(lobby_id)),
             };
+
+            if lobby.agent_ids.len() == lobby.capacity as usize {
+                return Err(Error::LobbyIsFull(lobby_id));
+            }
 
             // player is already in the lobby
             if lobby.agent_ids.contains(&agent_id) {
@@ -347,7 +363,7 @@ impl Coordinator {
 
         let runner = match Runner::from_lobby(&lobby, agent_keys).await {
             Ok(runner) => runner,
-            Err(err) => return Err(CannotRunError(err))
+            Err(err) => return Err(Error::CannotRunError(err))
         };
 
         Ok(runner)
@@ -360,8 +376,8 @@ mod tests {
     use tokio::sync::mpsc::Receiver;
     use tokio::task::{JoinHandle};
     use tokio::time::sleep;
-    use crate::coordinator::{Coordinator};
-    use crate::{Error, LobbyEvent};
+    use crate::coordinator::{Coordinator, Error};
+    use crate::{AgentId, AgentKey, LobbyEvent};
     use crate::runner::Runner;
 
     fn expect_events(mut rx: Receiver<LobbyEvent>, expected_events: Vec<LobbyEvent>) -> JoinHandle<()> {
@@ -383,10 +399,10 @@ mod tests {
     async fn test_no_listener() {
         let mut coordinator = Coordinator::new();
 
-        let (_, agent_key) = coordinator.create_new_agent("Denis").await;
+        let (_, agent_key) = coordinator.create_new_agent("Denis").await.unwrap();
         let lobby_id = coordinator.create_lobby_with_host(agent_key, "Lobby").await.unwrap();
 
-        let (_, agent_2_key) = coordinator.create_new_agent("Greg").await;
+        let (_, agent_2_key) = coordinator.create_new_agent("Greg").await.unwrap();
 
         // these should work without filling up a queue, even though no one is listening
         for _ in 0..100 {
@@ -400,9 +416,9 @@ mod tests {
         let mut coordinator = Coordinator::new();
 
         // users register
-        let (jim_agent_id, jim_agent_key) = coordinator.create_new_agent("Jim").await;
-        let (pam_agent_id, pam_agent_key) = coordinator.create_new_agent("Pam").await;
-        let (dwight_agent_id, dwight_agent_key) = coordinator.create_new_agent("Dwight").await;
+        let (jim_agent_id, jim_agent_key) = coordinator.create_new_agent("Jim").await.unwrap();
+        let (pam_agent_id, pam_agent_key) = coordinator.create_new_agent("Pam").await.unwrap();
+        let (dwight_agent_id, dwight_agent_key) = coordinator.create_new_agent("Dwight").await.unwrap();
 
 
         // jim makes lobby
@@ -465,12 +481,12 @@ mod tests {
     #[tokio::test]
     async fn test_coordinator_broadcast() {
         let mut coordinator = Coordinator::new();
-        let (jim_agent_id, jim_agent_key) = coordinator.create_new_agent("Jim").await;
+        let (jim_agent_id, jim_agent_key) = coordinator.create_new_agent("Jim").await.unwrap();
         let lobby_id = coordinator.create_lobby_with_host(jim_agent_key, "Lobby").await.unwrap();
 
         let rx = coordinator.lobby_listen(jim_agent_key, lobby_id).unwrap();
 
-        let (pam_agent_id, pam_agent_key) = coordinator.create_new_agent("Pam").await;
+        let (pam_agent_id, pam_agent_key) = coordinator.create_new_agent("Pam").await.unwrap();
 
         let listener_handle = expect_events(rx, vec![
             LobbyEvent::AgentJoined(pam_agent_id),
@@ -490,11 +506,11 @@ mod tests {
     async fn test_coordinator_join_leave() {
         let mut coordinator = Coordinator::new();
 
-        let (_, agent_key) = coordinator.create_new_agent("Jim").await;
+        let (_, agent_key) = coordinator.create_new_agent("Jim").await.unwrap();
 
         let lobby_id = coordinator.create_lobby_with_host(agent_key, "Lobby").await.unwrap();
 
-        let (_, agent_2_key) = coordinator.create_new_agent("Pam").await;
+        let (_, agent_2_key) = coordinator.create_new_agent("Pam").await.unwrap();
 
         coordinator.join_lobby(agent_2_key, lobby_id).await.unwrap();
 
@@ -503,15 +519,15 @@ mod tests {
         let mut agent_keys = vec![];
         agent_keys.push(agent_2_key);
 
-        let (_, agent_key) = coordinator.create_new_agent("Dwight").await;
+        let (_, agent_key) = coordinator.create_new_agent("Dwight").await.unwrap();
         coordinator.join_lobby(agent_key, lobby_id).await.unwrap();
         agent_keys.push(agent_key);
 
-        let (_, agent_key) = coordinator.create_new_agent("Larry").await;
+        let (_, agent_key) = coordinator.create_new_agent("Larry").await.unwrap();
         coordinator.join_lobby(agent_key, lobby_id).await.unwrap();
         agent_keys.push(agent_key);
 
-        let (_, agent_key) = coordinator.create_new_agent("Denis").await;
+        let (_, agent_key) = coordinator.create_new_agent("Denis").await.unwrap();
         coordinator.join_lobby(agent_key, lobby_id).await.unwrap();
         agent_keys.push(agent_key);
 
@@ -527,13 +543,13 @@ mod tests {
     async fn test_bad_listen() {
         let mut coordinator = Coordinator::new();
 
-        let (_, agent_key) = coordinator.create_new_agent("Denis").await;
+        let (_, agent_key) = coordinator.create_new_agent("Denis").await.unwrap();
         let lobby_id_1 = coordinator.create_lobby_with_host(agent_key, "Lobby").await.unwrap();
 
-        let (_, agent_2_key) = coordinator.create_new_agent("Greg").await;
+        let (_, agent_2_key) = coordinator.create_new_agent("Greg").await.unwrap();
         let lobby_id_2 = coordinator.create_lobby_with_host(agent_key, "Lobby").await.unwrap();
 
-        let (_, agent_3_key) = coordinator.create_new_agent("Evil").await;
+        let (_, agent_3_key) = coordinator.create_new_agent("Evil").await.unwrap();
 
         // while not in a lobby, mr evil tries to listen to a lobby. which is not valid.
         assert!(coordinator.lobby_listen(agent_3_key, lobby_id_1).is_err());
@@ -554,11 +570,11 @@ mod tests {
     async fn test_coordinator_2p_game() {
         let mut coordinator = Coordinator::new();
 
-        let (_, agent_1_key) = coordinator.create_new_agent("Denis").await;
+        let (_, agent_1_key) = coordinator.create_new_agent("Denis").await.unwrap();
 
         let lobby_id = coordinator.create_lobby_with_host(agent_1_key, "Lobby").await.unwrap();
 
-        let (_, agent_2_key) = coordinator.create_new_agent("Greg").await;
+        let (_, agent_2_key) = coordinator.create_new_agent("Greg").await.unwrap();
 
         coordinator.join_lobby(agent_2_key, lobby_id).await.unwrap();
 
@@ -576,5 +592,25 @@ mod tests {
         };
 
         runner.run();
+    }
+
+    #[tokio::test]
+    async fn test_coordinator_duplicate_agent() {
+        let mut coordinator = Coordinator::new();
+        let _ = coordinator.create_new_agent("Denis").await.unwrap();
+        let result = coordinator.create_new_agent("Denis").await;
+
+        match result {
+            Ok(_) => {
+                panic!("Should have been a duplicate error")
+            }
+            Err(err) => {
+                match err {
+                    Error::AgentAlreadyExistsWithUsername => {}
+                    _ => {panic!("Should have been an error with variant AgentAlreadyExistsWithUsername")}
+                }
+            }
+        }
+
     }
 }

@@ -23,17 +23,23 @@ pub async fn lobbies(coordinator: &State<Arc<RwLock<Coordinator>>>) -> Json<Vec<
 }
 
 #[post("/register", format = "json", data = "<data>")]
-pub async fn register(coordinator: &State<Arc<RwLock<Coordinator>>>, data: Json<models::RegistrationRequest>) -> Json<models::RegistrationResponse> {
+pub async fn register(coordinator: &State<Arc<RwLock<Coordinator>>>, data: Json<models::RegistrationRequest>) -> Result<Json<models::RegistrationResponse>, Error> {
     let mut coordinator = coordinator.write().await;
 
-    let (agent_id, agent_key) = coordinator.create_new_agent(data.username.as_str()).await;
+
+    let (agent_id, agent_key) = match coordinator.create_new_agent(data.username.as_str()).await {
+        Ok((agent_id, agent_key)) => (agent_id, agent_key),
+        Err(err) => {
+            return Err(Error::from(err));
+        }
+    };
 
     println!("registered agent {agent_key}");
 
-    Json(RegistrationResponse {
+    Ok(Json(RegistrationResponse {
         agent_id,
         agent_key: agent_key.to_string(),
-    })
+    }))
 }
 
 
