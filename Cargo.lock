@@ -73,6 +73,7 @@ dependencies = [
 name = "algomanserver"
 version = "0.1.0"
 dependencies = [
+ "algomacros",
  "algomancer_gre",
  "rand",
  "serde",

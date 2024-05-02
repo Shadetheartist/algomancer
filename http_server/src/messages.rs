@@ -6,44 +6,42 @@ use crate::models::{AgentModel, LobbyModel, MigrationInfoModel};
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum WsMessage {
-    Request { value: WsRequest },
-    Response { value: WsResponse },
-    Event { value: WsEvent },
+    ServerRequest { value: ServerRequest },
+    ServerResponse { value: ServerResponse },
+    ServerEvent { value: ServerEvent },
+    ClientRequest { value: ClientRequest },
+    ClientResponse { value: ClientResponse },
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
-pub enum WsRequest {
+pub enum ServerRequest {
     AgentKeyRequest,
-    StartGameRequest {
-        agent_key: String,
-        lobby_id: String
-    },
     MigrationInfoRequest
 }
 
+impl ServerRequest {
+    pub fn is_correct_response_type(&self, res: &ClientResponse) -> bool {
+        match self {
+            ServerRequest::AgentKeyRequest => matches!(res, ClientResponse::AgentKeyResponse {..}),
+            ServerRequest::MigrationInfoRequest => matches!(res, ClientResponse::MigrationInfoResponse {..}),
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
-pub enum WsResponse {
-    AgentKeyResponse {
-        agent_key: String,
-    },
-
-    LaunchGameResponse,
-
+pub enum ServerResponse {
+    StartGameResponse,
     LobbyCreated {
         lobby: LobbyModel
     },
-
-    MigrationInfoResponse {
-        info: MigrationInfoModel
-    }
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
-pub enum WsEvent {
+pub enum ServerEvent {
     AgentJoinedLobby {
         agent: AgentModel,
         lobby: LobbyModel
@@ -58,5 +56,33 @@ pub enum WsEvent {
         agent_id: String,
         migration_info: MigrationInfoModel
     },
+}
 
+#[derive(Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum ClientRequest {
+    StartGameRequest {
+        agent_key: String,
+        lobby_id: String
+    },
+}
+
+impl ClientRequest {
+    pub fn is_correct_response_type(&self, res: &ServerResponse) -> bool {
+        match self {
+            ClientRequest::StartGameRequest { .. } => matches!(res, ServerResponse::StartGameResponse {..}),
+        }
+    }
+}
+
+
+#[derive(Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum ClientResponse {
+    AgentKeyResponse {
+        agent_key: String,
+    },
+    MigrationInfoResponse {
+        info: MigrationInfoModel
+    }
 }

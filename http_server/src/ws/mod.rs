@@ -10,8 +10,7 @@ use tokio::sync::RwLock;
 use ws::frame::CloseFrame;
 use ws::Message;
 use algomanserver::{AgentId, AgentKey, Coordinator, LobbyEvent, LobbyId, Runner};
-use crate::messages::{WsEvent, WsMessage, WsRequest, WsResponse};
-use crate::messages::WsResponse::AgentKeyResponse;
+use crate::messages::{ServerEvent, WsMessage, ServerRequest, ServerResponse, ClientResponse, ClientRequest};
 use crate::models::{AgentModel, LobbyModel, MigrationInfoModel};
 
 
@@ -20,14 +19,14 @@ type RX = SplitStream<ws::stream::DuplexStream>;
 
 
 pub async fn ws_request_agent_key(tx: &mut TX, rx: &mut RX) -> Result<AgentKey, RequestResponseError> {
-    let agent_key_request = WsRequest::AgentKeyRequest;
+    let agent_key_request = ServerRequest::AgentKeyRequest;
     let ws_response = match ws_request_response(tx, rx, agent_key_request).await {
         Ok(response) => response,
         Err(err) => return Err(err)
     };
 
     let agent_key = {
-        if let AgentKeyResponse { agent_key } = ws_response {
+        if let ClientResponse::AgentKeyResponse { agent_key } = ws_response {
             let agent_key: AgentKey = match agent_key.parse::<u64>() {
                 Ok(agent_key) => agent_key.into(),
                 Err(_) => return Err(RequestResponseError::InvalidResponse("could not parse agent key".to_string()))
@@ -101,8 +100,8 @@ impl Display for RequestResponseError {
     }
 }
 
-pub async fn ws_request_response(tx: &mut TX, rx: &mut RX, request_variant: WsRequest) -> Result<WsResponse, RequestResponseError> {
-    if let Err(err) = ws_send_json(tx, &WsMessage::Request { value: request_variant }).await {
+pub async fn ws_request_response(tx: &mut TX, rx: &mut RX, request_variant: ServerRequest) -> Result<ClientResponse, RequestResponseError> {
+    if let Err(err) = ws_send_json(tx, &WsMessage::ServerRequest { value: request_variant }).await {
         return Err(RequestResponseError::ErrorSendingJson(err));
     }
 
@@ -114,7 +113,7 @@ pub async fn ws_request_response(tx: &mut TX, rx: &mut RX, request_variant: WsRe
                     match serde_json::from_str::<WsMessage>(&text) {
                         Ok(value) => {
                             match value {
-                                WsMessage::Response { value } => Ok(value),
+                                WsMessage::ClientResponse { value } => Ok(value),
                                 _ => Err(RequestResponseError::InvalidResponse("expected a message with type response".to_string()))
                             }
                         }
@@ -153,7 +152,7 @@ async fn respond_to_client_request(text: &str, tx: &mut TX, runners: &mut Vec<Ru
     let request = match serde_json::from_str::<WsMessage>(text) {
         Ok(value) => {
             match value {
-                WsMessage::Request { value } => value,
+                WsMessage::ClientRequest { value } => value,
                 _ => return Err(RequestResponseError::InvalidResponse("expected a message with type request".to_string()))
             }
         }
@@ -163,7 +162,7 @@ async fn respond_to_client_request(text: &str, tx: &mut TX, runners: &mut Vec<Ru
     };
 
     match request {
-        WsRequest::StartGameRequest { agent_key, lobby_id } => {
+        ClientRequest::StartGameRequest { agent_key, lobby_id } => {
             let agent_key: AgentKey = match agent_key.parse::<u64>() {
                 Ok(agent_key) => agent_key.into(),
                 Err(_) => return Err(RequestResponseError::InvalidRequest("failed to parse agent key".to_string()))
@@ -182,10 +181,6 @@ async fn respond_to_client_request(text: &str, tx: &mut TX, runners: &mut Vec<Ru
             }
 
             Ok(())
-        }
-        WsRequest::MigrationInfoRequest |
-        WsRequest::AgentKeyRequest => {
-            return Err(RequestResponseError::InvalidRequest("a client cannot make this type of request".to_string()));
         }
     }
 }
@@ -219,7 +214,7 @@ pub async fn ws_lobby_listen(
             tokio::spawn(async move {
                 while let Some(lobby_event) = lobby_rx.recv().await {
                     let event = match lobby_event {
-                        LobbyEvent::Migrate(agent_id, migration_info) => WsEvent::Migrate {
+                        LobbyEvent::Migrate(agent_id, migration_info) => ServerEvent::Migrate {
                             agent_id: agent_id.to_string(),
                             migration_info: MigrationInfoModel {
                                 runner_id: migration_info.runner_id.to_string(),
@@ -231,22 +226,22 @@ pub async fn ws_lobby_listen(
                             let mut coordinator = coordinator.read().await;
                             let agent: AgentModel = coordinator.get_agent_by_key(agent_key).expect("an agent").into();
                             let lobby = LobbyModel::from_coordinator_lobby(coordinator.deref(), coordinator.get_lobby(lobby_id).expect("a lobby"));
-                            WsEvent::AgentJoinedLobby {
+                            ServerEvent::AgentJoinedLobby {
                                 agent: agent,
                                 lobby: lobby,
                             }
                         }
-                        LobbyEvent::AgentLeft(agent_id) => WsEvent::AgentLeftLobby {
+                        LobbyEvent::AgentLeft(agent_id) => ServerEvent::AgentLeftLobby {
                             agent_id: agent_id.to_string(),
                         },
-                        LobbyEvent::NewHost(agent_id) => WsEvent::AgentLeftLobby {
+                        LobbyEvent::NewHost(agent_id) => ServerEvent::AgentLeftLobby {
                             agent_id: agent_id.to_string(),
                         },
                         LobbyEvent::Whisper(_, _, _) => unimplemented!(),
                     };
 
 
-                    match ws_send_json(tx.lock().await.deref_mut(), &WsMessage::Event { value: event }).await {
+                    match ws_send_json(tx.lock().await.deref_mut(), &WsMessage::ServerEvent { value: event }).await {
                         Ok(_) => {}
                         Err(err) => {
                             eprintln!("{err}")

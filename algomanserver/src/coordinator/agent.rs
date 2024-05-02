@@ -1,6 +1,8 @@
 use std::fmt::{Display, Formatter};
+use std::str::FromStr;
 use rand::{RngCore};
 use serde::{Deserialize, Serialize};
+use algomacros::impl_u64_key_wrapper;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Agent {
@@ -19,34 +21,11 @@ impl Agent {
     }
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq,Serialize, Deserialize, Hash)]
 pub struct AgentId(pub u64);
-
-impl Display for AgentId {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.write_str(self.0.to_string().as_str())
-    }
-}
-
-impl From<u64> for AgentId {
-    fn from(value: u64) -> Self {
-        Self(value)
-    }
-}
+impl_u64_key_wrapper!(AgentId);
 
 
-#[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Hash)]
 pub struct AgentKey(pub u64);
-
-impl Display for AgentKey {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.write_str(self.0.to_string().as_str())
-    }
-}
-
-impl From<u64> for AgentKey {
-    fn from(value: u64) -> Self {
-        Self(value)
-    }
-}
-
+impl_u64_key_wrapper!(AgentKey);

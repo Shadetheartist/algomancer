@@ -10,9 +10,8 @@ use crate::{Error, models};
 use crate::models::{AgentModel, AgentKeyRequest, LobbyModel, RegistrationResponse};
 use crate::ws::{SendJsonError, ws_close_with_error, ws_lobby_listen, ws_send_json, ws_send_text, ws_request_response, ws_request_agent_key, RequestResponseError};
 use rocket::futures::{SinkExt, StreamExt};
-use crate::messages::WsEvent::AgentJoinedLobby;
-use crate::messages::{WsEvent, WsMessage, WsRequest, WsResponse};
-use crate::messages::WsResponse::AgentKeyResponse;
+use crate::messages::ServerEvent::AgentJoinedLobby;
+use crate::messages::{ServerEvent, WsMessage, ServerRequest, ServerResponse};
 
 #[get("/lobbies")]
 pub async fn lobbies(coordinator: &State<Arc<RwLock<Coordinator>>>) -> Json<Vec<models::LobbyModel>> {
@@ -25,7 +24,6 @@ pub async fn lobbies(coordinator: &State<Arc<RwLock<Coordinator>>>) -> Json<Vec<
 #[post("/register", format = "json", data = "<data>")]
 pub async fn register(coordinator: &State<Arc<RwLock<Coordinator>>>, data: Json<models::RegistrationRequest>) -> Result<Json<models::RegistrationResponse>, Error> {
     let mut coordinator = coordinator.write().await;
-
 
     let (agent_id, agent_key) = match coordinator.create_new_agent(data.username.as_str()).await {
         Ok((agent_id, agent_key)) => (agent_id, agent_key),
@@ -72,7 +70,7 @@ pub async fn lobby_create(ws: WebSocket, coordinator: &State<Arc<RwLock<Coordina
                 let mut coordinator = coordinator.write().await;
                 if let Some(lobby) = coordinator.get_lobby(lobby_id) {
                     let lobby_model = LobbyModel::from_coordinator_lobby(coordinator.deref(), lobby);
-                    if let Err(err) = ws_send_json(&mut tx, &&WsMessage::Response {value: WsResponse::LobbyCreated { lobby: lobby_model }}).await {
+                    if let Err(err) = ws_send_json(&mut tx, &&WsMessage::ServerResponse {value: ServerResponse::LobbyCreated { lobby: lobby_model }}).await {
                         ws_close_with_error(tx, format!("failed to send json {}", err)).await;
                         return Ok(());
                     }
@@ -133,7 +131,7 @@ pub async fn lobby_join(ws: WebSocket, coordinator: &State<Arc<RwLock<Coordinato
                 let mut coordinator = coordinator.read().await;
                 let agent: AgentModel = coordinator.get_agent_by_key(agent_key).expect("an agent").into();
                 let lobby = LobbyModel::from_coordinator_lobby(coordinator.deref(), coordinator.get_lobby(lobby_id).expect("a lobby"));
-                WsMessage::Event {
+                WsMessage::ServerEvent {
                     value: AgentJoinedLobby {
                         agent: agent,
                         lobby: lobby,

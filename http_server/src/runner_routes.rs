@@ -11,8 +11,8 @@ use crate::models::{AgentModel, AgentKeyRequest, LobbyModel, RegistrationRespons
 use crate::ws::{SendJsonError, ws_close_with_error, ws_lobby_listen, ws_send_json, ws_send_text, ws_request_response, ws_request_agent_key, RequestResponseError};
 use rocket::futures::{SinkExt, StreamExt};
 use algomanserver::client::ClientKey;
-use crate::messages::WsEvent::AgentJoinedLobby;
-use crate::messages::{WsMessage, WsRequest, WsResponse};
+use crate::messages::ServerEvent::AgentJoinedLobby;
+use crate::messages::{WsMessage, ServerRequest, ServerResponse, ClientResponse};
 
 
 #[get("/connect")]
@@ -24,10 +24,10 @@ pub async fn runner_connect(ws: WebSocket, runners: &State<Arc<RwLock<Vec<algoma
             println!("someone connected");
             let (mut tx, mut rx) = stream.split();
 
-            match ws_request_response(&mut tx, &mut rx, WsRequest::MigrationInfoRequest).await {
+            match ws_request_response(&mut tx, &mut rx, ServerRequest::MigrationInfoRequest).await {
                 Ok(response) => {
                     match response {
-                        WsResponse::MigrationInfoResponse { info } => {
+                        ClientResponse::MigrationInfoResponse { info } => {
                             println!("they have info");
 
                             let runner_id: RunnerId = info.runner_id.parse::<u64>().unwrap().into();
