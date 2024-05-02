@@ -15,7 +15,7 @@ impl Agent {
     pub fn new(id: AgentId, username: String) -> Self {
         Self {
             id,
-            key: AgentKey(rand::thread_rng().next_u64()),
+            key: AgentKey::random(),
             username,
         }
     }
