@@ -1,4 +1,4 @@
-mod client;
+pub mod client;
 
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
@@ -6,7 +6,6 @@ use rand::RngCore;
 use serde::{Deserialize, Serialize};
 use algomancer_gre::game::{Game};
 use algomancer_gre::game::game_builder::NewGameError;
-use algomancer_gre::game::state::player::PlayerId;
 use crate::{AgentId, AgentKey, Lobby, LobbyEvent};
 use crate::runner::client::ClientKey;
 
@@ -34,22 +33,23 @@ impl From<u64> for  RunnerId {
 
 #[derive(Debug)]
 pub struct Runner {
-    runner_id: RunnerId,
+    pub runner_id: RunnerId,
     migration_state: Option<MigrationState>,
+    run_tx: Option<tokio::sync::broadcast::Sender<()>>,
     game: Game
 }
 
 #[derive(Debug)]
 pub struct MigrationState {
     migration_keys: HashMap<AgentKey, ClientKey>,
-    clients: HashMap<ClientKey, PlayerId>
+    clients: HashMap<ClientKey, bool> // connected
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
 pub struct MigrationInfo {
-    runner_id: RunnerId,
-    agent_key: AgentKey,
-    client_key: ClientKey,
+    pub runner_id: RunnerId,
+    pub agent_key: AgentKey,
+    pub client_key: ClientKey,
 }
 
 impl Runner {
@@ -69,6 +69,7 @@ impl Runner {
         let mut runner = Self {
             runner_id: RunnerId(rand::thread_rng().next_u64()),
             migration_state: None,
+            run_tx: Default::default(),
             game,
         };
 
@@ -83,20 +84,54 @@ impl Runner {
     }
 
     pub fn run(&self) {
-        tokio::spawn(async move {
-
-        });
+        println!("run game server!");
+        self.run_tx.as_ref().unwrap().send(()).unwrap();
     }
 
-    async fn connect_client(&self, client_key: ClientKey) {}
-
-    async fn wait_for_client(&self) {
-
+    pub fn ready(&self) -> bool {
+        if let Some(migration_state) = &self.migration_state {
+            let connected_clients_count = migration_state.clients.iter().filter(|(_, connected)| **connected).count();
+            connected_clients_count == migration_state.migration_keys.len()
+        } else {
+            false
+        }
     }
 
-    async fn wait_for_clients(&self, mut migration_state: MigrationState) {
+    pub fn connect_client(&mut self, client_key: ClientKey) -> tokio::sync::broadcast::Receiver<()> {
+        if let Some(migration_state) = &mut self.migration_state {
+            if let Some((_, client_key)) = migration_state.migration_keys.iter().find(|(_, k)| **k == client_key) {
+                migration_state.clients.insert(*client_key, true);
 
+                let rx = if let Some(ready_tx) = &mut self.run_tx {
+                    ready_tx.subscribe()
+                } else {
+                    let (tx, rx) = tokio::sync::broadcast::channel(1);
+                    self.run_tx = Some(tx);
+                    rx
+                };
+
+                if self.ready() {
+                    self.run();
+                }
+
+                return rx;
+            }
+
+            panic!("invalid client");
+
+        } else {
+            panic!("no migration state")
+        }
     }
+
+    pub fn disconnect_client(&mut self, client_key: ClientKey) {
+        if let Some(migration_state) = &mut self.migration_state {
+            migration_state.clients.remove(&client_key).expect("a removed client");
+        } else {
+            panic!("no migration state")
+        }
+    }
+
 
     async fn begin_migration(&self, lobby: &Lobby, lobby_agent_keys: Vec<(AgentId, AgentKey)>) -> Result<MigrationState, Error> {
 

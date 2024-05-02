@@ -590,8 +590,6 @@ mod tests {
                 panic!("{}", err)
             }
         };
-
-        runner.run();
     }
 
     #[tokio::test]

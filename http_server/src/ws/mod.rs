@@ -10,10 +10,12 @@ use serde::Serialize;
 use tokio::sync::RwLock;
 use ws::frame::CloseFrame;
 use ws::Message;
-use algomanserver::{AgentKey, Coordinator, LobbyId, Runner};
+use algomanserver::{AgentId, AgentKey, Coordinator, LobbyEvent, LobbyId, Runner};
 use algomanserver::coordinator::Error;
-use crate::messages::{WsMessage, WsRequest, WsResponse};
+use algomanserver::runner::MigrationInfo;
+use crate::messages::{WsEvent, WsMessage, WsRequest, WsResponse};
 use crate::messages::WsResponse::AgentKeyResponse;
+use crate::models::MigrationInfoModel;
 
 
 type TX = SplitSink<ws::stream::DuplexStream, Message>;
@@ -109,6 +111,7 @@ pub async fn ws_request_response(tx: &mut TX, rx: &mut RX, request_variant: WsRe
 
     while let Some(message) = rx.next().await {
         if let Ok(message) = message {
+            println!("received: {message}");
             return match message {
                 Message::Text(text) => {
                     match serde_json::from_str::<WsMessage>(&text) {
@@ -140,6 +143,7 @@ pub async fn ws_close_normally(tx: &mut TX) {
 }
 
 pub async fn ws_close_with_error(mut tx: TX, err_msg: String) {
+    eprintln!("{err_msg}");
     tx.send(Message::Text(err_msg.to_string())).await.ok();
     tx.send(Message::Close(Some(CloseFrame {
         code: ws::frame::CloseCode::Normal,
@@ -182,6 +186,7 @@ async fn respond_to_client_request(text: &str, tx: &mut TX, runners: &mut Vec<Ru
 
             Ok(())
         }
+        WsRequest::MigrationInfoRequest |
         WsRequest::AgentKeyRequest => {
             return Err(RequestResponseError::InvalidRequest("a client cannot make this type of request".to_string()));
         }
@@ -214,8 +219,26 @@ pub async fn ws_lobby_listen(
 
         tokio::spawn(async move {
             while let Some(lobby_event) = lobby_rx.recv().await {
-                let event_json = serde_json::to_string(&lobby_event).expect("serialized lobby event");
-                tx.lock().await.send(Message::Text(event_json)).await.ok();
+
+                let event = match lobby_event {
+                    LobbyEvent::Migrate(agent_id, migration_info) => WsEvent::Migrate { agent_id: agent_id.to_string(), migration_info: MigrationInfoModel {
+                        runner_id: migration_info.runner_id.to_string(),
+                        agent_key: migration_info.agent_key.to_string(),
+                        client_key: migration_info.client_key.to_string(),
+                    }},
+                    LobbyEvent::AgentJoined(_) => unimplemented!(),
+                    LobbyEvent::AgentLeft(_) => unimplemented!(),
+                    LobbyEvent::NewHost(_) => unimplemented!(),
+                    LobbyEvent::Whisper(_, _, _) => unimplemented!(),
+                };
+
+
+                match ws_send_json(tx.lock().await.deref_mut(), &WsMessage::Event { value: event }).await {
+                    Ok(_) => {}
+                    Err(err) => {
+                        eprintln!("{err}")
+                    }
+                }
             }
         })
     };

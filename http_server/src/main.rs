@@ -135,8 +135,11 @@ async fn rocket() -> _ {
         .manage(runners_arc)
         .mount("/coordinator/", routes![
             coordinator_routes::register,
-            coordinator_routes::lobby_create,
-            coordinator_routes::lobby_join, //ws
             coordinator_routes::lobbies,
+            coordinator_routes::lobby_create,
+            coordinator_routes::lobby_join,
+        ])
+        .mount("/runner/", routes![
+            runner_routes::runner_connect,
         ])
 }

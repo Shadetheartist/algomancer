@@ -20,4 +20,6 @@ pub use coordinator::{
 pub use runner::{
     Runner,
     RunnerId,
+    client
 };
+
