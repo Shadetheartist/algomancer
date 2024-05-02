@@ -105,12 +105,12 @@ impl Coordinator {
     pub async fn create_lobby_with_host(&mut self, host_agent_key: AgentKey, name: &str) -> Result<LobbyId, Error> {
         let _ = self.leave_current_lobby(host_agent_key);
 
-        let host_agent_id = match self.must_get_agent_id_by_key(host_agent_key) {
+        let host_agent_id = match self.get_agent_id_by_key(host_agent_key) {
             Ok(agent_id) => agent_id,
             Err(e) => return Err(e)
         };
 
-        let agent = match self.must_get_agent(host_agent_id) {
+        let agent = match self.get_agent_by_id(host_agent_id) {
             Ok(agent) => agent,
             Err(e) => return Err(e)
         };
@@ -140,7 +140,7 @@ impl Coordinator {
     }
 
     pub async fn leave_current_lobby(&mut self, leaver_agent_key: AgentKey) -> Result<(), Error> {
-        let leaver_agent_id = match self.must_get_agent_id_by_key(leaver_agent_key) {
+        let leaver_agent_id = match self.get_agent_id_by_key(leaver_agent_key) {
             Ok(agent_id) => agent_id,
             Err(e) => return Err(e)
         };
@@ -217,7 +217,7 @@ impl Coordinator {
     }
 
     pub async fn join_lobby(&mut self, agent_key: AgentKey, lobby_id: LobbyId) -> Result<(), Error> {
-        let agent_id = match self.must_get_agent_id_by_key(agent_key) {
+        let agent_id = match self.get_agent_id_by_key(agent_key) {
             Ok(agent_id) => agent_id,
             Err(e) => return Err(e)
         };
@@ -275,7 +275,7 @@ impl Coordinator {
             .find(|l| l.agent_ids.iter().any(|a| *a == agent_id))
     }
 
-    pub fn must_get_agent(&self, agent_id: AgentId) -> Result<&Agent, Error> {
+    pub fn get_agent_by_id(&self, agent_id: AgentId) -> Result<&Agent, Error> {
         if let Some(agent) = self.agents.iter().find(|a| a.id == agent_id) {
             Ok(agent)
         } else {
@@ -283,7 +283,7 @@ impl Coordinator {
         }
     }
 
-    pub fn must_get_agent_id_by_key(&self, agent_key: AgentKey) -> Result<AgentId, Error> {
+    pub fn get_agent_id_by_key(&self, agent_key: AgentKey) -> Result<AgentId, Error> {
         let agent = self.get_agent_by_key(agent_key)?;
         Ok(agent.id)
     }
@@ -309,7 +309,7 @@ impl Coordinator {
     }
 
     pub fn lobby_listen(&mut self, agent_key: AgentKey, lobby_id: LobbyId) -> Result<tokio::sync::mpsc::Receiver<LobbyEvent>, Error> {
-        let agent_id = match self.must_get_agent_id_by_key(agent_key) {
+        let agent_id = match self.get_agent_id_by_key(agent_key) {
             Ok(agent_id) => agent_id,
             Err(e) => return Err(e)
         };
@@ -331,7 +331,7 @@ impl Coordinator {
     }
 
     pub async fn whisper(&self, agent_key: AgentKey, target_agent_id: AgentId, content: String) -> Result<(), Error> {
-        let agent_id = match self.must_get_agent_id_by_key(agent_key) {
+        let agent_id = match self.get_agent_id_by_key(agent_key) {
             Ok(agent_id) => agent_id,
             Err(e) => return Err(e)
         };
