@@ -1,7 +1,6 @@
 use std::borrow::Cow;
 use std::fmt::{Display, Formatter};
-use std::num::ParseIntError;
-use std::ops::DerefMut;
+use std::ops::{Deref, DerefMut};
 use std::sync::{Arc};
 use rocket::futures::SinkExt;
 use rocket::futures::StreamExt;
@@ -11,11 +10,9 @@ use tokio::sync::RwLock;
 use ws::frame::CloseFrame;
 use ws::Message;
 use algomanserver::{AgentId, AgentKey, Coordinator, LobbyEvent, LobbyId, Runner};
-use algomanserver::coordinator::Error;
-use algomanserver::runner::MigrationInfo;
 use crate::messages::{WsEvent, WsMessage, WsRequest, WsResponse};
 use crate::messages::WsResponse::AgentKeyResponse;
-use crate::models::MigrationInfoModel;
+use crate::models::{AgentModel, LobbyModel, MigrationInfoModel};
 
 
 type TX = SplitSink<ws::stream::DuplexStream, Message>;
@@ -161,12 +158,12 @@ async fn respond_to_client_request(text: &str, tx: &mut TX, runners: &mut Vec<Ru
             }
         }
         Err(err) => {
-            return Err(RequestResponseError::ErrorDeserializingMessage(err))
+            return Err(RequestResponseError::ErrorDeserializingMessage(err));
         }
     };
 
     match request {
-        WsRequest::StartGameRequest{agent_key, lobby_id} => {
+        WsRequest::StartGameRequest { agent_key, lobby_id } => {
             let agent_key: AgentKey = match agent_key.parse::<u64>() {
                 Ok(agent_key) => agent_key.into(),
                 Err(_) => return Err(RequestResponseError::InvalidRequest("failed to parse agent key".to_string()))
@@ -215,32 +212,49 @@ pub async fn ws_lobby_listen(
     let tx = Arc::new(tokio::sync::Mutex::new(tx));
 
     let mut send_task = {
-        let tx = tx.clone();
+        let coordinator = coordinator.clone();
+        {
+            let tx = tx.clone();
 
-        tokio::spawn(async move {
-            while let Some(lobby_event) = lobby_rx.recv().await {
+            tokio::spawn(async move {
+                while let Some(lobby_event) = lobby_rx.recv().await {
+                    let event = match lobby_event {
+                        LobbyEvent::Migrate(agent_id, migration_info) => WsEvent::Migrate {
+                            agent_id: agent_id.to_string(),
+                            migration_info: MigrationInfoModel {
+                                runner_id: migration_info.runner_id.to_string(),
+                                agent_key: migration_info.agent_key.to_string(),
+                                client_key: migration_info.client_key.to_string(),
+                            },
+                        },
+                        LobbyEvent::AgentJoined(agent_id) => {
+                            let mut coordinator = coordinator.read().await;
+                            let agent: AgentModel = coordinator.get_agent_by_key(agent_key).expect("an agent").into();
+                            let lobby = LobbyModel::from_coordinator_lobby(coordinator.deref(), coordinator.get_lobby(lobby_id).expect("a lobby"));
+                            WsEvent::AgentJoinedLobby {
+                                agent: agent,
+                                lobby: lobby,
+                            }
+                        }
+                        LobbyEvent::AgentLeft(agent_id) => WsEvent::AgentLeftLobby {
+                            agent_id: agent_id.to_string(),
+                        },
+                        LobbyEvent::NewHost(agent_id) => WsEvent::AgentLeftLobby {
+                            agent_id: agent_id.to_string(),
+                        },
+                        LobbyEvent::Whisper(_, _, _) => unimplemented!(),
+                    };
 
-                let event = match lobby_event {
-                    LobbyEvent::Migrate(agent_id, migration_info) => WsEvent::Migrate { agent_id: agent_id.to_string(), migration_info: MigrationInfoModel {
-                        runner_id: migration_info.runner_id.to_string(),
-                        agent_key: migration_info.agent_key.to_string(),
-                        client_key: migration_info.client_key.to_string(),
-                    }},
-                    LobbyEvent::AgentJoined(_) => unimplemented!(),
-                    LobbyEvent::AgentLeft(_) => unimplemented!(),
-                    LobbyEvent::NewHost(_) => unimplemented!(),
-                    LobbyEvent::Whisper(_, _, _) => unimplemented!(),
-                };
 
-
-                match ws_send_json(tx.lock().await.deref_mut(), &WsMessage::Event { value: event }).await {
-                    Ok(_) => {}
-                    Err(err) => {
-                        eprintln!("{err}")
+                    match ws_send_json(tx.lock().await.deref_mut(), &WsMessage::Event { value: event }).await {
+                        Ok(_) => {}
+                        Err(err) => {
+                            eprintln!("{err}")
+                        }
                     }
                 }
-            }
-        })
+            })
+        }
     };
 
     let mut recv_task = tokio::spawn(async move {

@@ -48,6 +48,12 @@ pub enum WsEvent {
         agent: AgentModel,
         lobby: LobbyModel
     },
+    AgentLeftLobby {
+        agent_id: String,
+    },
+    NewHost {
+        agent_id: String,
+    },
     Migrate {
         agent_id: String,
         migration_info: MigrationInfoModel
