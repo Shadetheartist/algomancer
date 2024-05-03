@@ -3,7 +3,7 @@ macro_rules! impl_u64_key_wrapper {
     ($t:ident) => {
         impl std::fmt::Display for $t {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                write!(f, "{}({})", stringify!($t), self.0)
+                write!(f, "{}", self.0)
             }
         }
 

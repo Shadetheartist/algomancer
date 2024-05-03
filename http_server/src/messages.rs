@@ -11,9 +11,10 @@ pub enum WsMessage {
     ServerEvent { value: ServerEvent },
     ClientRequest { value: ClientRequest },
     ClientResponse { value: ClientResponse },
+    Error { value: String },
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ServerRequest {
     AgentKeyRequest,

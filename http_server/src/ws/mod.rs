@@ -2,11 +2,13 @@ use std::borrow::Cow;
 use std::fmt::{Display, Formatter};
 use std::ops::{Deref, DerefMut};
 use std::sync::{Arc};
+use std::time::Duration;
 use rocket::futures::SinkExt;
 use rocket::futures::StreamExt;
 use rocket::futures::stream::{SplitSink, SplitStream};
 use serde::Serialize;
 use tokio::sync::RwLock;
+use tokio::time::timeout;
 use ws::frame::CloseFrame;
 use ws::Message;
 use algomanserver::{AgentKey, Coordinator, LobbyEvent, LobbyId, Runner};
@@ -18,17 +20,22 @@ type TX = SplitSink<ws::stream::DuplexStream, Message>;
 type RX = SplitStream<ws::stream::DuplexStream>;
 
 
+fn default_timeout_duration() -> Duration {
+    Duration::from_secs(1)
+}
+
 pub async fn ws_request_agent_key(tx: &mut TX, rx: &mut RX) -> Result<AgentKey, RequestResponseError> {
     let agent_key_request = ServerRequest::AgentKeyRequest;
-    let ws_response = match ws_request_response(tx, rx, agent_key_request).await {
+
+    let ws_response = match ws_request_response_within(tx, rx, agent_key_request, default_timeout_duration()).await {
         Ok(response) => response,
         Err(err) => return Err(err)
     };
 
     let agent_key = {
         if let ClientResponse::AgentKeyResponse { agent_key } = ws_response {
-            let agent_key: AgentKey = match agent_key.parse::<u64>() {
-                Ok(agent_key) => agent_key.into(),
+            let agent_key: AgentKey = match agent_key.parse() {
+                Ok(agent_key) => agent_key,
                 Err(_) => return Err(RequestResponseError::InvalidResponse("could not parse agent key".to_string()))
             };
 
@@ -84,6 +91,7 @@ pub enum RequestResponseError {
     ErrorStartingGame(String),
     ConnectionClosed,
     MessageNotText,
+    Timeout,
 }
 
 impl Display for RequestResponseError {
@@ -95,26 +103,42 @@ impl Display for RequestResponseError {
             RequestResponseError::ConnectionClosed => write!(f, "connection has been closed"),
             RequestResponseError::MessageNotText => write!(f, "received message was not a text frame"),
             RequestResponseError::InvalidRequest(reason) => write!(f, "received an invalid request: {reason}"),
-            RequestResponseError::ErrorStartingGame(reason) => write!(f, "error starting game: {reason}")
+            RequestResponseError::ErrorStartingGame(reason) => write!(f, "error starting game: {reason}"),
+            RequestResponseError::Timeout => write!(f, "client did not send response within the allotted timeframe"),
         }
     }
 }
 
+pub async fn ws_send_err(tx: &mut TX, err_str: String) -> Result<(), SendJsonError> {
+    ws_send_json(tx, &WsMessage::Error { value: err_str }).await
+}
+
+pub async fn ws_request_response_within(tx: &mut TX, rx: &mut RX, request_variant: ServerRequest, duration: Duration) -> Result<ClientResponse, RequestResponseError> {
+    let result = timeout(duration, ws_request_response(tx, rx, request_variant)).await;
+    result.unwrap_or_else(|_| Err(RequestResponseError::Timeout))
+}
+
 pub async fn ws_request_response(tx: &mut TX, rx: &mut RX, request_variant: ServerRequest) -> Result<ClientResponse, RequestResponseError> {
-    if let Err(err) = ws_send_json(tx, &WsMessage::ServerRequest { value: request_variant }).await {
+    if let Err(err) = ws_send_json(tx, &WsMessage::ServerRequest { value: request_variant.clone() }).await {
         return Err(RequestResponseError::ErrorSendingJson(err));
     }
 
     while let Some(message) = rx.next().await {
         if let Ok(message) = message {
             println!("received: {message}");
-            return match message {
+            let result = match message {
                 Message::Text(text) => {
                     match serde_json::from_str::<WsMessage>(&text) {
                         Ok(value) => {
                             match value {
-                                WsMessage::ClientResponse { value } => Ok(value),
-                                _ => Err(RequestResponseError::InvalidResponse("expected a message with type response".to_string()))
+                                WsMessage::ClientResponse { value } => {
+                                    if request_variant.is_correct_response_type(&value) {
+                                        Ok(value)
+                                    } else {
+                                        Err(RequestResponseError::InvalidResponse("client response type does not pair with the request type".to_string()))
+                                    }
+                                },
+                                _ => Err(RequestResponseError::InvalidResponse("expected a message with type client_response".to_string()))
                             }
                         }
                         Err(err) => {
@@ -124,6 +148,12 @@ pub async fn ws_request_response(tx: &mut TX, rx: &mut RX, request_variant: Serv
                 }
                 _ => Err(RequestResponseError::MessageNotText)
             };
+
+            if let Err(err) = &result {
+                ws_send_err(tx, err.to_string()).await.ok();
+            }
+
+            return result
         }
     }
 
@@ -263,7 +293,8 @@ pub async fn ws_lobby_listen(
                         match respond_to_client_request(text.as_str(), tx.deref_mut(), runners.deref_mut(), coordinator.deref_mut()).await {
                             Ok(_) => {}
                             Err(err) => {
-                                eprintln!("{err}")
+                                eprintln!("{err}");
+                                ws_send_err(tx.deref_mut(), err.to_string()).await.ok();
                             }
                         }
                     }
