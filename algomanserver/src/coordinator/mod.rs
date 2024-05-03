@@ -182,6 +182,7 @@ impl Coordinator {
         self.agents.iter().find(|a| a.id == agent_id).map(|agent| agent.key)
     }
 
+    #[allow(dead_code)]
     async fn remove_lobby(&mut self, lobby_id: LobbyId) -> Result<(), Error> {
         let agent_keys_in_lobby: Vec<AgentKey> = {
             let lobby = self.try_get_lobby(lobby_id)?;
