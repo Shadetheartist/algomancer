@@ -1,10 +1,10 @@
 use std::collections::HashMap;
-use std::fmt::{Display, Formatter};
-use std::str::FromStr;
+
+
 use serde::{Deserialize, Serialize};
 use algomacros::impl_u64_key_wrapper;
 use algomancer_gre::game::GameOptions;
-use crate::AgentKey;
+
 use crate::coordinator::agent::AgentId;
 use crate::coordinator::Error;
 use crate::coordinator::Error::{NotListening, SendEventError};
@@ -102,7 +102,7 @@ impl Lobby {
                         Ok(())
                     }
                     Err(err) => {
-                        return Err(SendEventError(err));
+                        Err(SendEventError(err))
                     }
                 }
             }

@@ -60,7 +60,7 @@ impl CardPrototypeDatabase {
     pub fn resource(&self, resource_type: ResourceType) -> &CardPrototype {
         self.prototypes.iter().find(|(_, c)| {
             c.card_type == CardType::Resource(resource_type)
-        }).expect(format!("a prototype for this resource type {:?}", resource_type).as_str()).1
+        }).unwrap_or_else(|| panic!("a prototype for this resource type {:?}", resource_type)).1
     }
 
 
@@ -173,7 +173,7 @@ impl CardPrototypeDatabase {
         let mut c = 0;
         let mapped: Vec<CardPrototype> = data.into_values().map(|mut d| {
             let d = d.remove(0);
-            c = c + 1;
+            c += 1;
 
             CardPrototype {
                 prototype_id: CardPrototypeId(c),

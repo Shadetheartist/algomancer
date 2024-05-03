@@ -75,6 +75,12 @@ impl Display for Error {
 
 impl std::error::Error for Error {}
 
+impl Default for Coordinator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Coordinator {
     pub fn new() -> Self {
         Self {
@@ -88,7 +94,7 @@ impl Coordinator {
     pub async fn create_new_agent(&mut self, username: &str) -> Result<(AgentId, AgentKey), Error> {
         let id = self.next_agent_id();
 
-        if self.agents.iter().find(|a| a.username == username).is_some() {
+        if self.agents.iter().any(|a| a.username == username) {
             return Err(Error::AgentAlreadyExistsWithUsername(username.to_string()));
         }
 
@@ -173,11 +179,7 @@ impl Coordinator {
     }
 
     fn get_agent_key(&self, agent_id: AgentId) -> Option<AgentKey> {
-        if let Some(agent) = self.agents.iter().find(|a| a.id == agent_id) {
-            Some(agent.key)
-        } else {
-            None
-        }
+        self.agents.iter().find(|a| a.id == agent_id).map(|agent| agent.key)
     }
 
     async fn remove_lobby(&mut self, lobby_id: LobbyId) -> Result<(), Error> {
@@ -293,7 +295,7 @@ impl Coordinator {
 
         let lobby = self.try_get_lobby_mut(lobby_id)?;
 
-        if lobby.contains_agent(agent_id) == false {
+        if !lobby.contains_agent(agent_id) {
             return Err(Error::AgentNotInCorrectLobby(agent_id));
         }
 
@@ -324,12 +326,12 @@ impl Coordinator {
     }
 
     /// starting the game sends each agent details on how to connect to the game server,
-    pub async fn start_game(&mut self, agent_key: AgentKey, lobby_id: LobbyId) -> Result<Runner, Error> {
+    pub async fn start_game(&mut self, _agent_key: AgentKey, lobby_id: LobbyId) -> Result<Runner, Error> {
         let lobby = self.try_get_lobby(lobby_id)?;
 
         let agent_keys = lobby.agent_ids.iter().map(|a_id| (*a_id, self.agents.iter().find(|a| a.id == *a_id).unwrap().key)).collect();
 
-        let runner = match Runner::from_lobby(&lobby, agent_keys).await {
+        let runner = match Runner::from_lobby(lobby, agent_keys).await {
             Ok(runner) => runner,
             Err(err) => return Err(Error::CannotRunError(err))
         };
@@ -345,8 +347,8 @@ mod tests {
     use tokio::task::{JoinHandle};
     use tokio::time::sleep;
     use crate::coordinator::{Coordinator, Error};
-    use crate::{AgentId, AgentKey, LobbyEvent};
-    use crate::runner::Runner;
+    use crate::{LobbyEvent};
+    
 
     fn expect_events(mut rx: Receiver<LobbyEvent>, expected_events: Vec<LobbyEvent>) -> JoinHandle<()> {
         tokio::spawn(async move {
@@ -403,7 +405,7 @@ mod tests {
 
         coordinator.whisper(jim_agent_key, pam_agent_id, "Hello Pam".to_string()).await.unwrap();
 
-        let dwight_rx = coordinator.lobby_listen(pam_agent_key, lobby_id).unwrap();
+        let _dwight_rx = coordinator.lobby_listen(pam_agent_key, lobby_id).unwrap();
         coordinator.join_lobby(dwight_agent_key, lobby_id).await.unwrap();
 
         coordinator.whisper(pam_agent_key, jim_agent_id, "Hello Jim".to_string()).await.unwrap();
@@ -514,7 +516,7 @@ mod tests {
         let (_, agent_key) = coordinator.create_new_agent("Denis").await.unwrap();
         let lobby_id_1 = coordinator.create_lobby_with_host(agent_key, "Lobby").await.unwrap();
 
-        let (_, agent_2_key) = coordinator.create_new_agent("Greg").await.unwrap();
+        let (_, _agent_2_key) = coordinator.create_new_agent("Greg").await.unwrap();
         let lobby_id_2 = coordinator.create_lobby_with_host(agent_key, "Lobby").await.unwrap();
 
         let (_, agent_3_key) = coordinator.create_new_agent("Evil").await.unwrap();
@@ -549,10 +551,10 @@ mod tests {
         // expect error since agents are not listening
         assert!(coordinator.start_game(agent_1_key, lobby_id).await.is_err());
 
-        let rx_1 = coordinator.lobby_listen(agent_1_key, lobby_id).unwrap();
-        let rx_2 = coordinator.lobby_listen(agent_2_key, lobby_id).unwrap();
+        let _rx_1 = coordinator.lobby_listen(agent_1_key, lobby_id).unwrap();
+        let _rx_2 = coordinator.lobby_listen(agent_2_key, lobby_id).unwrap();
 
-        let runner = match coordinator.start_game(agent_1_key, lobby_id).await {
+        let _runner = match coordinator.start_game(agent_1_key, lobby_id).await {
             Ok(runner) => runner,
             Err(err) => {
                 panic!("{}", err)

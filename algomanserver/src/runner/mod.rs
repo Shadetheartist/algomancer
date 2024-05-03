@@ -147,16 +147,16 @@ impl Runner {
                 client_key: *migration_keys.get(agent_key).expect("a migration key for this agent")
             };
 
-            match lobby.send_event(LobbyEvent::Migrate(agent_id.clone(), info)).await {
+            match lobby.send_event(LobbyEvent::Migrate(*agent_id, info)).await {
                 Ok(_) => {}
                 Err(err) => {
-                    return Err(Error::CouldNotMigrate(agent_id.clone(), Box::new(err)));
+                    return Err(Error::CouldNotMigrate(*agent_id, Box::new(err)));
                 }
             }
         }
 
         let migration_state = MigrationState {
-            migration_keys: migration_keys,
+            migration_keys,
             clients: Default::default()
         };
 
