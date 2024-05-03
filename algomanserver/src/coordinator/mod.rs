@@ -20,7 +20,7 @@ pub struct Coordinator {
 
 #[derive(Debug)]
 pub enum Error {
-    AgentAlreadyExistsWithUsername,
+    AgentAlreadyExistsWithUsername(String),
     AgentDoesNotExist(AgentId),
     AgentDoesNotExistWithKey(AgentKey),
     LobbyDoesNotExist(LobbyId),
@@ -63,11 +63,11 @@ impl Display for Error {
             Error::SendEventError(err) => {
                 write!(f, "send error for event: {:?}", err)
             }
-            Error::AgentAlreadyExistsWithUsername => {
-                write!(f, "an agent already exists with this username")
+            Error::AgentAlreadyExistsWithUsername(username) => {
+                write!(f, "an agent already exists with the username '{username}'")
             }
             Error::LobbyIsFull(lobby_id) => {
-                write!(f, "the lobby {lobby_id} is full")
+                write!(f, "lobby {lobby_id} is full")
             }
         }
     }
@@ -89,7 +89,7 @@ impl Coordinator {
         let id = self.next_agent_id();
 
         if self.agents.iter().find(|a| a.username == username).is_some() {
-            return Err(Error::AgentAlreadyExistsWithUsername);
+            return Err(Error::AgentAlreadyExistsWithUsername(username.to_string()));
         }
 
         let agent = Agent::new(id, username.to_string());
@@ -105,15 +105,9 @@ impl Coordinator {
     pub async fn create_lobby_with_host(&mut self, host_agent_key: AgentKey, name: &str) -> Result<LobbyId, Error> {
         let _ = self.leave_current_lobby(host_agent_key);
 
-        let host_agent_id = match self.get_agent_id_by_key(host_agent_key) {
-            Ok(agent_id) => agent_id,
-            Err(e) => return Err(e)
-        };
+        let host_agent_id = self.get_agent_id_by_key(host_agent_key)?;
 
-        let agent = match self.get_agent_by_id(host_agent_id) {
-            Ok(agent) => agent,
-            Err(e) => return Err(e)
-        };
+        let agent = self.get_agent_by_id(host_agent_id)?;
 
         let options = GameOptions {
             seed: AlgomancerRngSeed::from([0; 16]),
@@ -140,33 +134,22 @@ impl Coordinator {
     }
 
     pub async fn leave_current_lobby(&mut self, leaver_agent_key: AgentKey) -> Result<(), Error> {
-        let leaver_agent_id = match self.get_agent_id_by_key(leaver_agent_key) {
-            Ok(agent_id) => agent_id,
-            Err(e) => return Err(e)
-        };
+        let leaver_agent_id = self.get_agent_id_by_key(leaver_agent_key)?;
 
-        if self.get_agent(leaver_agent_id).is_none() {
-            return Err(Error::AgentDoesNotExist(leaver_agent_id));
-        }
+        // unused result because we use this method to return an error if the agent doesn't exist
+        let _ = self.try_get_agent(leaver_agent_id)?;
 
         // remove lobby if it's empty after the agent leaves, must be done after the mutable borrow is over
-        let mut remove_lobby: Option<LobbyId> = None;
+        let mut lobby_to_remove: Option<LobbyId> = None;
 
         if let Some(current_lobby) = self.get_current_lobby_mut(leaver_agent_id) {
-            let agent_idx = current_lobby.agent_ids
-                .iter()
-                .enumerate()
-                .find(|(_, agent_id)| **agent_id == leaver_agent_id)
-                .unwrap_or_else(|| panic!("a controller with an agent with id {:?}", leaver_agent_id)).0;
+            current_lobby.remove_agent_by_id(leaver_agent_id);
 
-            current_lobby.agent_ids.remove(agent_idx);
-            current_lobby.event_sender.remove(&leaver_agent_id);
-
-            if current_lobby.agent_ids.is_empty() {
+            if current_lobby.is_empty() {
                 // don't need to send any events here as the lobby only had the one player and the lobby is about to close
 
                 // if the lobby is empty, remove the lobby (after borrow is over)
-                remove_lobby = Some(current_lobby.id);
+                lobby_to_remove = Some(current_lobby.id);
             } else {
                 current_lobby.send_event(LobbyEvent::AgentLeft(leaver_agent_id)).await.unwrap();
 
@@ -181,7 +164,7 @@ impl Coordinator {
             return Err(Error::AgentNotInAnyLobby(leaver_agent_id));
         }
 
-        if let Some(lobby_id) = remove_lobby {
+        if let Some(lobby_id) = lobby_to_remove {
             let lobby_idx = self.lobbies.iter().enumerate().find(|(_, l)| l.id == lobby_id).expect("a lobby").0;
             self.lobbies.remove(lobby_idx);
         }
@@ -199,11 +182,7 @@ impl Coordinator {
 
     async fn remove_lobby(&mut self, lobby_id: LobbyId) -> Result<(), Error> {
         let agent_keys_in_lobby: Vec<AgentKey> = {
-            let lobby = match self.get_lobby(lobby_id) {
-                Some(lobby) => lobby,
-                None => return Err(Error::LobbyDoesNotExist(lobby_id)),
-            };
-
+            let lobby = self.try_get_lobby(lobby_id)?;
             lobby.agent_ids.iter().map(|a_id| self.get_agent_key(*a_id).expect("an agent")).collect()
         };
 
@@ -217,56 +196,57 @@ impl Coordinator {
     }
 
     pub async fn join_lobby(&mut self, agent_key: AgentKey, lobby_id: LobbyId) -> Result<(), Error> {
-        let agent_id = match self.get_agent_id_by_key(agent_key) {
-            Ok(agent_id) => agent_id,
-            Err(e) => return Err(e)
-        };
+        let agent_id = self.get_agent_id_by_key(agent_key)?;
 
-        {
-            let lobby = match self.get_lobby_mut(lobby_id) {
-                Some(lobby) => lobby,
-                None => return Err(Error::LobbyDoesNotExist(lobby_id)),
-            };
+        let lobby = self.try_get_lobby_mut(lobby_id)?;
 
-            if lobby.agent_ids.len() == lobby.capacity as usize {
-                return Err(Error::LobbyIsFull(lobby_id));
-            }
+        if lobby.is_full() {
+            return Err(Error::LobbyIsFull(lobby_id));
+        }
 
-            // player is already in the lobby
-            if lobby.agent_ids.contains(&agent_id) {
-                return Err(Error::AgentAlreadyInLobby(agent_id, lobby_id));
+        if lobby.contains_agent(agent_id) {
+            return Err(Error::AgentAlreadyInLobby(agent_id, lobby_id));
+        }
+
+        if let Err(err) = self.leave_current_lobby(agent_key).await {
+            // if the error is because the agent isn't in any lobby, that's completely alright
+            if let Error::AgentNotInAnyLobby(_) = err {} else {
+                return Err(err);
             }
         }
 
-        match self.leave_current_lobby(agent_key).await {
-            Ok(_) => {}
-            Err(err) => {
-                if let Error::AgentNotInAnyLobby(_) = err {} else {
-                    return Err(err);
-                }
-            }
-        }
+        // borrow lobby again
+        let lobby = self.try_get_lobby_mut(lobby_id).expect("a lobby");
 
-        let lobby = self.get_lobby_mut(lobby_id).expect("a lobby");
-
-        lobby.agent_ids.push(agent_id);
+        lobby.add_agent_by_id(agent_id);
 
         lobby.send_event(LobbyEvent::AgentJoined(agent_id)).await.unwrap();
 
         Ok(())
     }
 
-
-    pub fn get_agent(&self, agent_id: AgentId) -> Option<&Agent> {
-        self.agents.iter().find(|a| a.id == agent_id)
+    pub fn try_get_agent(&self, agent_id: AgentId) -> Result<&Agent, Error> {
+        if let Some(agent) = self.agents.iter().find(|a| a.id == agent_id) {
+            Ok(agent)
+        } else {
+            Err(Error::AgentDoesNotExist(agent_id))
+        }
     }
 
-    pub fn get_lobby(&self, lobby_id: LobbyId) -> Option<&Lobby> {
-        self.lobbies.iter().find(|l| l.id == lobby_id)
+    pub fn try_get_lobby(&self, lobby_id: LobbyId) -> Result<&Lobby, Error> {
+        if let Some(lobby) = self.lobbies.iter().find(|l| l.id == lobby_id) {
+            Ok(lobby)
+        } else {
+            Err(Error::LobbyDoesNotExist(lobby_id))
+        }
     }
 
-    pub fn get_lobby_mut(&mut self, lobby_id: LobbyId) -> Option<&mut Lobby> {
-        self.lobbies.iter_mut().find(|l| l.id == lobby_id)
+    pub fn try_get_lobby_mut(&mut self, lobby_id: LobbyId) -> Result<&mut Lobby, Error> {
+        if let Some(lobby) = self.lobbies.iter_mut().find(|l| l.id == lobby_id) {
+            Ok(lobby)
+        } else {
+            Err(Error::LobbyDoesNotExist(lobby_id))
+        }
     }
 
     pub fn get_current_lobby_mut(&mut self, agent_id: AgentId) -> Option<&mut Lobby> {
@@ -309,17 +289,11 @@ impl Coordinator {
     }
 
     pub fn lobby_listen(&mut self, agent_key: AgentKey, lobby_id: LobbyId) -> Result<tokio::sync::mpsc::Receiver<LobbyEvent>, Error> {
-        let agent_id = match self.get_agent_id_by_key(agent_key) {
-            Ok(agent_id) => agent_id,
-            Err(e) => return Err(e)
-        };
+        let agent_id = self.get_agent_id_by_key(agent_key)?;
 
-        let lobby = match self.get_lobby_mut(lobby_id) {
-            Some(lobby) => lobby,
-            None => return Err(Error::LobbyDoesNotExist(lobby_id)),
-        };
+        let lobby = self.try_get_lobby_mut(lobby_id)?;
 
-        if lobby.agent_ids.contains(&agent_id) == false {
+        if lobby.contains_agent(agent_id) == false {
             return Err(Error::AgentNotInCorrectLobby(agent_id));
         }
 
@@ -331,10 +305,7 @@ impl Coordinator {
     }
 
     pub async fn whisper(&self, agent_key: AgentKey, target_agent_id: AgentId, content: String) -> Result<(), Error> {
-        let agent_id = match self.get_agent_id_by_key(agent_key) {
-            Ok(agent_id) => agent_id,
-            Err(e) => return Err(e)
-        };
+        let agent_id = self.get_agent_id_by_key(agent_key)?;
 
         let lobby_id = match self.lobbies.iter().find(|l| l.agent_ids.contains(&agent_id)) {
             None => {
@@ -343,7 +314,7 @@ impl Coordinator {
             Some(l) => l.id
         };
 
-        let lobby = self.get_lobby(lobby_id).expect("a lobby");
+        let lobby = self.try_get_lobby(lobby_id).expect("a lobby");
 
         let event = LobbyEvent::Whisper(agent_id, target_agent_id, content);
 
@@ -354,10 +325,7 @@ impl Coordinator {
 
     /// starting the game sends each agent details on how to connect to the game server,
     pub async fn start_game(&mut self, agent_key: AgentKey, lobby_id: LobbyId) -> Result<Runner, Error> {
-        let lobby = match self.get_lobby(lobby_id) {
-            Some(lobby) => lobby,
-            None => return Err(Error::LobbyDoesNotExist(lobby_id)),
-        };
+        let lobby = self.try_get_lobby(lobby_id)?;
 
         let agent_keys = lobby.agent_ids.iter().map(|a_id| (*a_id, self.agents.iter().find(|a| a.id == *a_id).unwrap().key)).collect();
 
@@ -604,7 +572,7 @@ mod tests {
             }
             Err(err) => {
                 match err {
-                    Error::AgentAlreadyExistsWithUsername => {}
+                    Error::AgentAlreadyExistsWithUsername(_) => {}
                     _ => {panic!("Should have been an error with variant AgentAlreadyExistsWithUsername")}
                 }
             }

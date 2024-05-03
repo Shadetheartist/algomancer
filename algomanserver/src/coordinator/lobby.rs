@@ -40,6 +40,35 @@ pub enum LobbyEvent {
 
 
 impl Lobby {
+
+    pub fn contains_agent(&self, agent_id: AgentId) -> bool {
+        self.agent_ids.contains(&agent_id)
+    }
+
+    pub fn is_full(&self) -> bool {
+        self.agent_ids.len() == self.capacity as usize
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.agent_ids.is_empty()
+    }
+
+    pub fn add_agent_by_id(&mut self, agent_id: AgentId) {
+        self.agent_ids.push(agent_id);
+    }
+
+    pub fn remove_agent_by_id(&mut self, remove_agent_id: AgentId) {
+        let agent_idx = self.agent_ids
+            .iter()
+            .enumerate()
+            .find(|(_, a_id)| **a_id == remove_agent_id);
+
+        if let Some(agent_idx) = agent_idx {
+            self.agent_ids.remove(agent_idx.0);
+            self.event_sender.remove(&remove_agent_id);
+        }
+    }
+
     pub async fn send_event(&self, lobby_event: LobbyEvent) -> Result<(), Error>{
         match lobby_event {
             // publicly broadcasted events

@@ -21,8 +21,8 @@ impl LobbyModel {
             name: lobby.name.clone(),
             capacity: lobby.capacity,
             mode: lobby.game_options.game_mode.to_string(),
-            agents: lobby.agent_ids.iter().filter(|a| coordinator.get_agent(**a).is_some()).map(|a| {
-                let agent = coordinator.get_agent(*a).expect("missing agents already should be filtered out");
+            agents: lobby.agent_ids.iter().filter(|a| coordinator.try_get_agent(**a).is_ok()).map(|a| {
+                let agent = coordinator.try_get_agent(*a).expect("missing agents already should be filtered out");
 
                 AgentModel {
                     id: agent.id.to_string(),

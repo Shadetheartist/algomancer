@@ -225,7 +225,7 @@ pub async fn ws_lobby_listen(
                         LobbyEvent::AgentJoined(agent_id) => {
                             let mut coordinator = coordinator.read().await;
                             let agent: AgentModel = coordinator.get_agent_by_key(agent_key).expect("an agent").into();
-                            let lobby = LobbyModel::from_coordinator_lobby(coordinator.deref(), coordinator.get_lobby(lobby_id).expect("a lobby"));
+                            let lobby = LobbyModel::from_coordinator_lobby(coordinator.deref(), coordinator.try_get_lobby(lobby_id).expect("a lobby"));
                             ServerEvent::AgentJoinedLobby {
                                 agent: agent,
                                 lobby: lobby,

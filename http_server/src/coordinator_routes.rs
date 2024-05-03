@@ -68,14 +68,11 @@ pub async fn lobby_create(ws: WebSocket, coordinator: &State<Arc<RwLock<Coordina
 
             {
                 let mut coordinator = coordinator.write().await;
-                if let Some(lobby) = coordinator.get_lobby(lobby_id) {
-                    let lobby_model = LobbyModel::from_coordinator_lobby(coordinator.deref(), lobby);
-                    if let Err(err) = ws_send_json(&mut tx, &&WsMessage::ServerResponse {value: ServerResponse::LobbyCreated { lobby: lobby_model }}).await {
-                        ws_close_with_error(tx, format!("failed to send json {}", err)).await;
-                        return Ok(());
-                    }
-                } else {
-                    panic!("lobby not found?")
+                let lobby = coordinator.try_get_lobby(lobby_id).expect("a lobby");
+                let lobby_model = LobbyModel::from_coordinator_lobby(coordinator.deref(), lobby);
+                if let Err(err) = ws_send_json(&mut tx, &&WsMessage::ServerResponse {value: ServerResponse::LobbyCreated { lobby: lobby_model }}).await {
+                    ws_close_with_error(tx, format!("failed to send json {}", err)).await;
+                    return Ok(());
                 }
             }
 
@@ -130,7 +127,7 @@ pub async fn lobby_join(ws: WebSocket, coordinator: &State<Arc<RwLock<Coordinato
             let message = {
                 let mut coordinator = coordinator.read().await;
                 let agent: AgentModel = coordinator.get_agent_by_key(agent_key).expect("an agent").into();
-                let lobby = LobbyModel::from_coordinator_lobby(coordinator.deref(), coordinator.get_lobby(lobby_id).expect("a lobby"));
+                let lobby = LobbyModel::from_coordinator_lobby(coordinator.deref(), coordinator.try_get_lobby(lobby_id).expect("a lobby"));
                 WsMessage::ServerEvent {
                     value: AgentJoinedLobby {
                         agent: agent,

@@ -138,7 +138,7 @@ impl algomancer::coordinator_server::Coordinator for CoordinatorService {
                 lobby_name: "".to_string(),
                 agents: l.agent_ids.iter().map(|a| AgentPublicInfo {
                     agent_id: a.0,
-                    username: coordinator.get_agent(*a).unwrap().username.to_owned()
+                    username: coordinator.try_get_agent(*a).unwrap().username.to_owned()
                 }).collect(),
             }).collect()
         };
