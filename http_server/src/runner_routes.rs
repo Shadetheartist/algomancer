@@ -1,25 +1,25 @@
-use std::num::ParseIntError;
-use std::ops::Deref;
+
+
 use std::sync::Arc;
-use rocket::serde::json::Json;
+
 use rocket::State;
 use tokio::sync::RwLock;
-use ws::{Message, WebSocket};
-use algomanserver::{AgentId, AgentKey, Coordinator, coordinator, LobbyId, RunnerId};
-use crate::{Error, models};
-use crate::models::{AgentModel, AgentKeyRequest, LobbyModel, RegistrationResponse};
-use crate::ws::{SendJsonError, ws_close_with_error, ws_lobby_listen, ws_send_json, ws_send_text, ws_request_response, ws_request_agent_key, RequestResponseError};
-use rocket::futures::{SinkExt, StreamExt};
+use ws::{WebSocket};
+use algomanserver::{RunnerId};
+
+
+use crate::ws::{ws_close_with_error, ws_request_response};
+use rocket::futures::{StreamExt};
 use algomanserver::client::ClientKey;
-use crate::messages::ServerEvent::AgentJoinedLobby;
-use crate::messages::{WsMessage, ServerRequest, ServerResponse, ClientResponse};
+
+use crate::messages::{ServerRequest, ClientResponse};
 
 
 #[get("/connect")]
 pub async fn runner_connect(ws: WebSocket, runners: &State<Arc<RwLock<Vec<algomanserver::Runner>>>>) -> ws::Channel<'static> {
     let runners = runners.inner().clone();
 
-    ws.channel(move |mut stream| {
+    ws.channel(move |stream| {
         Box::pin(async move {
             println!("someone connected");
             let (mut tx, mut rx) = stream.split();

@@ -1,5 +1,5 @@
 use rocket::serde::{Deserialize, Serialize};
-use algomanserver::{AgentId, AgentKey};
+use algomanserver::{AgentId};
 
 #[derive(Serialize, Deserialize)]
 pub struct RegistrationRequest {

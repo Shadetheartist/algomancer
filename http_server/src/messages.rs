@@ -1,6 +1,6 @@
 use rocket::serde::Serialize;
 use rocket::serde::Deserialize;
-use algomanserver::runner::MigrationInfo;
+
 use crate::models::{AgentModel, LobbyModel, MigrationInfoModel};
 
 #[derive(Serialize, Deserialize)]

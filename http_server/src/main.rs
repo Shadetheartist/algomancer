@@ -10,11 +10,11 @@ extern crate rocket;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use algomanserver::Coordinator;
-use rand::RngCore;
 
-use rocket::response::status;
 
-use rocket::futures::{SinkExt, StreamExt};
+
+
+
 
 #[derive(Debug, Responder)]
 enum Error {
@@ -101,7 +101,7 @@ impl From<algomanserver::coordinator::Error> for Error {
 async fn rocket() -> _ {
 
 
-    let mut coordinator = Coordinator::new();
+    let coordinator = Coordinator::new();
     let coordinator_rwl = RwLock::new(coordinator);
     let coordinator_arc: Arc<RwLock<Coordinator>> = Arc::new(coordinator_rwl);
 
@@ -112,13 +112,13 @@ async fn rocket() -> _ {
         // simulate some state to test
         let mut a_id = 0;
         for i in 0..100 {
-            let (agent_id, agent_key) = coordinator.create_new_agent(format!("Agent {a_id}").as_str()).await.unwrap();
+            let (_agent_id, agent_key) = coordinator.create_new_agent(format!("Agent {a_id}").as_str()).await.unwrap();
             a_id += 1;
 
             let lobby_id = coordinator.create_lobby_with_host(agent_key, format!("Lobby {i}").as_str()).await.unwrap();
 
-            for a in 1..=(rand::random::<u64>() % 4) {
-                let (agent_id, agent_key) = coordinator.create_new_agent(format!("Agent {}", a_id).as_str()).await.unwrap();
+            for _a in 1..=(rand::random::<u64>() % 4) {
+                let (_agent_id, agent_key) = coordinator.create_new_agent(format!("Agent {}", a_id).as_str()).await.unwrap();
                 a_id += 1;
 
                 coordinator.join_lobby(agent_key, lobby_id).await.unwrap()

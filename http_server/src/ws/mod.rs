@@ -9,8 +9,8 @@ use serde::Serialize;
 use tokio::sync::RwLock;
 use ws::frame::CloseFrame;
 use ws::Message;
-use algomanserver::{AgentId, AgentKey, Coordinator, LobbyEvent, LobbyId, Runner};
-use crate::messages::{ServerEvent, WsMessage, ServerRequest, ServerResponse, ClientResponse, ClientRequest};
+use algomanserver::{AgentKey, Coordinator, LobbyEvent, LobbyId, Runner};
+use crate::messages::{ServerEvent, WsMessage, ServerRequest, ClientResponse, ClientRequest};
 use crate::models::{AgentModel, LobbyModel, MigrationInfoModel};
 
 
@@ -148,7 +148,7 @@ pub async fn ws_close_with_error(mut tx: TX, err_msg: String) {
 }
 
 
-async fn respond_to_client_request(text: &str, tx: &mut TX, runners: &mut Vec<Runner>, coordinator: &mut Coordinator) -> Result<(), RequestResponseError> {
+async fn respond_to_client_request(text: &str, _tx: &mut TX, runners: &mut Vec<Runner>, coordinator: &mut Coordinator) -> Result<(), RequestResponseError> {
     let request = match serde_json::from_str::<WsMessage>(text) {
         Ok(value) => {
             match value {
@@ -190,12 +190,12 @@ pub async fn ws_lobby_listen(
     coordinator: Arc<RwLock<Coordinator>>,
     agent_key: AgentKey,
     lobby_id: LobbyId,
-    mut tx: TX,
+    tx: TX,
     mut rx: RX)
 {
     let mut lobby_rx = {
         let mut coordinator = coordinator.write().await;
-        match coordinator.lobby_listen(agent_key, lobby_id.into()) {
+        match coordinator.lobby_listen(agent_key, lobby_id) {
             Ok(lobby_rx) => lobby_rx,
             Err(err) => {
                 ws_close_with_error(tx, format!("{}", err)).await;
@@ -222,13 +222,13 @@ pub async fn ws_lobby_listen(
                                 client_key: migration_info.client_key.to_string(),
                             },
                         },
-                        LobbyEvent::AgentJoined(agent_id) => {
-                            let mut coordinator = coordinator.read().await;
+                        LobbyEvent::AgentJoined(_agent_id) => {
+                            let coordinator = coordinator.read().await;
                             let agent: AgentModel = coordinator.get_agent_by_key(agent_key).expect("an agent").into();
                             let lobby = LobbyModel::from_coordinator_lobby(coordinator.deref(), coordinator.try_get_lobby(lobby_id).expect("a lobby"));
                             ServerEvent::AgentJoinedLobby {
-                                agent: agent,
-                                lobby: lobby,
+                                agent,
+                                lobby,
                             }
                         }
                         LobbyEvent::AgentLeft(agent_id) => ServerEvent::AgentLeftLobby {
