@@ -86,7 +86,7 @@ impl From<algomanserver::coordinator::Error> for Error {
             algomanserver::coordinator::Error::SendEventError(_) => {
                 Error::AgentNotInCorrectLobby(value.to_string())
             }
-            algomanserver::coordinator::Error::AgentAlreadyExistsWithUsername => {
+            algomanserver::coordinator::Error::AgentAlreadyExistsWithUsername(_) => {
                 Error::DuplicateUsername(value.to_string())
             }
             algomanserver::coordinator::Error::LobbyIsFull(_) => {
