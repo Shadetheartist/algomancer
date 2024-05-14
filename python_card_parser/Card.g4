@@ -106,7 +106,7 @@ action:
 
 
 action_buff:
-    'target' buff_target=('unit'|'ally') 'gains' stat derived_quantity='for each of your units'? ('and' keyword)? 'until regroup'
+    'target' buff_target=('unit'|'ally') 'gains' stat derived_quantity='for each of your units'? ('and' evergreen_keyword)? 'until regroup'
     ;
 
 
@@ -134,9 +134,9 @@ action_put_counter: 'put' amount_item counter 'on' counter_target;
 
 action_stat_change:
 	('target' ('unit' | 'ally') 'gains' | 'your units gain') (
-		stat 'and' keyword
+		stat 'and' evergreen_keyword
 		| stat
-		| keyword
+		| evergreen_keyword
 	) region_derived_quantity? lifetime;
 
 
@@ -153,7 +153,7 @@ counter: stat 'counter';
 stat: power=signed_int '/' defence=signed_int;
 
 
-keyword: 'flying' | 'piercing';
+evergreen_keyword: 'flying' | 'piercing';
 
 
 mod: graft | augment;
@@ -162,8 +162,7 @@ mod: graft | augment;
 graft: '[graft' limit=amount? ']';
 
 
-augment:
-    '[augment]'limit='[once]'?;
+augment: '[augment]'limit='[once]'?;
 
 
 affinity: '[' ('r' | 'b' | 'e' | 'g' | 'm') ']';

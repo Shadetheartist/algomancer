@@ -129,8 +129,8 @@ class CardVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by CardParser#keyword.
-    def visitKeyword(self, ctx:CardParser.KeywordContext):
+    # Visit a parse tree produced by CardParser#evergreen_keyword.
+    def visitEvergreen_keyword(self, ctx:CardParser.Evergreen_keywordContext):
         return self.visitChildren(ctx)
 
 

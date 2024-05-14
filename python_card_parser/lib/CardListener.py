@@ -224,12 +224,12 @@ class CardListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by CardParser#keyword.
-    def enterKeyword(self, ctx:CardParser.KeywordContext):
+    # Enter a parse tree produced by CardParser#evergreen_keyword.
+    def enterEvergreen_keyword(self, ctx:CardParser.Evergreen_keywordContext):
         pass
 
-    # Exit a parse tree produced by CardParser#keyword.
-    def exitKeyword(self, ctx:CardParser.KeywordContext):
+    # Exit a parse tree produced by CardParser#evergreen_keyword.
+    def exitEvergreen_keyword(self, ctx:CardParser.Evergreen_keywordContext):
         pass
 
 

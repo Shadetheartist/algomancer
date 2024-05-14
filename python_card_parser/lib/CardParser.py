@@ -206,7 +206,7 @@ class CardParser ( Parser ):
     RULE_lifetime = 19
     RULE_counter = 20
     RULE_stat = 21
-    RULE_keyword = 22
+    RULE_evergreen_keyword = 22
     RULE_mod = 23
     RULE_graft = 24
     RULE_augment = 25
@@ -221,8 +221,9 @@ class CardParser ( Parser ):
                    "you_event", "you_event_inner", "action", "action_buff", 
                    "action_deal_damage", "counter_target", "action_put_counter", 
                    "action_stat_change", "region_derived_quantity", "lifetime", 
-                   "counter", "stat", "keyword", "mod", "graft", "augment", 
-                   "affinity", "signed_int", "amount", "amount_item", "unit_derived_quantity" ]
+                   "counter", "stat", "evergreen_keyword", "mod", "graft", 
+                   "augment", "affinity", "signed_int", "amount", "amount_item", 
+                   "unit_derived_quantity" ]
 
     EOF = Token.EOF
     T__0=1
@@ -1427,8 +1428,8 @@ class CardParser ( Parser ):
             return self.getTypedRuleContext(CardParser.StatContext,0)
 
 
-        def keyword(self):
-            return self.getTypedRuleContext(CardParser.KeywordContext,0)
+        def evergreen_keyword(self):
+            return self.getTypedRuleContext(CardParser.Evergreen_keywordContext,0)
 
 
         def getRuleIndex(self):
@@ -1487,7 +1488,7 @@ class CardParser ( Parser ):
                 self.state = 180
                 self.match(CardParser.T__61)
                 self.state = 181
-                self.keyword()
+                self.evergreen_keyword()
 
 
             self.state = 184
@@ -1769,8 +1770,8 @@ class CardParser ( Parser ):
             return self.getTypedRuleContext(CardParser.StatContext,0)
 
 
-        def keyword(self):
-            return self.getTypedRuleContext(CardParser.KeywordContext,0)
+        def evergreen_keyword(self):
+            return self.getTypedRuleContext(CardParser.Evergreen_keywordContext,0)
 
 
         def region_derived_quantity(self):
@@ -1836,7 +1837,7 @@ class CardParser ( Parser ):
                 self.state = 223
                 self.match(CardParser.T__61)
                 self.state = 224
-                self.keyword()
+                self.evergreen_keyword()
                 pass
 
             elif la_ == 2:
@@ -1846,7 +1847,7 @@ class CardParser ( Parser ):
 
             elif la_ == 3:
                 self.state = 227
-                self.keyword()
+                self.evergreen_keyword()
                 pass
 
 
@@ -2083,7 +2084,7 @@ class CardParser ( Parser ):
         return localctx
 
 
-    class KeywordContext(ParserRuleContext):
+    class Evergreen_keywordContext(ParserRuleContext):
         __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -2092,29 +2093,29 @@ class CardParser ( Parser ):
 
 
         def getRuleIndex(self):
-            return CardParser.RULE_keyword
+            return CardParser.RULE_evergreen_keyword
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterKeyword" ):
-                listener.enterKeyword(self)
+            if hasattr( listener, "enterEvergreen_keyword" ):
+                listener.enterEvergreen_keyword(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitKeyword" ):
-                listener.exitKeyword(self)
+            if hasattr( listener, "exitEvergreen_keyword" ):
+                listener.exitEvergreen_keyword(self)
 
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitKeyword" ):
-                return visitor.visitKeyword(self)
+            if hasattr( visitor, "visitEvergreen_keyword" ):
+                return visitor.visitEvergreen_keyword(self)
             else:
                 return visitor.visitChildren(self)
 
 
 
 
-    def keyword(self):
+    def evergreen_keyword(self):
 
-        localctx = CardParser.KeywordContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 44, self.RULE_keyword)
+        localctx = CardParser.Evergreen_keywordContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 44, self.RULE_evergreen_keyword)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)

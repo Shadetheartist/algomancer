@@ -237,7 +237,7 @@ region_derived_quantity
 lifetime
 counter
 stat
-keyword
+evergreen_keyword
 mod
 graft
 augment

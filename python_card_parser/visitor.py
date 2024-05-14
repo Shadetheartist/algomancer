@@ -139,13 +139,13 @@ class VisitorInterp(CardVisitor):
         target = ctx.buff_target.text
         stat = self.visit(ctx.stat())
         keywords = []
-        if ctx.keyword():
-            keywords.append(self.visit(ctx.keyword()))
+        if ctx.evergreen_keyword():
+            keywords.append(self.visit(ctx.evergreen_keyword()))
 
         return ApplyBuffAction(target, stat, keywords)
 
 
-    def visitKeyword(self, ctx:CardParser.KeywordContext):
+    def visitEvergreen_keyword(self, ctx:CardParser.Evergreen_keywordContext):
         return ctx.getText()
 
 
