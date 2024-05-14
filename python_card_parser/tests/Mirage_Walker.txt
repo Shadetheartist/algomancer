@@ -1,0 +1,1 @@
+[Battle] Ambush  [4bb] {i}(Play me with the effect "Recall target ally, put me into their position in play."){/i} {/n}At the end of turn, if you took no actions during deployment,  [Switch1] Create a 3/3 unit.

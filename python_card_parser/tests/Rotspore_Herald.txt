@@ -1,0 +1,1 @@
+[Augment] Everything is {g}deadly. {i}(Any damage from a deadly source will kill a unit.)

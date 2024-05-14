@@ -1,0 +1,1 @@
+Erase me: Create a non-prismite resource, then activate it. Do this only during the mana step. {i}(This does not use one of your activations for turn.)

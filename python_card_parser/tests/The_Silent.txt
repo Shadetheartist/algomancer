@@ -1,0 +1,1 @@
+[Augment] Teams may only play one spell that isn't targeting me in each battle. {i}(Spells targeting me are unaffected by this.)

@@ -1,0 +1,1 @@
+When I attack or block, [Switch1] I deal damage to each player equal to the number of cards in their hand.

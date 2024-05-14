@@ -1,0 +1,1 @@
+[Switch1] Each opponent discards a /[unit {i1}or spell] if able. Otherwise, they reveal their hand.

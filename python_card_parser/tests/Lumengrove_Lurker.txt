@@ -1,0 +1,1 @@
+Afer combat, [Switch1] Recall up to one target unit with cost less than or equal to the number of units in my formation.

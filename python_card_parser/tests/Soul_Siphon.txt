@@ -1,0 +1,1 @@
+[Switch1] Create an X/X unit, where X is the life target player lost in this battle. {i}(Damage causes life loss.)

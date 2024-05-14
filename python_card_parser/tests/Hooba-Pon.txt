@@ -1,0 +1,1 @@
+[Augment] When I attack or block, you may play a unit from your hand into an open position in my formation. {i}(You still pay the cost.)

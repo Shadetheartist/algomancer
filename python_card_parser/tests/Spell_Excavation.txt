@@ -1,0 +1,1 @@
+You may play target spell from your bin until regroup. It gains {p}unstable until regroup. {i}(If it {/n}would enter a bin, erase it instead.)

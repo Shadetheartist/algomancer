@@ -1,0 +1,1 @@
+Negate all activated and triggered effects.

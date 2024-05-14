@@ -1,0 +1,1 @@
+Negate all other effects. For each nontoken spell negated this way, create a Fireball 1.

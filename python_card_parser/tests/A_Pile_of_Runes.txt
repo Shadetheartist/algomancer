@@ -1,0 +1,1 @@
+[Augment] When I despawn, create a Crystal X, where X is my defense.

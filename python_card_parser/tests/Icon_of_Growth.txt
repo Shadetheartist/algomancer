@@ -1,0 +1,1 @@
+When I spawn, create two 1/1 units. {/n}[Augment] When I despawn, delete all token allies.

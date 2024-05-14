@@ -1,0 +1,1 @@
+[Augment][once] Whenever another player plays a spell, you may exchange control of me for that spell. If you do, you may choose new targets for that spell.

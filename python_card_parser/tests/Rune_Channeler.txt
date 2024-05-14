@@ -1,0 +1,1 @@
+When you play a nontoken spell, [Switch1] I deal 2 damage to any target.

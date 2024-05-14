@@ -1,0 +1,1 @@
+I deal 2 damage to each of X target allies. For each ally damaged this way, distribute 2 damage among target opponent's units.

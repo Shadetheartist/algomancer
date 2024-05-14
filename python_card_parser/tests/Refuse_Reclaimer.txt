@@ -1,0 +1,1 @@
+[Augment] Whenever another unit dies, put a +1/+1 counter on me.

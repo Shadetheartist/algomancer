@@ -1,0 +1,1 @@
+[Augment][once]  [one]: Negate target effect targeting me. That effect's controller draws a card.

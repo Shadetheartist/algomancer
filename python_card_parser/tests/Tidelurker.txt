@@ -1,0 +1,1 @@
+When a player is dealt combat damage, {/n}[Switch1] Create a 2/2 unit.

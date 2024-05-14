@@ -1,0 +1,1 @@
+Delete target unit with base power 2 or less.

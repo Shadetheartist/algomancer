@@ -1,0 +1,1 @@
+[Augment] Whenever a unit token is created, put a -1/-1 counter on me. If you do, put +1/+1 counter on that token.

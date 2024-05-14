@@ -1,0 +1,1 @@
+[Augment] [once] When you play a nontoken spell, put X +1/+1 counters on me, where X is that spell's cost.

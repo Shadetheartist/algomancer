@@ -1,0 +1,1 @@
+[Augment] Whenever one or more -1/-1 counters are put on a unit, each opponent loses 1 life.

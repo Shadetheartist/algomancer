@@ -1,0 +1,1 @@
+[Switch1] Target unit gains -1/-1 until regroup for each card in your hand.

@@ -1,0 +1,1 @@
+[Switch1] Look at target player's hand. You may choose a card from it and recycle that card. If you do, that player draws a card.

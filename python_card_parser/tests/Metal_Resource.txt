@@ -1,0 +1,1 @@
+When I activate, if you have at least [m][m][m], create a Shard.

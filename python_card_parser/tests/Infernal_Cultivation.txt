@@ -1,0 +1,1 @@
+[Switch1] /[Sacrifice X units]: I deal X damage to any target.

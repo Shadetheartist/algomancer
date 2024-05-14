@@ -1,0 +1,1 @@
+When a player loses life during battle, {/n}[Switch1] Draw a card. {i}(Damage causes life loss.)

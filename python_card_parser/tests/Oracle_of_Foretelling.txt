@@ -1,0 +1,1 @@
+Glimpse 5 {i}(Reveal the top five cards of the deck and cache one. Until end of turn, you may play it as if it was in your hand, ignoring affinity. Recycle the rest.)

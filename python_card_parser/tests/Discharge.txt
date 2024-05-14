@@ -1,0 +1,1 @@
+[Switch1] /[Remove X +1/+1 counters from allies]: I deal X damage to target unit.

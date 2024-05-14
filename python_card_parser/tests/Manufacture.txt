@@ -1,0 +1,1 @@
+[Switch1] Create a Robot 3, a Robot 2 and a Robot 1.

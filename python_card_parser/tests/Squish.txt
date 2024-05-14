@@ -1,0 +1,1 @@
+[Switch1] Target ally deals damage equal to its defense to another target unit.

@@ -1,0 +1,1 @@
+Negate target effect. Its controller gains control of me.

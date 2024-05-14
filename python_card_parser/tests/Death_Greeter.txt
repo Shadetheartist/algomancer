@@ -1,0 +1,1 @@
+[Augment] Whenever you play a spell during battle, each player sacrifices a unit with cost less than or equal to the spell's cost.

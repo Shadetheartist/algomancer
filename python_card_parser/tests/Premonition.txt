@@ -1,0 +1,1 @@
+Glimpse X, where X is your [b].  {i}(Reveal the top X cards of the deck and cache one. Until end of turn, you may play it as if it was in your hand, ignoring affinity. Recycle the rest.)

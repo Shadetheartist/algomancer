@@ -1,0 +1,1 @@
+Negate target spell effect with cost less than or equal to the greatest amount of life lost by a player in this battle.

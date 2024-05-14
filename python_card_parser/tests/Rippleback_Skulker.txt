@@ -1,0 +1,1 @@
+[Augment] Whenever my column deals combat damage to a player, put target card from that player's bin into your hand.

@@ -1,0 +1,1 @@
+[Switch1] Glimpse 1 {i}(Reveal the top card of the deck {/n}and cache it. Until end of turn, you may play it {/n}as if it was in your hand, ignoring affinity.)

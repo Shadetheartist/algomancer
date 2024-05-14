@@ -1,0 +1,1 @@
+Target unit loses all attributes and abilities until regroup. Erase all of its mods and negate all of its effects.

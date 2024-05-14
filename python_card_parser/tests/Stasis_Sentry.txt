@@ -1,0 +1,1 @@
+[Augment] Spells with base cost  [three] or less have a base cost of  [three] to play during battle.

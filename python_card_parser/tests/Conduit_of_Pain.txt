@@ -1,0 +1,1 @@
+[Augment] If an allied source would deal noncombat damage, it deals that much damage plus 1 instead.

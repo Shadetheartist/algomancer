@@ -1,0 +1,1 @@
+[Augment] Sacrifice me: I deal 3 damage to any target. Activate this ability only if I have an adjacent ally.

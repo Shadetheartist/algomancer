@@ -1,0 +1,1 @@
+When another nontoken ally spawns, {/n}[Switch1] Draw a card.

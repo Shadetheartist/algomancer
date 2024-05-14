@@ -1,0 +1,1 @@
+[Augment] Whenever I am dealt damage, I deal that much damage to you.

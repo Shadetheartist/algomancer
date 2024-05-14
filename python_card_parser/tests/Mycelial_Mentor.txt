@@ -1,0 +1,1 @@
+When you create a token, [Switch1] Target ally gains +3/+3 until regroup.

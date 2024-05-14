@@ -1,0 +1,1 @@
+[Augment] If combat damage would be dealt to you, that damage is dealt to me instead.

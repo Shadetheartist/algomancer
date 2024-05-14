@@ -1,0 +1,1 @@
+[Augment][once] When I am dealt damage, create that many 1/1 units.

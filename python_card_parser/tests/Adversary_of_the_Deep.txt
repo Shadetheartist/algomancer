@@ -1,0 +1,1 @@
+[Augment] Whenever a player loses life, put that many +1/+1 counters on me. {i}(Damage causes life loss.)

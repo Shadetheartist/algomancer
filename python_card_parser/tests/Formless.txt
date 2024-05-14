@@ -1,0 +1,1 @@
+When I attack or block,  [Switch] Target unit be- {/n}comes a base 4/4 and loses all attributes until regroup. {i}(This removes attributes from its column.)

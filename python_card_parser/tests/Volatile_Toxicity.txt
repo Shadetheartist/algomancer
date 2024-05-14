@@ -1,0 +1,1 @@
+[Switch] /[Sacrifice a unit]: Create a Poison X and a Fireball X, where X is the defense of the sacrificed unit.

@@ -1,0 +1,1 @@
+Whenever a nontoken enemy dies, {/n}  [Switch] Create a 1/1 unit.

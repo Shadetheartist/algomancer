@@ -1,0 +1,1 @@
+[Augment] Whenever an ally becomes the target of an enemy spell, create a 1/1 unit.

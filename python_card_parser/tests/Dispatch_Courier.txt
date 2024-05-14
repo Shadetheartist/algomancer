@@ -1,0 +1,1 @@
+[Augment] Each turn, you may play a unit during the mana step as if it had  [Haste].
