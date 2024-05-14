@@ -1,0 +1,13 @@
+[augment] whenever another ally spawns, put a +1/+1 counter on me.
+
+[augment] whenever another unit dies, put a +1/+1 counter on me.
+
+[augment] whenever you play a spell, put a +1/+1 counter on me.
+
+when i am dealt damage,  [graft1] put a +1/+1 counter on me.
+
+target unit gains -2/-2 and flying until regroup.
+
+put a -1/-1 counter on target unit.
+
+[augment] when i die, put a -1/-1 counter on each unit.
