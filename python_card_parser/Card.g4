@@ -1,11 +1,14 @@
 grammar Card;
 
+
 prog: effect+ EOF;
+
 
 effect
 	: mod? trigger ',' mod? action '.'
 	| action '.'
 	;
+
 
 trigger
     : trigger_word=('whenever' | 'when') event #eventTrigger
@@ -13,6 +16,20 @@ trigger
 	| 'at the end of the turn' #endOfTurnTrigger
 	;
 
+
+event
+    : unit_event
+    | board_event
+    | you_event
+    ;
+
+
+unit_event
+    : 'i' 'am'? unit_event_inner
+	| 'a player plays a nonunit spell targeting me'
+	| 'you play me'
+	| 'my column deals combat damage'
+	;
 
 unit_event_inner
     : 'dealt damage'
@@ -27,20 +44,14 @@ unit_event_inner
     | 'become targeted'
     ;
 
-unit_event
-    : 'i' 'am'? unit_event_inner
-	| 'a player plays a nonunit spell targeting me'
-	| 'you play me'
-	| 'my column deals combat damage'
+
+board_event:
+	subject='a' inner=board_event_inner
+	| subject='another' inner=board_event_inner
 	;
 
 board_event_inner
     : type='unit token' event_='is created'
-    | type='player' event_='loses life'
-    | type='player' event_='loses life during battle'
-    | type='player' event_='loses is dealt combat damage'
-    | type='player' event_='plays a spell'
-    | type='player' event_='plays their first spell in this battle'
     | type='nontoken unit' event_='dies'
     | type='nontoken enemy' event_='dies'
     | type='nontoken ally' event_='spawns'
@@ -48,31 +59,43 @@ board_event_inner
     | type='ally' event_='spawns'
     | type='ally' event_='spawns during battle'
     | type='card' event_='enters a player\'s hand during battle'
-		;
-
-board_event:
-	subject='a' inner=board_event_inner
-	| subject='another' inner=board_event_inner
 	;
 
-player_event:
-	player='you' player_action=(
-		'play a spell'
-		| 'play a spell during battle'
-		| 'put a counter on an enemy'
-		| 'create a token'
-		| 'sacrifice a unit'
-		| 'play a nontoken spell'
-		| 'are dealt combat damage'
-		| 'deal combat damage to an opponent'
-		| 'put one or more counters on an ally'
-		| 'play a unit'
-		| 'apply an augment during battle'
-		| 'do'
-		| 'play a token spell'
-	);
-	
-event: unit_event | board_event | player_event;
+
+player_event
+    : subject='a player' inner=player_event_inner
+	| subject='another player' inner=player_event_inner
+	;
+
+player_event_inner
+    : 'loses life'
+    | 'loses life during battle'
+    | 'loses is dealt combat damage'
+    | 'plays a spell'
+    | 'plays their first spell in this battle'
+    ;
+
+
+you_event
+    : subject='you' inner=you_event_inner
+    ;
+
+you_event_inner
+    : 'play a spell'
+    | 'play a spell during battle'
+    | 'put a counter on an enemy'
+    | 'create a token'
+    | 'sacrifice a unit'
+    | 'play a nontoken spell'
+    | 'are dealt combat damage'
+    | 'deal combat damage to an opponent'
+    | 'put one or more counters on an ally'
+    | 'play a unit'
+    | 'apply an augment during battle'
+    | 'do'
+    | 'play a token spell'
+    ;
+
 
 action:
 	action_put_counter
@@ -81,9 +104,11 @@ action:
 	| action_deal_damage
 	| action ', then' action;
 
+
 action_buff:
     'target' buff_target=('unit'|'ally') 'gains' stat derived_quantity='for each of your units'? ('and' keyword)? 'until regroup'
     ;
+
 
 action_deal_damage:
 	'i deal' (
@@ -91,13 +116,10 @@ action_deal_damage:
 		| 'damage' unit_derived_quantity
 	) 'to' ('each' ('player' | 'opponent' | 'unit')) 'for each blocked column'?;
 
-unit_derived_quantity:
-	'equal to my' ('defense')
-	| 'equal to your' affinity;
 
 counter_target
     : self_target='me'
-    | 'target' target=('unit'|'ally') board_state_derived_quantity?
+    | 'target' target=('unit'|'ally') region_derived_quantity?
     | 'each' target_each=(
         'unit'
         | 'enemy'
@@ -106,40 +128,60 @@ counter_target
     )
     ;
 
+
 action_put_counter: 'put' amount_item counter 'on' counter_target;
+
 
 action_stat_change:
 	('target' ('unit' | 'ally') 'gains' | 'your units gain') (
 		stat 'and' keyword
 		| stat
 		| keyword
-	) board_state_derived_quantity? lifetime;
+	) region_derived_quantity? lifetime;
 
-board_state_derived_quantity:
+
+region_derived_quantity:
 	'for each of your' ('units' | affinity);
+
 
 lifetime: 'until regroup';
 
+
 counter: stat 'counter';
+
 
 stat: power=signed_int '/' defence=signed_int;
 
+
 keyword: 'flying' | 'piercing';
+
 
 mod: graft | augment;
 
+
 graft: '[graft' limit=amount? ']';
+
 
 augment:
     '[augment]'limit='[once]'?;
 
+
 affinity: '[' ('r' | 'b' | 'e' | 'g' | 'm') ']';
+
 
 signed_int: SIGN DIGIT;
 
+
 amount: DIGIT | NUMBER_WORD;
 
+
 amount_item: 'a' | amount;
+
+
+unit_derived_quantity:
+	'equal to my' ('defense')
+	| 'equal to your' affinity;
+
 
 /* TOKENS */
 
@@ -154,9 +196,10 @@ NUMBER_WORD:
 	| 'eight'
 	| 'nine'
 	| 'ten';
-
 DIGIT: [0-9];
 SIGN: '+' | '-';
+
+/* SKIPPED TOKENS */
 
 COMMENT: '{i}(' .+? ')' -> skip;
 META: '{' .+? '}' -> skip;
