@@ -34,8 +34,8 @@ class CardVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by CardParser#unit_event_inner.
-    def visitUnit_event_inner(self, ctx:CardParser.Unit_event_innerContext):
+    # Visit a parse tree produced by CardParser#event.
+    def visitEvent(self, ctx:CardParser.EventContext):
         return self.visitChildren(ctx)
 
 
@@ -44,8 +44,8 @@ class CardVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by CardParser#board_event_inner.
-    def visitBoard_event_inner(self, ctx:CardParser.Board_event_innerContext):
+    # Visit a parse tree produced by CardParser#unit_event_inner.
+    def visitUnit_event_inner(self, ctx:CardParser.Unit_event_innerContext):
         return self.visitChildren(ctx)
 
 
@@ -54,13 +54,28 @@ class CardVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by CardParser#board_event_inner.
+    def visitBoard_event_inner(self, ctx:CardParser.Board_event_innerContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by CardParser#player_event.
     def visitPlayer_event(self, ctx:CardParser.Player_eventContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by CardParser#event.
-    def visitEvent(self, ctx:CardParser.EventContext):
+    # Visit a parse tree produced by CardParser#player_event_inner.
+    def visitPlayer_event_inner(self, ctx:CardParser.Player_event_innerContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CardParser#you_event.
+    def visitYou_event(self, ctx:CardParser.You_eventContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CardParser#you_event_inner.
+    def visitYou_event_inner(self, ctx:CardParser.You_event_innerContext):
         return self.visitChildren(ctx)
 
 
@@ -79,11 +94,6 @@ class CardVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by CardParser#unit_derived_quantity.
-    def visitUnit_derived_quantity(self, ctx:CardParser.Unit_derived_quantityContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by CardParser#counter_target.
     def visitCounter_target(self, ctx:CardParser.Counter_targetContext):
         return self.visitChildren(ctx)
@@ -99,8 +109,8 @@ class CardVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by CardParser#board_state_derived_quantity.
-    def visitBoard_state_derived_quantity(self, ctx:CardParser.Board_state_derived_quantityContext):
+    # Visit a parse tree produced by CardParser#region_derived_quantity.
+    def visitRegion_derived_quantity(self, ctx:CardParser.Region_derived_quantityContext):
         return self.visitChildren(ctx)
 
 
@@ -156,6 +166,11 @@ class CardVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by CardParser#amount_item.
     def visitAmount_item(self, ctx:CardParser.Amount_itemContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CardParser#unit_derived_quantity.
+    def visitUnit_derived_quantity(self, ctx:CardParser.Unit_derived_quantityContext):
         return self.visitChildren(ctx)
 
 

@@ -53,12 +53,12 @@ class CardListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by CardParser#unit_event_inner.
-    def enterUnit_event_inner(self, ctx:CardParser.Unit_event_innerContext):
+    # Enter a parse tree produced by CardParser#event.
+    def enterEvent(self, ctx:CardParser.EventContext):
         pass
 
-    # Exit a parse tree produced by CardParser#unit_event_inner.
-    def exitUnit_event_inner(self, ctx:CardParser.Unit_event_innerContext):
+    # Exit a parse tree produced by CardParser#event.
+    def exitEvent(self, ctx:CardParser.EventContext):
         pass
 
 
@@ -71,12 +71,12 @@ class CardListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by CardParser#board_event_inner.
-    def enterBoard_event_inner(self, ctx:CardParser.Board_event_innerContext):
+    # Enter a parse tree produced by CardParser#unit_event_inner.
+    def enterUnit_event_inner(self, ctx:CardParser.Unit_event_innerContext):
         pass
 
-    # Exit a parse tree produced by CardParser#board_event_inner.
-    def exitBoard_event_inner(self, ctx:CardParser.Board_event_innerContext):
+    # Exit a parse tree produced by CardParser#unit_event_inner.
+    def exitUnit_event_inner(self, ctx:CardParser.Unit_event_innerContext):
         pass
 
 
@@ -89,6 +89,15 @@ class CardListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by CardParser#board_event_inner.
+    def enterBoard_event_inner(self, ctx:CardParser.Board_event_innerContext):
+        pass
+
+    # Exit a parse tree produced by CardParser#board_event_inner.
+    def exitBoard_event_inner(self, ctx:CardParser.Board_event_innerContext):
+        pass
+
+
     # Enter a parse tree produced by CardParser#player_event.
     def enterPlayer_event(self, ctx:CardParser.Player_eventContext):
         pass
@@ -98,12 +107,30 @@ class CardListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by CardParser#event.
-    def enterEvent(self, ctx:CardParser.EventContext):
+    # Enter a parse tree produced by CardParser#player_event_inner.
+    def enterPlayer_event_inner(self, ctx:CardParser.Player_event_innerContext):
         pass
 
-    # Exit a parse tree produced by CardParser#event.
-    def exitEvent(self, ctx:CardParser.EventContext):
+    # Exit a parse tree produced by CardParser#player_event_inner.
+    def exitPlayer_event_inner(self, ctx:CardParser.Player_event_innerContext):
+        pass
+
+
+    # Enter a parse tree produced by CardParser#you_event.
+    def enterYou_event(self, ctx:CardParser.You_eventContext):
+        pass
+
+    # Exit a parse tree produced by CardParser#you_event.
+    def exitYou_event(self, ctx:CardParser.You_eventContext):
+        pass
+
+
+    # Enter a parse tree produced by CardParser#you_event_inner.
+    def enterYou_event_inner(self, ctx:CardParser.You_event_innerContext):
+        pass
+
+    # Exit a parse tree produced by CardParser#you_event_inner.
+    def exitYou_event_inner(self, ctx:CardParser.You_event_innerContext):
         pass
 
 
@@ -134,15 +161,6 @@ class CardListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by CardParser#unit_derived_quantity.
-    def enterUnit_derived_quantity(self, ctx:CardParser.Unit_derived_quantityContext):
-        pass
-
-    # Exit a parse tree produced by CardParser#unit_derived_quantity.
-    def exitUnit_derived_quantity(self, ctx:CardParser.Unit_derived_quantityContext):
-        pass
-
-
     # Enter a parse tree produced by CardParser#counter_target.
     def enterCounter_target(self, ctx:CardParser.Counter_targetContext):
         pass
@@ -170,12 +188,12 @@ class CardListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by CardParser#board_state_derived_quantity.
-    def enterBoard_state_derived_quantity(self, ctx:CardParser.Board_state_derived_quantityContext):
+    # Enter a parse tree produced by CardParser#region_derived_quantity.
+    def enterRegion_derived_quantity(self, ctx:CardParser.Region_derived_quantityContext):
         pass
 
-    # Exit a parse tree produced by CardParser#board_state_derived_quantity.
-    def exitBoard_state_derived_quantity(self, ctx:CardParser.Board_state_derived_quantityContext):
+    # Exit a parse tree produced by CardParser#region_derived_quantity.
+    def exitRegion_derived_quantity(self, ctx:CardParser.Region_derived_quantityContext):
         pass
 
 
@@ -275,6 +293,15 @@ class CardListener(ParseTreeListener):
 
     # Exit a parse tree produced by CardParser#amount_item.
     def exitAmount_item(self, ctx:CardParser.Amount_itemContext):
+        pass
+
+
+    # Enter a parse tree produced by CardParser#unit_derived_quantity.
+    def enterUnit_derived_quantity(self, ctx:CardParser.Unit_derived_quantityContext):
+        pass
+
+    # Exit a parse tree produced by CardParser#unit_derived_quantity.
+    def exitUnit_derived_quantity(self, ctx:CardParser.Unit_derived_quantityContext):
         pass
 
 

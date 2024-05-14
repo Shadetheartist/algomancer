@@ -161,7 +161,7 @@ class VisitorInterp(CardVisitor):
 
     def visitBoard_event(self, ctx:CardParser.Board_eventContext):
         exclude_self = ctx.subject.text == 'another'
-        event = self.visit(ctx.board_event_inner())
+        event = self.visit(ctx.inner)
 
         return GameEventTrigger(event[0], event[1], exclude_self)
 
