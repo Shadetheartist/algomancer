@@ -1,1 +1,1 @@
-After combat, [Switch1] Each player sacrifices a unit.
+after combat, [switch1] each player sacrifices a unit.

@@ -1,1 +1,1 @@
-[Augment] Your other units gain +1/+1.
+[augment] your other units gain +1/+1.

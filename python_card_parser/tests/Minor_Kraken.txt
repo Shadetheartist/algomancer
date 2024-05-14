@@ -1,1 +1,1 @@
-When I attack, [Switch1] Recall up to one target unit with 5 or less defense.
+when i attack, [switch1] recall up to one target unit with 5 or less defense.

@@ -1,1 +1,1 @@
-[Augment] I gain -2/-2.
+[augment] i gain -2/-2.

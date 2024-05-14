@@ -1,1 +1,1 @@
-When I spawn, draw a card. {/n}[Augment] When I despawn, each other player draws two cards.
+when i spawn, draw a card. {/n}[augment] when i despawn, each other player draws two cards.

@@ -1,1 +1,1 @@
-[Augment] Whenever another ally spawns during battle, double its /[power {i1}or defense] until regroup.
+[augment] whenever another ally spawns during battle, double its /[power {i1}or defense] until regroup.

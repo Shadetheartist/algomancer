@@ -1,1 +1,1 @@
-[Augment]  [one], Remove X +1/+1 counters from me: Delete target unit with defense X or less.
+[augment]  [one], remove x +1/+1 counters from me: delete target unit with defense x or less.

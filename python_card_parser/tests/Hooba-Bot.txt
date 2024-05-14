@@ -1,1 +1,1 @@
-[Augment] When I attack or block, create a Robot 2 in my formation.
+[augment] when i attack or block, create a robot 2 in my formation.

@@ -1,1 +1,1 @@
-When I attack, if I am still in formation, you may put target unit with cost 2 or less from your bin into the slot behind me.
+when i attack, if i am still in formation, you may put target unit with cost 2 or less from your bin into the slot behind me.

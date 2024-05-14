@@ -1,1 +1,1 @@
-[Augment] After combat, you may recall target ally. {/n}If you do, each opponent loses 2 life.
+[augment] after combat, you may recall target ally. {/n}if you do, each opponent loses 2 life.

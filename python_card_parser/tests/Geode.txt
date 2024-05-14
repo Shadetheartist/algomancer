@@ -1,1 +1,1 @@
-When I spawn or die, [Switch] Create a Crystal 1.
+when i spawn or die, [switch] create a crystal 1.

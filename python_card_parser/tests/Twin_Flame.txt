@@ -1,1 +1,1 @@
-[Switch1] I deal 2 damage to each of up to two target units.
+[switch1] i deal 2 damage to each of up to two target units.

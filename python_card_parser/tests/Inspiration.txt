@@ -1,1 +1,1 @@
-[Augment] Allies adjacent to me gain +2/+2.
+[augment] allies adjacent to me gain +2/+2.

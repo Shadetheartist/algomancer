@@ -1,1 +1,1 @@
-[Augment] Whenever one of your nontoken units dies, create a Fireball 1.
+[augment] whenever one of your nontoken units dies, create a fireball 1.

@@ -1,1 +1,1 @@
-Negate target spell effect.
+negate target spell effect.

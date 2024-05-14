@@ -1,1 +1,1 @@
-[Switchblk] Return target unit with cost X or less to its controller's hand.
+[switchblk] return target unit with cost x or less to its controller's hand.

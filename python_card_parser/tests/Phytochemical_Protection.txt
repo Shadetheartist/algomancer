@@ -1,1 +1,1 @@
-Until regroup, prevent all damage that would be dealt to target unit. Put a +1/+1 counter on it for each damage prevented this way.
+until regroup, prevent all damage that would be dealt to target unit. put a +1/+1 counter on it for each damage prevented this way.

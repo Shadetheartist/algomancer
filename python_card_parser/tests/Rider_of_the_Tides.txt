@@ -1,1 +1,1 @@
-[Augment] Whenever a card enters a player's hand during battle, I gain +2/+2 until regroup.
+[augment] whenever a card enters a player's hand during battle, i gain +2/+2 until regroup.

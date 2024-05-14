@@ -1,1 +1,1 @@
-[Augment] Whenever you are dealt combat damage, target opponent gains control of me.
+[augment] whenever you are dealt combat damage, target opponent gains control of me.

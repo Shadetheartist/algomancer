@@ -1,1 +1,1 @@
-[three]:   [Switch] Put a +1/+1 counter on me.
+[three]:   [switch] put a +1/+1 counter on me.

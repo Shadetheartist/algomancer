@@ -1,1 +1,1 @@
-[Augment] I gain -7/-7.
+[augment] i gain -7/-7.

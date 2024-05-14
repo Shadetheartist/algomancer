@@ -1,1 +1,1 @@
-When an enemy dies, [Switch1] Create a 2/2 unit.
+when an enemy dies, [switch1] create a 2/2 unit.

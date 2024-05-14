@@ -1,1 +1,1 @@
-When I die,  [Switch] Delete all units with -1/-1 counters on them.
+when i die,  [switch] delete all units with -1/-1 counters on them.

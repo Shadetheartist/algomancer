@@ -1,1 +1,1 @@
-[Augment]  [x], Sacrifice another nontoken unit: Create a Robot X. X can't be 0.
+[augment]  [x], sacrifice another nontoken unit: create a robot x. x can't be 0.

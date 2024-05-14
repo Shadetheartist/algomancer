@@ -1,1 +1,1 @@
-When I attack, block, or die, [Switch1] Create two Wisps. {i}(They aren't in formation.)
+when i attack, block, or die, [switch1] create two wisps. {i}(they aren't in formation.)

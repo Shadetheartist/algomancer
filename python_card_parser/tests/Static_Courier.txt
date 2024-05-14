@@ -1,1 +1,1 @@
-[Augment] When I die, create a Fireball X, where X is my power.
+[augment] when i die, create a fireball x, where x is my power.

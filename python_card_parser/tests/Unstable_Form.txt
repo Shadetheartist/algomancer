@@ -1,1 +1,1 @@
-[Augment] After combat, sacrifice another unit.
+[augment] after combat, sacrifice another unit.

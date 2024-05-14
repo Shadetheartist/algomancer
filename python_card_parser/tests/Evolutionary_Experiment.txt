@@ -1,1 +1,1 @@
-[Augment] Whenever I am modded or applied as a mod, put two +1/+1 counters on me.
+[augment] whenever i am modded or applied as a mod, put two +1/+1 counters on me.

@@ -1,1 +1,1 @@
-[Augment] Whenever one of your units dies, each opponent sacrifices a unit.
+[augment] whenever one of your units dies, each opponent sacrifices a unit.

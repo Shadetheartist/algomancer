@@ -1,1 +1,1 @@
-Rockfall 3 three times. {i}(To rockfall 3: Each player chooses one of their units. I deal 3 damage to each of the chosen units.)
+rockfall 3 three times. {i}(to rockfall 3: each player chooses one of their units. i deal 3 damage to each of the chosen units.)

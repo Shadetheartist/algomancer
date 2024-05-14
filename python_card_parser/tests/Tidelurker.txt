@@ -1,1 +1,1 @@
-When a player is dealt combat damage, {/n}[Switch1] Create a 2/2 unit.
+when a player is dealt combat damage, {/n}[switch1] create a 2/2 unit.

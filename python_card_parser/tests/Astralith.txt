@@ -1,1 +1,1 @@
-[Augment]  [three]: Put a +1/+1 counter on target unit.
+[augment]  [three]: put a +1/+1 counter on target unit.

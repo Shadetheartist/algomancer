@@ -1,1 +1,1 @@
-[Augment][once]  [one], Erase one of my modifications: Deal 2 damage to any target.
+[augment][once]  [one], erase one of my modifications: deal 2 damage to any target.

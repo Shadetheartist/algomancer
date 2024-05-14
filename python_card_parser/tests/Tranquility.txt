@@ -1,1 +1,1 @@
-[Augment] Spells cost  [one] more to play during battle.
+[augment] spells cost  [one] more to play during battle.

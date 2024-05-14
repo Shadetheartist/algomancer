@@ -1,1 +1,1 @@
-[Augment] After combat, delete all tokens.
+[augment] after combat, delete all tokens.

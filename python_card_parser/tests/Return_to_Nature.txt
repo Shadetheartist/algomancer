@@ -1,1 +1,1 @@
-Negate all effects. Erase all mods.
+negate all effects. erase all mods.

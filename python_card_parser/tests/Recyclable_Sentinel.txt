@@ -1,1 +1,1 @@
-When I spawn or die, [Switch1] Create a Robot 1.
+when i spawn or die, [switch1] create a robot 1.

@@ -1,1 +1,1 @@
-[Augment] Abilities cost  [one] more to activate or trigger during battle. {i}(Choosing to not pay {/n}this prevents abilities from triggering.)
+[augment] abilities cost  [one] more to activate or trigger during battle. {i}(choosing to not pay {/n}this prevents abilities from triggering.)

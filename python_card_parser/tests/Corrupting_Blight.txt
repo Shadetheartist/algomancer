@@ -1,1 +1,1 @@
-[Augment] After combat, a player of your choice who doesn't control me gains control of me.
+[augment] after combat, a player of your choice who doesn't control me gains control of me.

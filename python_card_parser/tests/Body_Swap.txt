@@ -1,1 +1,1 @@
-[Switch1] Exchange the base stats of two target units until regroup. {i}(Power and defense.)
+[switch1] exchange the base stats of two target units until regroup. {i}(power and defense.)

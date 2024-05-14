@@ -1,1 +1,1 @@
-Your units gain "When I die, create a Robot 3" until regroup.
+your units gain "when i die, create a robot 3" until regroup.

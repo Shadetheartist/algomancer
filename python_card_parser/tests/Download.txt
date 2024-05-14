@@ -1,1 +1,1 @@
-Gain control of target token. You may choose new targets for spells controlled this way.
+gain control of target token. you may choose new targets for spells controlled this way.

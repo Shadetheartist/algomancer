@@ -1,1 +1,1 @@
-When my column deals combat damage,  {/n}[Switch1] Put a +1/+1 counter on each of your {/n}units.
+when my column deals combat damage,  {/n}[switch1] put a +1/+1 counter on each of your {/n}units.

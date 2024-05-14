@@ -1,1 +1,1 @@
-[Augment] Whenever one of your units despawns, {/n}I deal 1 damage to any target.
+[augment] whenever one of your units despawns, {/n}i deal 1 damage to any target.

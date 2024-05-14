@@ -1,1 +1,1 @@
-[Switch1] Duplicate each counter on target unit.
+[switch1] duplicate each counter on target unit.

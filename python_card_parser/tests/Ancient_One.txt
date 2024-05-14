@@ -1,1 +1,1 @@
-[Augment] I have all abilities of adjacent allies. {i}(Abilities include everything below the type line.)
+[augment] i have all abilities of adjacent allies. {i}(abilities include everything below the type line.)

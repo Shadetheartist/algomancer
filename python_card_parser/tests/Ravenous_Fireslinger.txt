@@ -1,1 +1,1 @@
-Whenever you play a nontoken spell, {/n}[Switch] I gain +1/-1 until regroup.
+whenever you play a nontoken spell, {/n}[switch] i gain +1/-1 until regroup.

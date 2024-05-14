@@ -1,1 +1,1 @@
-When I spawn or die, [Switch] Create a Fireball 1.
+when i spawn or die, [switch] create a fireball 1.

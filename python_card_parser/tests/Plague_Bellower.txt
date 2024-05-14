@@ -1,1 +1,1 @@
-[Augment]  [three]: Each opponent chooses one of their units. Put a -1/-1 counter on each of the chosen units.
+[augment]  [three]: each opponent chooses one of their units. put a -1/-1 counter on each of the chosen units.

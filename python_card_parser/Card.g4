@@ -155,6 +155,14 @@ stat: power=signed_int '/' defence=signed_int;
 
 evergreen_keyword: 'flying' | 'piercing';
 
+keyword
+    : 'recall'
+    | 'ambush'
+    | 'fight'
+    | 'glimpse' amount
+    | 'rockfall' amount
+    ;
+
 
 mod: graft | augment;
 

@@ -1,1 +1,1 @@
-[Switch] Your units gain +1/+1 until regroup.
+[switch] your units gain +1/+1 until regroup.

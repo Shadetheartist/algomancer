@@ -1,1 +1,1 @@
-If you would create a Robot, Poison, Crystal or Fireball, you may instead create a token of any of these types. {i}(With the same X value.)
+if you would create a robot, poison, crystal or fireball, you may instead create a token of any of these types. {i}(with the same x value.)

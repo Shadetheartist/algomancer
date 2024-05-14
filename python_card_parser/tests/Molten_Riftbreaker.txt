@@ -1,1 +1,1 @@
-When I spawn, create two Fireball 1. {/n}[Augment] When I despawn, negate all allied spells.
+when i spawn, create two fireball 1. {/n}[augment] when i despawn, negate all allied spells.

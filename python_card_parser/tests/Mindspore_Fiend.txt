@@ -1,1 +1,1 @@
-After combat, [Switch1] You may give an opponent control of target ally. If you do, draw a card.
+after combat, [switch1] you may give an opponent control of target ally. if you do, draw a card.

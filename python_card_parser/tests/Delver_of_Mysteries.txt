@@ -1,1 +1,1 @@
-Recall target spell in your bin. {i}(Put it into your hand.)
+recall target spell in your bin. {i}(put it into your hand.)

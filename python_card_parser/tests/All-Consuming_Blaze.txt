@@ -1,1 +1,1 @@
-I deal damage to any target equal to your [r].
+i deal damage to any target equal to your [r].

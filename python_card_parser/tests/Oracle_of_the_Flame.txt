@@ -1,1 +1,1 @@
-Sacrifice me: [Switch] Create a Fireball 1.
+sacrifice me: [switch] create a fireball 1.

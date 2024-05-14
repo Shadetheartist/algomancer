@@ -1,1 +1,1 @@
-In this battle, you may play spells from your bin. If you do, they gain {p}unstable until regroup. {i}(If they would enter a bin, erase them instead.)
+in this battle, you may play spells from your bin. if you do, they gain {p}unstable until regroup. {i}(if they would enter a bin, erase them instead.)

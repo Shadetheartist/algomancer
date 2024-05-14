@@ -1,1 +1,1 @@
-When I die, [Switch] Rockfall 4 {i}(Each player chooses one of their units. I deal 4 damage to each of the chosen units.)
+when i die, [switch] rockfall 4 {i}(each player chooses one of their units. i deal 4 damage to each of the chosen units.)

@@ -1,1 +1,1 @@
-The controller of target effect may pay [one]. If they don't, negate that effect and draw a card.
+the controller of target effect may pay [one]. if they don't, negate that effect and draw a card.

@@ -1,1 +1,1 @@
-[Augment] Whenever a column becomes blocked, I deal 1 damage to each opponent.
+[augment] whenever a column becomes blocked, i deal 1 damage to each opponent.

@@ -1,1 +1,1 @@
-When I attack, [Switch1] Create a Poison 5.
+when i attack, [switch1] create a poison 5.

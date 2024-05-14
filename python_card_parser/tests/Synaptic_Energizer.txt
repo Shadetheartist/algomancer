@@ -1,1 +1,1 @@
-After combat, [Switch1] Put a +1/+1 counter on each of your units.
+after combat, [switch1] put a +1/+1 counter on each of your units.

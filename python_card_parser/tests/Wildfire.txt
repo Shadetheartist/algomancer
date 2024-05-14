@@ -1,1 +1,1 @@
-I deal X damage to any target.
+i deal x damage to any target.

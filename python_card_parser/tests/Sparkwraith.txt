@@ -1,1 +1,1 @@
-[Augment] Whenever you play a spell, put a +1/+1 counter on me.
+[augment] whenever you play a spell, put a +1/+1 counter on me.

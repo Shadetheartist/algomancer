@@ -1,1 +1,1 @@
-Put X -1/-1 counters on target unit.
+put x -1/-1 counters on target unit.

@@ -1,1 +1,1 @@
-[Augment] Whenever I am dealt damage, you may {/n}pay  [one]. If you do, I fight another target unit. {i}(We deal damage to each other equal to our power.)
+[augment] whenever i am dealt damage, you may {/n}pay  [one]. if you do, i fight another target unit. {i}(we deal damage to each other equal to our power.)

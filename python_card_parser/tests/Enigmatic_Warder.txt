@@ -1,1 +1,1 @@
-[Augment] [two]: Change a target of target effect to me.
+[augment] [two]: change a target of target effect to me.

@@ -1,1 +1,1 @@
-[Switch1] Create an 8/8 unit.
+[switch1] create an 8/8 unit.

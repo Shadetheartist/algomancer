@@ -1,1 +1,1 @@
-I deal 1 damage to each unit.
+i deal 1 damage to each unit.

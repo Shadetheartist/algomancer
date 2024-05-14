@@ -1,1 +1,1 @@
-[zero]:   [Switch1] Recall me. {i}(Put me into your hand.)
+[zero]:   [switch1] recall me. {i}(put me into your hand.)

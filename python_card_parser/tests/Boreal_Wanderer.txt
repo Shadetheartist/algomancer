@@ -1,1 +1,1 @@
-When an ally spawns during battle, {/n}[Switch1] I deal 2 damage to each opponent.
+when an ally spawns during battle, {/n}[switch1] i deal 2 damage to each opponent.

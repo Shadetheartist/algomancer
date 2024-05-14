@@ -1,1 +1,1 @@
-When I die, [Switch] Each player sacrifices a unit.
+when i die, [switch] each player sacrifices a unit.

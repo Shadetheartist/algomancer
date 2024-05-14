@@ -1,1 +1,1 @@
-[Switch] /[Target unit gains +4/+4 or{i1} target unit and each of its adjacent allies gain +1/+1] until regroup.
+[switch] /[target unit gains +4/+4 or{i1} target unit and each of its adjacent allies gain +1/+1] until regroup.

@@ -1,1 +1,1 @@
-[Battle] Ambush  [2be] {i}(Play me with the effect "Recall target ally, put me into their position in play."){/i}  {/n}[once] When I am dealt damage, I deal that much damage to any target.
+[battle] ambush  [2be] {i}(play me with the effect "recall target ally, put me into their position in play."){/i}  {/n}[once] when i am dealt damage, i deal that much damage to any target.

@@ -1,1 +1,1 @@
-When I attack or block, [Switch] Create a Crystal 1.
+when i attack or block, [switch] create a crystal 1.

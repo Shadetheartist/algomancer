@@ -1,1 +1,1 @@
-[Augment] After combat, sacrifice me.
+[augment] after combat, sacrifice me.

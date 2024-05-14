@@ -1,1 +1,1 @@
-Sacrifice me: [Switch] Create a Poison 1.
+sacrifice me: [switch] create a poison 1.

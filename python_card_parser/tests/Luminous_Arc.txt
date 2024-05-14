@@ -1,1 +1,1 @@
-I deal 6 damage to target unit.
+i deal 6 damage to target unit.

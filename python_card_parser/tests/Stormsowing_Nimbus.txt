@@ -1,1 +1,1 @@
-[Augment] Whenever you play a nontoken spell, create a 1/1 unit.
+[augment] whenever you play a nontoken spell, create a 1/1 unit.

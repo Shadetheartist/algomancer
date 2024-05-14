@@ -1,1 +1,1 @@
-When I spawn, create a Poison 6. {/n}[Augment] When I despawn, each opponent may recall a unit from their bin.
+when i spawn, create a poison 6. {/n}[augment] when i despawn, each opponent may recall a unit from their bin.

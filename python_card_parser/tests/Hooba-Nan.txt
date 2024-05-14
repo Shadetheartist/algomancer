@@ -1,1 +1,1 @@
-[Augment] When I attack, if I am still in formation, create a 1/1 unit in all my adjacent slots.
+[augment] when i attack, if i am still in formation, create a 1/1 unit in all my adjacent slots.

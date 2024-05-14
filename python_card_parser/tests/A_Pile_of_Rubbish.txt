@@ -1,1 +1,1 @@
-[Augment] When I die, draw a card.
+[augment] when i die, draw a card.

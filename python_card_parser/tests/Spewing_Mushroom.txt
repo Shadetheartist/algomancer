@@ -1,1 +1,1 @@
-When I attack or block, [Switch] Create a Poison X, where X is my power.
+when i attack or block, [switch] create a poison x, where x is my power.

@@ -1,1 +1,1 @@
-[Augment] Sacrifice another unit: I gain +2/+2 until regroup.
+[augment] sacrifice another unit: i gain +2/+2 until regroup.

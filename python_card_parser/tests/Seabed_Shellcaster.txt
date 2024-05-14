@@ -1,1 +1,1 @@
-When the second nontoken spell is played in {/n}this battle,  [Switch1] Each player recalls a unit.
+when the second nontoken spell is played in {/n}this battle,  [switch1] each player recalls a unit.

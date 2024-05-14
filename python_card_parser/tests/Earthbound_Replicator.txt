@@ -1,1 +1,1 @@
-[Augment] Whenever a player plays one or more spells targeting me, they copy those spells and may choose new targets for the copies.
+[augment] whenever a player plays one or more spells targeting me, they copy those spells and may choose new targets for the copies.

@@ -1,1 +1,1 @@
-Target unit gains +0/+1 until regroup. Draw a card.
+target unit gains +0/+1 until regroup. draw a card.

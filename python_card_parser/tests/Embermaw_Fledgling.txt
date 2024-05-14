@@ -1,1 +1,1 @@
-[Augment] After combat, create an X/X unit, where X is the number of attacking units in my formation.
+[augment] after combat, create an x/x unit, where x is the number of attacking units in my formation.

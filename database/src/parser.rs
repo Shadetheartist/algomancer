@@ -237,7 +237,7 @@ mod tests {
             file_name = file_name.replace(" ", "_");
 
             let mut file = std::fs::File::create(dir_path.join(file_name)).unwrap();
-            file.write_all(&d.text.as_bytes()).unwrap()
+            file.write_all(&d.text.to_lowercase().as_bytes()).unwrap()
         }
     }
 }

@@ -1,1 +1,1 @@
-[Switch1] /[Sacrifce a unit]: Each opponent sacrifices a unit.
+[switch1] /[sacrifce a unit]: each opponent sacrifices a unit.

@@ -1,1 +1,1 @@
-When I attack or block, [Switch] I deal 1 damage to each unit.
+when i attack or block, [switch] i deal 1 damage to each unit.

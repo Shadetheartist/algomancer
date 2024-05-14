@@ -1,1 +1,1 @@
-[Augment]  [x]: I become base X/X until regroup.
+[augment]  [x]: i become base x/x until regroup.

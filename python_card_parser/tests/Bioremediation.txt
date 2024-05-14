@@ -1,1 +1,1 @@
-Target player reveals their hand. You choose {/n}a card from it and put it into your hand.
+target player reveals their hand. you choose {/n}a card from it and put it into your hand.

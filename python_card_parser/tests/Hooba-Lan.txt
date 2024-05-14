@@ -1,1 +1,1 @@
-[Augment] When I attack or block, create a Shard.
+[augment] when i attack or block, create a shard.

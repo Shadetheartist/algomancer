@@ -1,1 +1,1 @@
-[Augment] Enemies gain +2/+2.
+[augment] enemies gain +2/+2.

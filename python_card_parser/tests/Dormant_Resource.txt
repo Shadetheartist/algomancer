@@ -1,1 +1,1 @@
-{i}(To create a resource, recycle a card from your hand during the resource step. All resources spawn dormant. Dormant resources provide no affinity or mana. You may activate up to two resources each turn during the resource step, flipping them over permanently.)
+{i}(to create a resource, recycle a card from your hand during the resource step. all resources spawn dormant. dormant resources provide no affinity or mana. you may activate up to two resources each turn during the resource step, flipping them over permanently.)

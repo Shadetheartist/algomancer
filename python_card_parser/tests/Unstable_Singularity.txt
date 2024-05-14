@@ -1,1 +1,1 @@
-When I die, [Switch1] Delete target unit.
+when i die, [switch1] delete target unit.

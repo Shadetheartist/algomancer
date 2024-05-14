@@ -1,1 +1,1 @@
-Sacrifice me and another ally: Delete all units with cost equal to the total number of counters on us.
+sacrifice me and another ally: delete all units with cost equal to the total number of counters on us.

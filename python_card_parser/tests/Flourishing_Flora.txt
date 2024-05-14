@@ -1,1 +1,1 @@
-[Augment] Whenever another ally spawns, put a +1/+1 counter on me.
+[augment] whenever another ally spawns, put a +1/+1 counter on me.

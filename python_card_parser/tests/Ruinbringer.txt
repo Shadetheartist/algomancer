@@ -1,1 +1,1 @@
-[Augment] After combat, delete all units.
+[augment] after combat, delete all units.

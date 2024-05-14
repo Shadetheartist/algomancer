@@ -1,1 +1,1 @@
-[Switch1] I deal damage to target unit equal to the number of units you control.
+[switch1] i deal damage to target unit equal to the number of units you control.

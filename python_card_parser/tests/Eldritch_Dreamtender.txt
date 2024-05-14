@@ -1,1 +1,1 @@
-[Augment] When my column deals conbat damage to an opponent, sacrifice me. If you do, look at that player's hand and discard a card from it.
+[augment] when my column deals conbat damage to an opponent, sacrifice me. if you do, look at that player's hand and discard a card from it.

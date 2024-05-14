@@ -1,1 +1,1 @@
-Gain control of target unit with cost [x] or less unless its controller pays  [x].
+gain control of target unit with cost [x] or less unless its controller pays  [x].

@@ -1,1 +1,1 @@
-Each player recalls two units. If four or more units were recalled this way, repeat this.
+each player recalls two units. if four or more units were recalled this way, repeat this.

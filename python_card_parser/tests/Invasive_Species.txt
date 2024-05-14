@@ -1,1 +1,1 @@
-[Augment] At the start of deployment, recall all your other units.
+[augment] at the start of deployment, recall all your other units.

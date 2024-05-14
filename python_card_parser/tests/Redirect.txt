@@ -1,1 +1,1 @@
-Change the targets of target effect unless its controller pays  [x].
+change the targets of target effect unless its controller pays  [x].

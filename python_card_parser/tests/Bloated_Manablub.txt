@@ -1,1 +1,1 @@
-When I despawn, [Switch] Each opponent loses 3 life.
+when i despawn, [switch] each opponent loses 3 life.

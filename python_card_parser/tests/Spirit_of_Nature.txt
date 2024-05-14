@@ -1,1 +1,1 @@
-After combat, [Switch1] Create a /[Poison {i1}or Crystal] 2.
+after combat, [switch1] create a /[poison {i1}or crystal] 2.

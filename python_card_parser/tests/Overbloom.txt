@@ -1,1 +1,1 @@
-[Switch1] Target unit gains +7/+7 until regroup.
+[switch1] target unit gains +7/+7 until regroup.

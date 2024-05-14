@@ -1,1 +1,1 @@
-[Augment][once]  [one]: Switch my position with another target ally in my formation.
+[augment][once]  [one]: switch my position with another target ally in my formation.

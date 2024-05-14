@@ -1,1 +1,1 @@
-After combat, [Switch] Create a Robot 1.
+after combat, [switch] create a robot 1.

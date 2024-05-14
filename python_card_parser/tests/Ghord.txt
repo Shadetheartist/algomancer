@@ -1,1 +1,1 @@
-When you sacrifice a unit, [Switch1] Each oppo- nent sacrifices a nontoken unit.
+when you sacrifice a unit, [switch1] each oppo- nent sacrifices a nontoken unit.

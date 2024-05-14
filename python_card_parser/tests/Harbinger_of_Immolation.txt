@@ -1,1 +1,1 @@
-At the end of turn, create a Fireball X, where X is one plus the number of spell tokens you control. {/n}[Augment] Your spell tokens stay through regroup.
+at the end of turn, create a fireball x, where x is one plus the number of spell tokens you control. {/n}[augment] your spell tokens stay through regroup.

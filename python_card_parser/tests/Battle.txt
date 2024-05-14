@@ -1,1 +1,1 @@
-Two target units fight. {i}(They deal damage {/n}to each other equal to their power.)
+two target units fight. {i}(they deal damage {/n}to each other equal to their power.)

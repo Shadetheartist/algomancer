@@ -1,1 +1,1 @@
-When one of your units survives damage,  [Switch1] Create a 2/2 unit.
+when one of your units survives damage,  [switch1] create a 2/2 unit.
