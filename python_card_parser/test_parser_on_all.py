@@ -2,8 +2,8 @@ import contextlib
 import os
 import sys
 from antlr4 import *
-from lib.CardLexer import CardLexer
-from lib.CardParser import CardParser
+from gen.CardLexer import CardLexer
+from gen.CardParser import CardParser
 from visitor import VisitorInterp
 
 
@@ -48,10 +48,15 @@ def main(argv):
     print(f"Ok: ({len(ok)}/{len(files)} {percentage(ok)}%)")
     for file in ok:
         print(f'\t{file}: Ok!')
+        with open('tests/' + file, 'r') as file_content:
+            print(f'\t\t{file_content.read()}')
+
 
     print(f"Errors: ({len(err)}/{len(files)} {percentage(err)}%)")
     for (file, result) in err:
         print(f'\t{file}: {result}')
+        with open('tests/' + file, 'r') as file_content:
+            print(f'\t\t{file_content.read()}')
 
 
 if __name__ == '__main__':

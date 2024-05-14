@@ -1,7 +1,7 @@
 import sys
 from antlr4 import *
-from lib.CardLexer import CardLexer
-from lib.CardParser import CardParser
+from gen.CardLexer import CardLexer
+from gen.CardParser import CardParser
 from visitor import VisitorInterp
 
 def main(argv):

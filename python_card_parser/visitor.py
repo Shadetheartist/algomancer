@@ -1,7 +1,7 @@
 import sys
 from antlr4 import *
-from lib.CardParser import CardParser
-from lib.CardVisitor import CardVisitor
+from gen.CardParser import CardParser
+from gen.CardVisitor import CardVisitor
 from pprint import pprint
 
 
