@@ -49,7 +49,7 @@ def main(argv):
     for file in ok:
         print(f'\t{file}: Ok!')
 
-    print(f"Errors: ({len(err)}/{len(files)} {percentage(ok)}%)")
+    print(f"Errors: ({len(err)}/{len(files)} {percentage(err)}%)")
     for (file, result) in err:
         print(f'\t{file}: {result}')
 

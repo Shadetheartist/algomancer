@@ -134,6 +134,11 @@ class CardVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by CardParser#keyword.
+    def visitKeyword(self, ctx:CardParser.KeywordContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by CardParser#mod.
     def visitMod(self, ctx:CardParser.ModContext):
         return self.visitChildren(ctx)

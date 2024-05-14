@@ -233,6 +233,15 @@ class CardListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by CardParser#keyword.
+    def enterKeyword(self, ctx:CardParser.KeywordContext):
+        pass
+
+    # Exit a parse tree produced by CardParser#keyword.
+    def exitKeyword(self, ctx:CardParser.KeywordContext):
+        pass
+
+
     # Enter a parse tree produced by CardParser#mod.
     def enterMod(self, ctx:CardParser.ModContext):
         pass

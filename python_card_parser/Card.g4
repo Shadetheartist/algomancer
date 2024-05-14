@@ -1,7 +1,7 @@
 grammar Card;
 
 
-prog: effect+ EOF;
+prog: effect* EOF;
 
 
 effect
