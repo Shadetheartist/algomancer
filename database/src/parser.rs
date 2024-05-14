@@ -209,6 +209,8 @@ fn parse_affinity_string(affinity: &str) -> Vec<Affinity> {
 
 #[cfg(test)]
 mod tests {
+    use std::io::Write;
+    use std::path::Path;
     use crate::CardPrototypeDatabase;
 
     #[test]
@@ -218,6 +220,24 @@ mod tests {
 
         for d in db.prototypes.values() {
             println!("{}: {:?} | {} [{:?}] -- Cost: {:?}", d.prototype_id.0, d.card_type, d.name, d.std_name, d.costs);
+        }
+    }
+
+    //#[test]
+    fn generate_test_files() {
+        let path = "../resources/core_cards.json";
+        let db = CardPrototypeDatabase::from_path(path).unwrap();
+
+        let dir_path = Path::new("tests");
+        std::fs::create_dir(dir_path).ok();
+        for d in db.prototypes.values() {
+            println!("{}: {}", d.name, d.text);
+            let mut file_name = d.name.clone();
+            file_name.push_str(".txt");
+            file_name = file_name.replace(" ", "_");
+
+            let mut file = std::fs::File::create(dir_path.join(file_name)).unwrap();
+            file.write_all(&d.text.as_bytes()).unwrap()
         }
     }
 }
