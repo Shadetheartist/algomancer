@@ -1,1 +1,1 @@
-when i die,  [switch] delete all units with -1/-1 counters on them.
+when i die,  [graft] delete all units with -1/-1 counters on them.

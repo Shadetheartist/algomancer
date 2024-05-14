@@ -1,1 +1,1 @@
-[switch1] i deal damage to any target equal to the number of units that died in this battle.
+[graft1] i deal damage to any target equal to the number of units that died in this battle.

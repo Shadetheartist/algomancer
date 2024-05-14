@@ -1,1 +1,1 @@
-[switch1] create an x/x unit, where x is the life target player lost in this battle. {i}(damage causes life loss.)
+[graft1] create an x/x unit, where x is the life target player lost in this battle. {i}(damage causes life loss.)

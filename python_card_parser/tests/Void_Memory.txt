@@ -1,1 +1,1 @@
-[switch1] each opponent discards a /[unit {i1}or spell] if able. otherwise, they reveal their hand.
+[graft1] each opponent discards a /[unit {i1}or spell] if able. otherwise, they reveal their hand.

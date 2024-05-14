@@ -1,1 +1,1 @@
-when i am dealt damage,  [switch1] put a +1/+1 counter on me.
+when i am dealt damage,  [graft1] put a +1/+1 counter on me.

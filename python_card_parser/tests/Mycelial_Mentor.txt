@@ -1,1 +1,1 @@
-when you create a token, [switch1] target ally gains +3/+3 until regroup.
+when you create a token, [graft1] target ally gains +3/+3 until regroup.

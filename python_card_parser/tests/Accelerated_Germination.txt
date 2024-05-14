@@ -1,1 +1,1 @@
-[switch1] create two 1/1 units.
+[graft1] create two 1/1 units.

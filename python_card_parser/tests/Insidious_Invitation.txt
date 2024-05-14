@@ -1,1 +1,1 @@
-draw a card. [switch1] starting with you, players may play a unit from hand as if it were [battle]. {i}(the unit's costs still need to be paid.).
+draw a card. [graft1] starting with you, players may play a unit from hand as if it were [battle]. {i}(the unit's costs still need to be paid.).

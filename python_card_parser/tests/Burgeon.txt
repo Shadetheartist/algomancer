@@ -1,1 +1,1 @@
-[switch1] double the /[power {i1}or defense] of target unit until regroup.
+[graft1] double the /[power {i1}or defense] of target unit until regroup.

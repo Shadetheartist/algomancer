@@ -1,1 +1,1 @@
-[switch1] create a fireball 3.
+[graft1] create a fireball 3.

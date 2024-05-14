@@ -1,1 +1,1 @@
-[switch1] each player recalls a unit and loses 2 life.
+[graft1] each player recalls a unit and loses 2 life.

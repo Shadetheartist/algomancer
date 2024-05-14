@@ -1,1 +1,1 @@
-after combat, [switch1] each player sacrifices a unit.
+after combat, [graft1] each player sacrifices a unit.

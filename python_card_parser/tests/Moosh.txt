@@ -1,1 +1,1 @@
-when an enemy dies, [switch1] create a 2/2 unit.
+when an enemy dies, [graft1] create a 2/2 unit.

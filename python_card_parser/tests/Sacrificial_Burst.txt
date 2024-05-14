@@ -1,1 +1,1 @@
-[switch] /[sacrifice a unit]: deal 4 damage to any target.
+[graft] /[sacrifice a unit]: deal 4 damage to any target.

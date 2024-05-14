@@ -1,1 +1,1 @@
-[switch1] /[put a -1/-1 counter on each enemy or{i1} put a +1/+1 counter on each of your units.]
+[graft1] /[put a -1/-1 counter on each enemy or{i1} put a +1/+1 counter on each of your units.]

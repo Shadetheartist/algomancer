@@ -1,1 +1,1 @@
-whenever a nontoken enemy dies, {/n}  [switch] create a 1/1 unit.
+whenever a nontoken enemy dies, {/n}  [graft] create a 1/1 unit.

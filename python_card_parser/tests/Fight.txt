@@ -1,1 +1,1 @@
-[switch1] target ally and another target unit fight. {i}(they deal damage to each other equal to their power.)
+[graft1] target ally and another target unit fight. {i}(they deal damage to each other equal to their power.)

@@ -4,6 +4,7 @@ from gen.CardLexer import CardLexer
 from gen.CardParser import CardParser
 from visitor import VisitorInterp
 
+
 def main(argv):
     input_stream = FileStream(argv[1])
     lexer = CardLexer(input_stream)
@@ -17,9 +18,10 @@ def main(argv):
         vinterp = VisitorInterp()
         vinterp.visit(tree)
         print('---')
-        for effect in vinterp.effects:
+        for effect in vinterp.card.effects:
             effect.print()
             print('---')
+
 
 if __name__ == '__main__':
     main(sys.argv)

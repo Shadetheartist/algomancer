@@ -1,1 +1,1 @@
-[switch1] look at target player's hand. you may choose a card from it and recycle that card. if you do, that player draws a card.
+[graft1] look at target player's hand. you may choose a card from it and recycle that card. if you do, that player draws a card.

@@ -143,12 +143,84 @@ class CardListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by CardParser#token_type.
+    def enterToken_type(self, ctx:CardParser.Token_typeContext):
+        pass
+
+    # Exit a parse tree produced by CardParser#token_type.
+    def exitToken_type(self, ctx:CardParser.Token_typeContext):
+        pass
+
+
+    # Enter a parse tree produced by CardParser#x_stat.
+    def enterX_stat(self, ctx:CardParser.X_statContext):
+        pass
+
+    # Exit a parse tree produced by CardParser#x_stat.
+    def exitX_stat(self, ctx:CardParser.X_statContext):
+        pass
+
+
+    # Enter a parse tree produced by CardParser#token_stat.
+    def enterToken_stat(self, ctx:CardParser.Token_statContext):
+        pass
+
+    # Exit a parse tree produced by CardParser#token_stat.
+    def exitToken_stat(self, ctx:CardParser.Token_statContext):
+        pass
+
+
+    # Enter a parse tree produced by CardParser#token.
+    def enterToken(self, ctx:CardParser.TokenContext):
+        pass
+
+    # Exit a parse tree produced by CardParser#token.
+    def exitToken(self, ctx:CardParser.TokenContext):
+        pass
+
+
+    # Enter a parse tree produced by CardParser#action_create_token.
+    def enterAction_create_token(self, ctx:CardParser.Action_create_tokenContext):
+        pass
+
+    # Exit a parse tree produced by CardParser#action_create_token.
+    def exitAction_create_token(self, ctx:CardParser.Action_create_tokenContext):
+        pass
+
+
+    # Enter a parse tree produced by CardParser#action_draw.
+    def enterAction_draw(self, ctx:CardParser.Action_drawContext):
+        pass
+
+    # Exit a parse tree produced by CardParser#action_draw.
+    def exitAction_draw(self, ctx:CardParser.Action_drawContext):
+        pass
+
+
     # Enter a parse tree produced by CardParser#action_buff.
     def enterAction_buff(self, ctx:CardParser.Action_buffContext):
         pass
 
     # Exit a parse tree produced by CardParser#action_buff.
     def exitAction_buff(self, ctx:CardParser.Action_buffContext):
+        pass
+
+
+    # Enter a parse tree produced by CardParser#sub_action__damage_each_player.
+    def enterSub_action__damage_each_player(self, ctx:CardParser.Sub_action__damage_each_playerContext):
+        pass
+
+    # Exit a parse tree produced by CardParser#sub_action__damage_each_player.
+    def exitSub_action__damage_each_player(self, ctx:CardParser.Sub_action__damage_each_playerContext):
+        pass
+
+
+    # Enter a parse tree produced by CardParser#damage_quantity.
+    def enterDamage_quantity(self, ctx:CardParser.Damage_quantityContext):
+        pass
+
+    # Exit a parse tree produced by CardParser#damage_quantity.
+    def exitDamage_quantity(self, ctx:CardParser.Damage_quantityContext):
         pass
 
 
@@ -161,12 +233,12 @@ class CardListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by CardParser#counter_target.
-    def enterCounter_target(self, ctx:CardParser.Counter_targetContext):
+    # Enter a parse tree produced by CardParser#damage_quantity_equal_to.
+    def enterDamage_quantity_equal_to(self, ctx:CardParser.Damage_quantity_equal_toContext):
         pass
 
-    # Exit a parse tree produced by CardParser#counter_target.
-    def exitCounter_target(self, ctx:CardParser.Counter_targetContext):
+    # Exit a parse tree produced by CardParser#damage_quantity_equal_to.
+    def exitDamage_quantity_equal_to(self, ctx:CardParser.Damage_quantity_equal_toContext):
         pass
 
 
@@ -185,6 +257,15 @@ class CardListener(ParseTreeListener):
 
     # Exit a parse tree produced by CardParser#action_stat_change.
     def exitAction_stat_change(self, ctx:CardParser.Action_stat_changeContext):
+        pass
+
+
+    # Enter a parse tree produced by CardParser#counter_target.
+    def enterCounter_target(self, ctx:CardParser.Counter_targetContext):
+        pass
+
+    # Exit a parse tree produced by CardParser#counter_target.
+    def exitCounter_target(self, ctx:CardParser.Counter_targetContext):
         pass
 
 

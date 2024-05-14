@@ -1,1 +1,1 @@
-[Augment] When I die, draw a card.
+[augment] after combat, sacrifice me.

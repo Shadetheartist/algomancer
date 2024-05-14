@@ -1,1 +1,1 @@
-[switch1] create three wisps. {i}(they are 0/1 units that can't block with "sacrifice me after combat.")
+[graft1] create three wisps. {i}(they are 0/1 units that can't block with "sacrifice me after combat.")

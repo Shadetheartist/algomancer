@@ -1,1 +1,1 @@
-when you put a counter on an enemy,  {/n}[switch1] draw a card.
+when you put a counter on an enemy,  {/n}[graft1] draw a card.

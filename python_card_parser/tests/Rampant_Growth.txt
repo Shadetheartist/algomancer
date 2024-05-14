@@ -1,1 +1,1 @@
-[switch1] your units gain +2/+2 and {g}piercing until regroup. {i}(excess damage from piercing sources is dealt to the recipient's controller.)
+[graft1] your units gain +2/+2 and {g}piercing until regroup. {i}(excess damage from piercing sources is dealt to the recipient's controller.)

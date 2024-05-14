@@ -1,1 +1,1 @@
-when my column deals combat damage to an opponent,  [switch1][switch1][switch1] {i}(trigger three copies of this graft ability as one single trigger).
+when my column deals combat damage to an opponent,  [graft1][graft1][graft1] {i}(trigger three copies of this graft ability as one single trigger).

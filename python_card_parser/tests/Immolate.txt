@@ -1,1 +1,1 @@
-[switch1] /[sacrifice a unit]: draw a card.
+[graft1] /[sacrifice a unit]: draw a card.

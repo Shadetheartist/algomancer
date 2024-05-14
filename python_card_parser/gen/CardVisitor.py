@@ -84,8 +84,48 @@ class CardVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by CardParser#token_type.
+    def visitToken_type(self, ctx:CardParser.Token_typeContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CardParser#x_stat.
+    def visitX_stat(self, ctx:CardParser.X_statContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CardParser#token_stat.
+    def visitToken_stat(self, ctx:CardParser.Token_statContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CardParser#token.
+    def visitToken(self, ctx:CardParser.TokenContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CardParser#action_create_token.
+    def visitAction_create_token(self, ctx:CardParser.Action_create_tokenContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CardParser#action_draw.
+    def visitAction_draw(self, ctx:CardParser.Action_drawContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by CardParser#action_buff.
     def visitAction_buff(self, ctx:CardParser.Action_buffContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CardParser#sub_action__damage_each_player.
+    def visitSub_action__damage_each_player(self, ctx:CardParser.Sub_action__damage_each_playerContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CardParser#damage_quantity.
+    def visitDamage_quantity(self, ctx:CardParser.Damage_quantityContext):
         return self.visitChildren(ctx)
 
 
@@ -94,8 +134,8 @@ class CardVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by CardParser#counter_target.
-    def visitCounter_target(self, ctx:CardParser.Counter_targetContext):
+    # Visit a parse tree produced by CardParser#damage_quantity_equal_to.
+    def visitDamage_quantity_equal_to(self, ctx:CardParser.Damage_quantity_equal_toContext):
         return self.visitChildren(ctx)
 
 
@@ -106,6 +146,11 @@ class CardVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by CardParser#action_stat_change.
     def visitAction_stat_change(self, ctx:CardParser.Action_stat_changeContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CardParser#counter_target.
+    def visitCounter_target(self, ctx:CardParser.Counter_targetContext):
         return self.visitChildren(ctx)
 
 

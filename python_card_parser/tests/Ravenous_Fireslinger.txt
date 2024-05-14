@@ -1,1 +1,1 @@
-whenever you play a nontoken spell, {/n}[switch] i gain +1/-1 until regroup.
+whenever you play a nontoken spell, {/n}[graft] i gain +1/-1 until regroup.

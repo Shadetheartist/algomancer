@@ -1,1 +1,1 @@
-when i attack or block, [switch] your units gain +1/+0 until regroup.
+when i attack or block, [graft] your units gain +1/+0 until regroup.

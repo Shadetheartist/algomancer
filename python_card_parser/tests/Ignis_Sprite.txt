@@ -1,1 +1,1 @@
-when i spawn or die, [switch] create a fireball 1.
+when i spawn or die, [graft] create a fireball 1.

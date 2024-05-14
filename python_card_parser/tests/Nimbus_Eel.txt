@@ -1,1 +1,1 @@
-when you play a token spell, [switch1] target unit gains +2/+0 and {g}flying until regroup. {i}(only flying units can block flying units.)
+when you play a token spell, [graft1] target unit gains +2/+0 and {g}flying until regroup. {i}(only flying units can block flying units.)

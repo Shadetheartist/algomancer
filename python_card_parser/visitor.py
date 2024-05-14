@@ -86,9 +86,24 @@ class Effect:
             print('\t' + str(a))
 
 
-class VisitorInterp(CardVisitor):
+class Card:
     def __init__(self):
         self.effects = []
+
+
+class VisitorInterp(CardVisitor):
+    def __init__(self):
+        self.card = Card()
+
+    def visitProg(self, ctx:CardParser.ProgContext):
+        self.card = Card()
+
+        effects = ctx.getChildren(lambda c: isinstance(c, CardParser.EffectContext))
+
+        for effect in effects:
+            self.card.effects.append(self.visit(effect))
+
+        return self.visitChildren(ctx)
 
 
     def visitEffect(self, ctx:CardParser.EffectContext):
@@ -105,9 +120,7 @@ class VisitorInterp(CardVisitor):
         effect.trigger_mod = self.visit(ctx.mod(0)) if ctx.mod(0) is not None else None
         effect.action_mod = self.visit(ctx.mod(1)) if ctx.mod(1) is not None else None
 
-        self.effects.append(effect)
-
-        return self.visitChildren(ctx)
+        return effect
 
 
     def visitMod(self, ctx:CardParser.ModContext):
@@ -136,7 +149,7 @@ class VisitorInterp(CardVisitor):
 
 
     def visitAction_buff(self, ctx:CardParser.Action_buffContext):
-        target = ctx.buff_target.text
+        target = ctx.buff_target.text if ctx.buff_target is not None else 'self'
         stat = self.visit(ctx.stat())
         keywords = []
         if ctx.evergreen_keyword():
@@ -186,7 +199,7 @@ class VisitorInterp(CardVisitor):
 
     def visitStat(self, ctx:CardParser.StatContext):
         power = self.parse_signed_digit(ctx.power)
-        defense = self.parse_signed_digit(ctx.defence)
+        defense = self.parse_signed_digit(ctx.defense)
         return power, defense
 
 

@@ -1,1 +1,1 @@
-after combat, [switch] create a robot 1.
+after combat, [graft] create a robot 1.

@@ -1,1 +1,1 @@
-[one]:   [switch1] give target opponent control of me. if you do, create three 1/1 units.
+[one]:   [graft1] give target opponent control of me. if you do, create three 1/1 units.
