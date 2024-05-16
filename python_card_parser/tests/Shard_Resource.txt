@@ -1,0 +1,1 @@
+{i}(shards add no affinity, but can be expended for{/i}  [one]. {i})

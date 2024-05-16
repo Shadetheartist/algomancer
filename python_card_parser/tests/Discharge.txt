@@ -1,0 +1,1 @@
+[graft1] /[remove x +1/+1 counters from allies]: i deal x damage to target unit.

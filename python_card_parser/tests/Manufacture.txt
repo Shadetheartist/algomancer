@@ -1,0 +1,1 @@
+[graft1] create a robot 3, a robot 2 and a robot 1.

@@ -1,0 +1,1 @@
+augment target unit and all of its mods onto another target unit. {i}(the first target must have{/i}  [augment] {i}to be able to be augmented.)

@@ -1,0 +1,1 @@
+when i attack, block, or die, [graft1] create two wisps. {i}(they aren't in formation.)

@@ -1,0 +1,1 @@
+[augment] your units and spells gain {g}powerful. {i}(powerful sources deal double damage).

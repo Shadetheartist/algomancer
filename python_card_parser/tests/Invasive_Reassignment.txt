@@ -1,0 +1,1 @@
+switch the power and defense of target unit until regroup.

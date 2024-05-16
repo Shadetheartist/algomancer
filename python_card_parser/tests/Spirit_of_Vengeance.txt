@@ -1,0 +1,1 @@
+[augment] whenever a unit dies, i deal 1 damage to each opponent.

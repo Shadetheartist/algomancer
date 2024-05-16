@@ -1,0 +1,1 @@
+erase target unit. its controller glimpses 3. {i}(they reveal the top three cards of their deck and cache one. until end of turn, they may play it as if it was in their hand, ignoring affinity. recycle the rest.)

@@ -1,0 +1,1 @@
+each player sacrifices half of their units, rounded up.

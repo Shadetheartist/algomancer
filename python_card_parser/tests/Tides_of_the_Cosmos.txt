@@ -1,0 +1,1 @@
+reveal the top eight cards of the deck. choose up to two of them with total cost 8 or less. you may play them now, for free. recycle the rest.

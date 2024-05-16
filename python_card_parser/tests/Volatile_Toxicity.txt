@@ -1,0 +1,1 @@
+[graft] /[sacrifice a unit]: create a poison x and a fireball x, where x is the defense of the sacrificed unit.

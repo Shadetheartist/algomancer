@@ -1,0 +1,1 @@
+[augment] after combat, i deal damage equal to my defense to each opponent.

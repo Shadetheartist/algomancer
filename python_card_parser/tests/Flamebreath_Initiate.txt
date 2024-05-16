@@ -1,0 +1,1 @@
+[augment] when i attack or block, create a fireball x+1, where x is the number of allies adja- cent to me.

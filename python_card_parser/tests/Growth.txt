@@ -1,0 +1,1 @@
+target unit gains +x/+x until regroup.

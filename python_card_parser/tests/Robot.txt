@@ -1,0 +1,1 @@
+i spawn with x +1/+1 counters on me. {i}(if the number of counters changes, so does the x value.)

@@ -1,0 +1,1 @@
+when one of your units survives damage,  [graft1] create a 2/2 unit.

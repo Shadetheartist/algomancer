@@ -1,0 +1,1 @@
+/[sacrifice x units]: negate up to x target effects.

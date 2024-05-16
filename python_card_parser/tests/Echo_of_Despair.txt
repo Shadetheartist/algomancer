@@ -1,0 +1,1 @@
+after combat, if a player lost life in this battle, create a copy of me.

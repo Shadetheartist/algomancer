@@ -1,0 +1,1 @@
+[augment] when i attack, create a 1/1 unit in my formation.

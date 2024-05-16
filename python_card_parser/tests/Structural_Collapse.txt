@@ -1,0 +1,1 @@
+[graft1] /[sacrifice a unit]: each opponent sacri- {/n}fices units until their total defense is at least {/n}equal to the defense of your sacrificed unit.

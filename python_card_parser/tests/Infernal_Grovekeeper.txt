@@ -1,0 +1,1 @@
+[augment] after battle, put a -1/-1 counter on each {/n}unit, then i deal 2 damage to each player.

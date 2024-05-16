@@ -1,0 +1,1 @@
+[augment] whenever another nontoken ally spawns, create a crystal 1.

@@ -1,0 +1,1 @@
+[battle] ambush  [3bb] {i}(play me with the effect "recall target ally, put me into their position in play.")

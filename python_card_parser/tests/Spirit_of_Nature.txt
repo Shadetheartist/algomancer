@@ -1,0 +1,1 @@
+after combat, [graft1] create a /[poison {i1}or crystal] 2.

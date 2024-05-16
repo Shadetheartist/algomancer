@@ -1,0 +1,1 @@
+[augment][once] when i am dealt damage, create an x/x unit, where x is the damage i am dealt.

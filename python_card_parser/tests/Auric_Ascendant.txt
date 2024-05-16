@@ -1,0 +1,1 @@
+[once]  [one], recall another ally: i gain {g}flying and +2/+0 until regroup. {i}(only flying units can block flying units.)

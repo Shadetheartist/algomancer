@@ -1,0 +1,1 @@
+[augment] your spell effects with a single target are {g}electric. {i}(excess damage from electric sources can {/n}be directed to an adjacent unit, recursively.)

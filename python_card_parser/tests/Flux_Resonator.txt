@@ -1,0 +1,1 @@
+[augment] if one or more counters would be put on a unit by an allied source, put that many counters plus one instead.

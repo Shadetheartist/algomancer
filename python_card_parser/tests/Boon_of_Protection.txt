@@ -1,0 +1,1 @@
+negate target effect that targets an allied effect, player or unit.

@@ -1,0 +1,1 @@
+after combat, gain control of target unit if it has a -1/-1 counter on it. {/n}[augment] when i die, give each unit you control with {/n}a -1/-1 counter on it to target opponent.

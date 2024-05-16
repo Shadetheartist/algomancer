@@ -1,0 +1,1 @@
+the controller of target enemy effect may pay  [x]. if they do, you draw a card. otherwise, negate that effect. x can't be zero.

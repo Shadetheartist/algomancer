@@ -1,0 +1,1 @@
+deal x damage to any target.

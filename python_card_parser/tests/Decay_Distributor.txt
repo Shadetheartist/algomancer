@@ -1,0 +1,1 @@
+[augment] whenever i am dealt damage, put that many -1/-1 counters on target unit.

@@ -1,0 +1,1 @@
+negate all enemy effects targeting allied effects, players or units.

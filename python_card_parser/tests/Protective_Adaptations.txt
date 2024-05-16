@@ -1,0 +1,1 @@
+[graft1] target unit gains +1/+1 and {g}piercing until regroup. {i}(excess damage from piercing sources is dealt to the recipient's controller.)

@@ -1,0 +1,1 @@
+[once] when another ally with greater defense than power spawns, draw a card.

@@ -1,0 +1,1 @@
+[augment] whenever a player plays their first spell in this battle, negate it.

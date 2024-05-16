@@ -1,0 +1,1 @@
+[augment][once] when you play a nontoken spell, cre- {/n}ate a fireball x, where x is the spell's cost.

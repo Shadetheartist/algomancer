@@ -1,0 +1,1 @@
+when i attack or block, [graft1] i deal damage to each player equal to the number of cards in their hand.

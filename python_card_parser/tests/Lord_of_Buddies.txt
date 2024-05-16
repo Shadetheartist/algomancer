@@ -1,0 +1,1 @@
+[augment] if another nontoken buddy would die in battle, recall it and create a 7/7 unit instead.

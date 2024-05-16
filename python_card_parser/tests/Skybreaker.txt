@@ -1,0 +1,1 @@
+[augment] erase me: negate all spell effects.

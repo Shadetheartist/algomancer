@@ -1,0 +1,1 @@
+erase target unit. i become an exact copy of that unit. {i}(i copy all stat changes, counters, card text and mods).

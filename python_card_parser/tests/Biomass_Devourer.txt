@@ -1,0 +1,1 @@
+[augment] whenever a nontoken unit dies, you may pay  [two] to erase it and put two +1/+1 counters on me.

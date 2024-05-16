@@ -1,0 +1,1 @@
+[graft1] target ally deals damage equal to its defense to another target unit.

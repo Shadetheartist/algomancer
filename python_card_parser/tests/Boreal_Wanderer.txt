@@ -1,0 +1,1 @@
+when an ally spawns during battle, {/n}[graft1] i deal 2 damage to each opponent.

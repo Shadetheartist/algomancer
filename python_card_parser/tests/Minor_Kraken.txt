@@ -1,0 +1,1 @@
+when i attack, [graft1] recall up to one target unit with 5 or less defense.

@@ -1,0 +1,1 @@
+[augment] whenever another unit spawns in battle, {/n}its controller sacrifices it unless they pay  [one].

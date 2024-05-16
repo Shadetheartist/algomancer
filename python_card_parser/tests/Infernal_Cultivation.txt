@@ -1,0 +1,1 @@
+[graft1] /[sacrifice x units]: i deal x damage to any target.

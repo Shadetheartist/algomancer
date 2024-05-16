@@ -1,0 +1,1 @@
+[augment] when my column deals conbat damage to an opponent, sacrifice me. if you do, look at that player's hand and discard a card from it.

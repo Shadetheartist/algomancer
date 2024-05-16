@@ -1,0 +1,1 @@
+[augment] whenever you play a spell, i deal 1 damage to any target.

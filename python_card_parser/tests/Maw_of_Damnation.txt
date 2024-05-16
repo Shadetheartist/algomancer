@@ -1,0 +1,1 @@
+each player sacrifices two units. if four or more units were sacrificed this way, repeat this.

@@ -1,0 +1,1 @@
+[augment] [once] sacrifice x units: create x fireball 1.

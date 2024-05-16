@@ -1,0 +1,1 @@
+[augment][once] when a spell effect you control deals damage, create that many 1/1 units.

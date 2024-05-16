@@ -1,0 +1,1 @@
+[augment][once]  [one], erase one of my modifications: deal 2 damage to any target.

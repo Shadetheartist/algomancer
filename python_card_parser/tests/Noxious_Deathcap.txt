@@ -1,0 +1,1 @@
+[augment] when i die, put a -1/-1 counter on each unit.
