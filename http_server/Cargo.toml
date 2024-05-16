@@ -1,0 +1,17 @@
+[package]
+name = "http_server"
+version = "0.1.0"
+edition = "2021"
+authors = ["Derek Hemingson"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tokio = { version = "1.37.0", features = ["full"]}
+tokio-stream = "0.1.15"
+ws = { package = "rocket_ws", version = "0.1.0" }
+algomanserver = { path = "../algomanserver"}
+rocket = { version = "0.5.0", features = ["json"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.108"
+rand = "0.8.5"

@@ -6,4 +6,6 @@ members = [
     "cli",
     "game_rules_engine",
     "database",
+    "algomanserver",
+    "http_server",
 ]
