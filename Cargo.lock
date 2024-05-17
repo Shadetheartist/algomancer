@@ -587,6 +587,7 @@ dependencies = [
  "rand_core",
  "rand_xorshift",
  "serde",
+ "thiserror",
 ]
 
 [[package]]

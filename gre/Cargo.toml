@@ -9,3 +9,4 @@ edition = "2021"
 rand_core = "0.6.4"
 rand_xorshift = "0.3.0"
 serde = { version = "1.0.202", features = ["derive"] }
+thiserror = "1.0.60"
