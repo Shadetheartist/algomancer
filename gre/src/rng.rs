@@ -3,19 +3,20 @@ use core::fmt;
 use std::hash::{Hash, Hasher};
 use rand_core::{RngCore, SeedableRng, Error, impls, le};
 
-/// GreRng is basically just the Xorshift from rand_xorshift random number generator with Hash
+/// GreRng is basically just the XORshift from rand_xorshift random number generator with Hash
 /// implemented.
-///
-/// The Xorshift[^1] algorithm is not suitable for cryptographic purposes
-/// but is very fast. If you do not know for sure that it fits your
-/// requirements, use a more secure one such as `StdRng` or `OsRng`.
-///
 #[derive(Clone, PartialEq, Eq)]
 pub struct GreRng {
     x: w<u32>,
     y: w<u32>,
     z: w<u32>,
     w: w<u32>,
+}
+
+impl Default for GreRng {
+    fn default() -> Self {
+        Self::from_seed([0; 16])
+    }
 }
 
 impl Hash for GreRng {

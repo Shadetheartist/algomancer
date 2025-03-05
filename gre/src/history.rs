@@ -10,7 +10,7 @@ pub struct HistoryItem {
 }
 
 impl HistoryItem {
-    pub fn new(state: &State, action: &Action) -> Self {
+    pub fn from_state_action_pair(state: &State, action: &Action) -> Self {
         let mut hasher = DefaultHasher::default();
         state.hash(&mut hasher);
         let state_hash = hasher.finish();
