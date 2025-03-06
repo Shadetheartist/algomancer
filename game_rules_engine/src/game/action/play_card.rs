@@ -92,8 +92,8 @@ impl ActionTrait for PlayCardAction {
                             let region_id = next_state.find_region_id_containing_player(player_id);
                             let permanent = Permanent::Unit {
                                 card: Card {
-                                    card_id: card_id,
-                                    prototype_id: prototype_id
+                                    card_id,
+                                    prototype_id
                                 },
                                 common: PermanentCommon {
                                     permanent_id: PermanentId(next_state.permanent_id_factory.peek()),

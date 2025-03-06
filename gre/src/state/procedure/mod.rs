@@ -48,7 +48,7 @@ pub enum Team {
     NIT,
 }
 
-const TEAM_PROCEDURE: &'static [Phase] = &[
+const TEAM_PROCEDURE: &[Phase] = &[
     Phase::PlanningPhase(PlanningPhaseStep::Refresh),
     Phase::PlanningPhase(PlanningPhaseStep::Draw),
     Phase::PlanningPhase(PlanningPhaseStep::Draft),

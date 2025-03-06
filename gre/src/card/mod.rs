@@ -15,7 +15,7 @@ impl Display for CardId {
 
 impl From<ObjectId> for CardId {
     fn from(value: ObjectId) -> Self {
-        Self { 0: value }
+        Self(value)
     }
 }
 

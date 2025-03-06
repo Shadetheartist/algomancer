@@ -15,7 +15,7 @@ impl Display for PermanentId {
 
 impl From<ObjectId> for PermanentId {
     fn from(value: ObjectId) -> Self {
-        Self { 0: value }
+        Self(value)
     }
 }
 

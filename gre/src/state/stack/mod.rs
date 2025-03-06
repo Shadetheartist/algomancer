@@ -8,15 +8,11 @@ pub enum StackError {
 }
 
 #[derive(Clone, Hash, PartialEq, Eq)]
+#[derive(Default)]
 pub struct Stack {
     data: Vec<ObjectId>
 }
 
-impl Default for Stack {
-    fn default() -> Self {
-        Self { data: Default::default() }
-    }
-}
 
 impl Stack {
     pub fn push(&mut self, object_id: ObjectId) {

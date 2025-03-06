@@ -15,6 +15,6 @@ impl HistoryItem {
         state.hash(&mut hasher);
         let state_hash = hasher.finish();
 
-        Self { action: action.clone(), state_hash: state_hash }
+        Self { action: action.clone(), state_hash }
     }
 }

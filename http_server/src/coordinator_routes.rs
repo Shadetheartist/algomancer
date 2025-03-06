@@ -74,10 +74,7 @@ pub async fn lobby_create(ws: WebSocket, coordinator: &State<Arc<RwLock<Coordina
 
             {
                 let mut coordinator = coordinator.write().await;
-                match coordinator.leave_current_lobby(agent_key).await {
-                    Ok(_) => {}
-                    Err(_) => {}
-                }
+                if let Ok(_) = coordinator.leave_current_lobby(agent_key).await {}
             }
 
             Ok(())
@@ -142,10 +139,7 @@ pub async fn lobby_join(ws: WebSocket, coordinator: &State<Arc<RwLock<Coordinato
             // if the agent stops listening to the lobby, they must leave the lobby
             {
                 let mut coordinator = coordinator.write().await;
-                match coordinator.leave_current_lobby(agent_key).await {
-                    Ok(_) => {}
-                    Err(_) => {}
-                }
+                if let Ok(_) = coordinator.leave_current_lobby(agent_key).await {}
             }
 
             Ok(())

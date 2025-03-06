@@ -75,7 +75,7 @@ impl Lobby {
             LobbyEvent::AgentJoined(_) |
             LobbyEvent::AgentLeft(_) |
             LobbyEvent::NewHost(_) => {
-                for (_, rx) in &self.event_sender {
+                for rx in self.event_sender.values() {
                     match rx.send(lobby_event.clone()).await {
                         Ok(_) => {}
                         Err(err) => {

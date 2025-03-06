@@ -4,13 +4,9 @@ use crate::card::Card;
 use crate::permanent::Permanent;
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, Ord, PartialOrd, Serialize, Deserialize)]
+#[derive(Default)]
 pub struct ObjectId(pub usize);
 
-impl Default for ObjectId {
-    fn default() -> Self {
-        ObjectId { 0: 0 }
-    }
-}
 
 impl Display for ObjectId {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {

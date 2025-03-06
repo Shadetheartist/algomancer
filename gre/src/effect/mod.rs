@@ -9,12 +9,9 @@ pub enum Effect {
 }
 
 #[derive(Debug, Hash, Serialize, Deserialize)]
+#[derive(Default)]
 pub enum Recipient {
+    #[default]
     Controller
 }
 
-impl Default for Recipient {
-    fn default() -> Self {
-        Recipient::Controller
-    }
-}

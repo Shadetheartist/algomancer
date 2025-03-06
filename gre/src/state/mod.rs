@@ -14,7 +14,7 @@ use crate::event::Event;
 use crate::library::{Library, LibraryId};
 use crate::object::{Object, ObjectId};
 use crate::options::Options;
-use crate::permanent::Permanent;
+use crate::permanent::{Permanent, PermanentId};
 use crate::player::{Player, PlayerId};
 use crate::priority::Priority;
 use crate::rng::GreRng;
@@ -57,7 +57,7 @@ impl TryFrom<&Options> for State {
 
         let state = Self {
             options: options.clone(),
-            rng: rng,
+            rng,
             ..Default::default()
         };
 
@@ -75,6 +75,7 @@ impl State {
             },
         }
 
+        state.state_based_actions(db)?;
 
         Ok(state)
     }
@@ -129,14 +130,24 @@ impl State {
         }
     }
 
+    pub fn permanent_mut(&mut self, permanent_id: &PermanentId) -> Result<&mut Permanent, StateError> {
+        let object_id = ObjectId::from(*permanent_id);
+        let object = self.object_mut(&object_id)?;
+
+        match object {
+            Object::Permanent { permanent } => Ok(permanent),
+            _ => panic!("permanent query found an object but it's not a permanent"),
+        }
+    }
+
     pub fn player_draw(&mut self, player_id: &PlayerId) -> Result<(), StateError> {
-        let library_id = self.player(&player_id)?.library_id;
-        let mut library = self.library_mut(&library_id)?;
+        let library_id = self.player(player_id)?.library_id;
+        let library = self.library_mut(&library_id)?;
         let card_id = library
             .card_ids
             .pop_back()
             .unwrap_or_else(|| unimplemented!("milled out"));
-        let mut card = self.card_mut(&card_id)?;
+        let card = self.card_mut(&card_id)?;
         card.zone = Zone::Hand(*player_id);
 
         Ok(())
@@ -196,7 +207,7 @@ impl State {
         player_id: &PlayerId,
         card_id: &CardId,
     ) -> Result<(), StateError> {
-        let card = self.player_card_mut(&player_id, &card_id)?;
+        let card = self.player_card_mut(player_id, card_id)?;
         card.zone = Zone::Stack;
         self.stack.push((*card_id).into());
         self.event_queue
@@ -243,7 +254,7 @@ mod test {
             player_id,
             Player {
                 id: player_id,
-                library_id: library_id,
+                library_id,
             },
         );
 
@@ -255,7 +266,7 @@ mod test {
         };
         state
             .objects
-            .insert(card_id.into(), Object::Card { card: card });
+            .insert(card_id.into(), Object::Card { card });
 
         state.player_cast(&db, &player_id, &card_id).unwrap();
 

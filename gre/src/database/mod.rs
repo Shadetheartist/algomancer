@@ -3,7 +3,6 @@ use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use crate::ability::Ability;
-use crate::card::Card;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub(crate) struct CardRef(pub String);
@@ -25,17 +24,11 @@ impl CardData {
     }
 }
 
+#[derive(Default)]
 pub struct Database {
     pub(crate) cards: HashMap<CardRef, CardData>,
 }
 
-impl Default for Database {
-    fn default() -> Self {
-        Database {
-            cards: Default::default(),
-        }
-    }
-}
 
 #[derive(Error, Debug)]
 pub enum DatabaseError {

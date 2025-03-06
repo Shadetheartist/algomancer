@@ -113,7 +113,7 @@ impl State {
         });
 
         if let Some(permanent) = find_result {
-            Ok(&permanent)
+            Ok(permanent)
         } else {
             Err(EntityNotFoundError::Permanent(id))
         }

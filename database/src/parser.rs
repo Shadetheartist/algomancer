@@ -4,15 +4,15 @@ use algocore::{Affinity, CardType, Cost, Faction, MetaCardType, ResourceType, Ti
 use crate::{CardPrototype, CardPrototypeId};
 use phf::{phf_map};
 
-const HASTE_STR: &'static str = "{Haste}";
-const VIRUS_STR: &'static str = "{Virus}";
-const BATTLE_STR: &'static str = "{Battle}";
-const TRIGGER_STR: &'static str = "Trigger";
-const STOLEN_CARD_STR: &'static str = "Stolen Card";
-const SPELL_STR: &'static str = "Spell";
-const TOKEN_STR: &'static str = "Token";
-const META_RESOURCE_STR: &'static str = "!Resource";
-const RESOURCE_STR: &'static str = "Resource";
+const HASTE_STR: &str = "{Haste}";
+const VIRUS_STR: &str = "{Virus}";
+const BATTLE_STR: &str = "{Battle}";
+const TRIGGER_STR: &str = "Trigger";
+const STOLEN_CARD_STR: &str = "Stolen Card";
+const SPELL_STR: &str = "Spell";
+const TOKEN_STR: &str = "Token";
+const META_RESOURCE_STR: &str = "!Resource";
+const RESOURCE_STR: &str = "Resource";
 
 static RESOURCE_TYPE_MAP: phf::Map<&'static str, ResourceType> = phf_map! {
     "Fire" => ResourceType::Fire,
@@ -62,7 +62,7 @@ pub fn parse_json(raw_json: &str) -> Result<HashMap<CardPrototypeId, CardPrototy
     let mut c = 0;
     let mapped: Vec<CardPrototype> = data.into_values().map(|mut d| {
         let d = d.remove(0);
-        c = c + 1;
+        c += 1;
 
         CardPrototype {
             prototype_id: CardPrototypeId(c),
@@ -116,11 +116,11 @@ fn card_type_from_string(card_type: &str) -> CardType {
         return CardType::Resource(resource_type_from_string(card_type));
     }
 
-    return if card_type.contains(TOKEN_STR) {
+    if card_type.contains(TOKEN_STR) {
         CardType::UnitToken
     } else {
         CardType::Unit(timing_from_string(card_type))
-    };
+    }
 }
 
 fn timing_from_string(card_type: &str) -> Timing {
@@ -237,7 +237,7 @@ mod tests {
             file_name = file_name.replace(" ", "_");
 
             let mut file = std::fs::File::create(dir_path.join(file_name)).unwrap();
-            file.write_all(&d.text.to_lowercase().as_bytes()).unwrap()
+            file.write_all(d.text.to_lowercase().as_bytes()).unwrap()
         }
     }
 }
