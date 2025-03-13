@@ -1,4 +1,5 @@
+use serde::{Deserialize, Serialize};
 use crate::player::PlayerId;
 
-#[derive(Clone, Hash, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, Copy, Hash, Default, Serialize, Deserialize)]
 pub struct Priority(pub(crate) Option<PlayerId>);

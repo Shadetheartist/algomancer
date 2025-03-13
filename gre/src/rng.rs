@@ -2,10 +2,11 @@ use core::num::Wrapping as w;
 use core::fmt;
 use std::hash::{Hash, Hasher};
 use rand_core::{RngCore, SeedableRng, Error, impls, le};
+use serde::{Deserialize, Serialize};
 
 /// GreRng is basically just the XORshift from rand_xorshift random number generator with Hash
 /// implemented.
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct GreRng {
     x: w<u32>,
     y: w<u32>,

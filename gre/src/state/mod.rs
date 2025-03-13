@@ -4,6 +4,7 @@ mod stack;
 
 use rand_core::SeedableRng;
 use std::collections::BTreeMap;
+use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::action::ActionError;
@@ -22,7 +23,7 @@ use crate::state::procedure::Phase;
 use crate::state::stack::Stack;
 use crate::zone::Zone;
 
-#[derive(Clone, Hash, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, Hash, Default, Serialize, Deserialize)]
 pub struct State {
     options: Options,
     rng: GreRng,
@@ -77,14 +78,16 @@ impl State {
 
         state.state_based_actions(db)?;
 
+        // after state based actions, a player must have priority or the game must be over
+
         Ok(state)
     }
 
-    pub fn valid_actions() -> Vec<Action> {
+    pub fn valid_actions(&self) -> Vec<Action> {
         vec![]
     }
 
-    pub fn is_terminal() -> bool {
+    pub fn is_terminal(&self) -> bool {
         false
     }
 }
@@ -220,15 +223,19 @@ impl State {
 mod test {
     use super::*;
     use crate::ability::{Ability, OneShotAbility};
-    use crate::database::{CardData, CardRef};
+    use crate::card_type::CardType;
+    use crate::database::{PaperCard, PaperCardId};
     use crate::effect::Effect;
 
     #[test]
     fn test_cast_trigger() {
         let mut db = Database::default();
+        let paper_card_id = PaperCardId("draw one".into());
         db.cards.insert(
-            CardRef("draw one".into()),
-            CardData {
+            paper_card_id.clone(),
+            PaperCard {
+                id: paper_card_id.clone(),
+                card_type: CardType::UnitToken,
                 abilities: vec![Ability::OneShot(OneShotAbility {
                     effect: Effect::Draw {
                         recipient: Default::default(),
@@ -261,7 +268,7 @@ mod test {
         let card_id = CardId::from(ObjectId(1));
         let card = Card {
             id: card_id,
-            card_ref: CardRef("draw one".into()),
+            card_ref: paper_card_id,
             zone: Zone::Hand(player_id),
         };
         state

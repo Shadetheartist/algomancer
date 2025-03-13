@@ -1,6 +1,6 @@
 use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
-use crate::database::CardRef;
+use crate::database::PaperCardId;
 use crate::object::ObjectId;
 use crate::zone::Zone;
 
@@ -26,10 +26,10 @@ impl From<CardId> for ObjectId {
 }
 
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Hash, Serialize, Deserialize)]
 pub struct Card {
     pub id: CardId,
-    pub card_ref: CardRef,
+    pub card_ref: PaperCardId,
     pub zone: Zone
 }
 

@@ -1,6 +1,6 @@
 use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
-use crate::database::CardRef;
+use crate::database::PaperCardId;
 use crate::object::ObjectId;
 use crate::zone::Zone;
 
@@ -29,6 +29,6 @@ impl From<PermanentId> for ObjectId {
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Permanent {
     pub id: PermanentId,
-    pub card_ref: CardRef,
+    pub card_ref: PaperCardId,
     pub zone: Zone,
 }

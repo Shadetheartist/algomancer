@@ -1,5 +1,6 @@
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Hash, PartialEq, Eq)]
+#[derive(Debug, Clone, Hash, Serialize, Deserialize)]
 pub struct Options {
     pub seed: u128
 }

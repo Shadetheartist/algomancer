@@ -14,16 +14,25 @@ mod event;
 mod permanent;
 mod ability;
 mod effect;
+mod resource_type;
+mod faction;
+mod cost;
+mod affinity;
+mod card_type;
+mod timing;
 
+use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use crate::action::{ActionError};
 use crate::database::Database;
-use crate::options::Options;
 use crate::state::StateError;
-use action::Action;
 use history::HistoryItem;
 use state::State;
 
+pub use crate::options::Options;
+use action::Action;
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct GameRulesEngine {
     state: State,
     database: Database,
@@ -36,11 +45,15 @@ impl GameRulesEngine {
             .push(HistoryItem::from_state_action_pair(&self.state, action))
     }
 
-    fn apply_action(&mut self, action: &Action) -> Result<(), GameRulesEngineError> {
+    pub fn apply_action(&mut self, action: &Action) -> Result<(), GameRulesEngineError> {
         let next_state = self.state.apply_action(action, &self.database)?;
         self.push_history_item(action);
         self.state = next_state;
         Ok(())
+    }
+
+    pub fn valid_actions(&self) -> Vec<Action> {
+        self.state.valid_actions()
     }
 }
 

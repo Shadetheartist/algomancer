@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use crate::object::ObjectId;
 
@@ -7,8 +8,7 @@ pub enum StackError {
     NothingToResolve
 }
 
-#[derive(Clone, Hash, PartialEq, Eq)]
-#[derive(Default)]
+#[derive(Debug, Clone, Hash, Default, Serialize, Deserialize)]
 pub struct Stack {
     data: Vec<ObjectId>
 }

@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::Action;
 use crate::state::State;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct HistoryItem {
     action: Action,
     state_hash: u64

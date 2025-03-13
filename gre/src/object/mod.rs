@@ -3,8 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::card::Card;
 use crate::permanent::Permanent;
 
-#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, Ord, PartialOrd, Serialize, Deserialize)]
-#[derive(Default)]
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, Ord, PartialOrd, Default, Serialize, Deserialize)]
 pub struct ObjectId(pub usize);
 
 
@@ -14,9 +13,7 @@ impl Display for ObjectId {
     }
 }
 
-
-
-#[derive(Clone, Hash, PartialEq, Eq)]
+#[derive(Debug, Clone, Hash, Serialize, Deserialize)]
 pub enum Object {
     Effect {
 

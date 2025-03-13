@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Eq, Hash, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+#[derive(Debug, Clone, Hash, Serialize, Deserialize)]
 #[serde(tag = "phase")]
 pub enum Phase {
     PlanningPhase(PlanningPhaseStep),
@@ -15,7 +15,7 @@ impl Default for Phase {
     }
 }
 
-#[derive(Eq, Hash, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+#[derive(Debug, Clone, Hash, Serialize, Deserialize)]
 #[serde(tag = "step")]
 pub enum PlanningPhaseStep {
     Refresh,
@@ -25,7 +25,7 @@ pub enum PlanningPhaseStep {
     Haste,
 }
 
-#[derive(Eq, Hash, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+#[derive(Debug, Clone, Hash, Serialize, Deserialize)]
 #[serde(tag = "step")]
 pub enum BattlePhaseStep {
     Attack(Team),
@@ -34,14 +34,14 @@ pub enum BattlePhaseStep {
 }
 
 
-#[derive(Eq, Hash, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+#[derive(Debug, Clone, Hash, Serialize, Deserialize)]
 #[serde(tag = "step")]
 pub enum DeploymentPhaseStep {
     Regroup,
     Deployment(Team),
 }
 
-#[derive(Eq, Hash, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
+#[derive(Debug, Clone, Hash, Serialize, Deserialize)]
 #[serde(tag = "team")]
 pub enum Team {
     IT,

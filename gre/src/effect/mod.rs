@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Hash, Serialize, Deserialize)]
 pub enum Effect {
     Draw {
         recipient: Recipient,
@@ -8,7 +8,7 @@ pub enum Effect {
     }
 }
 
-#[derive(Debug, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Hash, Serialize, Deserialize)]
 #[derive(Default)]
 pub enum Recipient {
     #[default]
