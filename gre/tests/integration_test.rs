@@ -2,8 +2,8 @@ use gre::GameRulesEngine;
 
 pub fn test_scenario() -> GameRulesEngine {
     let options = gre::Options { seed: 0 };
-    let mut gre = GameRulesEngine::try_from(&options).unwrap();
-    gre
+    
+    GameRulesEngine::try_from(&options).unwrap()
 }
 
 #[test]
