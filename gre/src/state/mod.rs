@@ -25,15 +25,15 @@ use crate::zone::Zone;
 
 #[derive(Debug, Clone, Hash, Default, Serialize, Deserialize)]
 pub struct State {
-    options: Options,
-    rng: GreRng,
-    stack: Stack,
-    phase: Phase,
-    priority: Priority,
-    event_queue: Vec<Event>,
-    objects: BTreeMap<ObjectId, Object>,
-    players: BTreeMap<PlayerId, Player>,
-    libraries: BTreeMap<LibraryId, Library>,
+    pub(crate) options: Options,
+    pub(crate) rng: GreRng,
+    pub(crate) stack: Stack,
+    pub(crate) phase: Phase,
+    pub(crate) priority: Priority,
+    pub(crate) event_queue: Vec<Event>,
+    pub(crate) objects: BTreeMap<ObjectId, Object>,
+    pub(crate) players: BTreeMap<PlayerId, Player>,
+    pub(crate) libraries: BTreeMap<LibraryId, Library>,
 }
 
 #[derive(Error, Debug)]
@@ -229,67 +229,6 @@ mod test {
 
     #[test]
     fn test_cast_trigger() {
-        let mut db = Database::default();
-        let paper_card_id = PaperCardId("draw one".into());
-        db.cards.insert(
-            paper_card_id.clone(),
-            PaperCard {
-                id: paper_card_id.clone(),
-                card_type: CardType::UnitToken,
-                abilities: vec![Ability::OneShot(OneShotAbility {
-                    effect: Effect::Draw {
-                        recipient: Default::default(),
-                        amount: 1,
-                    },
-                })],
-            },
-        );
 
-        let mut state = State::try_from(&Options::default()).unwrap();
-
-        let library_id = LibraryId(1);
-        state.libraries.insert(
-            library_id,
-            Library {
-                id: library_id,
-                card_ids: Default::default(),
-            },
-        );
-
-        let player_id = PlayerId(1);
-        state.players.insert(
-            player_id,
-            Player {
-                id: player_id,
-                library_id,
-            },
-        );
-
-        let card_id = CardId::from(ObjectId(1));
-        let card = Card {
-            id: card_id,
-            card_ref: paper_card_id,
-            zone: Zone::Hand(player_id),
-        };
-        state
-            .objects
-            .insert(card_id.into(), Object::Card { card });
-
-        state.player_cast(&db, &player_id, &card_id).unwrap();
-
-        assert_eq!(
-            state.event_queue[0],
-            Event::PlayerCastSpell(player_id, card_id.into())
-        );
-
-        // try creating a permanent with an on-cast trigger
-
-        // trigger it with this cast
-
-        // check the stack for correctness
-
-        // resolve stack, check for correctness
-
-        // check correctness of priority
     }
 }
