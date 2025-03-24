@@ -10,6 +10,7 @@ mod cost;
 mod affinity;
 mod card_type;
 mod timing;
+mod game_mode;
 
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
@@ -91,7 +92,7 @@ mod tests {
 
 
     fn test_scenario() -> GameRulesEngine {
-        let options = Options { seed: 0 };
+        let options = Options { seed: 0, game_mode: Default::default() };
 
         let mut db = Database::default();
         let paper_card_id = PaperCardId("draw one".into());
@@ -109,12 +110,8 @@ mod tests {
             },
         );
 
-        GameRulesEngine::new_from_options(db, &options).unwrap()
-    }
+        let mut gre = GameRulesEngine::new_from_options(db, &options).unwrap();
 
-    #[test]
-    fn test_2() {
-        let mut gre = test_scenario();
         let library_id = LibraryId(1);
 
         gre.state.libraries.insert(
@@ -126,22 +123,29 @@ mod tests {
         );
 
         let player_id = PlayerId(1);
-        gre.state.players.insert(
-            player_id,
-            Player::new(player_id, library_id),
-        );
+        gre.state.add_player(Player::new(player_id, library_id), 0).unwrap();
 
         let card_id = CardId::from(ObjectId(1));
-        let paper_card_id = PaperCardId("draw one".into());
+        let paper_card_id = PaperCardId::new("draw one");
         let card = Card {
             id: card_id,
             card_ref: paper_card_id,
             zone: Zone::Hand(player_id),
         };
+
         gre.state
             .objects
             .insert(card_id.into(), Object::Card { card });
 
+        gre
+    }
+
+    #[test]
+    fn test_2() {
+        let mut gre = test_scenario();
+
+        let player_id = PlayerId(1);
+        let card_id = CardId::from(ObjectId(1));
         gre.state.player_cast(&gre.database, &player_id, &card_id).unwrap();
 
         assert_eq!(
@@ -150,4 +154,5 @@ mod tests {
         );
 
     }
+
 }

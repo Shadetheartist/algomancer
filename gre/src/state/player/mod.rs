@@ -34,6 +34,18 @@ impl Player {
 }
 
 impl State {
+
+    pub(crate) fn add_player(&mut self, player: Player, seat_number: usize) -> Result<(), StateError> {
+        assert!(self.seating.len() >= seat_number, "seat does not exist");
+        assert_eq!(self.seating.get(seat_number).unwrap().player_id, None, "seat not available");
+
+        let player_id = player.id;
+        self.players.insert(player_id, player);
+        self.seating[seat_number].player_id = Some(player_id);
+
+        Ok(())
+    }
+
     pub(crate) fn get_player(&self, player_id: &PlayerId) -> Result<&Player, StateError> {
         self.players
             .get(player_id)
@@ -49,7 +61,7 @@ impl State {
             .ok_or(StateError::PlayerDoesNotExist(*player_id))
     }
 
-    pub fn player_card_mut(
+    pub(crate) fn player_card_mut(
         &mut self,
         player_id: &PlayerId,
         card_id: &CardId,
@@ -59,7 +71,7 @@ impl State {
             .ok_or(StateError::CardNotInHand(*player_id, *card_id))
     }
 
-    pub fn player_draw(&mut self, player_id: &PlayerId) -> Result<(), StateError> {
+    pub(crate) fn player_draw(&mut self, player_id: &PlayerId) -> Result<(), StateError> {
         let library_id = self.get_player(player_id)?.library_id;
         let library = self.library_mut(&library_id)?;
         let card_id = library
@@ -72,7 +84,7 @@ impl State {
         Ok(())
     }
 
-    pub fn player_draw_n(&mut self, player_id: &PlayerId, n: u64) -> Result<(), StateError> {
+    pub(crate) fn player_draw_n(&mut self, player_id: &PlayerId, n: u64) -> Result<(), StateError> {
         for _ in 0..n {
             self.player_draw(player_id)?;
         }
@@ -91,6 +103,50 @@ impl State {
         self.stack.push((*card_id).into());
         self.event_queue
             .push(Event::PlayerCastSpell(*player_id, (*card_id).into()));
+        Ok(())
+    }
+
+    pub(crate) fn pass_priority(&mut self, _: &Database) -> Result<(), StateError> {
+        let currently_prioritized_player = self
+            .priority
+            .0
+            .expect("a player must have priority in order to pass it");
+
+        let current_player_seat_idx = self
+            .seating
+            .iter()
+            .enumerate()
+            .find(|(_, seat)| {
+                if let Some(player_id) = &seat.player_id {
+                    *player_id == currently_prioritized_player
+                } else {
+                    false
+                }
+            })
+            .expect("player with priority does not exist in seating")
+            .0;
+
+        let next_player_id = {
+            let mut next_seat_idx = current_player_seat_idx;
+            loop {
+                next_seat_idx = (next_seat_idx + 1) % self.seating.len();
+                let player_id = self.seating[next_seat_idx].player_id;
+                if let Some(player_id) = player_id {
+                    let player = self.get_player(&player_id).expect("seated player does not exist");
+                    if player.alive {
+                        break player_id;
+                    }
+                }
+            }
+        };
+
+        assert_ne!(
+            currently_prioritized_player, next_player_id,
+            "the next living player with priority can't be the current player with priority"
+        );
+
+        self.priority.0 = Some(next_player_id);
+
         Ok(())
     }
 }

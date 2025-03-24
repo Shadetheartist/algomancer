@@ -1,35 +1,40 @@
-pub mod  procedure;
-pub mod sba;
-pub mod stack;
+pub mod ability;
 pub mod action;
 pub mod card;
-pub mod object;
-pub mod player;
-pub mod library;
-pub mod priority;
-pub mod event;
-pub mod permanent;
-pub mod ability;
 pub mod effect;
+pub mod event;
+pub mod library;
+pub mod object;
+pub mod permanent;
+pub mod player;
+pub mod priority;
+pub mod procedure;
+pub mod sba;
+mod seating;
+pub mod stack;
+mod seat;
 
 use rand_core::SeedableRng;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use thiserror::Error;
 
-use action::ActionError;
-use event::Event;
-use priority::Priority;
 use crate::database::{Database, DatabaseError};
+use crate::game_mode::{GameMode, TeamConfiguration};
 use crate::options::Options;
 use crate::rng::GreRng;
 use crate::state::action::{Action, PlayerAction};
-use crate::state::card::{CardId};
+use crate::state::card::CardId;
 use crate::state::library::{Library, LibraryId};
 use crate::state::object::{Object, ObjectId};
 use crate::state::player::{Player, PlayerId};
 use crate::state::procedure::Phase;
+use crate::state::seating::interlace_players;
 use crate::state::stack::Stack;
+use action::ActionError;
+use event::Event;
+use priority::Priority;
+use crate::state::seat::{Seat, TeamId};
 
 #[derive(Debug, Clone, Hash, Default, Serialize, Deserialize)]
 pub struct State {
@@ -41,7 +46,7 @@ pub struct State {
     pub(crate) event_queue: Vec<Event>,
     pub(crate) players: BTreeMap<PlayerId, Player>,
     pub(crate) libraries: BTreeMap<LibraryId, Library>,
-    pub(crate) seating: Vec<PlayerId>,
+    pub(crate) seating: Vec<Seat>,
     pub(crate) objects: BTreeMap<ObjectId, Object>,
 }
 
@@ -65,9 +70,12 @@ impl TryFrom<&Options> for State {
     fn try_from(options: &Options) -> Result<Self, Self::Error> {
         let rng = GreRng::from_seed(options.seed.to_le_bytes());
 
+        let seating = seating_from_game_mode(&options);
+
         let state = Self {
             options: options.clone(),
             rng,
+            seating,
             ..Default::default()
         };
 
@@ -101,7 +109,27 @@ impl State {
     }
 }
 
-impl State {
+fn seating_from_game_mode(options: &&Options) -> Vec<Seat> {
+    match &options.game_mode {
+        GameMode::LiveDraft {
+            team_configuration, ..
+        } => match team_configuration {
+            TeamConfiguration::Teams { teams_of_players } => {
+                let teams = interlace_players(teams_of_players)
+                    .into_iter()
+                    .map(|v| v as usize)
+                    .collect::<Vec<usize>>();
 
-
+                teams.iter().enumerate().map(|(idx, t)| Seat {
+                    seat_number: idx,
+                    team_id: TeamId(*t),
+                    player_id: None,
+                }).collect()
+            }
+            _ => unimplemented!(),
+        },
+        _ => unimplemented!(),
+    }
 }
+
+impl State {}

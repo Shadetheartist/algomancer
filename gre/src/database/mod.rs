@@ -11,6 +11,12 @@ use crate::card_type::CardType;
 #[derive(Debug, Clone, Hash, Eq, PartialEq, Serialize, Deserialize)]
 pub struct PaperCardId(pub String);
 
+impl PaperCardId {
+    pub(crate) fn new<T: Into<String>>(val: T) -> Self {
+        Self(val.into())
+    }
+}
+
 impl Display for PaperCardId {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.write_fmt(format_args!("[[{}]]", self.0))
