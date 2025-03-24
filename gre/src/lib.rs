@@ -1,19 +1,9 @@
-mod action;
-mod card;
 mod database;
 mod history;
-mod object;
 mod options;
-mod player;
 mod rng;
 mod state;
 mod zone;
-mod library;
-mod priority;
-mod event;
-mod permanent;
-mod ability;
-mod effect;
 mod resource_type;
 mod faction;
 mod cost;
@@ -23,11 +13,11 @@ mod timing;
 
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
-use crate::action::{ActionError};
+use self::state::action::ActionError;
 use crate::state::StateError;
 use history::HistoryItem;
 use state::State;
-use action::Action;
+use self::state::action::Action;
 
 pub use crate::options::Options;
 use crate::database::Database;
@@ -80,17 +70,17 @@ impl GameRulesEngine {
 
 #[cfg(test)]
 mod tests {
-    use crate::ability::{Ability, OneShotAbility};
-    use crate::card::{Card, CardId};
+    use crate::state::ability::{Ability, OneShotAbility};
+    use crate::state::card::{Card, CardId};
     use crate::card_type::CardType;
     use crate::database::{Database, PaperCard, PaperCardId};
-    use crate::effect::Effect;
-    use crate::event::Event;
+    use crate::state::effect::Effect;
+    use crate::state::event::Event;
     use crate::options::Options;
     use crate::GameRulesEngine;
-    use crate::library::{Library, LibraryId};
-    use crate::object::{Object, ObjectId};
-    use crate::player::{Player, PlayerId};
+    use crate::state::library::{Library, LibraryId};
+    use crate::state::object::{Object, ObjectId};
+    use crate::state::player::{Player, PlayerId};
     use crate::zone::Zone;
 
     #[test]
@@ -138,10 +128,7 @@ mod tests {
         let player_id = PlayerId(1);
         gre.state.players.insert(
             player_id,
-            Player {
-                id: player_id,
-                library_id,
-            },
+            Player::new(player_id, library_id),
         );
 
         let card_id = CardId::from(ObjectId(1));

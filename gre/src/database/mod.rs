@@ -5,7 +5,7 @@ use std::fmt::{Display, Formatter};
 use std::{fs, io};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
-use crate::ability::Ability;
+use crate::state::ability::Ability;
 use crate::card_type::CardType;
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq, Serialize, Deserialize)]

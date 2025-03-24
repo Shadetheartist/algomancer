@@ -3,8 +3,8 @@ use serde::{Deserialize, Serialize};
 mod error;
 
 pub use error::ActionError;
-use crate::card::CardId;
-use crate::player::PlayerId;
+use crate::state::card::CardId;
+use crate::state::player::PlayerId;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Action {

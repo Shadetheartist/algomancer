@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
-use crate::library::LibraryId;
-use crate::player::PlayerId;
+use crate::state::library::LibraryId;
+use crate::state::player::PlayerId;
 
 #[derive(Eq, Hash, PartialEq, Clone, Serialize, Deserialize, Debug, Copy)]
 pub enum Zone {

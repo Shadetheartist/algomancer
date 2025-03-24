@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
-use crate::object::ObjectId;
-use crate::player::PlayerId;
+use crate::state::object::ObjectId;
+use crate::state::player::PlayerId;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Event {

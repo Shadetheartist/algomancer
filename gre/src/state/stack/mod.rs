@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
-use crate::object::ObjectId;
+use crate::state::object::ObjectId;
 
 #[derive(Error, Debug)]
 pub enum StackError {
@@ -26,7 +26,7 @@ impl Stack {
 
 #[cfg(test)]
 mod test {
-    use crate::object::ObjectId;
+    use crate::state::object::ObjectId;
     use super::{Stack};
 
     #[test]

@@ -1,7 +1,8 @@
 use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
-use crate::card::Card;
-use crate::permanent::Permanent;
+use crate::state::card::Card;
+use crate::state::permanent::Permanent;
+use crate::state::{State, StateError};
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, Ord, PartialOrd, Default, Serialize, Deserialize)]
 pub struct ObjectId(pub usize);
@@ -27,3 +28,16 @@ pub enum Object {
 }
 
 
+impl State {
+    pub fn object(&self, object_id: &ObjectId) -> Result<&Object, StateError> {
+        self.objects
+            .get(object_id)
+            .ok_or(StateError::ObjectDoesNotExist(*object_id))
+    }
+
+    pub fn object_mut(&mut self, object_id: &ObjectId) -> Result<&mut Object, StateError> {
+        self.objects
+            .get_mut(object_id)
+            .ok_or(StateError::ObjectDoesNotExist(*object_id))
+    }
+}

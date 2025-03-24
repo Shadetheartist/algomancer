@@ -1,7 +1,8 @@
 use std::collections::VecDeque;
 use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
-use crate::card::CardId;
+use crate::state::card::CardId;
+use crate::state::{State, StateError};
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, Ord, PartialOrd, Serialize, Deserialize)]
 pub struct LibraryId(pub usize);
@@ -18,3 +19,16 @@ pub struct Library {
     pub card_ids: VecDeque<CardId>,
 }
 
+impl State {
+    pub fn library(&self, library_id: &LibraryId) -> Result<&Library, StateError> {
+        self.libraries
+            .get(library_id)
+            .ok_or(StateError::LibraryDoesNotExist(*library_id))
+    }
+
+    pub fn library_mut(&mut self, library_id: &LibraryId) -> Result<&mut Library, StateError> {
+        self.libraries
+            .get_mut(library_id)
+            .ok_or(StateError::LibraryDoesNotExist(*library_id))
+    }
+}

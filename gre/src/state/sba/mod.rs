@@ -1,6 +1,6 @@
 use crate::database::Database;
-use crate::object::{Object, ObjectId};
-use crate::permanent::PermanentId;
+use crate::state::object::{Object, ObjectId};
+use crate::state::permanent::PermanentId;
 use crate::state::{State, StateError};
 
 impl State {
