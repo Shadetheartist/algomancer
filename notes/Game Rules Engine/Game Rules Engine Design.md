@@ -24,7 +24,7 @@ We can test against the most ridiculous states we can imagine to ensure that the
 
 Algomancy is comprised of two things. A rule-book and a set of cards. The rule-book is like the GRE, and the cards are like a dataset for the GRE to work with. To avoid desynchronisation issues the card text itself is the database for the game. The card text is parsed into logic and applied to the game state by the GRE.
 
-## Fast
+## Fast / Lightweight
 *Limits are lame.*
 
 It's not unlikely for a game of Algomancy to reach pretty disgusting levels of complexity, with a mass of tokens, competing layers of static effects, a stack like a can of Pringles, if you've played you know what I mean.
@@ -33,8 +33,11 @@ The key to avoiding low limits is to have a lean, performant GRE.
 
 ## Scalable
 
+The GRE should be able to understand cards it's never seen before, so long as the effects exist. It should also be able to be shard-ed and scaled horizontally. The game might not get that popular but it shouldn't be a concession to design it in a way where it can be scaled up if needed.
+
 ## Flexible
 
+Adding functionality the the GRE as new mechanics are introduced is essential. It's important that the system is designed in a way where further alterations and improvements can be accomplished. 
 
 # Existing Engines to Reference
 
@@ -50,8 +53,11 @@ Building this in `Rust` will help maintain stability during development, especia
 [[#Testable]]
 Rust's package manager, `Cargo`, comes with a really nice & easy way to write both unit and integration tests.
 
-[[#Fast]]
+[[#Fast / Lightweight]]
 Rust is a low level language, so any performance issues can be addressed without being blocked by the base-level performance of a language. It's on us.
+
+[[#Flexible]]
+Rust's strict but expressive syntax helps keep code maintainable. And It's macros could do a lot of work in keeping the code-base simple to understand. 
 
 ## Antlr4 (Card Parser)
 
