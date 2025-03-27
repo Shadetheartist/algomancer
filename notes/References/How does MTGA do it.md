@@ -15,9 +15,19 @@ The article doesn't go into exact detail about the way CLIPS is used internally,
 
 The main goal of CLIPS is to take a list of things the GRE thinks it will do and modify the list to reflect the additional influence of a variety of effects. So if we don't use CLIPS for this, then a different architecture would be required to solve the same problem.
 
+### More on CLIPS
+
+[A user of early Expert Systems details their experience](https://news.ycombinator.com/item?id=29439117)
+
 # Who's the Boss?
 
 Notably also, this quote reflects that their internal systems have the GRE *asking the client* to make a choice. Which the client just needs to resolve, then the GRE can get back in action. It's an important distinction.
 
 > \[the] GRE is constantly coming to points in a _Magic_ game in which it needs a player to make a decision. It sends a message asking the client to make a choice, and it's the responsibility of the DS team to display that choice to the user, which they do in a variety of different ways, sometimes highlighting creatures on the battlefield, sometimes popping up a dialog of some sort, sometimes displaying various buttons, etc.
 
+
+# More
+
+[Here's a WOTC (same guy who wrote the blog post) employee discussing some internals related to fixing an edge case](https://www.reddit.com/r/MagicArena/comments/175mvdf/comment/k4ivcuc/?context=99)
+
+Could get in contact with this guy Alex Werner about how he feels about the use of CLIPS for the purposes of GRE. Was it a good move? Regrets?
