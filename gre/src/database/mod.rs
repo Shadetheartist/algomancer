@@ -9,7 +9,7 @@ use crate::state::ability::Ability;
 use crate::card_type::CardType;
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq, Serialize, Deserialize)]
-pub struct PaperCardId(pub String);
+pub struct PaperCardId(String);
 
 impl PaperCardId {
     pub(crate) fn new<T: Into<String>>(val: T) -> Self {

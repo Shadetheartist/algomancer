@@ -95,7 +95,7 @@ mod tests {
         let options = Options { seed: 0, game_mode: Default::default() };
 
         let mut db = Database::default();
-        let paper_card_id = PaperCardId("draw one".into());
+        let paper_card_id = PaperCardId::new("draw one");
         db.cards.insert(
             paper_card_id.clone(),
             PaperCard {

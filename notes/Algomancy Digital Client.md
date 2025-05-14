@@ -1,2 +1,6 @@
-[[Game Rules Engine Design]]
+Free
+Open Source?
+Web-accessible?
+
+[[Design]]
 
